@@ -2,12 +2,12 @@ import { cssBundleHref } from '@remix-run/css-bundle';
 import type { LinksFunction } from '@remix-run/node';
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react';
+import { useSWEffect, LiveReload } from '@remix-pwa/sw';
 
 import styles from '~/styles/globals.css';
 
@@ -17,6 +17,8 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
+  useSWEffect();
+
   return (
     <html lang="en">
       <head>
