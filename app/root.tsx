@@ -1,5 +1,6 @@
 import { cssBundleHref } from '@remix-run/css-bundle';
 import type { LinksFunction } from '@remix-run/node';
+import { defer } from '@remix-run/node';
 import {
   Links,
   Meta,
@@ -10,11 +11,20 @@ import {
 import { useSWEffect, LiveReload } from '@remix-pwa/sw';
 
 import styles from '~/styles/globals.css';
+import { getData } from '~/lib/fosdem';
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
+
+export async function loader() {
+  const fosdem = await getData({ year: '2024' });
+
+  return defer({
+    fosdem,
+  });
+}
 
 export default function App() {
   useSWEffect();

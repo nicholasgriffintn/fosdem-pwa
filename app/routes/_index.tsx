@@ -1,9 +1,6 @@
 import type { MetaFunction } from '@remix-run/node';
-import { defer } from '@remix-run/node';
-import { Await, useLoaderData } from '@remix-run/react';
+import { Await, useRouteLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
-
-import { getSchedule } from '~/lib/fosdem';
 
 export const meta: MetaFunction = () => {
   return [
@@ -12,28 +9,31 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader() {
-  const schedule = await getSchedule({ year: '2024' });
-
-  return defer({
-    schedule,
-  });
-}
-
 export default function Index() {
-  const { schedule } = useLoaderData<typeof loader>();
+  const { fosdem } = useRouteLoaderData('root');
 
   return (
     <div className="min-h-screen">
-      <div className="py-20">
-        <h1 className="text-4xl font-bold text-center">Hello World!</h1>
+      <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <Await resolve={schedule}>
+          <header className="flex flex-col items-center justify-center">
+            <h1 className="">Welcome to {fosdem.conference.title._text}!</h1>
+          </header>
+          <Await resolve={fosdem}>
             {(data) => {
+              console.log(data);
+
               return (
                 <div>
-                  <h2 className="text-2xl font-bold text-center">Schedule</h2>
-                  <>{console.log(data)}</>
+                  {data.tracks.map((track) => {
+                    return (
+                      <div key={track.id}>
+                        <img src={`/images/${track.id}.png`} alt={track.name} />
+                        <h2>{track.name}</h2>
+                        <p>{track.rooms.length} ROOMS</p>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             }}
