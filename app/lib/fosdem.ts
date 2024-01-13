@@ -1,5 +1,5 @@
 import { xml2json } from 'xml-js';
-import { LRUCache } from 'lru-cache';
+import { kv } from '@vercel/kv';
 
 import { constants } from '~/constants';
 
@@ -182,12 +182,7 @@ const buildEvent = (event, isLive, roomName) => {
 };
 
 export async function getData({ year }: { year: string }) {
-  const cache = new LRUCache({
-    max: 1000,
-    ttl: 1000 * 60 * 60 * 24 * 7,
-  });
-
-  const cachedData = cache.get('fosdem');
+  const cachedData = await kv.get('fosdem');
 
   if (cachedData) {
     return cachedData;
@@ -255,7 +250,7 @@ export async function getData({ year }: { year: string }) {
     conference,
   };
 
-  cache.set('fosdem', result);
+  await kv.set('fosdem', result, { ex: 1000 * 60 * 60 * 24 * 7, nx: true });
 
   return result;
 }
