@@ -1,4 +1,6 @@
 import { xml2json } from 'xml-js';
+import { LRUCache } from 'lru-cache';
+
 import { constants } from '~/constants';
 
 type RoomEvent = {
@@ -180,6 +182,17 @@ const buildEvent = (event, isLive, roomName) => {
 };
 
 export async function getData({ year }: { year: string }) {
+  const cache = new LRUCache({
+    max: 1000,
+    ttl: 1000 * 60 * 60 * 24 * 7,
+  });
+
+  const cachedData = cache.get('fosdem');
+
+  if (cachedData) {
+    return cachedData;
+  }
+
   const url = constants.SCHEDULE_LINK.replace('${YEAR}', year);
   const response = await fetch(url);
   const text = await response.text();
@@ -237,8 +250,12 @@ export async function getData({ year }: { year: string }) {
     };
   });
 
-  return {
+  const result = {
     tracks: tracksData,
     conference,
   };
+
+  cache.set('fosdem', result);
+
+  return result;
 }
