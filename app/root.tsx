@@ -1,16 +1,18 @@
 import { cssBundleHref } from '@remix-run/css-bundle';
 import type { LinksFunction } from '@remix-run/node';
-import { defer } from '@remix-run/node';
+import { json } from '@vercel/remix';
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from '@remix-run/react';
 import { useSWEffect, LiveReload } from '@remix-pwa/sw';
 
 import styles from '~/styles/globals.css';
+import { getSession, commitSession } from '~/sessions';
 import { getData } from '~/lib/fosdem';
 import { cn } from '~/lib/utils';
 import { Header } from '~/components/Header';
@@ -22,15 +24,24 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
-export async function loader() {
+export async function loader({ request }: { request: Request }) {
   const fosdem = await getData({ year: '2024' });
 
-  return defer({
-    fosdem,
+  const session = await getSession(request.headers.get('Cookie'));
+  const userId = session.get('userId');
+
+  const data = { user: { id: userId }, fosdem };
+
+  return json(data, {
+    headers: {
+      'Set-Cookie': await commitSession(session),
+    },
   });
 }
 
 export default function App() {
+  const { user } = useLoaderData<typeof loader>();
+
   useSWEffect();
 
   return (
@@ -50,6 +61,13 @@ export default function App() {
       >
         <main className="flex min-h-screen flex-col">
           <Header />
+          {user?.id && (
+            <div className="bg-primary text-white text-center py-2">
+              <p>
+                You are logged in as <strong>{user.id}</strong>
+              </p>
+            </div>
+          )}
           <div className="container flex-1">
             <Outlet />
             <Toaster />

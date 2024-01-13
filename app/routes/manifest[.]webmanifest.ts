@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node';
+import { json } from '@vercel/remix';
 
 export const loader = async () => {
   return json(
