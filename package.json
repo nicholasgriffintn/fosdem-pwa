@@ -15,6 +15,14 @@
     "dev:worker": "remix-pwa dev"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-toast": "^1.1.5",
+    "@remix-pwa/cache": "^2.0.12",
+    "@remix-pwa/client": "^2.0.1",
+    "@remix-pwa/push": "^1.0.9",
+    "@remix-pwa/strategy": "^2.1.9",
+    "@remix-pwa/sw": "^2.1.12",
+    "@remix-pwa/sync": "^2.0.1",
     "@remix-run/css-bundle": "^2.5.0",
     "@remix-run/node": "^2.5.0",
     "@remix-run/react": "^2.5.0",
@@ -22,6 +30,7 @@
     "autoprefixer": "^10.4.16",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "dotenv": "^16.3.1",
     "isbot": "^4.1.0",
     "lucide-react": "^0.309.0",
     "react": "^18.2.0",
@@ -29,16 +38,11 @@
     "tailwind-merge": "^2.2.0",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
-    "xml-js": "^1.6.11",
-    "dotenv": "^16.3.1",
-    "@remix-pwa/cache": "^2.0.12",
-    "@remix-pwa/sw": "^2.1.12",
-    "@remix-pwa/strategy": "^2.1.9",
-    "@remix-pwa/push": "^1.0.9",
-    "@remix-pwa/client": "^2.0.1",
-    "@remix-pwa/sync": "^2.0.1"
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
+    "@remix-pwa/dev": "2.0.31",
+    "@remix-pwa/worker-runtime": "^2.0.8",
     "@remix-run/dev": "^2.5.0",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
@@ -50,12 +54,10 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "typescript": "^5.1.6",
-    "@remix-pwa/worker-runtime": "^2.0.8",
-    "@remix-pwa/dev": "2.0.31",
-    "remix-pwa": "^3.0.19",
+    "glob": "^10.3.10",
     "npm-run-all": "^4.1.5",
-    "glob": "^10.3.10"
+    "remix-pwa": "^3.0.19",
+    "typescript": "^5.1.6"
   },
   "engines": {
     "node": ">=18.0.0"

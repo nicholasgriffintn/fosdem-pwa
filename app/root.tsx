@@ -12,6 +12,10 @@ import { useSWEffect, LiveReload } from '@remix-pwa/sw';
 
 import styles from '~/styles/globals.css';
 import { getData } from '~/lib/fosdem';
+import { cn } from '~/lib/utils';
+import { Header } from '~/components/Header';
+import { Footer } from '~/components/Footer';
+import { Toaster } from '~/components/ui/toaster';
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -37,8 +41,21 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
-        <Outlet />
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          '--font-sans',
+          '--font-heading'
+        )}
+      >
+        <main className="flex min-h-screen flex-col">
+          <Header />
+          <div className="container flex-1">
+            <Outlet />
+            <Toaster />
+          </div>
+          <Footer />
+        </main>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
