@@ -1,6 +1,16 @@
 import type { MetaFunction } from '@remix-run/node';
-import { Await, useRouteLoaderData } from '@remix-run/react';
+import { Await, useRouteLoaderData, useNavigate } from '@remix-run/react';
 import { Suspense } from 'react';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
+import { Button } from '~/components/ui/button';
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,31 +20,49 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+  const navigate = useNavigate();
   const { fosdem } = useRouteLoaderData('root');
 
   return (
     <div className="min-h-screen">
       <div>
         <Suspense fallback={<div>Loading...</div>}>
-          <header className="flex flex-col items-center justify-center">
-            <h1 className="">Welcome to {fosdem.conference.title._text}!</h1>
-          </header>
           <Await resolve={fosdem}>
             {(data) => {
               console.log(data);
 
               return (
-                <div>
+                <ul>
                   {data.tracks.map((track) => {
                     return (
-                      <div key={track.id}>
-                        <img src={`/images/${track.id}.png`} alt={track.name} />
-                        <h2>{track.name}</h2>
-                        <p>{track.rooms.length} ROOMS</p>
-                      </div>
+                      <li key={track.id}>
+                        <Card className="lg:max-w-md w-full">
+                          <CardContent>
+                            <img
+                              src={`/images/${track.id}.png`}
+                              alt={track.name}
+                              className="w-full"
+                            />
+                          </CardContent>
+                          <CardHeader>
+                            <CardTitle>{track.name}</CardTitle>
+                            <CardDescription>
+                              {track.rooms.length} ROOMS
+                            </CardDescription>
+                          </CardHeader>
+                          <CardFooter>
+                            <Button
+                              className="w-full"
+                              onClick={() => navigate(`/tracks/${track.id}`)}
+                            >
+                              View Track
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               );
             }}
           </Await>
