@@ -26,23 +26,22 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader({ request }: { request: Request }) {
-  let fosdem = {};
   try {
-    fosdem = JSON.parse(fs.readFileSync('./public/fosdem.json', 'utf-8'));
+    const fosdem = await getData({ year: '2024' });
+
+    const session = await getSession(request.headers.get('Cookie'));
+    const userId = session.get('userId');
+
+    const data = { user: { id: userId }, fosdem };
+
+    return json(data, {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    });
   } catch (error) {
     console.error(error);
   }
-
-  const session = await getSession(request.headers.get('Cookie'));
-  const userId = session.get('userId');
-
-  const data = { user: { id: userId }, fosdem };
-
-  return json(data, {
-    headers: {
-      'Set-Cookie': await commitSession(session),
-    },
-  });
 }
 
 export default function App() {
