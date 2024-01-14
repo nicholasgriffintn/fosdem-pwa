@@ -6,7 +6,14 @@ import {
   useNavigate,
 } from '@remix-run/react';
 
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '~/components/ui/resizable';
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
 import { PageHeader } from '~/components/PageHeader';
+import { Icons } from '~/components/Icons';
 
 export const meta: MetaFunction = () => {
   return [
@@ -38,49 +45,83 @@ export default function TrackPage() {
             event.room
           }${event.persons?.length > 0 && ` | ${event.persons.join(', ')}`}`}
         />
-        {event.abstract && (
-          <div className="mt-8 prose prose-lg prose-indigo">
-            <div dangerouslySetInnerHTML={{ __html: event.abstract }} />
-          </div>
-        )}
-        {event.chat && (
-          <div>
-            <a href={event.chat} target="_blank" rel="noreferrer">
-              Chat
-            </a>
-          </div>
-        )}
-        {event.links?.length > 0 && (
-          <div>
-            <h2>Links</h2>
-            <ul>
-              {event.links.map((link) => {
-                return (
-                  <li key={link.href}>
-                    <a href={link.href} target="_blank" rel="noreferrer">
-                      {link.title}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-        {event.isLive && event.streams?.length && (
-          <div>
-            <h2>Streams</h2>
-            <div>
-              {event.streams.map((stream) => {
-                return (
-                  <div key={stream.url}>
-                    <h3>{stream.title}</h3>
-                    <video src={stream.url} controls></video>
+        <div className="w-full">
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="min-h-[200px] rounded-lg border"
+          >
+            <ResizablePanel defaultSize={75}>
+              <div className="flex h-full items-center justify-center p-6">
+                {event.isLive && event.streams?.length ? (
+                  <div>
+                    {event.streams.map((stream) => {
+                      return (
+                        <div key={stream.url} className="w-full aspect-video">
+                          <video preload="none" controls="controls">
+                            <source
+                              src={stream.url}
+                              type='application/x-mpegURL; codecs="avc1.42E01E, mp4a.40.2"'
+                            />
+                          </video>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+                ) : (
+                  <div>
+                    <span>Sorry! The stream isn't available yet!</span>
+                  </div>
+                )}
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={25}>
+              <div className="h-full p-6">
+                {event.abstract && (
+                  <div className="max-h-[500px] w-full prose prose-lg prose-indigo overflow-scroll">
+                    <div dangerouslySetInnerHTML={{ __html: event.abstract }} />
+                  </div>
+                )}
+                {event.links?.length > 0 && (
+                  <div>
+                    <h2>Links</h2>
+                    <ul>
+                      {event.links.map((link) => {
+                        return (
+                          <li key={link.href}>
+                            <a
+                              href={link.href}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {link.title}
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+          {event.chat && (
+            <Alert className="mt-4">
+              <Icons.logo className="h-4 w-4" />
+              <AlertTitle>Get involved in the conversation!</AlertTitle>
+              <AlertDescription>
+                <a
+                  href={event.chat}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  Click here to join the chat
+                </a>
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
       </div>
     </div>
   );
