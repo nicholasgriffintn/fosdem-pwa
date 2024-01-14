@@ -45,7 +45,9 @@ export default function TrackPage() {
         )}
         {event.chat && (
           <div>
-            <a href={event.chat}>Chat</a>
+            <a href={event.chat} target="_blank" rel="noreferrer">
+              Chat
+            </a>
           </div>
         )}
         {event.links?.length > 0 && (
@@ -54,8 +56,10 @@ export default function TrackPage() {
             <ul>
               {event.links.map((link) => {
                 return (
-                  <li key={link.url}>
-                    <a href={link.url}>{link.title}</a>
+                  <li key={link.href}>
+                    <a href={link.href} target="_blank" rel="noreferrer">
+                      {link.title}
+                    </a>
                   </li>
                 );
               })}

@@ -104,7 +104,7 @@ const getLinks = (links) => {
   if (Array.isArray(links.link)) {
     return links.link.map((link) => ({
       href: link._attributes.href,
-      title: link.text,
+      title: link._text,
       type: getLinkType(link._attributes.href),
     }));
   }
@@ -112,7 +112,7 @@ const getLinks = (links) => {
   return [
     {
       href: links.link._attributes.href,
-      title: links.link.text,
+      title: links.link._text,
       type: getLinkType(links.link._attributes.href),
     },
   ];
