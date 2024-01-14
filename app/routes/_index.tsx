@@ -20,7 +20,7 @@ export default function Index() {
         <Suspense fallback={<TypesSkeleton />}>
           <Await resolve={fosdem}>
             {(data) => {
-              return <Types types={data.types} tracks={data.tracks} />;
+              return <Types types={data.types} />;
             }}
           </Await>
         </Suspense>

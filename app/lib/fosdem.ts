@@ -1,5 +1,5 @@
 import { xml2json } from 'xml-js';
-import { kv } from '@vercel/kv';
+// import { kv } from '@vercel/kv';
 
 import { constants } from '~/constants';
 
@@ -20,8 +20,7 @@ type Day = {
   room: Room[];
 };
 
-const types = constants.TYPES;
-const typesSet = new Set(types.map((type) => type.id));
+const typeData = constants.TYPES;
 
 const buildings = constants.BUILDINGS;
 
@@ -123,7 +122,7 @@ const getTitle = (title, status) => {
 
 const getType = (event) => {
   const type = getText(event.type);
-  if (!typesSet.has(type)) {
+  if (!typeData[type]) {
     return 'other';
   }
   return type;
@@ -210,6 +209,7 @@ export async function getData({ year }: { year: string }) {
     new Date().toISOString().substring(0, 10)
   );
 
+  const types = {};
   const days = {};
   const rooms = {};
   const events = {};
@@ -228,7 +228,7 @@ export async function getData({ year }: { year: string }) {
     };
 
     for (const room of day.room) {
-      const name = getRoomName(room._attributes.name);
+      const roomName = getRoomName(room._attributes.name);
       const slug = room._attributes.slug;
       const roomKey = slug.substring(0, 1).toUpperCase();
 
@@ -237,7 +237,7 @@ export async function getData({ year }: { year: string }) {
       const roomData = rooms[slug];
       if (!roomData) {
         rooms[slug] = {
-          name,
+          name: roomName,
           slug,
           building,
         };
@@ -246,24 +246,42 @@ export async function getData({ year }: { year: string }) {
       const roomEvents = Array.isArray(room.event) ? room.event : [room.event];
 
       for (const event of roomEvents) {
-        const eventData = buildEvent(event, isLive, name, index);
+        const eventData = buildEvent(event, isLive, roomName, index);
 
         if (!eventData) {
           continue;
         }
 
         const type = eventData.type;
-
-        const trackData = tracks[eventData.track];
-        if (!trackData) {
-          const trackKey = eventData.track.toLowerCase().replace(/\s/g, '');
-          tracks[trackKey] = {
-            name: eventData.track,
-            type,
+        if (!types[type]) {
+          types[type] = {
+            id: type,
+            name: typeData[type].name,
+            trackCount: 0,
           };
         }
 
+        const track = eventData.track;
+        const trackKey = track.toLowerCase().replace(/\s/g, '');
+        if (!tracks[trackKey]) {
+          tracks[trackKey] = {
+            id: trackKey,
+            name: track,
+            type,
+            room: roomName,
+            day: [],
+            eventCount: 0,
+          };
+
+          types[type].trackCount += 1;
+        }
+
+        if (!tracks[trackKey].day.includes(index)) {
+          tracks[trackKey].day.push(index);
+        }
+
         events[eventData.id] = eventData;
+        tracks[trackKey].eventCount += 1;
       }
     }
   }
