@@ -6,7 +6,7 @@ import {
 } from '~/components/ui/card';
 import { Skeleton } from '~/components/ui/skeleton';
 
-export function TracksSkeleton() {
+export function TypesSkeleton() {
   return (
     <Card>
       <CardHeader className="gap-2">

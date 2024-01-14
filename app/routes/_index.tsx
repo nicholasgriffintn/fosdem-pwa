@@ -2,7 +2,7 @@ import type { MetaFunction } from '@remix-run/node';
 import { Await, useRouteLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
 
-import { Tracks, TracksSkeleton } from '~/components/Tracks';
+import { Types, TypesSkeleton } from '~/components/Types';
 
 export const meta: MetaFunction = () => {
   return [
@@ -17,10 +17,10 @@ export default function Index() {
   return (
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
-        <Suspense fallback={<TracksSkeleton />}>
+        <Suspense fallback={<TypesSkeleton />}>
           <Await resolve={fosdem}>
             {(data) => {
-              return <Tracks tracks={data.tracks} />;
+              return <Types types={data.types} tracks={data.tracks} />;
             }}
           </Await>
         </Suspense>
