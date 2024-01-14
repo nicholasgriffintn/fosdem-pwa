@@ -75,9 +75,15 @@ const getRoomName = (name) => {
 };
 
 const getPersons = (persons) => {
-  return persons && persons[0] && persons[0].person
-    ? persons[0].person.map((person) => person.text)
-    : [];
+  if (!persons.person) {
+    return [];
+  }
+
+  if (Array.isArray(persons.person)) {
+    return persons.person.map((person) => person._text);
+  }
+
+  return [persons.person._text];
 };
 
 const getLinkType = (url) => {
@@ -91,13 +97,25 @@ const getLinkType = (url) => {
 };
 
 const getLinks = (links) => {
-  return links && links[0] && links[0].link
-    ? links[0].link.map((link) => ({
-        href: link.href,
-        title: link.text,
-        type: getLinkType(link.href),
-      }))
-    : [];
+  if (!links.link) {
+    return [];
+  }
+
+  if (Array.isArray(links.link)) {
+    return links.link.map((link) => ({
+      href: link._attributes.href,
+      title: link.text,
+      type: getLinkType(link._attributes.href),
+    }));
+  }
+
+  return [
+    {
+      href: links.link._attributes.href,
+      title: links.link.text,
+      type: getLinkType(links.link._attributes.href),
+    },
+  ];
 };
 
 const getText = (element) =>
@@ -144,6 +162,7 @@ const buildEvent = (event, isLive, roomName, day) => {
 
   const type = getType(event);
   const track = getText(event.track);
+  const trackKey = track.toLowerCase().replace(/\s/g, '');
 
   if (type === 'other' && track === 'stand') {
     return null;
@@ -178,11 +197,13 @@ const buildEvent = (event, isLive, roomName, day) => {
     status,
     type,
     track,
+    trackKey,
     title,
     persons,
     links,
     streams,
     chat,
+    room: roomName,
     id: event._attributes.id,
     startTime: getText(event.start),
     duration: getText(event.duration),
@@ -261,12 +282,11 @@ export async function getData({ year }: { year: string }) {
           };
         }
 
-        const track = eventData.track;
-        const trackKey = track.toLowerCase().replace(/\s/g, '');
+        const trackKey = eventData.trackKey;
         if (!tracks[trackKey]) {
           tracks[trackKey] = {
             id: trackKey,
-            name: track,
+            name: eventData.track,
             type,
             room: roomName,
             day: [],
