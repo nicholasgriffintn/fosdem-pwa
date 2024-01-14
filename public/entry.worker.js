@@ -6568,11 +6568,9 @@ var dataCache = Storage.open(DATA, {
 var documentCache = Storage.open(PAGES);
 var assetCache = Storage.open(ASSETS);
 self.addEventListener("install", (event) => {
-  logger.log("Service worker installed");
   event.waitUntil(self.skipWaiting());
 });
 self.addEventListener("activate", (event) => {
-  logger.log("Service worker activated");
   event.waitUntil(self.clients.claim());
 });
 var dataHandler = networkFirst({
@@ -6620,7 +6618,7 @@ var route4 = __toESM(require_index());
 var route5 = __toESM(require_slug());
 
 // assets-module:@remix-pwa/dev?assets
-var assets = ["/build/root-MIFQJZX3.js", "/build/manifest-2BDF22CE.js", "/build/entry.client-VSMMK5KC.js", "/build/__remix_entry_dev-AWNMWNKP.js", "/build/routes/track.$slug-VGTV3NN4.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-YJYANLKL.js", "/build/routes/api.build-MQ4UDTHD.js", "/build/routes/_index-OARAKQ2T.js", "/build/routes/$slug-S2FBMEMC.js", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-VGT5QD4U.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-J4N6E2NI.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-D74SNG3B.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-AA4HRKMN.js", "/build/_shared/chunk-76G7XZOH.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js", "/build/_shared/chunk-3M3EQHHR.js", "/build/_assets/globals-MEVI7CC7.css"];
+var assets = ["/build/root-HZX333XR.js", "/build/manifest-BFF5063F.js", "/build/entry.client-VSMMK5KC.js", "/build/__remix_entry_dev-OURQJXCK.js", "/build/_assets/globals-FBYBI26R.css", "/build/routes/track.$slug-VQ3ZZJHA.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-2ET5XEYK.js", "/build/routes/_index-C32LWAL4.js", "/build/routes/$slug-ON2FRGPL.js", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-VJ66WSZF.js", "/build/_shared/chunk-VGT5QD4U.js", "/build/_shared/chunk-QB3O6UCR.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-J4N6E2NI.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-D74SNG3B.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-AA4HRKMN.js", "/build/_shared/chunk-76G7XZOH.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js", "/build/_shared/chunk-3M3EQHHR.js"];
 
 // entry-module:@remix-pwa/build/magic
 var routes = {

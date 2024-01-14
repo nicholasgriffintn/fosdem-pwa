@@ -3,7 +3,7 @@
 import { Storage } from '@remix-pwa/cache';
 import { cacheFirst, networkFirst } from '@remix-pwa/strategy';
 import type { DefaultFetchHandler } from '@remix-pwa/sw';
-import { PrecacheHandler, logger, matchRequest } from '@remix-pwa/sw';
+import { PrecacheHandler, matchRequest } from '@remix-pwa/sw';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -19,12 +19,10 @@ const documentCache = Storage.open(PAGES);
 const assetCache = Storage.open(ASSETS);
 
 self.addEventListener('install', (event: ExtendableEvent) => {
-  logger.log('Service worker installed');
   event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event: ExtendableEvent) => {
-  logger.log('Service worker activated');
   event.waitUntil(self.clients.claim());
 });
 
