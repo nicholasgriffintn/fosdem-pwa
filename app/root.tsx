@@ -1,6 +1,6 @@
 import { cssBundleHref } from '@remix-run/css-bundle';
 import type { LinksFunction } from '@remix-run/node';
-import { json } from '@vercel/remix';
+import { json } from '@remix-run/cloudflare';
 import {
   Links,
   Meta,
@@ -10,7 +10,6 @@ import {
   useLoaderData,
 } from '@remix-run/react';
 import { useSWEffect, LiveReload } from '@remix-pwa/sw';
-import fs from 'fs';
 
 import styles from '~/styles/globals.css';
 import { getSession, commitSession } from '~/sessions';

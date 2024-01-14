@@ -1,5 +1,5 @@
 import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node';
-import { json } from '@vercel/remix';
+import { json } from '@remix-run/cloudflare';
 import {
   useLoaderData,
   useRouteLoaderData,
