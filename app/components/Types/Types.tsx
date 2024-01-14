@@ -12,51 +12,45 @@ import { Button } from '~/components/ui/button';
 
 export function Types({
   types,
-  tracks,
 }: {
   types: {
     [key: string]: {
       id: string;
       name: string;
-    };
-  }[];
-  tracks: {
-    [key: string]: {
-      name: string;
-      type: string;
+      trackCount: number;
     };
   };
 }) {
   const navigate = useNavigate();
 
+  const typeKeys = Object.keys(types);
+
   return (
     <ul className="flex flex-wrap -mx-1 lg:-mx-4">
-      {types.map((type: unknown) => {
-        const track = Object.values(tracks).filter(
-          (track) => track.type === type.id
-        );
-
+      {typeKeys.map((typeKey: string) => {
         return (
           <li
-            key={type.id}
+            key={types[typeKey].id}
             className="my-1 px-1 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/3"
           >
             <Card className="lg:max-w-md w-full">
               <CardHeader>
-                <CardTitle>{type.name}</CardTitle>
-                <CardDescription>{track.length} TRACKS</CardDescription>
+                <CardTitle>{types[typeKey].name}</CardTitle>
+                <CardDescription>
+                  {types[typeKey].trackCount} TRACKS
+                </CardDescription>
               </CardHeader>
               <CardContent className="w-full">
                 <img
-                  src={`/images/${type.id}.png`}
-                  alt={type.name}
+                  src={`/images/${types[typeKey].id}.png`}
+                  alt={types[typeKey].name}
                   className="w-full"
                 />
               </CardContent>
               <CardFooter>
                 <Button
                   className="w-full"
-                  onClick={() => navigate(`/${type.id}`)}
+                  onClick={() => navigate(`/${types[typeKey].id}`)}
                 >
                   View Track
                 </Button>
