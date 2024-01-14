@@ -1,10 +1,6 @@
 import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@vercel/remix';
-import {
-  useLoaderData,
-  useRouteLoaderData,
-  useNavigate,
-} from '@remix-run/react';
+import { useLoaderData, useRouteLoaderData } from '@remix-run/react';
 
 import {
   ResizableHandle,
@@ -27,8 +23,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export default function TrackPage() {
-  const navigate = useNavigate();
-
   const { slug } = useLoaderData<typeof loader>();
   const { fosdem } = useRouteLoaderData('root');
 
