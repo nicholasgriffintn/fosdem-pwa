@@ -10,6 +10,7 @@ import {
   useLoaderData,
 } from '@remix-run/react';
 import { useSWEffect, LiveReload } from '@remix-pwa/sw';
+import fs from 'fs';
 
 import styles from '~/styles/globals.css';
 import { getSession, commitSession } from '~/sessions';
@@ -25,7 +26,12 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader({ request }: { request: Request }) {
-  const fosdem = await getData({ year: '2024' });
+  let fosdem = {};
+  try {
+    fosdem = JSON.parse(fs.readFileSync('./public/fosdem.json', 'utf-8'));
+  } catch (error) {
+    console.error(error);
+  }
 
   const session = await getSession(request.headers.get('Cookie'));
   const userId = session.get('userId');
