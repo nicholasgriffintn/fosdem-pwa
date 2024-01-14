@@ -246,6 +246,8 @@ export async function getData({ year }: { year: string }) {
       date,
       start,
       end,
+      id: index,
+      name: `Day ${index}`,
     };
 
     for (const room of day.room) {
