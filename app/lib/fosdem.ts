@@ -20,8 +20,10 @@ type Day = {
   room: Room[];
 };
 
-const tracks = constants.MAIN_TRACKS;
-const trackSet = new Set(tracks.map((track) => track.id));
+const types = constants.TYPES;
+const typesSet = new Set(types.map((type) => type.id));
+
+const buildings = constants.BUILDINGS;
 
 function flattenData(element: unknown) {
   if (Array.isArray(element)) {
@@ -29,11 +31,20 @@ function flattenData(element: unknown) {
   }
 
   if (typeof element === 'object' && element !== null) {
-    const result: { [key: string]: unknown } = {};
-    for (const [key, value] of Object.entries(element)) {
-      result[key] = flattenData(value);
+    const keys = Object.keys(element);
+
+    if (keys.length === 1) {
+      const key = keys[0];
+      if (key === 'value') {
+        return element[key];
+      }
     }
-    return result;
+
+    const newElement = {};
+    keys.forEach((e) => {
+      newElement[e] = flattenData(element[e]);
+    });
+    return newElement;
   }
 
   return element;
@@ -112,13 +123,13 @@ const getTitle = (title, status) => {
 
 const getType = (event) => {
   const type = getText(event.type);
-  if (!trackSet.has(type)) {
+  if (!typesSet.has(type)) {
     return 'other';
   }
   return type;
 };
 
-const buildEvent = (event, isLive, roomName) => {
+const buildEvent = (event, isLive, roomName, day) => {
   if (!event) {
     return null;
   }
@@ -150,7 +161,7 @@ const buildEvent = (event, isLive, roomName) => {
     !roomName.startsWith('I.') &&
     !roomName.startsWith('S.');
   const normalizedRoom = roomName.toLowerCase().replace(/\./g, '');
-  if (isLive && isLiveRoom) {
+  if (isLiveRoom) {
     streams.push({
       href: constants.STREAM_LINK.replace('${ROOM_ID}', normalizedRoom),
       title: 'Stream',
@@ -159,10 +170,11 @@ const buildEvent = (event, isLive, roomName) => {
   }
 
   const chat = /^[A-Z]\./.test(roomName)
-    ? constants.CHAT_LINK.replace('${ROOM_ID}', normalizedRoom)
+    ? constants.CHAT_LINK.replace('${ROOM_ID}', roomName.substring(2))
     : null;
 
   return {
+    day,
     isLive,
     status,
     type,
@@ -182,11 +194,11 @@ const buildEvent = (event, isLive, roomName) => {
 };
 
 export async function getData({ year }: { year: string }) {
-  const cachedData = await kv.get('fosdem');
+  /* const cachedData = await kv.get(`fosdem-${year}`);
 
   if (cachedData) {
     return cachedData;
-  }
+  } */
 
   const url = constants.SCHEDULE_LINK.replace('${YEAR}', year);
   const response = await fetch(url);
@@ -198,59 +210,79 @@ export async function getData({ year }: { year: string }) {
     new Date().toISOString().substring(0, 10)
   );
 
-  const days = data.day.map((day: Day) => {
+  const days = {};
+  const rooms = {};
+  const events = {};
+  const tracks = {};
+
+  for (const day of data.day) {
+    const index = day._attributes.index;
     const date = day._attributes.date;
     const start = day._attributes.start;
     const end = day._attributes.end;
 
-    const rooms = day.room.map((room: Room) => {
-      const name = getRoomName(room._attributes.name);
-      const slug = room._attributes.slug;
-
-      const roomEvents = Array.isArray(room.event) ? room.event : [room.event];
-
-      const track = roomEvents?.[0]?.type ? getType(roomEvents[0]) : 'other';
-
-      const events = roomEvents.map((event) => {
-        return buildEvent(event, isLive, name);
-      });
-
-      return {
-        name,
-        slug,
-        track,
-        events,
-      };
-    });
-
-    return {
+    days[index] = {
       date,
       start,
       end,
-      rooms,
     };
-  });
+
+    for (const room of day.room) {
+      const name = getRoomName(room._attributes.name);
+      const slug = room._attributes.slug;
+      const roomKey = slug.substring(0, 1).toUpperCase();
+
+      const building = buildings[roomKey];
+
+      const roomData = rooms[slug];
+      if (!roomData) {
+        rooms[slug] = {
+          name,
+          slug,
+          building,
+        };
+      }
+
+      const roomEvents = Array.isArray(room.event) ? room.event : [room.event];
+
+      for (const event of roomEvents) {
+        const eventData = buildEvent(event, isLive, name, index);
+
+        if (!eventData) {
+          continue;
+        }
+
+        const type = eventData.type;
+
+        const trackData = tracks[eventData.track];
+        if (!trackData) {
+          const trackKey = eventData.track.toLowerCase().replace(/\s/g, '');
+          tracks[trackKey] = {
+            name: eventData.track,
+            type,
+          };
+        }
+
+        events[eventData.id] = eventData;
+      }
+    }
+  }
 
   const conference = data.conference as {
     _attributes: { start: string; end: string };
   };
 
-  const allRooms = days.flatMap((day) => day.rooms);
-
-  const tracksData = constants.MAIN_TRACKS.map((track) => {
-    const rooms = allRooms.filter((room) => room && room.track === track.id);
-    return {
-      ...track,
-      rooms,
-    };
-  });
-
   const result = {
-    tracks: tracksData,
     conference,
+    types,
+    buildings,
+    days,
+    rooms,
+    tracks,
+    events,
   };
 
-  await kv.set('fosdem', result, { ex: 1000 * 60 * 60 * 24 * 7, nx: true });
+  // await kv.set(`fosdem-${year}`, result, { ex: 900000, nx: true });
 
   return result;
 }

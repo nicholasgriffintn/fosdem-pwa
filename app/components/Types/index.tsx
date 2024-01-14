@@ -1,2 +1,2 @@
-export * from './Tracks';
+export * from './Types';
 export * from './Skeleton';
