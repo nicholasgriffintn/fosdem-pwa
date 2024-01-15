@@ -10,6 +10,8 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
 import { PageHeader } from '~/components/PageHeader';
 import { Icons } from '~/components/Icons';
+import { Button } from '~/components/ui/button';
+import { toast } from '~/components/ui/use-toast';
 
 export const meta: MetaFunction = () => {
   return [
@@ -38,7 +40,32 @@ export default function TrackPage() {
           text={`Day ${event.day} | ${event.startTime} | ${event.duration} | ${
             event.room
           }${event.persons?.length > 0 && ` | ${event.persons.join(', ')}`}`}
-        />
+        >
+          <div className="flex items-center pl-6 pr-3 gap-2">
+            <Button
+              variant="ghost"
+              onClick={() =>
+                toast({
+                  title: 'Not implemented',
+                  description: "We're still working on favoriting items.",
+                })
+              }
+            >
+              <Icons.star />
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                toast({
+                  title: 'Not implemented',
+                  description: "We're still working on sharing items.",
+                })
+              }
+            >
+              <Icons.share />
+            </Button>
+          </div>
+        </PageHeader>
         <div className="w-full">
           <ResizablePanelGroup
             direction="horizontal"

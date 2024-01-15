@@ -2,6 +2,8 @@ import { useNavigate } from '@remix-run/react';
 import clsx from 'clsx';
 
 import { Button } from '~/components/ui/button';
+import { Icons } from '~/components/Icons';
+import { toast } from '~/components/ui/use-toast';
 
 type TrackListItem = {
   id: string;
@@ -40,7 +42,29 @@ function TrackListItem({
           {track.room} | {track.eventCount} events
         </p>
       </div>
-      <div className="flex items-center pl-6 pr-3">
+      <div className="flex items-center pl-6 pr-3 gap-2">
+        <Button
+          variant="ghost"
+          onClick={() =>
+            toast({
+              title: 'Not implemented',
+              description: "We're still working on favoriting items.",
+            })
+          }
+        >
+          <Icons.star />
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={() =>
+            toast({
+              title: 'Not implemented',
+              description: "We're still working on sharing items.",
+            })
+          }
+        >
+          <Icons.share />
+        </Button>
         <Button
           variant="outline"
           onClick={() => navigate(`/track/${track.id}`)}
