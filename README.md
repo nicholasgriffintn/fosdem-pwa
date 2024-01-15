@@ -2,7 +2,7 @@
 
 This is a companion app for [FOSDEM 2023](https://fosdem.org/2024/), built with [Remix](https://remix.run) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop.
 
-This is heavily inpsired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), just in Remix.
+This is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), just in Remix.
 
 ## Check it out
 
@@ -19,7 +19,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
     - [ ] Should have bookmarking capabilities, stored locally and potentially with a sync to a remote server using an ID that the user can provide or generate
 - [ ] A page for each speaker with the speaker details
 - [ ] A page for each room with the room details
-- [ ] A page for live content with embeeded video streams
+- [ ] A page for live content with embedded video streams
 - [ ] A page for the user profile, with a generated pass for the event
 - [ ] A search page
 - [ ] A page for creating or generating your user ID
