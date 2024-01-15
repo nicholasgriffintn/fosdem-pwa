@@ -19,14 +19,17 @@ type EventListProps = {
 function EventListItem({
   event,
   index,
+  isLast,
 }: {
   event: EventListItem;
   index: number;
+  isLast: boolean;
 }) {
   const navigate = useNavigate();
 
   const className = clsx('flex justify-between', {
-    'border-t-2 border-b-2 border-solid border-muted': index % 2 === 1,
+    'border-t-2 border-solid border-muted': index % 2 === 1,
+    'border-b-2': index % 2 === 1 && !isLast,
   });
 
   return (
@@ -58,7 +61,11 @@ export function EventList({ events }: EventListProps) {
       {events?.length > 0 ? (
         events.map((event, index) => (
           <li key={event.id}>
-            <EventListItem event={event} index={index} />
+            <EventListItem
+              event={event}
+              index={index}
+              isLast={events.length === index + 1}
+            />
           </li>
         ))
       ) : (

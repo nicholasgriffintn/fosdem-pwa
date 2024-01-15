@@ -17,14 +17,17 @@ type TrackListProps = {
 function TrackListItem({
   track,
   index,
+  isLast,
 }: {
   track: TrackListItem;
   index: number;
+  isLast: boolean;
 }) {
   const navigate = useNavigate();
 
   const className = clsx('flex justify-between', {
-    'border-t-2 border-b-2 border-solid border-muted': index % 2 === 1,
+    'border-t-2 border-solid border-muted': index % 2 === 1,
+    'border-b-2': index % 2 === 1 && !isLast,
   });
 
   return (
@@ -55,7 +58,11 @@ export function TrackList({ tracks }: TrackListProps) {
       {tracks?.length > 0 ? (
         tracks.map((track, index) => (
           <li key={track.id}>
-            <TrackListItem track={track} index={index} />
+            <TrackListItem
+              track={track}
+              index={index}
+              isLast={tracks.length === index + 1}
+            />
           </li>
         ))
       ) : (
