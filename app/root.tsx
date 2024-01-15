@@ -8,6 +8,8 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteError,
+  isRouteErrorResponse,
 } from '@remix-run/react';
 import { useSWEffect, LiveReload } from '@remix-pwa/sw';
 
@@ -18,6 +20,7 @@ import { cn } from '~/lib/utils';
 import { Header } from '~/components/Header';
 import { Footer } from '~/components/Footer';
 import { Toaster } from '~/components/ui/toaster';
+import { PageHeader } from './components/PageHeader';
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -43,10 +46,8 @@ export async function loader({ request }: { request: Request }) {
   }
 }
 
-export default function App() {
-  const { user } = useLoaderData<typeof loader>();
-
-  useSWEffect();
+function Layout({ children }: { children: React.ReactNode }) {
+  const loaderData = useLoaderData<typeof loader>();
 
   return (
     <html lang="en">
@@ -65,15 +66,15 @@ export default function App() {
       >
         <main className="flex min-h-screen flex-col">
           <Header />
-          {user?.id && (
+          {loaderData?.user?.id && (
             <div className="bg-primary text-white text-center py-2">
               <p>
-                You are logged in as <strong>{user.id}</strong>
+                You are logged in as <strong>{loaderData.user.id}</strong>
               </p>
             </div>
           )}
           <div className="container flex-1">
-            <Outlet />
+            {children}
             <Toaster />
           </div>
           <Footer />
@@ -84,4 +85,46 @@ export default function App() {
       </body>
     </html>
   );
+}
+
+export default function App() {
+  useSWEffect();
+
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <Layout>
+        <PageHeader heading={`${error.status} ${error.statusText}`} />
+        <div className="prose">
+          <p>{error.data}</p>
+        </div>
+      </Layout>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <Layout>
+        <PageHeader heading="Error" />
+        <div className="prose">
+          <p>{error.message}</p>
+          <p>The stack trace is:</p>
+          <pre>{error.stack}</pre>
+        </div>
+      </Layout>
+    );
+  } else {
+    return (
+      <Layout>
+        <PageHeader heading="Unknown Error" />
+      </Layout>
+    );
+  }
 }
