@@ -6,7 +6,7 @@ This is heavily inpsired by [sojourner-web](https://github.com/loomchild/sojourn
 
 ## Check it out
 
-You can check out the app at [https://fosdem-pwa.vercel.app/](https://fosdem-pwa.vercel.app/)
+You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## Features
 
