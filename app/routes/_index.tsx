@@ -1,4 +1,4 @@
-import type { MetaFunction } from '@remix-run/node';
+import type { MetaFunction } from '@remix-run/cloudflare';
 import { Await, useRouteLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
 

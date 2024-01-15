@@ -5964,7 +5964,7 @@ var RemixCache = class {
       await this._lruCleanup();
       return await cache.put(request, toBeCachedRes.clone());
     } catch (error) {
-      if (false)
+      if (true)
         console.error("Failed to put to cache:", error);
     }
   }
@@ -6227,6 +6227,77 @@ var networkFirst = ({ cache: cacheName, cacheOptions, cacheQueryOptions, fetchDi
   };
 };
 
+// node_modules/.pnpm/@remix-pwa+sw@2.1.12_@remix-pwa+cache@2.0.12_@remix-run+dev@2.5.0_@remix-run+react@2.5.0_reac_5n7isixezl4kpfgicdkdtgf6ty/node_modules/@remix-pwa/sw/dist/src/private/logger.js
+var methodToColorMap = {
+  debug: `#7f8c8d`,
+  log: `#2ecc71`,
+  info: `#3498db`,
+  warn: `#f39c12`,
+  error: `#c0392b`,
+  groupCollapsed: `#3498db`,
+  groupEnd: null
+  // No colored prefix on groupEnd
+};
+var logger = false ? (() => {
+  const api = {};
+  const loggerMethods = Object.keys(methodToColorMap);
+  for (const key of loggerMethods) {
+    const method = key;
+    api[method] = () => {
+    };
+  }
+  return api;
+})() : (() => {
+  let inGroup = false;
+  const print = function(method, args) {
+    if (self.__DISABLE_PWA_DEV_LOGS) {
+      return;
+    }
+    if (method === "debug" && self.__DISABLE_PWA_DEBUG_LOGS) {
+      return;
+    }
+    if (method === "info" && self.__DISABLE_PWA_INFO_LOGS) {
+      return;
+    }
+    if (method === "warn" && self.__DISABLE_PWA_WARN_LOGS) {
+      return;
+    }
+    if (method === "error" && self.__DISABLE_PWA_ERROR_LOGS) {
+      return;
+    }
+    if (method === "groupCollapsed") {
+      if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+        console[method](...args);
+        return;
+      }
+    }
+    const styles = [
+      `background: ${methodToColorMap[method]}`,
+      `border-radius: 0.5em`,
+      `color: white`,
+      `font-weight: bold`,
+      `padding: 2px 0.5em`
+    ];
+    const logPrefix = inGroup ? [] : ["%cremix-pwa", styles.join(";")];
+    console[method](...logPrefix, ...args);
+    if (method === "groupCollapsed") {
+      inGroup = true;
+    }
+    if (method === "groupEnd") {
+      inGroup = false;
+    }
+  };
+  const api = {};
+  const loggerMethods = Object.keys(methodToColorMap);
+  for (const key of loggerMethods) {
+    const method = key;
+    api[method] = (...args) => {
+      print(method, args);
+    };
+  }
+  return api;
+})();
+
 // node_modules/.pnpm/@remix-pwa+sw@2.1.12_@remix-pwa+cache@2.0.12_@remix-run+dev@2.5.0_@remix-run+react@2.5.0_reac_5n7isixezl4kpfgicdkdtgf6ty/node_modules/@remix-pwa/sw/dist/src/utils/worker.js
 function isMethod(request, methods) {
   return methods.includes(request.method.toLowerCase());
@@ -6324,7 +6395,7 @@ var PrecacheHandler = class extends MessageHandler {
     const routes2 = Object.values(manifest?.routes || {});
     for (const route of routes2) {
       if (route.id.includes("$")) {
-        if (false)
+        if (true)
           logger.info("Skipping parametrized route:", route.id);
         continue;
       }
@@ -6367,7 +6438,7 @@ var PrecacheHandler = class extends MessageHandler {
           if (map.includes(true))
             continue;
         } else {
-          if (false)
+          if (true)
             logger.error("Invalid ignoredRoutes type:", this._ignoredFiles);
         }
       } else if (typeof this._ignoredFiles === "function") {
@@ -6388,7 +6459,7 @@ var PrecacheHandler = class extends MessageHandler {
       }
       if (route.imports) {
         for (const assetUrl of route.imports) {
-          if (false) {
+          if (true) {
             logger.groupCollapsed("Caching asset: ", assetUrl);
             logger.log("Is index:", route.index || false);
             logger.log("Parent ID:", route.parentId);
@@ -6402,7 +6473,7 @@ var PrecacheHandler = class extends MessageHandler {
           cachePromises.set(assetUrl, cacheAsset(assetUrl));
         }
       }
-      if (false)
+      if (true)
         logger.info("Caching document:", pathname);
       const response = await fetch(pathname);
       cachePromises.set(
@@ -6410,13 +6481,13 @@ var PrecacheHandler = class extends MessageHandler {
         // @ts-expect-error
         documentCache2.put(pathname, response).catch((error) => {
           if (error instanceof TypeError) {
-            if (false)
+            if (true)
               logger.error(`TypeError when caching document ${pathname}:`, error.message);
           } else if (error instanceof DOMException) {
-            if (false)
+            if (true)
               logger.error(`DOMException when caching document ${pathname}:`, error.message);
           } else {
-            if (false)
+            if (true)
               logger.error(`Failed to cache document ${pathname}:`, error);
           }
         })
@@ -6434,13 +6505,13 @@ var PrecacheHandler = class extends MessageHandler {
           // @ts-expect-error
           dataCache2.put(url, data2).catch((error) => {
             if (error instanceof TypeError) {
-              if (false)
+              if (true)
                 logger.error(`TypeError when caching data ${pathname}:`, error.message);
             } else if (error instanceof DOMException) {
-              if (false)
+              if (true)
                 logger.error(`DOMException when caching data ${pathname}:`, error.message);
             } else {
-              if (false)
+              if (true)
                 logger.error(`Failed to cache data ${pathname}:`, error);
             }
           })
@@ -6457,13 +6528,13 @@ var PrecacheHandler = class extends MessageHandler {
       const response = await fetch(assetUrl);
       return assetCache2.put(assetUrl, response).catch((error) => {
         if (error instanceof TypeError) {
-          if (false)
+          if (true)
             logger.error(`TypeError when caching asset ${assetUrl}:`, error.message);
         } else if (error instanceof DOMException) {
-          if (false)
+          if (true)
             logger.error(`DOMException when caching asset ${assetUrl}:`, error.message);
         } else {
-          if (false)
+          if (true)
             logger.error(`Failed to cache asset ${assetUrl}:`, error);
         }
       });
@@ -6547,7 +6618,7 @@ var route4 = __toESM(require_index());
 var route5 = __toESM(require_slug());
 
 // assets-module:@remix-pwa/dev?assets
-var assets = ["/build/root-IMRMPTB3.js", "/build/manifest-6DDBF174.js", "/build/entry.client-6LZV7ER4.js", "/build/_assets/globals-LKSQC3PX.css", "/build/routes/track.$slug-DD57SIV7.js", "/build/routes/manifest[.]webmanifest-WJ6SR2LU.js", "/build/routes/event.$slug-DZEQP5T6.js", "/build/routes/_index-KCIES4ZK.js", "/build/routes/$slug-CQODWCU3.js", "/build/_shared/chunk-XE2TPKYL.js", "/build/_shared/chunk-XDF7JQ2K.js", "/build/_shared/chunk-WDEQRGH7.js", "/build/_shared/chunk-TOSE7K5M.js", "/build/_shared/chunk-LLL4PRLU.js", "/build/_shared/chunk-HBGJREDS.js", "/build/_shared/chunk-G5WX4PPA.js", "/build/_shared/chunk-CG6F6NGP.js", "/build/_shared/chunk-5L4ED436.js", "/build/_shared/chunk-4SKPAXPS.js", "/build/_shared/chunk-3BEKSPMT.js"];
+var assets = ["/build/root-ZSUVT4PJ.js", "/build/manifest-01D48D64.js", "/build/entry.client-VSMMK5KC.js", "/build/__remix_entry_dev-L3MQ2OVW.js", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-VJ66WSZF.js", "/build/_shared/chunk-QB3O6UCR.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-NFYMXIMP.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-J4N6E2NI.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-D74SNG3B.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-AA4HRKMN.js", "/build/_shared/chunk-76G7XZOH.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js", "/build/_shared/chunk-3M3EQHHR.js", "/build/routes/track.$slug-FDJB6KIB.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-NV54SBNK.js", "/build/routes/_index-MFZBHXYF.js", "/build/routes/$slug-IJFNQA4Q.js", "/build/_assets/globals-FBYBI26R.css"];
 
 // entry-module:@remix-pwa/build/magic
 var routes = {

@@ -16,8 +16,8 @@ const { getSession, commitSession, destroySession } =
       maxAge: 30 * 24 * 60 * 60,
       path: '/',
       sameSite: 'lax',
-      secrets: [process.env.SESSION_SECRET || 'super-secret'],
-      secure: process.env.NODE_ENV === 'production',
+      secrets: ['super-secret'],
+      secure: true,
     },
   });
 
