@@ -12,7 +12,7 @@ export function Footer() {
             </a>
             . You can find the source code on{' '}
             <a
-              href="https://github.com/nicholasgriffen/fosdem-pwa"
+              href="https://github.com/nicholasgriffintn/fosdem-pwa"
               target="_blank"
               rel="noreferrer"
               className="font-medium underline underline-offset-4"
