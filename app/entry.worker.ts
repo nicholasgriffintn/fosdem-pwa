@@ -58,13 +58,7 @@ const handler = new PrecacheHandler({
   dataCache,
   documentCache,
   assetCache,
-  state: {
-    // A list of routes to ignore when precaching.
-    // Make sure to edit this list to match your app's routes.
-    // Alternatively, use ['*'] to ignore all routes.
-    // Or delete this option to precache all routes.
-    ignoredRoutes: route => route.id.includes('dashboard'),
-  },
+  state: {},
 });
 
 self.addEventListener('message', event => {
