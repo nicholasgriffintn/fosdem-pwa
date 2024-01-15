@@ -1,4 +1,5 @@
 import { useNavigate } from '@remix-run/react';
+import clsx from 'clsx';
 
 import { Button } from '~/components/ui/button';
 
@@ -13,12 +14,22 @@ type TrackListProps = {
   tracks: TrackListItem[];
 };
 
-function TrackListItem({ track }: { track: TrackListItem }) {
+function TrackListItem({
+  track,
+  index,
+}: {
+  track: TrackListItem;
+  index: number;
+}) {
   const navigate = useNavigate();
 
+  const className = clsx('flex justify-between', {
+    'border-t-2 border-b-2 border-solid border-muted': index % 2 === 1,
+  });
+
   return (
-    <div className="flex justify-between">
-      <div className="flex flex-col space-y-1.5 pt-6 pb-6">
+    <div className={className}>
+      <div className="flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1">
         <h3 className="font-semibold leading-none tracking-tight">
           {track.name}
         </h3>
@@ -26,7 +37,7 @@ function TrackListItem({ track }: { track: TrackListItem }) {
           {track.room} | {track.eventCount} events
         </p>
       </div>
-      <div className="flex items-center pl-6">
+      <div className="flex items-center pl-6 pr-3">
         <Button
           variant="outline"
           onClick={() => navigate(`/track/${track.id}`)}
@@ -40,11 +51,11 @@ function TrackListItem({ track }: { track: TrackListItem }) {
 
 export function TrackList({ tracks }: TrackListProps) {
   return (
-    <ul className="track-list w-full">
+    <ul className="track-list w-full rounded-md">
       {tracks?.length > 0 ? (
-        tracks.map((track) => (
+        tracks.map((track, index) => (
           <li key={track.id}>
-            <TrackListItem track={track} />
+            <TrackListItem track={track} index={index} />
           </li>
         ))
       ) : (
