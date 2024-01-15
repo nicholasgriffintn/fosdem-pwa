@@ -8,6 +8,7 @@ import {
 
 import { PageHeader } from '~/components/PageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { TrackList } from '~/components/TrackList';
 
 export const meta: MetaFunction = () => {
   return [
@@ -61,59 +62,9 @@ export default function TrackPage() {
           {days.map((day) => {
             const event = trackDataSplitByDay[day.id];
 
-            if (!event) {
-              return (
-                <TabsContent key={day.id} value={day.id}>
-                  <div className="flex flex-wrap -mx-1 lg:-mx-4">
-                    <div className="my-1 px-1 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/3">
-                      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                        <div className="p-4">
-                          <p className="text-3xl text-gray-900">
-                            No events for this day
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              );
-            }
-
             return (
               <TabsContent key={day.id} value={day.id}>
-                <div className="flex flex-wrap -mx-1 lg:-mx-4">
-                  {event.map((track) => {
-                    return (
-                      <div
-                        key={track.id}
-                        className="my-1 px-1 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/3"
-                      >
-                        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                          <div className="p-4">
-                            <p className="uppercase tracking-wide text-sm font-bold text-gray-700">
-                              {track.type} | DAY {track.day.join(' and ')}
-                            </p>
-                            <p className="text-3xl text-gray-900">
-                              {track.name}
-                            </p>
-                            <p className="text-gray-700">{track.description}</p>
-                            <p className="text-gray-700">
-                              {track.eventCount} events | {track.room}
-                            </p>
-                            <div>
-                              <button
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                onClick={() => navigate(`/track/${track.id}`)}
-                              >
-                                View Track
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <TrackList tracks={event} />
               </TabsContent>
             );
           })}
