@@ -50,7 +50,7 @@ export function Types({
               <CardFooter>
                 <Button
                   className="w-full"
-                  onClick={() => navigate(`/${types[typeKey].id}`)}
+                  onClick={() => navigate(`/type/${types[typeKey].id}`)}
                 >
                   View Track
                 </Button>
