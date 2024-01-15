@@ -12,9 +12,15 @@ import {
   isRouteErrorResponse,
 } from '@remix-run/react';
 import { useSWEffect, LiveReload } from '@remix-pwa/sw';
+import clsx from 'clsx';
 
 import styles from '~/styles/globals.css';
-import { getSession, commitSession } from '~/sessions.server';
+import {
+  ThemeProvider,
+  useTheme,
+  ThemeProviderNoFlash,
+} from '~/lib/theme-provider';
+import { getUserSession } from '~/sessions.server';
 import { getData } from '~/lib/fosdem';
 import { cn } from '~/lib/utils';
 import { Header } from '~/components/Header';
@@ -31,14 +37,17 @@ export async function loader({ request }: { request: Request }) {
   try {
     const fosdem = await getData({ year: '2024' });
 
-    const session = await getSession(request.headers.get('Cookie'));
-    const userId = session.get('userId');
+    const session = await getUserSession(request);
 
-    const data = { user: { id: userId }, fosdem };
+    const data = {
+      user: { id: session.getUserId() },
+      theme: session.getTheme(),
+      fosdem,
+    };
 
     return json(data, {
       headers: {
-        'Set-Cookie': await commitSession(session),
+        'Set-Cookie': await session.commit(),
       },
     });
   } catch (error) {
@@ -46,16 +55,25 @@ export async function loader({ request }: { request: Request }) {
   }
 }
 
+function Providers({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>();
+
+  return <ThemeProvider specifiedTheme={data?.theme}>{children}</ThemeProvider>;
+}
+
 function Layout({ children }: { children: React.ReactNode }) {
   const loaderData = useLoaderData<typeof loader>();
 
+  const [theme] = useTheme();
+
   return (
-    <html lang="en">
+    <html lang="en" className={clsx(theme)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <ThemeProviderNoFlash ssrTheme={Boolean(loaderData?.theme)} />
       </head>
       <body
         className={cn(
@@ -91,9 +109,11 @@ export default function App() {
   useSWEffect();
 
   return (
-    <Layout>
-      <Outlet />
-    </Layout>
+    <Providers>
+      <Layout>
+        <Outlet />
+      </Layout>
+    </Providers>
   );
 }
 
@@ -102,29 +122,35 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     return (
-      <Layout>
-        <PageHeader heading={`${error.status} ${error.statusText}`} />
-        <div className="prose">
-          <p>{error.data}</p>
-        </div>
-      </Layout>
+      <Providers>
+        <Layout>
+          <PageHeader heading={`${error.status} ${error.statusText}`} />
+          <div className="prose">
+            <p>{error.data}</p>
+          </div>
+        </Layout>
+      </Providers>
     );
   } else if (error instanceof Error) {
     return (
-      <Layout>
-        <PageHeader heading="Error" />
-        <div className="prose">
-          <p>{error.message}</p>
-          <p>The stack trace is:</p>
-          <pre>{error.stack}</pre>
-        </div>
-      </Layout>
+      <Providers>
+        <Layout>
+          <PageHeader heading="Error" />
+          <div className="prose">
+            <p>{error.message}</p>
+            <p>The stack trace is:</p>
+            <pre>{error.stack}</pre>
+          </div>
+        </Layout>
+      </Providers>
     );
   } else {
     return (
-      <Layout>
-        <PageHeader heading="Unknown Error" />
-      </Layout>
+      <Providers>
+        <Layout>
+          <PageHeader heading="Unknown Error" />
+        </Layout>
+      </Providers>
     );
   }
 }

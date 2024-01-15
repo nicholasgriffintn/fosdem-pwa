@@ -1,4 +1,5 @@
 import { Icons } from '~/components/Icons';
+import { ModeToggle } from '~/components/ModeToggle';
 
 export function Footer() {
   return (
@@ -34,6 +35,7 @@ export function Footer() {
             .
           </p>
         </div>
+        <ModeToggle />
       </div>
     </footer>
   );

@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, SunMedium, Moon } from 'lucide-react';
 
 export const Icons = {
   logo: ({ ...props }) => (
@@ -26,6 +26,8 @@ export const Icons = {
     </svg>
   ),
   close: X,
+  sun: SunMedium,
+  moon: Moon,
   gitHub: ({ ...props }) => (
     <svg
       aria-hidden="true"
