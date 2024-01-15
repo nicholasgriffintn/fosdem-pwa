@@ -99,12 +99,13 @@ export default function TrackPage() {
             <ResizablePanel defaultSize={25}>
               <div className="h-full p-6">
                 {event.abstract && (
-                  <div className="max-h-[500px] w-full prose prose-lg prose-indigo overflow-scroll">
+                  <div className="max-h-[420px] w-full prose prose-lg prose-indigo overflow-scroll">
                     <div dangerouslySetInnerHTML={{ __html: event.abstract }} />
                   </div>
                 )}
                 {event.links?.length > 0 && (
                   <div>
+                    <hr className="my-4" />
                     <h2>Links</h2>
                     <ul>
                       {event.links.map((link) => {
