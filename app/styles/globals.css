@@ -86,3 +86,23 @@ a {
   line-height: 1.2rem;
   margin-bottom: 1.2rem;
 }
+
+.bg-devroom {
+  background-image: url('/images/devroom.png');
+}
+
+.bg-keynote {
+  background-image: url('/images/keynote.png');
+}
+
+.bg-lightningtalk {
+  background-image: url('/images/lightningtalk.png');
+}
+
+.bg-maintrack {
+  background-image: url('/images/maintrack.png');
+}
+
+.bg-other {
+  background-image: url('/images/other.png');
+}

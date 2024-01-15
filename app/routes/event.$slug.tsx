@@ -28,10 +28,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 function EventPlayer({ event, isMobile = false }) {
   const videoWrapperClassName = clsx(
-    'flex h-full items-center justify-center p-6 bg-muted text-muted-foreground',
+    'flex h-full items-center justify-center bg-muted text-muted-foreground relative',
     {
       'min-h-[340px] rounded-md': isMobile,
-      'min-h-[420px]': !isMobile,
+      'min-h-[640px]': !isMobile,
     }
   );
   return (
@@ -53,7 +53,12 @@ function EventPlayer({ event, isMobile = false }) {
         </div>
       ) : (
         <div>
-          <span>Sorry! The stream isn't available yet!</span>
+          <div
+            className={`bg-${event.type} w-full h-full absolute top-0 left-0 z-0'`}
+          />
+          <div className="p-6 relative bg-muted p-6 rounded-md">
+            <span>Sorry! The stream isn't available yet!</span>
+          </div>
         </div>
       )}
     </div>
