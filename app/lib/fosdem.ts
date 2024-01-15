@@ -212,13 +212,7 @@ const buildEvent = (event, isLive, roomName, day) => {
   };
 };
 
-export async function getData({ year }: { year: string }) {
-  /* const cachedData = await kv.get(`fosdem-${year}`);
-
-  if (cachedData) {
-    return cachedData;
-  } */
-
+export async function buildData({ year }: { year: string }) {
   const url = constants.SCHEDULE_LINK.replace('${YEAR}', year);
   const response = await fetch(url);
   const text = await response.text();
@@ -321,7 +315,24 @@ export async function getData({ year }: { year: string }) {
     events,
   };
 
-  // await kv.set(`fosdem-${year}`, result, { ex: 900000, nx: true });
-
   return result;
+}
+
+export async function getData({ year }: { year: string }) {
+  try {
+    const url = constants.DATA_LINK.replace('${YEAR}', year);
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data) {
+      return null;
+    }
+
+    console.log(url, data);
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }

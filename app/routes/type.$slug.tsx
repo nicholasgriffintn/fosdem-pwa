@@ -26,6 +26,8 @@ export default function TrackPage() {
   const { slug } = useLoaderData<typeof loader>();
   const { fosdem } = useRouteLoaderData('root');
 
+  if (!fosdem) return null;
+
   const days = Object.values(fosdem.days);
 
   const type = fosdem.types[slug];

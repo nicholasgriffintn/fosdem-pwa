@@ -26,6 +26,8 @@ export default function TrackPage() {
   const { slug } = useLoaderData<typeof loader>();
   const { fosdem } = useRouteLoaderData('root');
 
+  if (!fosdem) return null;
+
   const days = Object.values(fosdem.days);
 
   const track = fosdem.tracks[slug];
@@ -49,8 +51,6 @@ export default function TrackPage() {
     acc[event.day].push(event);
     return acc;
   }, []);
-
-  console.log('eventDataSplitByDay', eventDataSplitByDay);
 
   return (
     <div className="min-h-screen">

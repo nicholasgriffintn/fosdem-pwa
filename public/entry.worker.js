@@ -6590,7 +6590,16 @@ var assetsHandler = cacheFirst({
     ignoreVary: true
   }
 });
-var defaultFetchHandler = ({ context, request }) => {
+var defaultFetchHandler = ({
+  context,
+  request
+}) => {
+  if (request.method !== "GET") {
+    return context.fetchFromServer();
+  }
+  if (request.url.includes("/api/")) {
+    return context.fetchFromServer();
+  }
   const type = matchRequest(request);
   if (type === "asset") {
     return assetsHandler(context.event.request);
@@ -6605,7 +6614,9 @@ var handler = new PrecacheHandler({
   documentCache,
   assetCache,
   state: {
-    ignoredRoutes: (route) => route.id.includes("api/")
+    ignoredRoutes: (route) => {
+      return route.id.includes("api.");
+    }
   }
 });
 self.addEventListener("message", (event) => {
@@ -6622,7 +6633,7 @@ var route5 = __toESM(require_type_slug());
 var route6 = __toESM(require_index());
 
 // assets-module:@remix-pwa/dev?assets
-var assets = ["/build/root-ORQZZTKJ.js", "/build/manifest-4801AD50.js", "/build/entry.client-VSMMK5KC.js", "/build/__remix_entry_dev-6LCUEISU.js", "/build/routes/type.$slug-KUWY65T6.js", "/build/routes/track.$slug-FDJB6KIB.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-2AQDY6SW.js", "/build/routes/api.cron-J3H57G5F.js", "/build/routes/_index-FDOQPQOD.js", "/build/_assets/globals-FBYBI26R.css", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-VJ66WSZF.js", "/build/_shared/chunk-QB3O6UCR.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-NFYMXIMP.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-J4N6E2NI.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-D74SNG3B.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-AA4HRKMN.js", "/build/_shared/chunk-76G7XZOH.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js", "/build/_shared/chunk-3M3EQHHR.js"];
+var assets = ["/build/root-ORQZZTKJ.js", "/build/manifest-5A7A2DDD.js", "/build/entry.client-VSMMK5KC.js", "/build/__remix_entry_dev-6LCUEISU.js", "/build/routes/type.$slug-6A3SPBY7.js", "/build/routes/track.$slug-CMUNDHHO.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-UQYVOCPM.js", "/build/routes/api.build-data-ENPSUSUQ.js", "/build/routes/_index-AGC3FDPP.js", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-VJ66WSZF.js", "/build/_shared/chunk-QB3O6UCR.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-NFYMXIMP.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-J4N6E2NI.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-D74SNG3B.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-AA4HRKMN.js", "/build/_shared/chunk-76G7XZOH.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js", "/build/_shared/chunk-3M3EQHHR.js", "/build/_assets/globals-FBYBI26R.css"];
 
 // entry-module:@remix-pwa/build/magic
 var routes = {
