@@ -86,7 +86,7 @@ function Layout({ children }: { children: React.ReactNode }) {
         <main className="flex min-h-screen flex-col">
           <Header />
           {loaderData?.user?.id && (
-            <div className="bg-primary text-white text-center py-2">
+            <div className="bg-muted text-muted-foreground text-center py-2">
               <p>
                 You are logged in as <strong>{loaderData.user.id}</strong>
               </p>
