@@ -72,7 +72,7 @@ export default function TrackPage() {
             className="min-h-[200px] rounded-lg border"
           >
             <ResizablePanel defaultSize={75}>
-              <div className="flex h-full items-center justify-center p-6 video-wrapper">
+              <div className="flex h-full items-center justify-center p-6 bg-muted text-muted-foreground">
                 {event.isLive && event.streams?.length ? (
                   <div>
                     {event.streams.map((stream) => {
