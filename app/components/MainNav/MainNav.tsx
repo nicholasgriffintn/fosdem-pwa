@@ -16,7 +16,7 @@ export function MainNav({
 
   return (
     <div className="flex gap-6 md:gap-10">
-      <Link to="/" className="hidden items-center space-x-2 md:flex">
+      <Link to="/" className="hidden items-center space-x-2 md:flex logo-link">
         <Icons.logo className="h-7 w-7" />
         <span className="hidden font-bold sm:inline-block">{title}</span>
       </Link>

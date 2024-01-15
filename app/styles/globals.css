@@ -81,9 +81,21 @@ a {
   font-weight: 500;
 }
 
+a:hover {
+  text-decoration-line: none;
+}
+
+.logo-link {
+  text-decoration-line: none;
+}
+
+.logo-link:hover {
+  text-decoration-line: underline;
+}
+
 .prose p {
   font-size: 1rem;
-  line-height: 1.2rem;
+  line-height: 1.5rem;
   margin-bottom: 1.2rem;
 }
 
