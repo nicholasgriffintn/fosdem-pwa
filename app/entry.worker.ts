@@ -58,7 +58,9 @@ const handler = new PrecacheHandler({
   dataCache,
   documentCache,
   assetCache,
-  state: {},
+  state: {
+    ignoredRoutes: (route) => route.id.includes('api/'),
+  },
 });
 
 self.addEventListener('message', event => {

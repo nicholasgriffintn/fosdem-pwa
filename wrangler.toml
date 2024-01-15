@@ -1,0 +1,3 @@
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "fosdem"
