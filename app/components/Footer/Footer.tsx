@@ -9,15 +9,27 @@ export function Footer() {
           <p className="text-center text-sm leading-loose md:text-left">
             <a href="/" className="font-medium underline underline-offset-4">
               FOSDEM PWA
-            </a>
-            . You can find the source code on{' '}
+            </a>{' '}
+            | Using data from{' '}
+            <a href="https://fosdem.org/" target="_blank" rel="noreferrer">
+              FOSDEM
+            </a>{' '}
+            | Hosted on{' '}
+            <a
+              href="https://www.cloudflare.com/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              CloudFlare
+            </a>{' '}
+            |{' '}
             <a
               href="https://github.com/nicholasgriffintn/fosdem-pwa"
               target="_blank"
               rel="noreferrer"
               className="font-medium underline underline-offset-4"
             >
-              GitHub
+              Source Code
             </a>
             .
           </p>
