@@ -26,9 +26,9 @@ export default function TrackPage() {
   const { slug } = useLoaderData<typeof loader>();
   const { fosdem } = useRouteLoaderData('root');
 
-  const event = fosdem.events[slug];
+  if (!fosdem) return null;
 
-  console.log(event);
+  const event = fosdem.events[slug];
 
   return (
     <div className="min-h-screen">

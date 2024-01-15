@@ -40,7 +40,18 @@ const assetsHandler = cacheFirst({
 
 // The default fetch event handler will be invoke if the
 // route is not matched by any of the worker action/loader.
-export const defaultFetchHandler: DefaultFetchHandler = ({ context, request }) => {
+export const defaultFetchHandler: DefaultFetchHandler = ({
+  context,
+  request,
+}) => {
+  if (request.method !== 'GET') {
+    return context.fetchFromServer();
+  }
+
+  if (request.url.includes('/api/')) {
+    return context.fetchFromServer();
+  }
+
   const type = matchRequest(request);
 
   if (type === 'asset') {
@@ -59,7 +70,9 @@ const handler = new PrecacheHandler({
   documentCache,
   assetCache,
   state: {
-    ignoredRoutes: (route) => route.id.includes('api/'),
+    ignoredRoutes: (route) => {
+      return route.id.includes('api.');
+    },
   },
 });
 

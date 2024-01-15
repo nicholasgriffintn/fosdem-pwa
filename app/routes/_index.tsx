@@ -14,6 +14,8 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   const { fosdem } = useRouteLoaderData('root');
 
+  if (!fosdem) return null;
+
   return (
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
