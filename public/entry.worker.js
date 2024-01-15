@@ -6369,205 +6369,64 @@ var MessageHandler = class {
   }
 };
 
-// node_modules/.pnpm/@remix-pwa+sw@2.1.12_@remix-pwa+cache@2.0.12_@remix-run+dev@2.5.0_@remix-run+react@2.5.0_reac_5n7isixezl4kpfgicdkdtgf6ty/node_modules/@remix-pwa/sw/dist/src/message/precacheHandler.js
-var PrecacheHandler = class extends MessageHandler {
+// node_modules/.pnpm/@remix-pwa+sw@2.1.12_@remix-pwa+cache@2.0.12_@remix-run+dev@2.5.0_@remix-run+react@2.5.0_reac_5n7isixezl4kpfgicdkdtgf6ty/node_modules/@remix-pwa/sw/dist/src/message/remixNavigationHandler.js
+var RemixNavigationHandler = class extends MessageHandler {
   dataCacheName;
   documentCacheName;
-  assetCacheName;
-  _ignoredFiles = null;
-  // private _whiteListRoutes: PrecacheHandlerState['whiteListRoutes'] = null;
-  // private _staticAssets: PrecacheHandlerState['staticAssets'] = [];
-  constructor({ assetCache: assetCache2, dataCache: dataCache2, documentCache: documentCache2, plugins, state }) {
-    super({ plugins, state: {} });
+  constructor({ dataCache: dataCache2, documentCache: documentCache2, plugins, state }) {
+    super({ plugins, state });
     this.dataCacheName = dataCache2;
     this.documentCacheName = documentCache2;
-    this.assetCacheName = assetCache2;
     this._handleMessage = this._handleMessage.bind(this);
-    this._ignoredFiles = state?.ignoredRoutes || null;
   }
   async _handleMessage(event) {
     const { data } = event;
-    let dataCache2, documentCache2, assetCache2;
+    let dataCache2, documentCache2;
     dataCache2 = this.dataCacheName;
     documentCache2 = this.documentCacheName;
-    if (data.type !== "REMIX_NAVIGATION" || !data.isMount)
-      return;
     this.runPlugins("messageDidReceive", {
       event
     });
     const cachePromises = /* @__PURE__ */ new Map();
-    if (typeof dataCache2 === "string") {
-      dataCache2 = Storage.open(dataCache2);
-    }
-    if (typeof documentCache2 === "string") {
-      documentCache2 = Storage.open(documentCache2);
-    }
-    if (typeof this.assetCacheName === "string") {
-      assetCache2 = Storage.open(assetCache2);
-    }
-    const manifest = data.manifest;
-    const routes2 = Object.values(manifest?.routes || {});
-    for (const route of routes2) {
-      if (route.id.includes("$")) {
-        if (true)
-          logger.info("Skipping parametrized route:", route.id);
-        continue;
+    if (data.type === "REMIX_NAVIGATION") {
+      const { isMount, location, manifest, matches } = data;
+      const documentUrl = location.pathname + location.search + location.hash;
+      if (typeof dataCache2 === "string") {
+        dataCache2 = Storage.open(dataCache2);
       }
-      if (Array.isArray(this._ignoredFiles)) {
-        if (typeof this._ignoredFiles[0] === "string") {
-          if (this._ignoredFiles.includes("*")) {
-            break;
-          }
-          const map = this._ignoredFiles.map((ignoredRoute) => {
-            ignoredRoute = ignoredRoute;
-            ignoredRoute = ignoredRoute.charAt(0) === "/" ? ignoredRoute : ignoredRoute = "/" + ignoredRoute;
-            if (getPathname(route) === ignoredRoute) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          if (map.includes(true))
-            continue;
-        } else if (typeof this._ignoredFiles[0] === "function") {
-          const map = this._ignoredFiles.map((ignoredRoute) => {
-            ignoredRoute = ignoredRoute;
-            if (ignoredRoute(route)) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          if (map.includes(true))
-            continue;
-        } else if (this._ignoredFiles[0] instanceof RegExp) {
-          const map = this._ignoredFiles.map((ignoredRoute) => {
-            ignoredRoute = ignoredRoute;
-            if (ignoredRoute.test(getPathname(route))) {
-              return true;
-            } else {
-              return false;
-            }
-          });
-          if (map.includes(true))
-            continue;
-        } else {
+      if (typeof documentCache2 === "string") {
+        documentCache2 = Storage.open(documentCache2);
+      }
+      const existingDocument = await Storage._match(documentUrl);
+      if (!existingDocument || !isMount) {
+        const response = await fetch(documentUrl);
+        cachePromises.set(documentUrl, documentCache2.put(documentUrl, response).catch((error) => {
           if (true)
-            logger.error("Invalid ignoredRoutes type:", this._ignoredFiles);
-        }
-      } else if (typeof this._ignoredFiles === "function") {
-        if (this._ignoredFiles(route)) {
-          continue;
+            logger.error(`Failed to cache document for ${documentUrl}:`, error);
+        }));
+      }
+      if (isMount) {
+        for (const match of matches) {
+          if (manifest.routes[match.id].hasLoader) {
+            const params = new URLSearchParams(location.search);
+            params.set("_data", match.id);
+            let search = params.toString();
+            search = search ? `?${search}` : "";
+            const url = location.pathname + search + location.hash;
+            if (!cachePromises.has(url)) {
+              if (true)
+                logger.debug("Caching data for:", url);
+              const response = await fetch(url);
+              cachePromises.set(url, dataCache2.put(url, response).catch((error) => {
+                if (true)
+                  logger.error(`Failed to cache data for ${url}:`, error);
+              }));
+            }
+          }
         }
       }
-      cacheRoute(route);
     }
     await Promise.all(cachePromises.values());
-    async function cacheRoute(route) {
-      const pathname = getPathname(route);
-      if (route.hasLoader) {
-        await cacheLoaderData(route);
-      }
-      if (route.module) {
-        cachePromises.set(route.module, cacheAsset(route.module));
-      }
-      if (route.imports) {
-        for (const assetUrl of route.imports) {
-          if (true) {
-            logger.groupCollapsed("Caching asset: ", assetUrl);
-            logger.log("Is index:", route.index || false);
-            logger.log("Parent ID:", route.parentId);
-            logger.log("Imports:", route.imports);
-            logger.log("Module:", route.module);
-            logger.groupEnd();
-          }
-          if (cachePromises.has(assetUrl)) {
-            continue;
-          }
-          cachePromises.set(assetUrl, cacheAsset(assetUrl));
-        }
-      }
-      if (true)
-        logger.info("Caching document:", pathname);
-      const response = await fetch(pathname);
-      cachePromises.set(
-        pathname,
-        // @ts-expect-error
-        documentCache2.put(pathname, response).catch((error) => {
-          if (error instanceof TypeError) {
-            if (true)
-              logger.error(`TypeError when caching document ${pathname}:`, error.message);
-          } else if (error instanceof DOMException) {
-            if (true)
-              logger.error(`DOMException when caching document ${pathname}:`, error.message);
-          } else {
-            if (true)
-              logger.error(`Failed to cache document ${pathname}:`, error);
-          }
-        })
-      );
-    }
-    async function cacheLoaderData(route) {
-      const pathname = getPathname(route);
-      const params = new URLSearchParams({ _data: route.id });
-      const search = `?${params.toString()}`;
-      const url = pathname + search;
-      if (!cachePromises.has(url)) {
-        const data2 = await fetch(url);
-        cachePromises.set(
-          url,
-          // @ts-expect-error
-          dataCache2.put(url, data2).catch((error) => {
-            if (error instanceof TypeError) {
-              if (true)
-                logger.error(`TypeError when caching data ${pathname}:`, error.message);
-            } else if (error instanceof DOMException) {
-              if (true)
-                logger.error(`DOMException when caching data ${pathname}:`, error.message);
-            } else {
-              if (true)
-                logger.error(`Failed to cache data ${pathname}:`, error);
-            }
-          })
-        );
-      }
-    }
-    async function cacheAsset(assetUrl) {
-      if (await assetCache2.match(assetUrl, {
-        ignoreSearch: true,
-        ignoreVary: true
-      })) {
-        return;
-      }
-      const response = await fetch(assetUrl);
-      return assetCache2.put(assetUrl, response).catch((error) => {
-        if (error instanceof TypeError) {
-          if (true)
-            logger.error(`TypeError when caching asset ${assetUrl}:`, error.message);
-        } else if (error instanceof DOMException) {
-          if (true)
-            logger.error(`DOMException when caching asset ${assetUrl}:`, error.message);
-        } else {
-          if (true)
-            logger.error(`Failed to cache asset ${assetUrl}:`, error);
-        }
-      });
-    }
-    function getPathname(route) {
-      if (route.index && route.parentId === "root")
-        return "/";
-      let pathname = "";
-      if (route.path && route.path.length > 0) {
-        pathname = "/" + route.path;
-      }
-      if (route.parentId) {
-        const parentPath = getPathname(manifest.routes[route.parentId]);
-        if (parentPath) {
-          pathname = parentPath + pathname;
-        }
-      }
-      return pathname;
-    }
   }
 };
 
@@ -6604,7 +6463,10 @@ var defaultFetchHandler = ({
   if (request.method !== "GET") {
     return context.fetchFromServer();
   }
-  if (request.url.includes("/api/")) {
+  if (request.url.includes("/api/") || request.url.includes("api.")) {
+    return context.fetchFromServer();
+  }
+  if (request.url.includes("/action/") || request.url.includes("action.")) {
     return context.fetchFromServer();
   }
   const type = matchRequest(request);
@@ -6616,15 +6478,9 @@ var defaultFetchHandler = ({
   }
   return context.fetchFromServer();
 };
-var handler = new PrecacheHandler({
+var handler = new RemixNavigationHandler({
   dataCache,
-  documentCache,
-  assetCache,
-  state: {
-    ignoredRoutes: (route) => {
-      return route.id.includes("api.") || route.id.includes("action.");
-    }
-  }
+  documentCache
 });
 self.addEventListener("message", (event) => {
   event.waitUntil(handler.handle(event));
@@ -6641,7 +6497,7 @@ var route6 = __toESM(require_type_slug());
 var route7 = __toESM(require_index());
 
 // assets-module:@remix-pwa/dev?assets
-var assets = [];
+var assets = ["/build/root-4P2RHEBE.js", "/build/manifest-091E2C12.js", "/build/entry.client-3SCKLKC5.js", "/build/__remix_entry_dev-MUVWNHZW.js", "/build/_assets/globals-MQWCDDGS.css", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-Z4I3Q6LH.js", "/build/_shared/chunk-VK2I7QNU.js", "/build/_shared/chunk-ULJD3E76.js", "/build/_shared/chunk-QVRSZTTZ.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-G4YLQOAQ.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-76G7XZOH.js", "/build/_shared/chunk-5DDXOS3C.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js", "/build/_shared/chunk-2XLROKFW.js", "/build/routes/type.$slug-NPR6PXJS.js", "/build/routes/track.$slug-AJG4QR2U.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-UZDONHJO.js", "/build/routes/api.build-data-ENPSUSUQ.js", "/build/routes/action.set-theme-HPLUF7FO.js", "/build/routes/_index-SZTPSSMC.js"];
 
 // entry-module:@remix-pwa/build/magic
 var routes = {

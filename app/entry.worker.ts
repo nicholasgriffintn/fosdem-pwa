@@ -3,7 +3,11 @@
 import { Storage } from '@remix-pwa/cache';
 import { cacheFirst, networkFirst } from '@remix-pwa/strategy';
 import type { DefaultFetchHandler } from '@remix-pwa/sw';
-import { PrecacheHandler, matchRequest } from '@remix-pwa/sw';
+import {
+  PrecacheHandler,
+  RemixNavigationHandler,
+  matchRequest,
+} from '@remix-pwa/sw';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -48,7 +52,11 @@ export const defaultFetchHandler: DefaultFetchHandler = ({
     return context.fetchFromServer();
   }
 
-  if (request.url.includes('/api/')) {
+  if (request.url.includes('/api/') || request.url.includes('api.')) {
+    return context.fetchFromServer();
+  }
+
+  if (request.url.includes('/action/') || request.url.includes('action.')) {
     return context.fetchFromServer();
   }
 
@@ -65,15 +73,9 @@ export const defaultFetchHandler: DefaultFetchHandler = ({
   return context.fetchFromServer();
 };
 
-const handler = new PrecacheHandler({
+const handler = new RemixNavigationHandler({
   dataCache,
   documentCache,
-  assetCache,
-  state: {
-    ignoredRoutes: (route) => {
-      return route.id.includes('api.') || route.id.includes('action.');
-    },
-  },
 });
 
 self.addEventListener('message', event => {
