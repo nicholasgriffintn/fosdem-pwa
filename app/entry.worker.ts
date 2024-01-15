@@ -71,7 +71,7 @@ const handler = new PrecacheHandler({
   assetCache,
   state: {
     ignoredRoutes: (route) => {
-      return route.id.includes('api.');
+      return route.id.includes('api.') || route.id.includes('action.');
     },
   },
 });
