@@ -1940,16 +1940,16 @@ var require_track_slug = __commonJS({
   }
 });
 
-// routes-module:routes/_index.tsx?worker
-var require_index = __commonJS({
-  "routes-module:routes/_index.tsx?worker"(exports, module) {
+// routes-module:routes/type.$slug.tsx?worker
+var require_type_slug = __commonJS({
+  "routes-module:routes/type.$slug.tsx?worker"(exports, module) {
     module.exports = {};
   }
 });
 
-// routes-module:routes/$slug.tsx?worker
-var require_slug = __commonJS({
-  "routes-module:routes/$slug.tsx?worker"(exports, module) {
+// routes-module:routes/_index.tsx?worker
+var require_index = __commonJS({
+  "routes-module:routes/_index.tsx?worker"(exports, module) {
     module.exports = {};
   }
 });
@@ -6608,11 +6608,11 @@ var route0 = __toESM(require_root());
 var route1 = __toESM(require_manifest_webmanifest());
 var route2 = __toESM(require_event_slug());
 var route3 = __toESM(require_track_slug());
-var route4 = __toESM(require_index());
-var route5 = __toESM(require_slug());
+var route4 = __toESM(require_type_slug());
+var route5 = __toESM(require_index());
 
 // assets-module:@remix-pwa/dev?assets
-var assets = ["/build/root-RSJWBH74.js", "/build/manifest-FFF27F8A.js", "/build/entry.client-VSMMK5KC.js", "/build/__remix_entry_dev-L3MQ2OVW.js", "/build/_assets/globals-FBYBI26R.css", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-VJ66WSZF.js", "/build/_shared/chunk-QB3O6UCR.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-NFYMXIMP.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-J4N6E2NI.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-D74SNG3B.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-AA4HRKMN.js", "/build/_shared/chunk-76G7XZOH.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js", "/build/_shared/chunk-3M3EQHHR.js", "/build/routes/track.$slug-FDJB6KIB.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-NV54SBNK.js", "/build/routes/_index-MFZBHXYF.js", "/build/routes/$slug-IJFNQA4Q.js"];
+var assets = ["/build/root-RSJWBH74.js", "/build/manifest-5431A33B.js", "/build/entry.client-VSMMK5KC.js", "/build/__remix_entry_dev-L3MQ2OVW.js", "/build/_assets/globals-FBYBI26R.css", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-VJ66WSZF.js", "/build/_shared/chunk-QB3O6UCR.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-NFYMXIMP.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-J4N6E2NI.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-D74SNG3B.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-AA4HRKMN.js", "/build/_shared/chunk-76G7XZOH.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js", "/build/_shared/chunk-3M3EQHHR.js", "/build/routes/track.$slug-FDJB6KIB.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-NV54SBNK.js", "/build/routes/_index-FDOQPQOD.js", "/build/routes/$slug-IJFNQA4Q.js"];
 
 // entry-module:@remix-pwa/build/magic
 var routes = {
@@ -6648,19 +6648,19 @@ var routes = {
     caseSensitive: void 0,
     module: route3
   },
+  "routes/type.$slug": {
+    id: "routes/type.$slug",
+    parentId: "root",
+    path: "type/:slug",
+    index: void 0,
+    caseSensitive: void 0,
+    module: route4
+  },
   "routes/_index": {
     id: "routes/_index",
     parentId: "root",
     path: void 0,
     index: true,
-    caseSensitive: void 0,
-    module: route4
-  },
-  "routes/$slug": {
-    id: "routes/$slug",
-    parentId: "root",
-    path: ":slug",
-    index: void 0,
     caseSensitive: void 0,
     module: route5
   }
