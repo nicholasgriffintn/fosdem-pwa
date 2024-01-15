@@ -14,7 +14,7 @@ import {
 import { useSWEffect, LiveReload } from '@remix-pwa/sw';
 
 import styles from '~/styles/globals.css';
-import { getSession, commitSession } from '~/sessions';
+import { getSession, commitSession } from '~/sessions.server';
 import { getData } from '~/lib/fosdem';
 import { cn } from '~/lib/utils';
 import { Header } from '~/components/Header';
