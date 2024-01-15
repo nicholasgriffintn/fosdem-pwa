@@ -5,6 +5,7 @@ export const loader = async () => {
     {
       short_name: 'FOSDEM',
       name: 'FOSDEM PWA',
+      description: 'A companion PWA for the FOSDEM 2024 event',
       start_url: '/',
       display: 'standalone',
       background_color: '#d3d7dd',
@@ -15,7 +16,7 @@ export const loader = async () => {
           url: '/',
           icons: [
             {
-              src: '/icons/android-icon-96x96.png',
+              src: '/icons/android-chrome-96x96.png',
               sizes: '96x96',
               type: 'image/png',
               purpose: 'any monochrome',
@@ -25,31 +26,31 @@ export const loader = async () => {
       ],
       icons: [
         {
-          src: '/icons/android-icon-36x36.png',
+          src: '/icons/android-chrome-36x36.png',
           sizes: '36x36',
           type: 'image/png',
           density: '0.75',
         },
         {
-          src: '/icons/android-icon-48x48.png',
+          src: '/icons/android-chrome-48x48.png',
           sizes: '48x48',
           type: 'image/png',
           density: '1.0',
         },
         {
-          src: '/icons/android-icon-72x72.png',
+          src: '/icons/android-chrome-72x72.png',
           sizes: '72x72',
           type: 'image/png',
           density: '1.5',
         },
         {
-          src: '/icons/android-icon-96x96.png',
+          src: '/icons/android-chrome-96x96.png',
           sizes: '96x96',
           type: 'image/png',
           density: '2.0',
         },
         {
-          src: '/icons/android-icon-144x144.png',
+          src: '/icons/android-chrome-144x144.png',
           sizes: '144x144',
           type: 'image/png',
           density: '3.0',
@@ -63,6 +64,30 @@ export const loader = async () => {
           src: '/icons/android-chrome-256x256.png',
           sizes: '256x256',
           type: 'image/png',
+        },
+        {
+          src: '/icons/android-chrome-384x384.png',
+          sizes: '384x384',
+          type: 'image/png',
+        },
+        {
+          src: '/icons/android-chrome-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+      screenshots: [
+        {
+          src: 'screenshots/1.jpg',
+          sizes: '1080x1920',
+          type: 'image/webp',
+          form_factor: 'narrow',
+        },
+        {
+          src: 'screenshots/2.png',
+          sizes: '3314x1920',
+          type: 'image/webp',
+          form_factor: 'wide',
         },
       ],
     },
