@@ -39,13 +39,21 @@ export default function TrackPage() {
     (event) => event.trackKey === slug
   );
 
-  const eventDataSplitByDay = eventData.reduce((acc, event) => {
-    if (!acc[event.day]) {
-      acc[event.day] = [];
+  const eventDataSplitByDay = {};
+
+  eventData.forEach((event) => {
+    if (!eventDataSplitByDay[event.day[0]]) {
+      eventDataSplitByDay[event.day[0]] = [];
     }
-    acc[event.day].push(event);
-    return acc;
-  }, []);
+    eventDataSplitByDay[event.day[0]].push(event);
+
+    if (event.day[1]) {
+      if (!eventDataSplitByDay[event.day[1]]) {
+        eventDataSplitByDay[event.day[1]] = [];
+      }
+      eventDataSplitByDay[event.day[1]].push(event);
+    }
+  });
 
   return (
     <div className="min-h-screen">
