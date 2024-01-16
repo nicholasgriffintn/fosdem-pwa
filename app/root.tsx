@@ -23,7 +23,7 @@ import {
 import { getSessionFromCookie, commitSessionCookie } from '~/services/session';
 import { getUserFromSession } from '~/services/auth';
 import { getThemeFromSession } from './services/theme';
-import { getData } from '~/lib/fosdem';
+import { getConferenceData } from '~/services/requests';
 import { cn } from '~/lib/utils';
 import { Header } from '~/components/Header';
 import { Footer } from '~/components/Footer';
@@ -50,7 +50,7 @@ export async function loader({ request }: { request: Request }) {
     const theme = await getThemeFromSession(session);
     const themeDetails = theme?.getTheme();
 
-    const fosdem = await getData({ year: '2024' });
+    const fosdem = await getConferenceData('2024');
 
     const data = {
       user: userDetails || null,
