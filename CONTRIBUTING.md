@@ -13,7 +13,19 @@ Before you do though, please read the [Code of Conduct](CODE_OF_CONDUCT.md) and 
 
 ## Development
 
-From your terminal:
+From your terminal install the dependencies:
+
+```sh
+pnpm install
+```
+
+Then initialise the database:
+
+```sh
+pnpm local:d1:init
+```
+
+Then start the app in development mode:
 
 ```sh
 pnpm run dev
