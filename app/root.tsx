@@ -43,8 +43,9 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   try {
     const cookie = request.headers.get('Cookie') || '';
     const session = await getSessionFromCookie(cookie);
+    const userAgent = request.headers.get('User-Agent') || '';
 
-    const user = await getUserFromSession(session, context);
+    const user = await getUserFromSession(session, userAgent, context);
     const userDetails = await user?.getUser();
     const theme = await getThemeFromSession(session);
     const themeDetails = theme?.getTheme();

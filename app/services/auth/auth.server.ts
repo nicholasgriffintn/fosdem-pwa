@@ -1,16 +1,23 @@
 import type { CustomSession } from '~/services/session';
 import type { AppLoadContext } from '@remix-run/cloudflare';
 import { eq } from 'drizzle-orm';
+import { isbot } from 'isbot';
 
 import { getDbFromContext, users } from '~/services/database';
 import { randomUsername } from '~/lib/username';
 
 export const getUserFromSession = async (
   session: CustomSession,
+  userAgent: string,
   context: AppLoadContext
 ) => {
   return {
     getUser: async () => {
+      const isThisUserABot = isbot(userAgent);
+      if (isThisUserABot || !userAgent) {
+        return null;
+      }
+
       const userValue = session.get('user');
 
       const db = getDbFromContext(context);
