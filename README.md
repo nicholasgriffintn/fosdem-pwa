@@ -18,6 +18,8 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] The ability to upgrade a guest sign in to a full account, and sign in with that instead
 - [ ] A page for the user profile, with a generated pass for the event
 - [x] The ability to bookmark tracks and events
+- [ ] Bookmarks are background synced when offline
+- [ ] Sends push notifications for bookmarked events
 - [ ] The ability to share tracks and events
 - [ ] The ability to share your bookmarks
 - [ ] A page to view your bookmarked tracks and events
@@ -35,6 +37,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] Unsure if the video player looks good/ works yet
 - [ ] Events and Tracks are not sorted
 - [ ] The duration is currently being displayed, instead, we should display and calculate the end time from the start time and duration
+
 
 ## Contributing
 
