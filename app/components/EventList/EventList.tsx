@@ -2,9 +2,8 @@ import { useNavigate } from '@remix-run/react';
 import clsx from 'clsx';
 
 import { Button } from '~/components/ui/button';
-import { Icons } from '~/components/Icons';
-import { toast } from '~/components/ui/use-toast';
 import { FavouriteButton } from '~/components/FavouriteButton';
+import { ShareButton } from '~/components/ShareButton';
 
 type EventListItem = {
   id: string;
@@ -56,17 +55,11 @@ function EventListItem({
           slug={event.id}
           status={event.isFavourited ? 'favourited' : 'unfavourited'}
         />
-        <Button
-          variant="ghost"
-          onClick={() =>
-            toast({
-              title: 'Not implemented',
-              description: "We're still working on sharing items.",
-            })
-          }
-        >
-          <Icons.share />
-        </Button>
+        <ShareButton
+          title={event.title}
+          text={`Check out ${event.title} at FOSDEM`}
+          url={`https://fosdempwa.com/event/${event.id}`}
+        />
         <Button
           variant="outline"
           onClick={() => navigate(`/event/${event.id}`)}

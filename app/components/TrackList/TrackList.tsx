@@ -2,9 +2,8 @@ import { useNavigate } from '@remix-run/react';
 import clsx from 'clsx';
 
 import { Button } from '~/components/ui/button';
-import { Icons } from '~/components/Icons';
-import { toast } from '~/components/ui/use-toast';
 import { FavouriteButton } from '~/components/FavouriteButton';
+import { ShareButton } from '~/components/ShareButton';
 
 type TrackListItem = {
   id: string;
@@ -53,17 +52,11 @@ function TrackListItem({
           slug={track.id}
           status={track.isFavourited ? 'favourited' : 'unfavourited'}
         />
-        <Button
-          variant="ghost"
-          onClick={() =>
-            toast({
-              title: 'Not implemented',
-              description: "We're still working on sharing items.",
-            })
-          }
-        >
-          <Icons.share />
-        </Button>
+        <ShareButton
+          title={track.name}
+          text={`Check out ${track.name} at FOSDEM`}
+          url={`https://fosdempwa.com/track/${track.id}`}
+        />
         <Button
           variant="outline"
           onClick={() => navigate(`/track/${track.id}`)}
