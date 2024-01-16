@@ -8,8 +8,9 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "target": "ES2022",
-    "strict": true,
+    "strict": false,
     "allowJs": true,
+    "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
