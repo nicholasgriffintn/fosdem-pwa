@@ -15,6 +15,7 @@ import { Button } from '~/components/ui/button';
 import { toast } from '~/components/ui/use-toast';
 import { useWindowSize } from '~/hooks/useWindowSize';
 import { FavouriteButton } from '../components/FavouriteButton';
+import { ShareButton } from '~/components/ShareButton';
 
 export const meta: MetaFunction = () => {
   return [
@@ -135,17 +136,11 @@ export default function TrackPage() {
               slug={slug}
               status={isFavourite?.status ?? 'unfavourited'}
             />
-            <Button
-              variant="ghost"
-              onClick={() =>
-                toast({
-                  title: 'Not implemented',
-                  description: "We're still working on sharing items.",
-                })
-              }
-            >
-              <Icons.share />
-            </Button>
+            <ShareButton
+              title={event.title}
+              text={`Check out ${event.title} at FOSDEM`}
+              url={`https://fosdempwa.com/event/${event.id}`}
+            />
           </div>
         </PageHeader>
         <div className="w-full">
