@@ -33,6 +33,8 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] There are a bunch of eslint and typescript issues
 - [ ] Lists are not currently responsive
 - [ ] Unsure if the video player looks good/ works yet
+- [ ] Events and Tracks are not sorted
+- [ ] The duration is currently being displayed, instead, we should display and calculate the end time from the start time and duration
 
 ## Contributing
 
