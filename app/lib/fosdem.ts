@@ -229,6 +229,16 @@ export async function buildData({ year }: { year: string }) {
   const events = {};
   const tracks = {};
 
+  const typeKeys = Object.keys(typeData);
+
+  for (const type of typeKeys) {
+    types[type] = {
+      id: type,
+      name: typeData[type].name,
+      trackCount: 0,
+    };
+  }
+
   for (const day of data.day) {
     const index = day._attributes.index;
     const date = day._attributes.date;
@@ -270,11 +280,7 @@ export async function buildData({ year }: { year: string }) {
 
         const type = eventData.type;
         if (!types[type]) {
-          types[type] = {
-            id: type,
-            name: typeData[type].name,
-            trackCount: 0,
-          };
+          console.error(`Unknown type: ${type}`);
         }
 
         const trackKey = eventData.trackKey;
