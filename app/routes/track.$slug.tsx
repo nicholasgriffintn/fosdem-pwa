@@ -19,7 +19,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export default function TrackPage() {
   const { slug } = useLoaderData<typeof loader>();
-  const { fosdem } = useRouteLoaderData('root');
+  const { fosdem, favourites } = useRouteLoaderData('root');
 
   if (!fosdem) return null;
 
@@ -55,6 +55,10 @@ export default function TrackPage() {
     }
   });
 
+  const eventFavorites = favourites?.length
+    ? favourites.filter((bookmark) => bookmark.type === 'event')
+    : [];
+
   return (
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
@@ -83,7 +87,7 @@ export default function TrackPage() {
 
             return (
               <TabsContent key={day.id} value={day.id}>
-                <EventList events={event} />
+                <EventList events={event} favourites={eventFavorites} />
               </TabsContent>
             );
           })}

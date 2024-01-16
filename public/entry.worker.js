@@ -1926,6 +1926,13 @@ var require_manifest_webmanifest = __commonJS({
   }
 });
 
+// routes-module:routes/action.favourite-item.tsx?worker
+var require_action_favourite_item = __commonJS({
+  "routes-module:routes/action.favourite-item.tsx?worker"(exports, module) {
+    module.exports = {};
+  }
+});
+
 // routes-module:routes/action.set-theme.tsx?worker
 var require_action_set_theme = __commonJS({
   "routes-module:routes/action.set-theme.tsx?worker"(exports, module) {
@@ -1936,6 +1943,13 @@ var require_action_set_theme = __commonJS({
 // routes-module:routes/api.build-data.ts?worker
 var require_api_build_data = __commonJS({
   "routes-module:routes/api.build-data.ts?worker"(exports, module) {
+    module.exports = {};
+  }
+});
+
+// routes-module:routes/api.favourites.tsx?worker
+var require_api_favourites = __commonJS({
+  "routes-module:routes/api.favourites.tsx?worker"(exports, module) {
     module.exports = {};
   }
 });
@@ -6489,15 +6503,17 @@ self.addEventListener("message", (event) => {
 // entry-module:@remix-pwa/build/magic
 var route0 = __toESM(require_root());
 var route1 = __toESM(require_manifest_webmanifest());
-var route2 = __toESM(require_action_set_theme());
-var route3 = __toESM(require_api_build_data());
-var route4 = __toESM(require_event_slug());
-var route5 = __toESM(require_track_slug());
-var route6 = __toESM(require_type_slug());
-var route7 = __toESM(require_index());
+var route2 = __toESM(require_action_favourite_item());
+var route3 = __toESM(require_action_set_theme());
+var route4 = __toESM(require_api_build_data());
+var route5 = __toESM(require_api_favourites());
+var route6 = __toESM(require_event_slug());
+var route7 = __toESM(require_track_slug());
+var route8 = __toESM(require_type_slug());
+var route9 = __toESM(require_index());
 
 // assets-module:@remix-pwa/dev?assets
-var assets = ["/build/root-VP4MWNRR.js", "/build/manifest-007F0E46.js", "/build/entry.client-3SCKLKC5.js", "/build/__remix_entry_dev-MUVWNHZW.js", "/build/routes/type.$slug-6IGTTGK5.js", "/build/routes/track.$slug-YCZTPEJL.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-57WI7RI2.js", "/build/routes/api.build-data-ENPSUSUQ.js", "/build/routes/action.set-theme-HPLUF7FO.js", "/build/routes/_index-UAIJV3OG.js", "/build/_assets/globals-5KJRF52U.css", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-N6KZWQAX.js", "/build/_shared/chunk-L3D7OXBA.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-GBZ5MMIC.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-7OI3DQWM.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js"];
+var assets = ["/build/root-KSFUKNVQ.js", "/build/manifest-546D8027.js", "/build/entry.client-XMALRYIU.js", "/build/__remix_entry_dev-QXB7GY72.js", "/build/routes/type.$slug-OFHXV7AU.js", "/build/routes/track.$slug-XIHDFKDD.js", "/build/routes/manifest[.]webmanifest-J3KYYY3Q.js", "/build/routes/event.$slug-SMVODPUZ.js", "/build/routes/api.favourites-2SYZANRZ.js", "/build/routes/api.build-data-ENPSUSUQ.js", "/build/routes/action.set-theme-HPLUF7FO.js", "/build/routes/action.favourite-item-5NCSFHTA.js", "/build/routes/_index-Y3TQ5TXD.js", "/build/_assets/globals-3NUDNW7V.css", "/build/_shared/runtime-ZFKNW5BR.js", "/build/_shared/remix_hmr-732MILAX.js", "/build/_shared/react-dom-FDOIOBMT.js", "/build/_shared/react-KINKPTZX.js", "/build/_shared/jsx-runtime-UIJ2I6YU.js", "/build/_shared/jsx-dev-runtime-VZSIHBRO.js", "/build/_shared/esm-AWQFF2A3.js", "/build/_shared/client-ILSEVI3S.js", "/build/_shared/chunk-PNG5AS42.js", "/build/_shared/chunk-O4OKU2LD.js", "/build/_shared/chunk-NRH5LTJ7.js", "/build/_shared/chunk-N6KZWQAX.js", "/build/_shared/chunk-LKTJUI4Y.js", "/build/_shared/chunk-L3D7OXBA.js", "/build/_shared/chunk-K6PKGSTD.js", "/build/_shared/chunk-H5ZE7JVG.js", "/build/_shared/chunk-GBZ5MMIC.js", "/build/_shared/chunk-C3RNZX3L.js", "/build/_shared/chunk-BA6NHEY4.js", "/build/_shared/chunk-4QFRZGTH.js", "/build/_shared/chunk-3O6Y2MQ2.js"];
 
 // entry-module:@remix-pwa/build/magic
 var routes = {
@@ -6517,13 +6533,21 @@ var routes = {
     caseSensitive: void 0,
     module: route1
   },
+  "routes/action.favourite-item": {
+    id: "routes/action.favourite-item",
+    parentId: "root",
+    path: "action/favourite-item",
+    index: void 0,
+    caseSensitive: void 0,
+    module: route2
+  },
   "routes/action.set-theme": {
     id: "routes/action.set-theme",
     parentId: "root",
     path: "action/set-theme",
     index: void 0,
     caseSensitive: void 0,
-    module: route2
+    module: route3
   },
   "routes/api.build-data": {
     id: "routes/api.build-data",
@@ -6531,7 +6555,15 @@ var routes = {
     path: "api/build-data",
     index: void 0,
     caseSensitive: void 0,
-    module: route3
+    module: route4
+  },
+  "routes/api.favourites": {
+    id: "routes/api.favourites",
+    parentId: "root",
+    path: "api/favourites",
+    index: void 0,
+    caseSensitive: void 0,
+    module: route5
   },
   "routes/event.$slug": {
     id: "routes/event.$slug",
@@ -6539,7 +6571,7 @@ var routes = {
     path: "event/:slug",
     index: void 0,
     caseSensitive: void 0,
-    module: route4
+    module: route6
   },
   "routes/track.$slug": {
     id: "routes/track.$slug",
@@ -6547,7 +6579,7 @@ var routes = {
     path: "track/:slug",
     index: void 0,
     caseSensitive: void 0,
-    module: route5
+    module: route7
   },
   "routes/type.$slug": {
     id: "routes/type.$slug",
@@ -6555,7 +6587,7 @@ var routes = {
     path: "type/:slug",
     index: void 0,
     caseSensitive: void 0,
-    module: route6
+    module: route8
   },
   "routes/_index": {
     id: "routes/_index",
@@ -6563,7 +6595,7 @@ var routes = {
     path: void 0,
     index: true,
     caseSensitive: void 0,
-    module: route7
+    module: route9
   }
 };
 var entry = { module: entry_worker_exports };

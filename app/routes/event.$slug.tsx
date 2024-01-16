@@ -14,6 +14,7 @@ import { Icons } from '~/components/Icons';
 import { Button } from '~/components/ui/button';
 import { toast } from '~/components/ui/use-toast';
 import { useWindowSize } from '~/hooks/useWindowSize';
+import { FavouriteButton } from '../components/FavouriteButton';
 
 export const meta: MetaFunction = () => {
   return [
@@ -108,13 +109,16 @@ function EventSidebar({ event, isMobile = false }) {
 
 export default function TrackPage() {
   const { slug } = useLoaderData<typeof loader>();
-  const { fosdem } = useRouteLoaderData('root');
+  const { fosdem, favourites } = useRouteLoaderData('root');
 
   const { width } = useWindowSize();
 
   if (!fosdem) return null;
 
   const event = fosdem.events[slug];
+  const isFavourite = favourites?.length
+    ? favourites.find((favourite) => favourite.slug === slug)
+    : false;
 
   return (
     <div className="min-h-screen">
@@ -126,17 +130,11 @@ export default function TrackPage() {
           }${event.persons?.length > 0 && ` | ${event.persons.join(', ')}`}`}
         >
           <div className="flex items-center pl-6 pr-3 gap-2">
-            <Button
-              variant="ghost"
-              onClick={() =>
-                toast({
-                  title: 'Not implemented',
-                  description: "We're still working on favoriting items.",
-                })
-              }
-            >
-              <Icons.star />
-            </Button>
+            <FavouriteButton
+              type="event"
+              slug={slug}
+              status={isFavourite?.status ?? 'unfavourited'}
+            />
             <Button
               variant="ghost"
               onClick={() =>

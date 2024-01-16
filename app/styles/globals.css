@@ -118,3 +118,7 @@ a:hover {
 .bg-other {
   background-image: url('/images/other.png');
 }
+
+.icon--filled {
+  fill: hsl(var(--primary));
+}
