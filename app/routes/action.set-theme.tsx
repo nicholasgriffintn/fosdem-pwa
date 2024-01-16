@@ -1,11 +1,15 @@
 import { json } from '@remix-run/cloudflare';
 import type { ActionFunction } from '@remix-run/cloudflare';
 
-import { getUserSession } from '~/sessions.server';
+import { getThemeFromSession } from '~/services/theme';
+import { getSessionFromCookie, commitSessionCookie } from '~/services/session';
 import { isTheme } from '~/lib/theme-provider';
 
 export const action: ActionFunction = async ({ request }) => {
-  const themeSession = await getUserSession(request);
+  const cookie = request.headers.get('Cookie') || '';
+  const session = await getSessionFromCookie(cookie);
+  const themeSession = await getThemeFromSession(session);
+
   const requestText = await request.text();
   const form = new URLSearchParams(requestText);
   const theme = form.get('theme');
@@ -20,6 +24,6 @@ export const action: ActionFunction = async ({ request }) => {
   themeSession.setTheme(theme);
   return json(
     { success: true },
-    { headers: { 'Set-Cookie': await themeSession.commit() } }
+    { headers: { 'Set-Cookie': await commitSessionCookie(session) } }
   );
 };
