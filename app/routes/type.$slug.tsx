@@ -1,10 +1,6 @@
 import type { MetaFunction, LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { json } from '@remix-run/cloudflare';
-import {
-  useLoaderData,
-  useRouteLoaderData,
-  useNavigate,
-} from '@remix-run/react';
+import { useLoaderData, useRouteLoaderData } from '@remix-run/react';
 
 import { PageHeader } from '~/components/PageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
@@ -22,10 +18,8 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export default function TrackPage() {
-  const navigate = useNavigate();
-
   const { slug } = useLoaderData<typeof loader>();
-  const { fosdem } = useRouteLoaderData('root');
+  const { fosdem, favourites } = useRouteLoaderData('root');
 
   if (!fosdem) return null;
 
@@ -53,6 +47,10 @@ export default function TrackPage() {
     }
   });
 
+  const trackFavorites = favourites?.length
+    ? favourites.filter((bookmark) => bookmark.type === 'track')
+    : [];
+
   return (
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
@@ -72,7 +70,7 @@ export default function TrackPage() {
 
             return (
               <TabsContent key={day.id} value={day.id}>
-                <TrackList tracks={event} />
+                <TrackList tracks={event} favourites={trackFavorites} />
               </TabsContent>
             );
           })}

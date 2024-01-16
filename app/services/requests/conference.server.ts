@@ -19,8 +19,6 @@ export function getConferenceData(year: string) {
           return null;
         }
 
-        console.log(url, data);
-
         return data;
       } catch (error) {
         console.error(error);

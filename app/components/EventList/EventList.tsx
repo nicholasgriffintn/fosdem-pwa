@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { Button } from '~/components/ui/button';
 import { Icons } from '~/components/Icons';
 import { toast } from '~/components/ui/use-toast';
+import { FavouriteButton } from '~/components/FavouriteButton';
 
 type EventListItem = {
   id: string;
@@ -12,10 +13,14 @@ type EventListItem = {
   duration: string;
   room: string;
   persons: string[];
+  isFavourited?: boolean;
 };
 
 type EventListProps = {
   events: EventListItem[];
+  favourites: {
+    [key: string]: string;
+  }[];
 };
 
 function EventListItem({
@@ -46,17 +51,11 @@ function EventListItem({
         </p>
       </div>
       <div className="flex items-center pl-6 pr-3 gap-2">
-        <Button
-          variant="ghost"
-          onClick={() =>
-            toast({
-              title: 'Not implemented',
-              description: "We're still working on favoriting items.",
-            })
-          }
-        >
-          <Icons.star />
-        </Button>
+        <FavouriteButton
+          type="event"
+          slug={event.id}
+          status={event.isFavourited ? 'favourited' : 'unfavourited'}
+        />
         <Button
           variant="ghost"
           onClick={() =>
@@ -79,11 +78,24 @@ function EventListItem({
   );
 }
 
-export function EventList({ events }: EventListProps) {
+export function EventList({ events, favourites }: EventListProps) {
+  const eventsWithFavourites = events?.length
+    ? events.map((event) => {
+        return {
+          ...event,
+          isFavourited:
+            (favourites?.length &&
+              favourites.find((bookmark) => bookmark.slug === event.id)
+                ?.status === 'favourited') ??
+            false,
+        };
+      })
+    : [];
+
   return (
     <ul className="event-list w-full">
-      {events?.length > 0 ? (
-        events.map((event, index) => (
+      {eventsWithFavourites?.length > 0 ? (
+        eventsWithFavourites.map((event, index) => (
           <li key={event.id}>
             <EventListItem
               event={event}

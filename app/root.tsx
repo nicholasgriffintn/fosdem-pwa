@@ -23,7 +23,7 @@ import {
 import { getSessionFromCookie, commitSessionCookie } from '~/services/session';
 import { getUserFromSession } from '~/services/auth';
 import { getThemeFromSession } from './services/theme';
-import { getConferenceData } from '~/services/requests';
+import { getConferenceData, getFavouritesData } from '~/services/requests';
 import { cn } from '~/lib/utils';
 import { Header } from '~/components/Header';
 import { Footer } from '~/components/Footer';
@@ -51,11 +51,13 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     const themeDetails = theme?.getTheme();
 
     const fosdem = await getConferenceData('2024');
+    const favourites = await getFavouritesData(userDetails.id, context);
 
     const data = {
       user: userDetails || null,
       theme: themeDetails || null,
       fosdem,
+      favourites,
     };
 
     return json(data, {
