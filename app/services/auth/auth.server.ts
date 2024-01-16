@@ -11,7 +11,6 @@ export const getUserFromSession = async (
 ) => {
   return {
     getUser: async () => {
-      // TODO: Add something here to get user information
       const userValue = session.get('user');
 
       const db = getDbFromContext(context);
