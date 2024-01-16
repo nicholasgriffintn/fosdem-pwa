@@ -3,7 +3,9 @@ import type { Session } from '@remix-run/cloudflare';
 
 type SessionData = {
   user: {
-    id: string;
+    id: number;
+    name: string;
+    type: string;
   };
   theme: string;
 };

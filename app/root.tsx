@@ -1,5 +1,5 @@
 import { cssBundleHref } from '@remix-run/css-bundle';
-import type { LinksFunction } from '@remix-run/cloudflare';
+import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { json } from '@remix-run/cloudflare';
 import {
   Links,
@@ -29,6 +29,8 @@ import { Header } from '~/components/Header';
 import { Footer } from '~/components/Footer';
 import { Toaster } from '~/components/ui/toaster';
 import { PageHeader } from './components/PageHeader';
+import { Button } from '~/components/ui/button';
+import { toast } from '~/components/ui/use-toast';
 
 export const links: LinksFunction = () => [
   { rel: 'manifest', href: '/manifest.webmanifest' },
@@ -37,16 +39,13 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
-export async function loader({ request }: { request: Request }) {
+export async function loader({ request, context }: LoaderFunctionArgs) {
   try {
     const cookie = request.headers.get('Cookie') || '';
     const session = await getSessionFromCookie(cookie);
 
-    const user = await getUserFromSession(session);
-    const userDetails = user?.getUser();
-    if (!userDetails) {
-      user.setUser();
-    }
+    const user = await getUserFromSession(session, context);
+    const userDetails = await user?.getUser();
     const theme = await getThemeFromSession(session);
     const themeDetails = theme?.getTheme();
 
@@ -100,7 +99,20 @@ function Layout({ children }: { children: React.ReactNode }) {
           {loaderData?.user?.id && (
             <div className="bg-muted text-muted-foreground text-center py-2">
               <p>
-                You are logged in as <strong>{loaderData.user.id}</strong>
+                You are logged in with the guest account:{' '}
+                <strong>{loaderData.user.name}</strong>{' '}
+                <Button
+                  variant="link"
+                  onClick={() =>
+                    toast({
+                      title: 'Not implemented',
+                      description:
+                        "We're still working on signing in with full accounts.",
+                    })
+                  }
+                >
+                  Sign In
+                </Button>
               </p>
             </div>
           )}
