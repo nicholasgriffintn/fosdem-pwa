@@ -28,6 +28,11 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 - [ ] PWA is currently caching the data from Remix, which holds the bookmarked events and doesn't get cleared until a hard refresh
 - [ ] API calls are not super efficient, and could be improved
+- [ ] The header is not very responsive at the moment, different content could be displayed
+- [ ] Logic in the lists is compelex and could be simplified
+- [ ] There are a bunch of eslint and typescript issues
+- [ ] Lists are not currently responsive
+- [ ] Unsure if the video player looks good/ works yet
 
 ## Contributing
 
