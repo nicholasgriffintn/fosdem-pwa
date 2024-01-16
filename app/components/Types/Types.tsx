@@ -42,9 +42,9 @@ export function Types({
               </CardHeader>
               <CardContent className="w-full">
                 <img
-                  src={`/images/${types[typeKey].id}.png`}
+                  src={`/images/${types[typeKey].id}-featured.png`}
                   alt={types[typeKey].name}
-                  className="w-full"
+                  className="w-full rounded-md"
                 />
               </CardContent>
               <CardFooter>
