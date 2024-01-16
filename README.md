@@ -10,20 +10,24 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## Features
 
-- [ ] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
-- [ ] A page for each tack with a list of events
-- [ ] A page for each event with the event details
-    - [ ] Should link to the speaker page
-    - [ ] Should link to the room page
-    - [ ] Should link to the live content page
-    - [ ] Should have bookmarking capabilities, stored locally and potentially with a sync to a remote server using an ID that the user can provide or generate
-- [ ] A page for each speaker with the speaker details
-- [ ] A page for each room with the room details
-- [ ] A page for live content with embedded video streams
+- [x] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
+- [x] A page for each track with a list of events
+- [x] A page for each event with the event details
+- [ ] Automated guest sign in (without needing any details)
+- [ ] The ability to sign in with a previously generated guest sign in
+- [ ] The ability to upgrade a guest sign in to a full account, and sign in with that instead
 - [ ] A page for the user profile, with a generated pass for the event
+- [x] The ability to bookmark tracks and events
+- [ ] The ability to share tracks and events
+- [ ] The ability to share your bookmarks
+- [ ] A page to view your bookmarked tracks and events
+- [ ] A page for live content with embedded video streams
 - [ ] A search page
-- [ ] A page for creating or generating your user ID
-- [ ] A way to sign in with your user ID
+
+## Current Issues
+
+- [ ] PWA is currently caching the data from Remix, which holds the bookmarked events and doesn't get cleared until a hard refresh
+- [ ] API calls are not super efficient, and could be improved
 
 ## Contributing
 
