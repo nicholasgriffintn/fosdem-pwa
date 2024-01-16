@@ -20,7 +20,9 @@ import {
   useTheme,
   ThemeProviderNoFlash,
 } from '~/lib/theme-provider';
-import { getUserSession } from '~/sessions.server';
+import { getSessionFromCookie, commitSessionCookie } from '~/services/session';
+import { getUserFromSession } from '~/services/auth';
+import { getThemeFromSession } from './services/theme';
 import { getData } from '~/lib/fosdem';
 import { cn } from '~/lib/utils';
 import { Header } from '~/components/Header';
@@ -29,25 +31,36 @@ import { Toaster } from '~/components/ui/toaster';
 import { PageHeader } from './components/PageHeader';
 
 export const links: LinksFunction = () => [
+  { rel: 'manifest', href: '/manifest.webmanifest' },
+  { rel: 'icon', href: '/favicon.ico', type: 'image/x-icon' },
   { rel: 'stylesheet', href: styles },
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
 export async function loader({ request }: { request: Request }) {
   try {
+    const cookie = request.headers.get('Cookie') || '';
+    const session = await getSessionFromCookie(cookie);
+
+    const user = await getUserFromSession(session);
+    const userDetails = user?.getUser();
+    if (!userDetails) {
+      user.setUser();
+    }
+    const theme = await getThemeFromSession(session);
+    const themeDetails = theme?.getTheme();
+
     const fosdem = await getData({ year: '2024' });
 
-    const session = await getUserSession(request);
-
     const data = {
-      user: { id: session.getUserId() },
-      theme: session.getTheme(),
+      user: userDetails || null,
+      theme: themeDetails || null,
       fosdem,
     };
 
     return json(data, {
       headers: {
-        'Set-Cookie': await session.commit(),
+        'Set-Cookie': await commitSessionCookie(session),
       },
     });
   } catch (error) {
@@ -72,7 +85,6 @@ function Layout({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
-        <link rel="manifest" href="/manifest.webmanifest" />
         <Links />
         <ThemeProviderNoFlash ssrTheme={Boolean(loaderData?.theme)} />
       </head>
