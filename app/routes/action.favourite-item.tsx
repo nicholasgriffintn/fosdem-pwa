@@ -1,5 +1,6 @@
 import { json } from '@remix-run/cloudflare';
 import { isbot } from 'isbot';
+import { queueToServer } from '@remix-pwa/sync';
 
 import { getDbFromContext, bookmarks } from '~/services/database';
 
@@ -72,4 +73,22 @@ export const action = async ({ request, context }) => {
       { status: 500 }
     );
   }
+};
+
+export const workerAction = async ({ request, context }) => {
+  const { fetchFromServer, event } = context;
+
+  try {
+    const response = await fetchFromServer(request);
+    return response;
+  } catch (error) {
+    await queueToServer({
+      name: 'favourite-item',
+      request: event.request.clone(),
+    });
+  }
+
+  return new Response('Something went wrong', {
+    status: 500,
+  });
 };

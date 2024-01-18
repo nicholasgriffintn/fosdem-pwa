@@ -18,7 +18,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] The ability to upgrade a guest sign in to a full account, and sign in with that instead
 - [ ] A page for the user profile, with a generated pass for the event
 - [x] The ability to bookmark tracks and events
-- [ ] Bookmarks are background synced when offline
+- [x] Bookmarks are background synced when offline
 - [ ] Sends push notifications for bookmarked events
 - [x] The ability to share tracks and events
 - [ ] The ability to share your bookmarks

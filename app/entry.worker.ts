@@ -3,11 +3,8 @@
 import { Storage } from '@remix-pwa/cache';
 import { cacheFirst, networkFirst } from '@remix-pwa/strategy';
 import type { DefaultFetchHandler } from '@remix-pwa/sw';
-import {
-  PrecacheHandler,
-  RemixNavigationHandler,
-  matchRequest,
-} from '@remix-pwa/sw';
+import { RemixNavigationHandler, matchRequest } from '@remix-pwa/sw';
+import { registerAllSyncs } from '@remix-pwa/sync';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -81,3 +78,5 @@ const handler = new RemixNavigationHandler({
 self.addEventListener('message', event => {
   event.waitUntil(handler.handle(event));
 });
+
+registerAllSyncs(['favourite-item', 'set-theme']);
