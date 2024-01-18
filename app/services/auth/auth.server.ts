@@ -1,4 +1,4 @@
-import type { CustomSession } from '~/services/session';
+import type { CustomSession } from '~/types/session';
 import type { AppLoadContext } from '@remix-run/cloudflare';
 import { eq } from 'drizzle-orm';
 import { isbot } from 'isbot';

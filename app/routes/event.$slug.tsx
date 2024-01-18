@@ -11,8 +11,6 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
 import { PageHeader } from '~/components/PageHeader';
 import { Icons } from '~/components/Icons';
-import { Button } from '~/components/ui/button';
-import { toast } from '~/components/ui/use-toast';
 import { useWindowSize } from '~/hooks/useWindowSize';
 import { FavouriteButton } from '../components/FavouriteButton';
 import { ShareButton } from '~/components/ShareButton';
