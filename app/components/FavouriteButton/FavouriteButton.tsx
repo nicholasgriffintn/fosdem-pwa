@@ -3,6 +3,7 @@ import { useFetcher } from '@remix-run/react';
 
 import { Button } from '~/components/ui/button';
 import { Icons } from '~/components/Icons';
+import { toast } from '~/components/ui/use-toast';
 
 export function FavouriteButton({
   type,
@@ -27,6 +28,10 @@ export function FavouriteButton({
       { type, slug, status: newStatus },
       { action: '/action/favourite-item', method: 'post' }
     );
+
+    toast({
+      title: `Bookmark ${newStatus}`,
+    });
   };
 
   return (

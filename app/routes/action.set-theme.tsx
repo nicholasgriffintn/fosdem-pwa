@@ -1,4 +1,5 @@
 import { json } from '@remix-run/cloudflare';
+import { queueToServer } from '@remix-pwa/sync';
 
 import { getThemeFromSession } from '~/services/theme';
 import { isTheme } from '~/lib/theme-provider';
@@ -41,4 +42,27 @@ export const action = async ({ request, context }) => {
       { status: 500 }
     );
   }
+};
+
+export const workerAction = async ({ request, context }) => {
+  const { fetchFromServer, event } = context;
+
+  try {
+    const response = await fetchFromServer(request);
+    return response;
+  } catch (error) {
+    await queueToServer({
+      name: 'set-theme',
+      request: event.request.clone(),
+    });
+  }
+
+  return json(
+    {
+      success: false,
+      message: 'An error occurred',
+      status: 'queued',
+    },
+    { status: 500 }
+  );
 };
