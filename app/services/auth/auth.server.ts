@@ -28,6 +28,7 @@ export const getUserFromSession = async (
           .values({
             name: randomUsername(),
             type: 'guest',
+            userAgent,
           })
           .returning({
             id: users.id,
