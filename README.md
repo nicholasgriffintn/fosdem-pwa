@@ -13,14 +13,14 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [x] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
 - [x] A page for each track with a list of events
 - [x] A page for each event with the event details
-- [ ] Automated guest sign in (without needing any details)
+- [x] Automated guest sign in (without needing any details)
 - [ ] The ability to sign in with a previously generated guest sign in
 - [ ] The ability to upgrade a guest sign in to a full account, and sign in with that instead
 - [ ] A page for the user profile, with a generated pass for the event
 - [x] The ability to bookmark tracks and events
 - [ ] Bookmarks are background synced when offline
 - [ ] Sends push notifications for bookmarked events
-- [ ] The ability to share tracks and events
+- [x] The ability to share tracks and events
 - [ ] The ability to share your bookmarks
 - [ ] A page to view your bookmarked tracks and events
 - [ ] A page for live content with embedded video streams

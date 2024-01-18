@@ -1,4 +1,4 @@
-import type { CustomSession } from '~/services/session';
+import type { CustomSession } from '~/types/session';
 import { Theme, isTheme } from '~/lib/theme-provider';
 
 export const getThemeFromSession = async (session: CustomSession) => {

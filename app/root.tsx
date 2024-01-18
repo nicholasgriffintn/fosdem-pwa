@@ -20,7 +20,6 @@ import {
   useTheme,
   ThemeProviderNoFlash,
 } from '~/lib/theme-provider';
-import { getSessionFromCookie, commitSessionCookie } from '~/services/session';
 import { getUserFromSession } from '~/services/auth';
 import { getThemeFromSession } from './services/theme';
 import { getConferenceData, getFavouritesData } from '~/services/requests';
@@ -39,10 +38,10 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
 
-export async function loader({ request, context }: LoaderFunctionArgs) {
+export async function loader({ request, context }) {
   try {
     const cookie = request.headers.get('Cookie') || '';
-    const session = await getSessionFromCookie(cookie);
+    const session = await context.sessionStorage.getSession(cookie);
     const userAgent = request.headers.get('User-Agent') || '';
 
     const user = await getUserFromSession(session, userAgent, context);
@@ -62,11 +61,20 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
     return json(data, {
       headers: {
-        'Set-Cookie': await commitSessionCookie(session),
+        'Set-Cookie': await context.sessionStorage.commitSession(session),
       },
     });
   } catch (error) {
     console.error(error);
+
+    return json(
+      {
+        success: false,
+        message: 'An error occurred',
+        data: error,
+      },
+      { status: 500 }
+    );
   }
 }
 
