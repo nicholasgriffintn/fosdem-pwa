@@ -43,7 +43,7 @@ export function Types({
               </CardHeader>
               <CardContent className="w-full">
                 <Image
-                  src={`/images/${types[typeKey].id}-featured.png`}
+                  src={`/images/${types[typeKey].id}-featured.jpg`}
                   alt={types[typeKey].name}
                   className="w-full rounded-md min-h-[374px]"
                   loading="lazy"
