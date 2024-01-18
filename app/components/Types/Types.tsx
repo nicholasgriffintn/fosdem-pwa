@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
+import { Image } from '~/components/Image';
 
 export function Types({
   types,
@@ -41,7 +42,7 @@ export function Types({
                 </CardDescription>
               </CardHeader>
               <CardContent className="w-full">
-                <img
+                <Image
                   src={`/images/${types[typeKey].id}-featured.png`}
                   alt={types[typeKey].name}
                   className="w-full rounded-md min-h-[374px]"
