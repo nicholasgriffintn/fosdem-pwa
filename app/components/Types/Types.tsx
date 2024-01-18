@@ -44,7 +44,7 @@ export function Types({
                 <img
                   src={`/images/${types[typeKey].id}-featured.png`}
                   alt={types[typeKey].name}
-                  className="w-full rounded-md"
+                  className="w-full rounded-md min-h-[374px]"
                   loading="lazy"
                 />
               </CardContent>
