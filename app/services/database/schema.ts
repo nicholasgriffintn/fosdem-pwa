@@ -13,6 +13,7 @@ export const users = sqliteTable(
     name: text('name'),
     email: text('email'),
     type: text('type').notNull(),
+    userAgent: text('user_agent'),
     createdAt: integer('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),

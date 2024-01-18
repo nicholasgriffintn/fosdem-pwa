@@ -8,6 +8,13 @@
       "when": 1705426838919,
       "tag": "0000_wise_dracula",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1705542096839,
+      "tag": "0001_naive_loki",
+      "breakpoints": true
     }
   ]
 }
