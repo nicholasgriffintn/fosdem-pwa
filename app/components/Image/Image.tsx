@@ -12,12 +12,14 @@ export function Image({
   loading?: 'lazy' | 'eager';
 }) {
   return (
-    <picture className={className}>
-      {useWebP && (
-        <source srcSet={src.replace('.png', '.webp')} type="image/webp" />
-      )}
-      <source srcSet={src} type="image/png" />
-      <img src={src} alt={alt} {...props} />
-    </picture>
+    <div className={className}>
+      <picture>
+        {useWebP && (
+          <source srcSet={src.replace('.png', '.webp')} type="image/webp" />
+        )}
+        <source srcSet={src} type="image/png" />
+        <img src={src} alt={alt} {...props} />
+      </picture>
+    </div>
   );
 }
