@@ -1,6 +1,6 @@
 /// <reference lib="WebWorker" />
 
-import { Storage } from '@remix-pwa/cache';
+import { Storage, Strategy } from '@remix-pwa/cache';
 import { cacheFirst, networkFirst } from '@remix-pwa/strategy';
 import type { DefaultFetchHandler } from '@remix-pwa/sw';
 import { RemixNavigationHandler, matchRequest } from '@remix-pwa/sw';
@@ -14,10 +14,17 @@ const ASSETS = 'assets-cache';
 
 // Open the caches and wrap them in `RemixCache` instances.
 const dataCache = Storage.open(DATA, {
-  ttl: 60 * 60 * 24 * 7 * 1_000, // 7 days
+  ttl: 10 * 60000, // 10 minutes
+  strategy: Strategy['NETWORK_FIRST'],
 });
-const documentCache = Storage.open(PAGES);
-const assetCache = Storage.open(ASSETS);
+const documentCache = Storage.open(PAGES, {
+  ttl: 10 * 60000, // 10 minutes
+  strategy: Strategy['NETWORK_FIRST'],
+});
+const assetCache = Storage.open(ASSETS, {
+  ttl: 60 * 60 * 24 * 7 * 1_000, // 7 days
+  strategy: Strategy['CACHE_FIRST'],
+});
 
 self.addEventListener('install', (event: ExtendableEvent) => {
   event.waitUntil(self.skipWaiting());
