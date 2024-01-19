@@ -57,15 +57,15 @@ export const defaultFetchHandler: DefaultFetchHandler = ({
   request,
 }) => {
   if (request.method.toUpperCase() !== 'GET') {
-    return context.fetchFromServer();
+    return fetch(request);
   }
 
   if (request.url.includes('/api/') || request.url.includes('api.')) {
-    return context.fetchFromServer();
+    return fetch(request);
   }
 
   if (request.url.includes('/action/') || request.url.includes('action.')) {
-    return context.fetchFromServer();
+    return fetch(request);
   }
 
   const type = matchRequest(request, [
