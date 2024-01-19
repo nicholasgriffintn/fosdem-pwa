@@ -46,13 +46,17 @@ const assetsHandler = cacheFirst({
   },
 });
 
+const documentHandler = networkFirst({
+  cache: documentCache,
+});
+
 // The default fetch event handler will be invoke if the
 // route is not matched by any of the worker action/loader.
 export const defaultFetchHandler: DefaultFetchHandler = ({
   context,
   request,
 }) => {
-  if (request.method !== 'GET') {
+  if (request.method.toUpperCase() !== 'GET') {
     return context.fetchFromServer();
   }
 
@@ -64,7 +68,13 @@ export const defaultFetchHandler: DefaultFetchHandler = ({
     return context.fetchFromServer();
   }
 
-  const type = matchRequest(request);
+  const type = matchRequest(request, [
+    '/build/',
+    '/icons/',
+    '/images/',
+    '/screenshots/',
+    'favicon.ico',
+  ]);
 
   if (type === 'asset') {
     return assetsHandler(context.event.request);
@@ -74,7 +84,7 @@ export const defaultFetchHandler: DefaultFetchHandler = ({
     return dataHandler(context.event.request);
   }
 
-  return context.fetchFromServer();
+  return documentHandler(context.event.request);
 };
 
 const handler = new RemixNavigationHandler({
@@ -82,7 +92,10 @@ const handler = new RemixNavigationHandler({
   documentCache,
 });
 
-self.addEventListener('message', event => {
+self.addEventListener('message', (event) => {
+  if (event.data === 'skipWaiting') {
+    self.skipWaiting();
+  }
   event.waitUntil(handler.handle(event));
 });
 

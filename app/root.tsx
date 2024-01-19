@@ -1,5 +1,5 @@
 import { cssBundleHref } from '@remix-run/css-bundle';
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/cloudflare';
+import type { LinksFunction } from '@remix-run/cloudflare';
 import { json } from '@remix-run/cloudflare';
 import {
   Links,
@@ -84,19 +84,27 @@ function Providers({ children }: { children: React.ReactNode }) {
   return <ThemeProvider specifiedTheme={data?.theme}>{children}</ThemeProvider>;
 }
 
-function Layout({ children }: { children: React.ReactNode }) {
-  const loaderData = useLoaderData<typeof loader>();
-
-  const [theme] = useTheme();
-
+function Document({
+  children,
+  hasProvider,
+  theme,
+  loaderData,
+}: {
+  children: React.ReactNode;
+  hasProvider: boolean;
+  theme?: string;
+  loaderData?: unknown;
+}) {
   return (
-    <html lang="en" className={clsx(theme)}>
+    <html lang="en" className={theme ? clsx(theme) : undefined}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <ThemeProviderNoFlash ssrTheme={Boolean(loaderData?.theme)} />
+        <ThemeProviderNoFlash
+          ssrTheme={loaderData?.theme ? Boolean(loaderData?.theme) : false}
+        />
       </head>
       <body
         className={cn(
@@ -131,7 +139,7 @@ function Layout({ children }: { children: React.ReactNode }) {
             {children}
             <Toaster />
           </div>
-          <Footer />
+          <Footer hasProvider={hasProvider} />
         </main>
         <ScrollRestoration />
         <Scripts />
@@ -141,12 +149,30 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function Layout({
+  children,
+  hasProvider,
+}: {
+  children: React.ReactNode;
+  hasProvider: boolean;
+}) {
+  const loaderData = useLoaderData<typeof loader>();
+
+  const [theme] = useTheme();
+
+  return (
+    <Document hasProvider={hasProvider} theme={theme} loaderData={loaderData}>
+      {children}
+    </Document>
+  );
+}
+
 export default function App() {
   useSWEffect();
 
   return (
     <Providers>
-      <Layout>
+      <Layout hasProvider={true}>
         <Outlet />
       </Layout>
     </Providers>
@@ -158,35 +184,29 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     return (
-      <Providers>
-        <Layout>
-          <PageHeader heading={`${error.status} ${error.statusText}`} />
-          <div className="prose">
-            <p>{error.data}</p>
-          </div>
-        </Layout>
-      </Providers>
+      <Document hasProvider={false}>
+        <PageHeader heading={`${error.status} ${error.statusText}`} />
+        <div className="prose">
+          <p>{error.data}</p>
+        </div>
+      </Document>
     );
   } else if (error instanceof Error) {
     return (
-      <Providers>
-        <Layout>
-          <PageHeader heading="Error" />
-          <div className="prose">
-            <p>{error.message}</p>
-            <p>The stack trace is:</p>
-            <pre>{error.stack}</pre>
-          </div>
-        </Layout>
-      </Providers>
+      <Document hasProvider={false}>
+        <PageHeader heading="Error" />
+        <div className="prose">
+          <p>{error.message}</p>
+          <p>The stack trace is:</p>
+          <pre>{error.stack}</pre>
+        </div>
+      </Document>
     );
   } else {
     return (
-      <Providers>
-        <Layout>
-          <PageHeader heading="Unknown Error" />
-        </Layout>
-      </Providers>
+      <Document hasProvider={false}>
+        <PageHeader heading="Unknown Error" />
+      </Document>
     );
   }
 }
