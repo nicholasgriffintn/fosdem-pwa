@@ -1,7 +1,7 @@
 /// <reference lib="WebWorker" />
 
 import { Storage, Strategy } from '@remix-pwa/cache';
-import { cacheFirst, networkFirst } from '@remix-pwa/strategy';
+import { cacheFirst, staleWhileRevalidate } from '@remix-pwa/strategy';
 import type { DefaultFetchHandler } from '@remix-pwa/sw';
 import { RemixNavigationHandler, matchRequest } from '@remix-pwa/sw';
 import { registerAllSyncs } from '@remix-pwa/sync';
@@ -15,11 +15,11 @@ const ASSETS = 'assets-cache';
 // Open the caches and wrap them in `RemixCache` instances.
 const dataCache = Storage.open(DATA, {
   ttl: 10 * 60000, // 10 minutes
-  strategy: Strategy['NETWORK_FIRST'],
+  strategy: Strategy['STALE_WHILE_REVALIDATE'],
 });
 const documentCache = Storage.open(PAGES, {
   ttl: 10 * 60000, // 10 minutes
-  strategy: Strategy['NETWORK_FIRST'],
+  strategy: Strategy['STALE_WHILE_REVALIDATE'],
 });
 const assetCache = Storage.open(ASSETS, {
   ttl: 60 * 60 * 24 * 7 * 1_000, // 7 days
@@ -34,7 +34,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(self.clients.claim());
 });
 
-const dataHandler = networkFirst({
+const dataHandler = staleWhileRevalidate({
   cache: dataCache,
 });
 
@@ -46,7 +46,7 @@ const assetsHandler = cacheFirst({
   },
 });
 
-const documentHandler = networkFirst({
+const documentHandler = staleWhileRevalidate({
   cache: documentCache,
 });
 
