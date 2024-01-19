@@ -33,12 +33,12 @@ export const action = async ({ request, context }) => {
   } catch (error) {
     console.error(error);
 
-    return json(
-      {
+    return new Response(
+      JSON.stringify({
         success: false,
         message: 'An error occurred',
         data: error,
-      },
+      }),
       { status: 500 }
     );
   }
@@ -57,12 +57,5 @@ export const workerAction = async ({ request, context }) => {
     });
   }
 
-  return json(
-    {
-      success: false,
-      message: 'An error occurred',
-      status: 'queued',
-    },
-    { status: 500 }
-  );
+  return new Response(null, { status: 202 });
 };
