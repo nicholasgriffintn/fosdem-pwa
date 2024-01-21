@@ -5,6 +5,7 @@ import { cacheFirst, staleWhileRevalidate } from '@remix-pwa/strategy';
 import type { DefaultFetchHandler } from '@remix-pwa/sw';
 import { RemixNavigationHandler, matchRequest } from '@remix-pwa/sw';
 import { registerAllSyncs } from '@remix-pwa/sync';
+import { Push } from '@remix-pwa/push/worker';
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -100,3 +101,42 @@ self.addEventListener('message', (event) => {
 });
 
 registerAllSyncs(['favourite-item', 'set-theme']);
+
+class CustomPush extends Push {
+  async handlePush(event: PushEvent): Promise<void> {
+    const { data } = event;
+    const jsonData = data?.json();
+    console.log(jsonData, 'data');
+    await self.registration.showNotification(jsonData.title, jsonData.options);
+  }
+
+  async handleNotificationClick(event: NotificationEvent): Promise<void> {
+    console.log(event, 'event');
+  }
+
+  async handleNotificationClose(event: NotificationEvent): Promise<void> {
+    console.log(event, 'event');
+  }
+
+  async handleError(error: ErrorEvent): Promise<void> {
+    console.error(error, 'error');
+  }
+}
+
+const pushHandler = new CustomPush();
+
+self.addEventListener('push', (event: PushEvent) => {
+  event.waitUntil(pushHandler.handlePush(event));
+});
+
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
+  console.log(event, 'event');
+});
+
+self.addEventListener('notificationclose', (event: NotificationEvent) => {
+  console.log(event, 'event');
+});
+
+self.addEventListener('error', (error: ErrorEvent) => {
+  console.error(error, 'error');
+});

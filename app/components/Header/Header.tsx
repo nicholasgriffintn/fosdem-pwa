@@ -10,6 +10,10 @@ export function Header() {
       title: 'Home',
       href: '/',
     },
+    {
+      title: 'Bookmarks',
+      href: '/bookmarks/',
+    },
   ];
 
   return (
@@ -20,13 +24,13 @@ export function Header() {
           <div className="flex-1 sm:grow-0">
             <NavSearch />
           </div>
-          <nav className="flex space-x-4">
+          <nav className="hidden md:flex space-x-4">
             <Link
               to="https://github.com/nicholasgriffintn/fosdem-pwa"
               target="_blank"
               rel="noreferrer"
             >
-              <Icons.gitHub className="h-7 w-7" />
+              <Icons.gitHub className="h-7 w-7" width="7" height="7" />
               <span className="sr-only">GitHub</span>
             </Link>
           </nav>
