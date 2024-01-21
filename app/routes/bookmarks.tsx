@@ -80,7 +80,9 @@ export default function Bookmarks() {
                       when your bookmarked talks are about to start. Click the
                       button below to get started!
                     </p>
-                    <Button onClick={onSubscribe}>Enable Notifications</Button>
+                    <Button variant="outline" onClick={onSubscribe}>
+                      Enable Notifications
+                    </Button>
                   </AlertDescription>
                 </Alert>
               </div>
