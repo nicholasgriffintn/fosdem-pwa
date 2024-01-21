@@ -3,14 +3,14 @@ import { Link } from '@remix-run/react';
 
 import { cn } from '~/lib/utils';
 import { useLockBody } from '~/hooks/useLockBody';
-import { Icons } from '~/components/Icons';
 
 interface MobileNavProps {
   items: { title: string; href: string; disabled?: boolean }[];
+  onCloseMenu: () => void;
   children?: ReactNode;
 }
 
-export function MobileNav({ items }: MobileNavProps) {
+export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
   useLockBody();
 
   return (
@@ -20,10 +20,6 @@ export function MobileNav({ items }: MobileNavProps) {
       )}
     >
       <div className="relative z-20 grid gap-6 rounded-md bg-popover p-4 text-popover-foreground shadow-md">
-        <Link to="/" className="flex items-center space-x-2">
-          <Icons.logo className="h-7 w-7" />
-          <span className="font-bold">FOSDEM 2024</span>
-        </Link>
         <nav className="grid grid-flow-row auto-rows-max text-sm">
           {items.map((item, index) => (
             <Link
@@ -33,6 +29,7 @@ export function MobileNav({ items }: MobileNavProps) {
                 'flex w-full items-center rounded-md p-2 text-sm font-medium hover:underline',
                 item.disabled && 'cursor-not-allowed opacity-60'
               )}
+              onClick={onCloseMenu}
             >
               {item.title}
             </Link>
