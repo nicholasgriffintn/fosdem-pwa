@@ -57,7 +57,14 @@ export default function Bookmarks() {
   const onSubscribe = async () => {
     const PUBLIC_KEY =
       'BHdNRbVHaSS77klpV70lO7ZbS1MGbYhSpKGT6_m-aB_kwEB8t9R9pLWwZJcjUKTGzbjw4Uy7CEWt2uZU5aTn6OA';
-    const subscription = await subscribeToPush(PUBLIC_KEY);
+    const subscription = await subscribeToPush(
+      PUBLIC_KEY,
+      '/push',
+      'subscribe',
+      {
+        user: data.user,
+      }
+    );
     setSubscription(subscription);
   };
 
