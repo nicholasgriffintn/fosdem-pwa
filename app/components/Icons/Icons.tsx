@@ -1,4 +1,4 @@
-import { X, SunMedium, Moon, Star, Share } from 'lucide-react';
+import { X, SunMedium, Moon, Star, Share, Megaphone } from 'lucide-react';
 
 export const Icons = {
   logo: ({ ...props }) => (
@@ -30,6 +30,7 @@ export const Icons = {
   moon: Moon,
   star: Star,
   share: Share,
+  megaphone: Megaphone,
   gitHub: ({ ...props }) => (
     <svg
       aria-hidden="true"

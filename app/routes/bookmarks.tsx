@@ -13,6 +13,8 @@ import { getFavouritesData } from '~/services/requests';
 import { BookmarksList } from '~/components/BookmarksList';
 import { Button } from '~/components/ui/button';
 import { PageHeader } from '~/components/PageHeader';
+import { Alert, AlertTitle, AlertDescription } from '~/components/ui/alert';
+import { Icons } from '~/components/Icons';
 
 export const meta: MetaFunction = () => {
   return [
@@ -67,6 +69,22 @@ export default function Bookmarks() {
         <PageHeader heading="Bookmarks (WIP)" />
         {data?.bookmarks?.length ? (
           <>
+            {subscriptionLoaded && !subscription && (
+              <div className="mb-6">
+                <Alert>
+                  <Icons.megaphone className="h-4 w-4" />
+                  <AlertTitle>Heads up!</AlertTitle>
+                  <AlertDescription>
+                    <p className="mb-2">
+                      You can subscribe to push notifications to get notified
+                      when your bookmarked talks are about to start. Click the
+                      button below to get started!
+                    </p>
+                    <Button onClick={onSubscribe}>Enable Notifications</Button>
+                  </AlertDescription>
+                </Alert>
+              </div>
+            )}
             <BookmarksList bookmarks={data.bookmarks} />
           </>
         ) : (
@@ -74,9 +92,6 @@ export default function Bookmarks() {
             <h1 className="text-2xl font-bold">You have no bookmarks</h1>
             <p>You can bookmark talks from the schedule page</p>
           </div>
-        )}
-        {subscriptionLoaded && !subscription && (
-          <Button onClick={onSubscribe}>Subscribe to push notifications</Button>
         )}
       </div>
     </div>
