@@ -85,7 +85,7 @@ export const defaultFetchHandler: DefaultFetchHandler = ({
     return dataHandler(context.event.request);
   }
 
-  return documentHandler(context.event.request);
+  return context.fetchFromServer();
 };
 
 const handler = new RemixNavigationHandler({
