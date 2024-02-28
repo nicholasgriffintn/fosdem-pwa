@@ -46,7 +46,7 @@
     "drizzle-orm": "^0.29.3",
     "isbot": "^4.1.0",
     "lru-cache": "^10.1.0",
-    "lucide-react": "^0.338.0",
+    "lucide-react": "^0.340.0",
     "random-words": "^2.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
