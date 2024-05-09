@@ -23,7 +23,7 @@
     "d1:init": "npm run migrations:apply && wrangler d1 execute fosdem --file='./fixtures/data.sql'"
   },
   "dependencies": {
-    "@epic-web/cachified": "^4.0.0",
+    "@epic-web/cachified": "^5.0.0",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
