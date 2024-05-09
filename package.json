@@ -32,7 +32,7 @@
     "@remix-pwa/client": "^2.0.1",
     "@remix-pwa/push": "^1.0.9",
     "@remix-pwa/strategy": "^2.1.9",
-    "@remix-pwa/sw": "^2.1.12",
+    "@remix-pwa/sw": "^3.0.0",
     "@remix-pwa/sync": "^2.0.1",
     "@remix-run/cloudflare": "^2.5.0",
     "@remix-run/cloudflare-pages": "^2.5.0",
