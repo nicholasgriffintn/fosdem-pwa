@@ -29,7 +29,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toast": "^1.1.5",
     "@remix-pwa/cache": "^2.0.12",
-    "@remix-pwa/client": "^2.0.1",
+    "@remix-pwa/client": "^3.0.0",
     "@remix-pwa/push": "^1.0.9",
     "@remix-pwa/strategy": "^2.1.9",
     "@remix-pwa/sw": "^2.1.12",
