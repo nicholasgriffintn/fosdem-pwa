@@ -1,12 +1,29 @@
 {
   "name": "fosdem-pwa",
+  "version": "0.2024.1",
   "private": true,
   "sideEffects": false,
   "type": "module",
-  "scripts": {},
-  "dependencies": {},
-  "devDependencies": {},
+  "scripts": {
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start"
+  },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@tanstack/react-router": "^1.89.1",
+    "@tanstack/start": "^1.89.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "unenv": "^1.10.0",
+    "vinxi": "^0.5.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2"
   }
 }
