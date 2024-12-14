@@ -1,47 +1,48 @@
-import * as fs from 'node:fs'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/start'
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { Button } from "~/components/ui/button";
 
-const filePath = 'count.txt'
-
-async function readCount() {
-  return parseInt(
-    await fs.promises.readFile(filePath, 'utf-8').catch(() => '0'),
-  )
-}
-
-const getCount = createServerFn({
-  method: 'GET',
-}).handler(() => {
-  return readCount()
-})
-
-const updateCount = createServerFn({ method: 'POST' })
-  .validator((d: number) => d)
-  .handler(async ({ data }) => {
-    const count = await readCount()
-    await fs.promises.writeFile(filePath, `${count + data}`)
-  })
-
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: Home,
-  loader: async () => await getCount(),
-})
+});
 
 function Home() {
-  const router = useRouter()
-  const state = Route.useLoaderData()
+  const { user } = Route.useRouteContext();
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        updateCount({ data: 1 }).then(() => {
-          router.invalidate()
-        })
-      }}
-    >
-      Add 1 to {state}?
-    </button>
-  )
+    <div className="flex flex-col gap-4 p-6">
+      <h1 className="text-4xl font-bold">FOSDEM PWA</h1>
+      <div className="flex items-center gap-2">
+        This is an unprotected page:
+        <pre className="rounded-md border bg-card p-1 text-card-foreground">
+          routes/index.tsx
+        </pre>
+      </div>
+
+      {user ? (
+        <div className="flex flex-col gap-2">
+          <p>Welcome back, {user.name}!</p>
+          <Button type="button" asChild className="w-fit" size="lg">
+            <Link to="/dashboard">Go to Dashboard</Link>
+          </Button>
+          <div>
+            More data:
+            <pre>{JSON.stringify(user, null, 2)}</pre>
+          </div>
+
+          <form method="POST" action="/api/auth/logout">
+            <Button type="submit" className="w-fit" variant="destructive" size="lg">
+              Sign out
+            </Button>
+          </form>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <p>You are not signed in.</p>
+          <Button type="button" asChild className="w-fit" size="lg">
+            <Link to="/signin">Sign in</Link>
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 }

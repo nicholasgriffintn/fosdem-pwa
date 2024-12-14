@@ -1,48 +1,118 @@
+import type { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
+  createRootRouteWithContext,
+  Link,
   Outlet,
+  ScriptOnce,
   ScrollRestoration,
-  createRootRoute,
-} from '@tanstack/react-router'
-import { Meta, Scripts } from '@tanstack/start'
-import type { ReactNode } from 'react'
+} from "@tanstack/react-router";
+import { createServerFn, Meta, Scripts } from "@tanstack/start";
+import { lazy, Suspense } from "react";
 
-export const Route = createRootRoute({
+import { getAuthSession } from "~/server/auth";
+import appCss from "~/styles/app.css?url";
+import { cn } from "~/lib/utils";
+import { Header } from "~/components/Header";
+import { Footer } from "~/components/Footer";
+import { Toaster } from "~/components/ui/toaster";
+import { Button } from "~/components/ui/button";
+
+const TanStackRouterDevtools =
+  process.env.NODE_ENV === "production"
+    ? () => null // Render nothing in production
+    : lazy(() =>
+      // Lazy load in development
+      import("@tanstack/router-devtools").then((res) => ({
+        default: res.TanStackRouterDevtools,
+      })),
+    );
+
+const getUser = createServerFn({ method: "GET" }).handler(async () => {
+  const { user } = await getAuthSession();
+  return user;
+});
+
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: async () => {
+    const user = await getUser();
+    return { user };
+  },
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'TanStack Start Starter',
+        title: "FOSDEM PWA",
       },
     ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   component: RootComponent,
-})
+});
 
 function RootComponent() {
   return (
     <RootDocument>
       <Outlet />
     </RootDocument>
-  )
+  );
 }
 
-function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+function RootDocument({ children }: { readonly children: React.ReactNode }) {
+  const { user } = Route.useRouteContext();
+
   return (
-    <html>
+    <html className="dark">
       <head>
         <Meta />
       </head>
-      <body>
-        {children}
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          '--font-sans',
+          '--font-heading'
+        )}
+      >
+        <main className="flex min-h-screen flex-col">
+          <Header />
+          {!user && (
+            <div className="bg-muted text-muted-foreground text-center py-2">
+              <p>
+                You are not logged in.
+                <Button
+                  variant="link" asChild size="sm">
+                  <Link to="/signin">Sign in to remember your preferences</Link>
+                </Button>
+              </p>
+            </div>
+          )}
+          <div className="container flex-1">
+            {children}
+            <Toaster />
+          </div>
+          <Footer />
+          <ReactQueryDevtools buttonPosition="bottom-left" />
+          <Suspense>
+            <TanStackRouterDevtools position="bottom-right" />
+          </Suspense>
+        </main>
         <ScrollRestoration />
+
+        <ScriptOnce>
+          {`document.documentElement.classList.toggle(
+            'dark',
+            localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            )`}
+        </ScriptOnce>
+
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
