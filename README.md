@@ -26,19 +26,6 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] A page for live content with embedded video streams
 - [ ] A search page
 
-## Current Issues
-
-- [ ] PWA is currently caching the data from Remix, which holds the bookmarked events and doesn't get cleared until a hard refresh
-- [ ] API calls are not super efficient, and could be improved
-- [ ] The header is not very responsive at the moment, different content could be displayed
-- [ ] Logic in the lists is compelex and could be simplified
-- [ ] There are a bunch of eslint and typescript issues
-- [ ] Lists are not currently responsive
-- [ ] Unsure if the video player looks good/ works yet
-- [ ] Events and Tracks are not sorted
-- [ ] The duration is currently being displayed, instead, we should display and calculate the end time from the start time and duration
-
-
 ## Contributing
 
 If you want to contribute to this project, please read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
