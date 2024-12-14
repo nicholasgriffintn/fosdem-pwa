@@ -1,6 +1,6 @@
 # FOSDEM PWA Companion App
 
-This is a companion app for [FOSDEM 2024](https://fosdem.org/2024/), built with [TanStack Router](https://tanstack.com/router/) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop.
+This is a companion app for [FOSDEM 2024](https://fosdem.org/2024/), built with [TanStack Start](https://tanstack.com/start/) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop.
 
 This is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), just in TanStack Router.
 
