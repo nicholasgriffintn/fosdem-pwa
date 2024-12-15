@@ -49,15 +49,17 @@ function TrackPage() {
             })}
           </TabsList>
           {fosdem.days.map((day) => {
-            if (!fosdem.trackDataSplitByDay[day.id]) {
+            if (!fosdem.eventDataSplitByDay[day.id]) {
               return null;
             }
 
-            const event = fosdem.trackDataSplitByDay[day.id]?.sort(function (a, b) {
+            const event = fosdem.eventDataSplitByDay[day.id]?.sort(function (a, b) {
               const t1 = get24HrFormat(a.startTime);
               const t2 = get24HrFormat(b.startTime);
               return t1 > t2 ? 1 : t1 < t2 ? -1 : 0;
             });
+
+            console.log(event)
 
             return (
               <TabsContent key={day.id} value={day.id}>

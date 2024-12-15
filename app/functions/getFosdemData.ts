@@ -81,16 +81,16 @@ export const getTrackData = createServerFn({
     const track = data.tracks[ctx.data.slug];
     const type = data.types[track.type];
 
-    const eventData = Object.values(data.events).filter(
+    const events = Object.values(data.events);
+
+    const eventData = events.filter(
       (event: any) => event.trackKey === ctx.data.slug
     );
 
-    const eventDataSplitByDay = {};
+    const eventDataSplitByDay: Record<string, any[]> = {};
 
-    eventData.forEach((event) => {
-      if (!event.day || !Array.isArray(event.day)) {
-        return;
-      }
+    eventData.forEach((event: any) => {
+      console.log(event)
 
       if (!eventDataSplitByDay[event.day[0]]) {
         eventDataSplitByDay[event.day[0]] = [];
@@ -123,5 +123,9 @@ export const getEventData = createServerFn({
   .handler(async (ctx) => {
     const data = getFullData(ctx.data.year);
 
-    const event = fosdem.events[slug];
+    const event = data.events[ctx.data.slug];
+
+    return {
+      event,
+    };
   })
