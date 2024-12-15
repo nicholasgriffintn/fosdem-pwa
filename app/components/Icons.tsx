@@ -1,4 +1,4 @@
-import { X, SunMedium, Moon, Star, Share, Megaphone, ArrowLeft } from 'lucide-react';
+import { X, SunMedium, Moon, Star, Share, Megaphone, ArrowLeft, LogIn } from 'lucide-react';
 
 export const Icons = {
   logo: ({ ...props }) => (
@@ -25,6 +25,7 @@ export const Icons = {
       </g>
     </svg>
   ),
+  login: LogIn,
   arrowLeft: ArrowLeft,
   close: X,
   sun: SunMedium,
