@@ -14,8 +14,8 @@ export const Route = createFileRoute("/type/$slug")({
   head: ({ loaderData }) => ({
     meta: [
       {
-        title: `${loaderData?.fosdem.type.name} | FOSDEM PWA`,
-        description: loaderData?.fosdem.type.description,
+        title: `${loaderData?.fosdem.type?.name} | FOSDEM PWA`,
+        description: loaderData?.fosdem.type?.description,
       },
     ],
   }),
@@ -26,7 +26,13 @@ function TypePage() {
   const { fosdem } = Route.useLoaderData();
 
   if (!fosdem.type) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen">
+        <div className="relative py-6 lg:py-10">
+          <PageHeader heading="Type not found" />
+        </div>
+      </div>
+    )
   }
 
   return (

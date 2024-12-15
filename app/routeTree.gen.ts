@@ -14,6 +14,8 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SigninImport } from './routes/signin'
 import { Route as BookmarksImport } from './routes/bookmarks'
 import { Route as IndexImport } from './routes/index'
+import { Route as MapIndexImport } from './routes/map/index'
+import { Route as LiveIndexImport } from './routes/live/index'
 import { Route as TypeSlugImport } from './routes/type/$slug'
 import { Route as TrackSlugImport } from './routes/track/$slug'
 import { Route as EventSlugImport } from './routes/event/$slug'
@@ -35,6 +37,18 @@ const BookmarksRoute = BookmarksImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MapIndexRoute = MapIndexImport.update({
+  id: '/map/',
+  path: '/map/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LiveIndexRoute = LiveIndexImport.update({
+  id: '/live/',
+  path: '/live/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,6 +116,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TypeSlugImport
       parentRoute: typeof rootRoute
     }
+    '/live/': {
+      id: '/live/'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/map/': {
+      id: '/map/'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -114,6 +142,8 @@ export interface FileRoutesByFullPath {
   '/event/$slug': typeof EventSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
+  '/live': typeof LiveIndexRoute
+  '/map': typeof MapIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -123,6 +153,8 @@ export interface FileRoutesByTo {
   '/event/$slug': typeof EventSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
+  '/live': typeof LiveIndexRoute
+  '/map': typeof MapIndexRoute
 }
 
 export interface FileRoutesById {
@@ -133,6 +165,8 @@ export interface FileRoutesById {
   '/event/$slug': typeof EventSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
+  '/live/': typeof LiveIndexRoute
+  '/map/': typeof MapIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -144,6 +178,8 @@ export interface FileRouteTypes {
     | '/event/$slug'
     | '/track/$slug'
     | '/type/$slug'
+    | '/live'
+    | '/map'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,6 +188,8 @@ export interface FileRouteTypes {
     | '/event/$slug'
     | '/track/$slug'
     | '/type/$slug'
+    | '/live'
+    | '/map'
   id:
     | '__root__'
     | '/'
@@ -160,6 +198,8 @@ export interface FileRouteTypes {
     | '/event/$slug'
     | '/track/$slug'
     | '/type/$slug'
+    | '/live/'
+    | '/map/'
   fileRoutesById: FileRoutesById
 }
 
@@ -170,6 +210,8 @@ export interface RootRouteChildren {
   EventSlugRoute: typeof EventSlugRoute
   TrackSlugRoute: typeof TrackSlugRoute
   TypeSlugRoute: typeof TypeSlugRoute
+  LiveIndexRoute: typeof LiveIndexRoute
+  MapIndexRoute: typeof MapIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -179,6 +221,8 @@ const rootRouteChildren: RootRouteChildren = {
   EventSlugRoute: EventSlugRoute,
   TrackSlugRoute: TrackSlugRoute,
   TypeSlugRoute: TypeSlugRoute,
+  LiveIndexRoute: LiveIndexRoute,
+  MapIndexRoute: MapIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -196,7 +240,9 @@ export const routeTree = rootRoute
         "/signin",
         "/event/$slug",
         "/track/$slug",
-        "/type/$slug"
+        "/type/$slug",
+        "/live/",
+        "/map/"
       ]
     },
     "/": {
@@ -216,6 +262,12 @@ export const routeTree = rootRoute
     },
     "/type/$slug": {
       "filePath": "type/$slug.tsx"
+    },
+    "/live/": {
+      "filePath": "live/index.tsx"
+    },
+    "/map/": {
+      "filePath": "map/index.tsx"
     }
   }
 }
