@@ -16,10 +16,10 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       });
     }
 
-    const fosdem = await buildData({ year: '2024' });
+    const fosdem = await buildData({ year: '2025' });
 
     const response = await env.R2?.put(
-      'fosdem-2024.json',
+      'fosdem-2025.json',
       JSON.stringify(fosdem),
       {}
     );

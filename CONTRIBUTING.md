@@ -8,7 +8,7 @@ Before you do though, please read the [Code of Conduct](CODE_OF_CONDUCT.md) and 
 
 - [Remix Docs](https://remix.run/docs)
 - [Shadcn UI Docs](https://ui.shadcn.com/)
-- [FOSDEM 2024](https://fosdem.org/2024/)
+- [FOSDEM 2025](https://fosdem.org/2025/)
 - [Remix PWA](https://remix-pwa.run/)
 
 ## Development

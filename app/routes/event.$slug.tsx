@@ -17,7 +17,7 @@ import { ShareButton } from '~/components/ShareButton';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Events - FOSDEM 2024' },
+    { title: 'Events - FOSDEM 2025' },
     { name: 'description', content: 'The list of events available' },
   ];
 };
