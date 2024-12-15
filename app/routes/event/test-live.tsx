@@ -11,15 +11,14 @@ import { Icons } from '~/components/Icons'
 import { useWindowSize } from '~/hooks/use-window-size'
 import { FavouriteButton } from '~/components/FavouriteButton'
 import { ShareButton } from '~/components/ShareButton'
-import { getEventData } from '~/functions/getFosdemData'
+import { getTestEventData } from '~/functions/getFosdemData'
 import { EventSidebar } from '~/components/EventSidebar'
 import { EventPlayer } from '~/components/EventPlayer'
 
-export const Route = createFileRoute('/event/$slug')({
+export const Route = createFileRoute('/event/test-live')({
   component: TrackPage,
   loader: async ({ params }) => {
-    const fosdem = await getEventData({
-      data: { year: '2025', slug: params.slug },
+    const fosdem = await getTestEventData({
     })
     return { fosdem: fosdem ?? {} }
   },
@@ -50,9 +49,8 @@ function TrackPage() {
       <div className="relative py-6 lg:py-10">
         <PageHeader
           heading={fosdem.event.title}
-          text={`Day ${fosdem.event.day} | ${fosdem.event.startTime} | ${fosdem.event.duration} | ${
-            fosdem.event.room
-          }${fosdem.event.persons?.length > 0 && ` | ${fosdem.event.persons.join(', ')}`}`}
+          text={`Day ${fosdem.event.day} | ${fosdem.event.startTime} | ${fosdem.event.duration} | ${fosdem.event.room
+            }${fosdem.event.persons?.length > 0 && ` | ${fosdem.event.persons.join(', ')}`}`}
         >
           <div className="flex items-center pl-6 pr-3 gap-2">
             <FavouriteButton

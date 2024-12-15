@@ -16,6 +16,7 @@ import { Route as BookmarksImport } from './routes/bookmarks'
 import { Route as IndexImport } from './routes/index'
 import { Route as TypeSlugImport } from './routes/type/$slug'
 import { Route as TrackSlugImport } from './routes/track/$slug'
+import { Route as EventTestLiveImport } from './routes/event/test-live'
 import { Route as EventSlugImport } from './routes/event/$slug'
 
 // Create/Update Routes
@@ -47,6 +48,12 @@ const TypeSlugRoute = TypeSlugImport.update({
 const TrackSlugRoute = TrackSlugImport.update({
   id: '/track/$slug',
   path: '/track/$slug',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EventTestLiveRoute = EventTestLiveImport.update({
+  id: '/event/test-live',
+  path: '/event/test-live',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -88,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventSlugImport
       parentRoute: typeof rootRoute
     }
+    '/event/test-live': {
+      id: '/event/test-live'
+      path: '/event/test-live'
+      fullPath: '/event/test-live'
+      preLoaderRoute: typeof EventTestLiveImport
+      parentRoute: typeof rootRoute
+    }
     '/track/$slug': {
       id: '/track/$slug'
       path: '/track/$slug'
@@ -112,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/bookmarks': typeof BookmarksRoute
   '/signin': typeof SigninRoute
   '/event/$slug': typeof EventSlugRoute
+  '/event/test-live': typeof EventTestLiveRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
 }
@@ -121,6 +136,7 @@ export interface FileRoutesByTo {
   '/bookmarks': typeof BookmarksRoute
   '/signin': typeof SigninRoute
   '/event/$slug': typeof EventSlugRoute
+  '/event/test-live': typeof EventTestLiveRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
 }
@@ -131,6 +147,7 @@ export interface FileRoutesById {
   '/bookmarks': typeof BookmarksRoute
   '/signin': typeof SigninRoute
   '/event/$slug': typeof EventSlugRoute
+  '/event/test-live': typeof EventTestLiveRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
 }
@@ -142,6 +159,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/signin'
     | '/event/$slug'
+    | '/event/test-live'
     | '/track/$slug'
     | '/type/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -150,6 +168,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/signin'
     | '/event/$slug'
+    | '/event/test-live'
     | '/track/$slug'
     | '/type/$slug'
   id:
@@ -158,6 +177,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/signin'
     | '/event/$slug'
+    | '/event/test-live'
     | '/track/$slug'
     | '/type/$slug'
   fileRoutesById: FileRoutesById
@@ -168,6 +188,7 @@ export interface RootRouteChildren {
   BookmarksRoute: typeof BookmarksRoute
   SigninRoute: typeof SigninRoute
   EventSlugRoute: typeof EventSlugRoute
+  EventTestLiveRoute: typeof EventTestLiveRoute
   TrackSlugRoute: typeof TrackSlugRoute
   TypeSlugRoute: typeof TypeSlugRoute
 }
@@ -177,6 +198,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookmarksRoute: BookmarksRoute,
   SigninRoute: SigninRoute,
   EventSlugRoute: EventSlugRoute,
+  EventTestLiveRoute: EventTestLiveRoute,
   TrackSlugRoute: TrackSlugRoute,
   TypeSlugRoute: TypeSlugRoute,
 }
@@ -195,6 +217,7 @@ export const routeTree = rootRoute
         "/bookmarks",
         "/signin",
         "/event/$slug",
+        "/event/test-live",
         "/track/$slug",
         "/type/$slug"
       ]
@@ -210,6 +233,9 @@ export const routeTree = rootRoute
     },
     "/event/$slug": {
       "filePath": "event/$slug.tsx"
+    },
+    "/event/test-live": {
+      "filePath": "event/test-live.tsx"
     },
     "/track/$slug": {
       "filePath": "track/$slug.tsx"

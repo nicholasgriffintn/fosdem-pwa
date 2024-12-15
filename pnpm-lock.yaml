@@ -59,6 +59,9 @@ dependencies:
   drizzle-orm:
     specifier: ^0.38.0
     version: 0.38.0(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0)
+  hls.js:
+    specifier: ^1.5.17
+    version: 1.5.17
   lucide-react:
     specifier: ^0.468.0
     version: 0.468.0(react@19.0.0)
@@ -4729,6 +4732,10 @@ packages:
     engines: {node: '>= 0.4'}
     dependencies:
       function-bind: 1.1.2
+
+  /hls.js@1.5.17:
+    resolution: {integrity: sha512-wA66nnYFvQa1o4DO/BFgLNRKnBTVXpNeldGRBJ2Y0SvFtdwvFKCbqa9zhHoZLoxHhZ+jYsj3aIBkWQQCPNOhMw==}
+    dev: false
 
   /hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
