@@ -5,9 +5,9 @@ import { PageHeader } from '~/components/PageHeader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { EventList } from '~/components/EventList'
 
-function get24HrFormat(str) {
+function get24HrFormat(str: string) {
   const _t = str.split(/[^0-9]/g);
-  _t[0] = +_t[0] + (str.indexOf('pm') > -1 && +_t[0] !== 12 ? 12 : 0);
+  _t[0] = String(+_t[0] + (str.indexOf('pm') > -1 && +_t[0] !== 12 ? 12 : 0));
   return _t.join('');
 }
 
@@ -73,7 +73,7 @@ function TrackPage() {
 
             return (
               <TabsContent key={day.id} value={day.id}>
-                <EventList events={event} favourites={{}} />
+                <EventList events={event} />
               </TabsContent>
             );
           })}

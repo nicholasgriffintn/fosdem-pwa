@@ -15,7 +15,7 @@ type TrackListItem = {
 
 type TrackListProps = {
   tracks: TrackListItem[];
-  favourites: {
+  favourites?: {
     [key: string]: string;
   }[];
 };
@@ -68,11 +68,9 @@ export function TrackList({ tracks, favourites }: TrackListProps) {
     ? tracks.map((track) => {
       return {
         ...track,
-        isFavourited:
-          (favourites?.length &&
-            favourites.find((bookmark) => bookmark.slug === track.id)
-              ?.status === 'favourited') ??
-          false,
+        isFavourited: favourites?.length
+          ? Boolean(favourites.find((bookmark) => bookmark.slug === track.id)?.status === 'favourited')
+          : undefined,
       };
     })
     : [];
