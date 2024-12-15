@@ -1,12 +1,13 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { Types } from "~/components/Types";
-import { getFosdemData } from "~/lib/data";
+import { getHomepageData } from "~/functions/getFosdemData";
+import { PageHeader } from "../components/PageHeader";
 
 export const Route = createFileRoute("/")({
   component: Home,
   loader: async () => {
-    const fosdem = getFosdemData('2025');
+    const fosdem = await getHomepageData({ data: { year: '2025' } });
     return { fosdem };
   },
   staleTime: 10_000,
@@ -22,12 +23,7 @@ function Home() {
   return (
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
-        <h1 className="inline-block font-heading text-4xl lg:text-5xl">
-          {fosdem.conference.title._text}
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          {fosdem.conference.city._text} / {fosdem.conference.start._text} - {fosdem.conference.end._text}
-        </p>
+        <PageHeader heading={fosdem.conference.title._text} text={`${fosdem.conference.city._text} / ${fosdem.conference.start._text} - ${fosdem.conference.end._text}`} />
         <div>
           {fosdem.types && (
             <Types types={fosdem.types} />
