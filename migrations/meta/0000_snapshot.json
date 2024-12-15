@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3a0932f9-f4cf-460b-b7a8-485806a5cd52",
+  "id": "458459bb-93e7-49ca-9b09-564ad9808475",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "bookmark": {
@@ -44,19 +44,19 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(CURRENT_TIMESTAMP)"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(CURRENT_TIMESTAMP)"
         }
       },
       "indexes": {},
@@ -151,7 +151,7 @@
         },
         "expires_at": {
           "name": "expires_at",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -208,32 +208,74 @@
           "notNull": true,
           "autoincrement": false
         },
+        "github_username": {
+          "name": "github_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "company": {
+          "name": "company",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "site": {
+          "name": "site",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "location": {
+          "name": "location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "bio": {
+          "name": "bio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "twitter_username": {
+          "name": "twitter_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(CURRENT_TIMESTAMP)"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(CURRENT_TIMESTAMP)"
         },
         "setup_at": {
           "name": "setup_at",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "terms_accepted_at": {
           "name": "terms_accepted_at",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
