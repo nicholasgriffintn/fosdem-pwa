@@ -58,7 +58,11 @@ function TrackPage() {
           </TabsList>
           {fosdem.days.map((day) => {
             if (!fosdem.eventDataSplitByDay[day.id]) {
-              return null;
+              return (
+                <TabsContent key={day.id} value={day.id}>
+                  <p>No events are currently scheduled for this day, check the next day instead. Or check back later for updates.</p>
+                </TabsContent>
+              )
             }
 
             const event = fosdem.eventDataSplitByDay[day.id]?.sort(function (a, b) {
