@@ -11,7 +11,11 @@ bucket_name = "fosdem"
 binding = "DB"
 database_name = "fosdem"
 database_id = "a9e2ef23-b95b-49e4-b1aa-5abc2bd26152"
-preview_database_id = "2ec973b1-6e46-49a8-825b-1928ec34cd22"
+
+[[d1_databases]]
+binding = "DB_PREVIEW"
+database_name = "fosdem-preview"
+database_id = "2ec973b1-6e46-49a8-825b-1928ec34cd22"
 
 [[kv_namespaces]]
 binding = "KV"

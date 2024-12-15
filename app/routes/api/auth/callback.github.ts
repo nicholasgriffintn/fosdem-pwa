@@ -18,6 +18,10 @@ interface GitHubUser {
   avatar_url: string;
   location: string | null;
   login: string;
+  company: string | null;
+  blog: string | null;
+  bio: string | null;
+  twitter_username: string | null;
 }
 
 export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
@@ -53,7 +57,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
         ),
       });
 
-      if (existingUser) {
+      if (existingUser?.user_id) {
         const token = generateSessionToken();
         const session = await createSession(token, existingUser.user_id);
         setSessionTokenCookie(token, session.expires_at);
@@ -63,47 +67,53 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
             Location: "/",
           },
         });
-      } else {
-        const existingUserEmail = await db.query.user.findFirst({
-          where: eq(user.email, providerUser.email),
-        });
-        if (existingUserEmail) {
-          await db.insert(oauthAccount).values({
-            provider_id: PROVIDER_ID,
-            provider_user_id: providerUser.id,
-            user_id: existingUserEmail.id,
-          });
-          const token = generateSessionToken();
-          const session = await createSession(token, existingUserEmail.id);
-          setSessionTokenCookie(token, session.expires_at);
-          return new Response(null, {
-            status: 302,
-            headers: {
-              Location: "/",
-            },
-          });
-        }
       }
-
-      const userId = await db.transaction(async (tx) => {
-        const [{ newId }] = await tx
-          .insert(user)
-          .values({
-            email: providerUser.email,
-            name: providerUser.name || providerUser.login,
-            avatar_url: providerUser.avatar_url,
-          })
-          .returning({ newId: user.id });
-        await tx.insert(oauthAccount).values({
+      const existingUserEmail = await db.query.user.findFirst({
+        where: eq(user.email, providerUser.email),
+      });
+      if (existingUserEmail?.id) {
+        await db.insert(oauthAccount).values({
           provider_id: PROVIDER_ID,
           provider_user_id: providerUser.id,
-          user_id: newId,
+          user_id: existingUserEmail.id,
         });
-        return newId;
+        const token = generateSessionToken();
+        const session = await createSession(token, existingUserEmail.id);
+        setSessionTokenCookie(token, session.expires_at);
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: "/",
+          },
+        });
+      }
+
+      const userId = await db.insert(user).values({
+        email: providerUser.email,
+        name: providerUser.name || providerUser.login,
+        avatar_url: providerUser.avatar_url,
+        github_username: providerUser.login,
+        company: providerUser.company,
+        site: providerUser.blog,
+        location: providerUser.location,
+        bio: providerUser.bio,
+        twitter_username: providerUser.twitter_username,
+      }).returning({ id: user.id });
+
+      if (!userId[0].id) {
+        return new Response(null, {
+          status: 500,
+        });
+      }
+
+      await db.insert(oauthAccount).values({
+        provider_id: PROVIDER_ID,
+        provider_user_id: providerUser.id,
+        user_id: userId[0].id,
       });
 
       const token = generateSessionToken();
-      const session = await createSession(token, userId);
+      const session = await createSession(token, userId[0].id);
       setSessionTokenCookie(token, session.expires_at);
       return new Response(null, {
         status: 302,
