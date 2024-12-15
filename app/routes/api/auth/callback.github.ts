@@ -60,7 +60,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
       if (existingUser?.user_id) {
         const token = generateSessionToken();
         const session = await createSession(token, existingUser.user_id);
-        setSessionTokenCookie(token, session.expires_at);
+        setSessionTokenCookie(token, new Date(session.expires_at));
         return new Response(null, {
           status: 302,
           headers: {
@@ -79,7 +79,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
         });
         const token = generateSessionToken();
         const session = await createSession(token, existingUserEmail.id);
-        setSessionTokenCookie(token, session.expires_at);
+        setSessionTokenCookie(token, new Date(session.expires_at));
         return new Response(null, {
           status: 302,
           headers: {
@@ -114,7 +114,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 
       const token = generateSessionToken();
       const session = await createSession(token, userId[0].id);
-      setSessionTokenCookie(token, session.expires_at);
+      setSessionTokenCookie(token, new Date(session.expires_at));
       return new Response(null, {
         status: 302,
         headers: {
