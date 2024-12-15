@@ -11,6 +11,14 @@ export const Route = createFileRoute("/type/$slug")({
     const fosdem = await getTypesData({ data: { year: '2025', slug: params.slug } });
     return { fosdem: fosdem ?? {} }
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${loaderData?.fosdem.type.name} | FOSDEM PWA`,
+        description: loaderData?.fosdem.type.description,
+      },
+    ],
+  }),
   staleTime: 10_000,
 });
 

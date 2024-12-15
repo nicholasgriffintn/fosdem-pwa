@@ -23,6 +23,14 @@ export const Route = createFileRoute('/event/$slug')({
     })
     return { fosdem: fosdem ?? {} }
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${loaderData?.fosdem.event.title} | FOSDEM PWA`,
+        description: loaderData?.fosdem.event.description,
+      },
+    ],
+  }),
   staleTime: 10_000,
 })
 

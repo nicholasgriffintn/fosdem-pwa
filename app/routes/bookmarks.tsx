@@ -1,10 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { getHomepageData } from '~/functions/getFosdemData'
 import { PageHeader } from '~/components/PageHeader'
 
 export const Route = createFileRoute('/bookmarks')({
   component: BookmarksHome,
+  head: () => ({
+    meta: [
+      {
+        title: 'Bookmarks | FOSDEM PWA',
+        description: 'Bookmarks from FOSDEM 2025',
+      },
+    ],
+  }),
 })
 
 function BookmarksHome() {
