@@ -68,9 +68,13 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
           },
         });
       }
+
       const existingUserEmail = await db.query.user.findFirst({
         where: eq(user.email, providerUser.email),
       });
+
+      console.log("existingUserEmail", existingUserEmail);
+
       if (existingUserEmail?.id) {
         await db.insert(oauthAccount).values({
           provider_id: PROVIDER_ID,

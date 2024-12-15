@@ -49,7 +49,7 @@ dependencies:
     version: 1.87.3(@tanstack/react-router@1.89.1)(csstype@3.1.3)(react-dom@19.0.0)(react@19.0.0)
   '@tanstack/start':
     specifier: ^1.87.4
-    version: 1.89.1(drizzle-orm@0.38.0)(react-dom@19.0.0)(react@19.0.0)(typescript@5.7.2)(vite@4.5.5)
+    version: 1.89.1(drizzle-orm@0.38.2)(react-dom@19.0.0)(react@19.0.0)(typescript@5.7.2)(vite@4.5.5)
   '@vitejs/plugin-react':
     specifier: ^4.3.4
     version: 4.3.4(vite@4.5.5)
@@ -63,8 +63,8 @@ dependencies:
     specifier: ^2.1.1
     version: 2.1.1
   drizzle-orm:
-    specifier: ^0.38.0
-    version: 0.38.0(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0)
+    specifier: ^0.38.2
+    version: 0.38.2(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0)
   hls.js:
     specifier: ^1.5.17
     version: 1.5.17
@@ -91,7 +91,7 @@ dependencies:
     version: 1.10.0
   vinxi:
     specifier: ^0.5.1
-    version: 0.5.1(drizzle-orm@0.38.0)(typescript@5.7.2)
+    version: 0.5.1(drizzle-orm@0.38.2)(typescript@5.7.2)
 
 devDependencies:
   '@cloudflare/workers-types':
@@ -113,8 +113,8 @@ devDependencies:
     specifier: ^10.4.20
     version: 10.4.20(postcss@8.4.49)
   drizzle-kit:
-    specifier: ^0.30.0
-    version: 0.30.0
+    specifier: ^0.30.1
+    version: 0.30.1
   globals:
     specifier: ^15.13.0
     version: 15.13.0
@@ -3282,7 +3282,7 @@ packages:
       - supports-color
     dev: false
 
-  /@tanstack/start@1.89.1(drizzle-orm@0.38.0)(react-dom@19.0.0)(react@19.0.0)(typescript@5.7.2)(vite@4.5.5):
+  /@tanstack/start@1.89.1(drizzle-orm@0.38.2)(react-dom@19.0.0)(react@19.0.0)(typescript@5.7.2)(vite@4.5.5):
     resolution: {integrity: sha512-GQrK4qa/1exOED897J0Ljek7Q2ncdrYU36GZ2v5K78rxrwaIM8vzuK2fuFfpkOybw48P83YozD6Go8Tcu7GVUw==}
     engines: {node: '>=12'}
     peerDependencies:
@@ -3305,7 +3305,7 @@ packages:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       tiny-invariant: 1.3.3
-      vinxi: 0.5.1(drizzle-orm@0.38.0)(typescript@5.7.2)
+      vinxi: 0.5.1(drizzle-orm@0.38.2)(typescript@5.7.2)
       zod: 3.24.1
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -3615,7 +3615,7 @@ packages:
       magicast: 0.2.11
       recast: 0.23.9
       tslib: 2.8.1
-      vinxi: 0.5.1(drizzle-orm@0.38.0)(typescript@5.7.2)
+      vinxi: 0.5.1(drizzle-orm@0.38.2)(typescript@5.7.2)
     dev: false
 
   /@vinxi/react-server-dom@0.0.3(react-dom@19.0.0)(react@19.0.0)(vite@4.5.5):
@@ -3648,7 +3648,7 @@ packages:
       astring: 1.9.0
       magicast: 0.2.11
       recast: 0.23.9
-      vinxi: 0.5.1(drizzle-orm@0.38.0)(typescript@5.7.2)
+      vinxi: 0.5.1(drizzle-orm@0.38.2)(typescript@5.7.2)
     dev: false
 
   /@vinxi/server-functions@0.5.0(vinxi@0.5.1):
@@ -3663,7 +3663,7 @@ packages:
       astring: 1.9.0
       magicast: 0.2.11
       recast: 0.23.9
-      vinxi: 0.5.1(drizzle-orm@0.38.0)(typescript@5.7.2)
+      vinxi: 0.5.1(drizzle-orm@0.38.2)(typescript@5.7.2)
     dev: false
 
   /@vitejs/plugin-react@4.3.4(vite@4.5.5):
@@ -4242,7 +4242,7 @@ packages:
       undici-types: 5.28.4
     dev: false
 
-  /db0@0.2.1(drizzle-orm@0.38.0):
+  /db0@0.2.1(drizzle-orm@0.38.2):
     resolution: {integrity: sha512-BWSFmLaCkfyqbSEZBQINMVNjCVfrogi7GQ2RSy1tmtfK9OXlsup6lUMwLsqSD7FbAjD04eWFdXowSHHUp6SE/Q==}
     peerDependencies:
       '@electric-sql/pglite': '*'
@@ -4262,7 +4262,7 @@ packages:
       mysql2:
         optional: true
     dependencies:
-      drizzle-orm: 0.38.0(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0)
+      drizzle-orm: 0.38.2(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0)
     dev: false
 
   /debug@2.6.9:
@@ -4357,8 +4357,8 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
-  /drizzle-kit@0.30.0:
-    resolution: {integrity: sha512-zAf0qg/BX2lV/Xip4igXrtbDv+Ub8S39U6qSOEGNvqcHrnmaQjS4mkkFZOUsgXRbuH56QUeWZxfnLHefrKCV5g==}
+  /drizzle-kit@0.30.1:
+    resolution: {integrity: sha512-HmA/NeewvHywhJ2ENXD3KvOuM/+K2dGLJfxVfIHsGwaqKICJnS+Ke2L6UcSrSrtMJLJaT0Im1Qv4TFXfaZShyw==}
     hasBin: true
     dependencies:
       '@drizzle-team/brocli': 0.10.2
@@ -4369,8 +4369,8 @@ packages:
       - supports-color
     dev: true
 
-  /drizzle-orm@0.38.0(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0):
-    resolution: {integrity: sha512-Ev1UYKOUxiVwLZZfos4hoNDMDkp313FqF0CHelhR+BeOdb76z/a6pKF6SgYQSrmj6EXH4cy6QIkmuxl2KIFW0A==}
+  /drizzle-orm@0.38.2(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0):
+    resolution: {integrity: sha512-eCE3yPRAskLo1WpM9OHpFaM70tBEDsWhwR/0M3CKyztAXKR9Qs3asZlcJOEliIcUSg8GuwrlY0dmYDgmm6y5GQ==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -5797,7 +5797,7 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /nitropack@2.10.4(drizzle-orm@0.38.0)(typescript@5.7.2):
+  /nitropack@2.10.4(drizzle-orm@0.38.2)(typescript@5.7.2):
     resolution: {integrity: sha512-sJiG/MIQlZCVSw2cQrFG1H6mLeSqHlYfFerRjLKz69vUfdu0EL2l0WdOxlQbzJr3mMv/l4cOlCCLzVRzjzzF/g==}
     engines: {node: ^16.11.0 || >=17.0.0}
     hasBin: true
@@ -5829,7 +5829,7 @@ packages:
       cookie-es: 1.2.2
       croner: 9.0.0
       crossws: 0.3.1
-      db0: 0.2.1(drizzle-orm@0.38.0)
+      db0: 0.2.1(drizzle-orm@0.38.2)
       defu: 6.1.4
       destr: 2.0.3
       dot-prop: 9.0.0
@@ -7329,7 +7329,7 @@ packages:
   /util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  /vinxi@0.5.1(drizzle-orm@0.38.0)(typescript@5.7.2):
+  /vinxi@0.5.1(drizzle-orm@0.38.2)(typescript@5.7.2):
     resolution: {integrity: sha512-jvl2hJ0fyWwfDVQdDDHCJiVxqU4k0A6kFAnljS0kIjrGfhdTvKEWIoj0bcJgMyrKhxNMoZZGmHZsstQgjDIL3g==}
     hasBin: true
     dependencies:
@@ -7353,7 +7353,7 @@ packages:
       hookable: 5.5.3
       http-proxy: 1.18.1
       micromatch: 4.0.8
-      nitropack: 2.10.4(drizzle-orm@0.38.0)(typescript@5.7.2)
+      nitropack: 2.10.4(drizzle-orm@0.38.2)(typescript@5.7.2)
       node-fetch-native: 1.6.4
       path-to-regexp: 6.3.0
       pathe: 1.1.2

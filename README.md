@@ -22,7 +22,8 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] The ability to share tracks and events
 - [ ] The ability to share your bookmarks
 - [ ] A page to view your bookmarked tracks and events
-- [ ] A page for live content with embedded video streams
+- [x] A page for finding live events
+- [x] A map page
 - [ ] A search page
 - [x] Data synced automatically from FOSDEM on a schedule, deployed separately [here](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)
 
@@ -30,7 +31,6 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 - [ ] Make Fosdem PWA a PWA again
 - [ ] Images are loading in on the homepage with layout shift
-- [ ] Test the event streams somehow
 
 ## Contributing
 
