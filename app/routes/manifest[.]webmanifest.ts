@@ -5,7 +5,7 @@ export const loader = async () => {
     {
       short_name: 'FOSDEM',
       name: 'FOSDEM PWA',
-      description: 'A companion PWA for the FOSDEM 2024 event',
+      description: 'A companion PWA for the FOSDEM 2025 event',
       start_url: '/',
       display: 'standalone',
       background_color: '#d3d7dd',

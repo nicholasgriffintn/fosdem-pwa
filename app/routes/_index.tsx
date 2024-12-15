@@ -6,8 +6,8 @@ import { Types, TypesSkeleton } from '~/components/Types';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'FOSDEM 2024' },
-    { name: 'description', content: 'A companion PWA for FOSDEM 2024' },
+    { title: 'FOSDEM 2025' },
+    { name: 'description', content: 'A companion PWA for FOSDEM 2025' },
   ];
 };
 

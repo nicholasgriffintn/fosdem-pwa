@@ -18,10 +18,10 @@ import { Icons } from '~/components/Icons';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Bookmarks | FOSDEM 2024' },
+    { title: 'Bookmarks | FOSDEM 2025' },
     {
       name: 'description',
-      content: 'Your favourited bookmarks from FOSDEM 2024',
+      content: 'Your favourited bookmarks from FOSDEM 2025',
     },
   ];
 };

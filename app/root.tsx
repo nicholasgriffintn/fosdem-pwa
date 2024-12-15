@@ -49,7 +49,7 @@ export async function loader({ request, context }) {
     const theme = await getThemeFromSession(session);
     const themeDetails = theme?.getTheme();
 
-    const fosdem = await getConferenceData('2024');
+    const fosdem = await getConferenceData('2025');
     const favourites = await getFavouritesData(userDetails.id, context);
 
     const data = {

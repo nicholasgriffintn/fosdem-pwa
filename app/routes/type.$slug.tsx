@@ -8,7 +8,7 @@ import { TrackList } from '~/components/TrackList';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'Tracks - FOSDEM 2024' },
+    { title: 'Tracks - FOSDEM 2025' },
     { name: 'description', content: 'The list of tracks available' },
   ];
 };
