@@ -55,7 +55,7 @@ export function Header({ user }: { user: SessionUser | null }) {
                     <AvatarMenu user={user} />
                   ) : (
                     <Button variant="link" size="icon" className="h-7 w-7" asChild>
-                      <Link href="/signin">
+                      <Link to="/signin">
                         <Icons.login className="h-7 w-7" width="7" height="7" />
                         <span className="sr-only">Sign In</span>
                       </Link>
