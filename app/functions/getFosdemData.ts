@@ -38,8 +38,7 @@ export const getTypesData = createServerFn({
     const data = getFullData(ctx.data.year);
 
     const days = Object.values(data.days);
-    const track = data.tracks[ctx.data.slug];
-    const type = data.types[track.type];
+    const type = data.types[ctx.data.slug];
     const trackData = Object.values(data.tracks).filter(
       (track: any) => track.type === ctx.data.slug
     );
@@ -62,7 +61,6 @@ export const getTypesData = createServerFn({
 
     return {
       days,
-      track,
       type,
       trackDataSplitByDay,
     };
