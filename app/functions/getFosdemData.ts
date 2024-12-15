@@ -1,13 +1,22 @@
-import fs from 'node:fs';
 import { createServerFn } from '@tanstack/start'
 
-const getFullData = (year: string) => {
-  const data = fs.readFileSync(`public/data/fosdem-${year}.json`, 'utf8');
+import { constants } from '~/constants'
 
-  const json = JSON.parse(data);
+const getFullData = async (year: string) => {
+  const url = constants.DATA_LINK.replace('${YEAR}', year);
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('Data not found');
+  }
+
+  const json = await response.json();
+
   if (!json.conference) {
     throw new Error('Data not found');
   }
+
+  console.log(json.conference)
 
   return json;
 }
@@ -19,7 +28,7 @@ export const getHomepageData = createServerFn({
     year: string;
   }) => data)
   .handler(async (ctx) => {
-    const data = getFullData(ctx.data.year);
+    const data = await getFullData(ctx.data.year);
 
     return {
       conference: data.conference,
@@ -35,7 +44,7 @@ export const getTypesData = createServerFn({
     slug: string;
   }) => data)
   .handler(async (ctx) => {
-    const data = getFullData(ctx.data.year);
+    const data = await getFullData(ctx.data.year);
 
     const days = Object.values(data.days);
     const type = data.types[ctx.data.slug];
@@ -74,7 +83,7 @@ export const getTrackData = createServerFn({
     slug: string;
   }) => data)
   .handler(async (ctx) => {
-    const data = getFullData(ctx.data.year);
+    const data = await getFullData(ctx.data.year);
 
     const days = Object.values(data.days);
 
@@ -121,7 +130,7 @@ export const getEventData = createServerFn({
     slug: string;
   }) => data)
   .handler(async (ctx) => {
-    const data = getFullData(ctx.data.year);
+    const data = await getFullData(ctx.data.year);
 
     const event = data.events[ctx.data.slug];
 
