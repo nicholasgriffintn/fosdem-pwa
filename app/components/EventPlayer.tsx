@@ -1,9 +1,14 @@
+'use client';
+
 import clsx from 'clsx';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
+import { Play } from 'lucide-react';
+
+import { Event } from '~/functions/getFosdemData';
 
 interface EventPlayerProps {
-  event: any;
+  event: Event;
   isMobile?: boolean;
   onClose?: () => void;
   isFloating?: boolean;
@@ -12,9 +17,10 @@ interface EventPlayerProps {
 export function EventPlayer({ event, isMobile = false, onClose, isFloating = false }: EventPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (!videoRef.current || !event.streams.length) return;
+    if (!videoRef.current || !event.streams.length || !isPlaying) return;
 
     const stream = event.streams[0];
     if (stream.type === 'application/vnd.apple.mpegurl') {
@@ -33,7 +39,11 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
         hlsRef.current.destroy();
       }
     };
-  }, [event.streams]);
+  }, [event.streams, isPlaying]);
+
+  const handlePlay = () => {
+    setIsPlaying(true);
+  };
 
   const containerClassName = clsx(
     'relative h-full',
@@ -51,7 +61,7 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
 
   return (
     <div className={containerClassName}>
-      {!event.isLive && (
+      {!isPlaying && (
         <div
           className={`bg-${event.type} w-full h-full absolute top-0 left-0 z-0'`}
         />
@@ -59,23 +69,37 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
 
       <div className={videoWrapperClassName}>
         {event.isLive && event.streams?.length ? (
-          <video
-            ref={videoRef}
-            className="h-full w-full object-cover"
-            controls
-            autoPlay
-          >
-            {event.streams.map((stream) => (
-              <source
-                key={stream.href}
-                src={stream.href}
-                type={stream.type}
-              />
-            ))}
-          </video>
+          <>
+            {!isPlaying && (
+              <button
+                onClick={handlePlay}
+                className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 hover:bg-black/60 transition-colors"
+              >
+                <Play className="w-16 h-16 text-white" />
+              </button>
+            )}
+            {isPlaying && (
+              <video
+                ref={videoRef}
+                className="h-full w-full object-cover"
+                controls
+                autoPlay
+              >
+                {event.streams.map((stream) => (
+                  <source
+                    key={stream.href}
+                    src={stream.href}
+                    type={stream.type}
+                  />
+                ))}
+              </video>
+            )}
+          </>
         ) : (
-          <div className="p-6 relative bg-muted rounded-md">
-            <span>Sorry! The stream isn't available yet!</span>
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 transition-colors">
+            <div className="p-6 relative bg-muted rounded-md">
+              <span>The stream isn't available yet! Check back at {event.startTime}.</span>
+            </div>
           </div>
         )}
       </div>
