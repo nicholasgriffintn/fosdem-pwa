@@ -55,17 +55,17 @@ function TrackPage() {
   }
 
   const ChatAlert = () => (
-    <div className="border-t bg-card px-4 py-3">
-      <div className="flex items-center gap-2">
-        <Icons.logo className="h-4 w-4" />
-        <span className="font-medium">Get involved in the conversation!</span>
+    <div className="bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75">
+      <div className="flex items-center gap-2 px-4 py-3">
+        <Icons.logo className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">Get involved in the conversation!</span>
         <a
           href={fosdem.event.chat}
           target="_blank"
           rel="noreferrer"
-          className="text-primary hover:underline ml-1"
+          className="text-sm text-primary hover:underline"
         >
-          Click here to join the chat
+          Join chat
         </a>
       </div>
     </div>
@@ -95,8 +95,10 @@ function TrackPage() {
         <div className="w-full">
           {width < 768 ? (
             <div className="space-y-4">
-              <div className="overflow-hidden rounded-lg border">
-                <EventPlayer event={fosdem.event} isMobile />
+              <div className="overflow-hidden rounded-lg bg-card">
+                <div className="w-full">
+                  <EventPlayer event={fosdem.event} isMobile />
+                </div>
                 {fosdem.event.chat && <ChatAlert />}
               </div>
               <EventSidebar event={fosdem.event} isMobile />
