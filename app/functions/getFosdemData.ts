@@ -16,8 +16,6 @@ const getFullData = async (year: string) => {
     throw new Error('Data not found');
   }
 
-  console.log(json.conference)
-
   return json;
 }
 
@@ -99,8 +97,6 @@ export const getTrackData = createServerFn({
     const eventDataSplitByDay: Record<string, any[]> = {};
 
     eventData.forEach((event: any) => {
-      console.log(event)
-
       if (!eventDataSplitByDay[event.day[0]]) {
         eventDataSplitByDay[event.day[0]] = [];
       }

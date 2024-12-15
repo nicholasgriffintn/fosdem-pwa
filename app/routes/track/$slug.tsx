@@ -19,6 +19,14 @@ export const Route = createFileRoute('/track/$slug')({
     })
     return { fosdem: fosdem ?? {} }
   },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${loaderData?.fosdem.track.name} | FOSDEM PWA`,
+        description: loaderData?.fosdem.track.description,
+      },
+    ],
+  }),
   staleTime: 10_000,
 })
 
@@ -58,8 +66,6 @@ function TrackPage() {
               const t2 = get24HrFormat(b.startTime);
               return t1 > t2 ? 1 : t1 < t2 ? -1 : 0;
             });
-
-            console.log(event)
 
             return (
               <TabsContent key={day.id} value={day.id}>
