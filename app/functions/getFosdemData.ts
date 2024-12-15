@@ -14,7 +14,7 @@ interface Track {
   description: string;
   room: string;
   type: string;
-  day: string[];
+  day: number;
 }
 
 interface Event {
@@ -71,7 +71,8 @@ const getFullData = async (year: string): Promise<Conference> => {
  */
 const groupByDay = (items: any[], getDayFn: (item: any) => string[]): DayGroupedData => {
   return items.reduce((acc: DayGroupedData, item) => {
-    const days = getDayFn(item);
+    const dayValue = getDayFn(item);
+    const days = Array.isArray(dayValue) ? dayValue : [String(dayValue)];
 
     days.forEach(day => {
       if (!acc[day]) {
