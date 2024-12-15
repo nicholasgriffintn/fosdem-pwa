@@ -16,17 +16,25 @@ export const db = drizzle(
         Authorization: `Bearer ${process.env.CLOUDFLARE_D1_TOKEN}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ sql, params, method }),
+      body: JSON.stringify({ sql, params }),
     });
 
-    const data: {
-      success: boolean;
-      errors: string[];
-      result: {
-        success: boolean;
-        results: { [key: string]: any }[];
-      }[];
-    } = await res.json();
+    const data = await res.json() as
+      | {
+        success: true;
+        result: {
+          results:
+          | any[]
+          | {
+            columns: string[];
+            rows: any[][];
+          };
+        }[];
+      }
+      | {
+        success: false;
+        errors: { code: number; message: string }[];
+      };;
 
     if (res.status !== 200) {
       throw new Error(
@@ -35,22 +43,16 @@ export const db = drizzle(
       );
     }
 
-    if (data.errors.length > 0 || !data.success) {
+    if (!data.success) {
       throw new Error(
-        `Error from sqlite proxy server: \n${JSON.stringify(data)}}`,
+        data.errors.map((it) => `${it.code}: ${it.message}`).join('\n'),
       );
     }
 
-    const qResult = data.result[0];
+    const result = data.result[0].results;
+    const rows = Array.isArray(result) ? result : result.rows;
 
-    if (!qResult?.success) {
-      throw new Error(
-        `Error from sqlite proxy server: \n${JSON.stringify(data)}`,
-      );
-    }
-
-    // https://orm.drizzle.team/docs/get-started-sqlite#http-proxy
-    return { rows: qResult?.results?.map((r: any) => Object.values(r)) };
+    return { rows };
   },
   { schema },
 );
