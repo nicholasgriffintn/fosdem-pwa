@@ -10,12 +10,11 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## Features
 
-- [ ] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
-- [ ] A page for each track with a list of events
-- [ ] A page for each event with the event details
-- [ ] Automated guest sign in (without needing any details)
-- [ ] The ability to sign in with a previously generated guest sign in
-- [ ] The ability to upgrade a guest sign in to a full account, and sign in with that instead
+- [x] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
+- [x] A page for each track with a list of events
+- [x] A page for each event with the event details
+- [ ] GitHub sign in
+- [ ] Guest sign in (potentially)
 - [ ] A page for the user profile, with a generated pass for the event
 - [ ] The ability to bookmark tracks and events
 - [ ] Bookmarks are background synced when offline
@@ -25,6 +24,12 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] A page to view your bookmarked tracks and events
 - [ ] A page for live content with embedded video streams
 - [ ] A search page
+
+## TODO
+
+- [ ] Make Fosdem PWA a PWA again
+- [ ] Images are loading in on the homepage with layout shift
+- [ ] Test the event streams somehow
 
 ## Contributing
 
