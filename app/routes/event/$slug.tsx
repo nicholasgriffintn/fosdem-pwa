@@ -43,16 +43,18 @@ function TrackPage() {
 
   const { width } = useWindowSize()
 
-  const isFavourite = false
+  const isFavourite = {
+    status: 'null',
+    slug: fosdem.event.slug,
+  }
 
   return (
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
         <PageHeader
           heading={fosdem.event.title}
-          text={`Day ${fosdem.event.day} | ${fosdem.event.startTime} | ${fosdem.event.duration} | ${
-            fosdem.event.room
-          }${fosdem.event.persons?.length > 0 && ` | ${fosdem.event.persons.join(', ')}`}`}
+          text={`Day ${fosdem.event.day} | ${fosdem.event.startTime} | ${fosdem.event.duration} | ${fosdem.event.room
+            }${fosdem.event.persons?.length > 0 && ` | ${fosdem.event.persons.join(', ')}`}`}
         >
           <div className="flex items-center pl-6 pr-3 gap-2">
             <FavouriteButton

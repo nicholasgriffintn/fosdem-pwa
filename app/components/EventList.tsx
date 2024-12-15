@@ -17,7 +17,7 @@ type EventListItem = {
 
 type EventListProps = {
   events: EventListItem[];
-  favourites: {
+  favourites?: {
     [key: string]: string;
   }[];
 };
@@ -71,11 +71,9 @@ export function EventList({ events, favourites }: EventListProps) {
     ? events.map((event) => {
       return {
         ...event,
-        isFavourited:
-          (favourites?.length &&
-            favourites.find((bookmark) => bookmark.slug === event.id)
-              ?.status === 'favourited') ??
-          false,
+        isFavourited: favourites?.length
+          ? Boolean(favourites.find((bookmark) => bookmark.slug === event.id)?.status === 'favourited')
+          : undefined,
       };
     })
     : [];

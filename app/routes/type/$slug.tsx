@@ -48,7 +48,7 @@ function TypePage() {
 
             return (
               <TabsContent key={day.id} value={day.id}>
-                <TrackList tracks={event} favourites={{}} />
+                <TrackList tracks={event} />
               </TabsContent>
             );
           })}
