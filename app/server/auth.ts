@@ -32,40 +32,35 @@ export async function createSession(token: string, userId: number): Promise<Sess
 
 export async function validateSessionToken(token: string) {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+  const now = Date.now();
 
-  const sessions = await db
-    .select()
+  const results = await db
+    .select({
+      session: {
+        user_id: sessionTable.user_id,
+        expires_at: sessionTable.expires_at,
+      },
+      user: {
+        name: userTable.name,
+        avatar_url: userTable.avatar_url,
+        email: userTable.email,
+      },
+    })
     .from(sessionTable)
+    .innerJoin(userTable, eq(sessionTable.user_id, userTable.id))
     .where(eq(sessionTable.id, sessionId));
 
-  if (sessions.length < 1) {
+  if (results.length < 1) {
     return { session: null, user: null };
   }
 
-  const session = sessions[0];
-  const now = Date.now();
+  const { session, user } = results[0];
   const expiresAt = new Date(session.expires_at).getTime();
 
   if (now >= expiresAt) {
     await db.delete(sessionTable).where(eq(sessionTable.id, session.id));
     return { session: null, user: null };
   }
-
-  const users = await db
-    .select({
-      id: userTable.id,
-      name: userTable.name,
-      avatar_url: userTable.avatar_url,
-      email: userTable.email,
-    })
-    .from(userTable)
-    .where(eq(userTable.id, session.user_id));
-
-  if (users.length < 1) {
-    return { session: null, user: null };
-  }
-
-  const user = users[0];
 
   const shouldExtend = now >= expiresAt - 1000 * 60 * 60 * 24 * 15;
   if (shouldExtend) {
