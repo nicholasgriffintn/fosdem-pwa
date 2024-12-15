@@ -12,9 +12,11 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SigninImport } from './routes/signin'
-import { Route as DashboardImport } from './routes/dashboard'
+import { Route as BookmarksImport } from './routes/bookmarks'
 import { Route as IndexImport } from './routes/index'
-import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as TypeSlugImport } from './routes/type/$slug'
+import { Route as TrackSlugImport } from './routes/track/$slug'
+import { Route as EventSlugImport } from './routes/event/$slug'
 
 // Create/Update Routes
 
@@ -24,9 +26,9 @@ const SigninRoute = SigninImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardRoute = DashboardImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const BookmarksRoute = BookmarksImport.update({
+  id: '/bookmarks',
+  path: '/bookmarks',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -36,10 +38,22 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardIndexRoute = DashboardIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardRoute,
+const TypeSlugRoute = TypeSlugImport.update({
+  id: '/type/$slug',
+  path: '/type/$slug',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TrackSlugRoute = TrackSlugImport.update({
+  id: '/track/$slug',
+  path: '/track/$slug',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EventSlugRoute = EventSlugImport.update({
+  id: '/event/$slug',
+  path: '/event/$slug',
+  getParentRoute: () => rootRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -53,11 +67,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardImport
+    '/bookmarks': {
+      id: '/bookmarks'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof BookmarksImport
       parentRoute: typeof rootRoute
     }
     '/signin': {
@@ -67,70 +81,104 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SigninImport
       parentRoute: typeof rootRoute
     }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexImport
-      parentRoute: typeof DashboardImport
+    '/event/$slug': {
+      id: '/event/$slug'
+      path: '/event/$slug'
+      fullPath: '/event/$slug'
+      preLoaderRoute: typeof EventSlugImport
+      parentRoute: typeof rootRoute
+    }
+    '/track/$slug': {
+      id: '/track/$slug'
+      path: '/track/$slug'
+      fullPath: '/track/$slug'
+      preLoaderRoute: typeof TrackSlugImport
+      parentRoute: typeof rootRoute
+    }
+    '/type/$slug': {
+      id: '/type/$slug'
+      path: '/type/$slug'
+      fullPath: '/type/$slug'
+      preLoaderRoute: typeof TypeSlugImport
+      parentRoute: typeof rootRoute
     }
   }
 }
 
 // Create and export the route tree
 
-interface DashboardRouteChildren {
-  DashboardIndexRoute: typeof DashboardIndexRoute
-}
-
-const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardIndexRoute: DashboardIndexRoute,
-}
-
-const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
-  DashboardRouteChildren,
-)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRouteWithChildren
+  '/bookmarks': typeof BookmarksRoute
   '/signin': typeof SigninRoute
-  '/dashboard/': typeof DashboardIndexRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/track/$slug': typeof TrackSlugRoute
+  '/type/$slug': typeof TypeSlugRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bookmarks': typeof BookmarksRoute
   '/signin': typeof SigninRoute
-  '/dashboard': typeof DashboardIndexRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/track/$slug': typeof TrackSlugRoute
+  '/type/$slug': typeof TypeSlugRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRouteWithChildren
+  '/bookmarks': typeof BookmarksRoute
   '/signin': typeof SigninRoute
-  '/dashboard/': typeof DashboardIndexRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/track/$slug': typeof TrackSlugRoute
+  '/type/$slug': typeof TypeSlugRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/signin' | '/dashboard/'
+  fullPaths:
+    | '/'
+    | '/bookmarks'
+    | '/signin'
+    | '/event/$slug'
+    | '/track/$slug'
+    | '/type/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signin' | '/dashboard'
-  id: '__root__' | '/' | '/dashboard' | '/signin' | '/dashboard/'
+  to:
+    | '/'
+    | '/bookmarks'
+    | '/signin'
+    | '/event/$slug'
+    | '/track/$slug'
+    | '/type/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/bookmarks'
+    | '/signin'
+    | '/event/$slug'
+    | '/track/$slug'
+    | '/type/$slug'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRouteWithChildren
+  BookmarksRoute: typeof BookmarksRoute
   SigninRoute: typeof SigninRoute
+  EventSlugRoute: typeof EventSlugRoute
+  TrackSlugRoute: typeof TrackSlugRoute
+  TypeSlugRoute: typeof TypeSlugRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRouteWithChildren,
+  BookmarksRoute: BookmarksRoute,
   SigninRoute: SigninRoute,
+  EventSlugRoute: EventSlugRoute,
+  TrackSlugRoute: TrackSlugRoute,
+  TypeSlugRoute: TypeSlugRoute,
 }
 
 export const routeTree = rootRoute
@@ -144,25 +192,30 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/dashboard",
-        "/signin"
+        "/bookmarks",
+        "/signin",
+        "/event/$slug",
+        "/track/$slug",
+        "/type/$slug"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/dashboard": {
-      "filePath": "dashboard.tsx",
-      "children": [
-        "/dashboard/"
-      ]
+    "/bookmarks": {
+      "filePath": "bookmarks.tsx"
     },
     "/signin": {
       "filePath": "signin.tsx"
     },
-    "/dashboard/": {
-      "filePath": "dashboard/index.tsx",
-      "parent": "/dashboard"
+    "/event/$slug": {
+      "filePath": "event/$slug.tsx"
+    },
+    "/track/$slug": {
+      "filePath": "track/$slug.tsx"
+    },
+    "/type/$slug": {
+      "filePath": "type/$slug.tsx"
     }
   }
 }
