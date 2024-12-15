@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 
-export function EventSidebar({ event, isMobile = false }) {
+import { Event } from '~/functions/getFosdemData';
+
+export function EventSidebar({ event, isMobile = false }: { event: Event; isMobile?: boolean }) {
   const sidebarClassName = clsx('h-full', {
     'p-6': !isMobile,
     'pt-6 pb-6': isMobile,
