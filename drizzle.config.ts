@@ -1,7 +1,8 @@
 import type { Config } from 'drizzle-kit';
 
 export default {
+  // @ts-ignore
   driver: 'd1',
-  schema: './app/services/database/schema.ts',
-  out: './migrations',
+  schema: './app/server/db/schema.ts',
+  out: './drizzle',
 } satisfies Config;
