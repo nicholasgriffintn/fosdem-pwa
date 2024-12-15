@@ -30,8 +30,11 @@ export function Footer() {
               className="font-medium underline underline-offset-4"
             >
               Source Code
+            </a>{' '}
+            |{' '}
+            <a href="https:undefined.computer" className="font-medium underline underline-offset-4">
+              Undefined
             </a>
-            .
           </p>
         </div>
       </div>

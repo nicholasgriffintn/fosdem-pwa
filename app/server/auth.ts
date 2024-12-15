@@ -3,6 +3,7 @@ import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from "@oslojs/enco
 import { GitHub } from "arctic";
 import { eq } from "drizzle-orm";
 import { deleteCookie, getCookie, setCookie } from "vinxi/http";
+import { nanoid } from 'nanoid';
 
 import { db } from "~/server/db";
 import {
@@ -44,6 +45,8 @@ export async function validateSessionToken(token: string) {
         name: userTable.name,
         avatar_url: userTable.avatar_url,
         email: userTable.email,
+        is_guest: userTable.is_guest,
+        guest_id: userTable.guest_id,
       },
     })
     .from(sessionTable)
@@ -94,20 +97,46 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
   });
 }
 
-// OAuth2 Providers
 export const github = new GitHub(
   process.env.GITHUB_CLIENT_ID as string,
   process.env.GITHUB_CLIENT_SECRET as string,
   process.env.GITHUB_REDIRECT_URI || null,
 );
 
-/**
- * Retrieves the session and user data if valid.
- * Can be used in API routes and server functions.
- */
+export async function createGuestUser() {
+  const guestId = nanoid();
+
+  const user = {
+    name: `Guest-${guestId.slice(0, 6)}`,
+    email: `anonymous+${guestId.slice(0, 6)}@undefined.computer`,
+    guest_id: guestId,
+    is_guest: true,
+  };
+
+  const [createdUser] = await db
+    .insert(userTable)
+    .values(user)
+    .returning();
+
+  // Create a session for the guest user
+  const token = generateSessionToken();
+  const session = await createSession(token, createdUser.id);
+
+  return {
+    user: createdUser,
+    session,
+    token,
+  };
+}
+
 export async function getAuthSession({ refreshCookie } = { refreshCookie: true }) {
   const token = getCookie(SESSION_COOKIE_NAME);
   if (!token) {
+    // TODO: Implement guest user creation
+    /* const { user, session, token: newToken } = await createGuestUser();
+    setSessionTokenCookie(newToken, new Date(session.expires_at));
+    return { session, user }; */
+
     return { session: null, user: null };
   }
   const { session, user } = await validateSessionToken(token);

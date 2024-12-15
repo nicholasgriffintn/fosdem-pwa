@@ -5,6 +5,7 @@ import { parseCookies } from "vinxi/http";
 import {
   createSession,
   generateSessionToken,
+  getAuthSession,
   github,
   setSessionTokenCookie,
 } from "~/server/auth";
@@ -42,6 +43,8 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
     const PROVIDER_ID = "github";
 
     try {
+      const { session: currentSession, user: currentUser } = await getAuthSession({ refreshCookie: false });
+
       const tokens = await github.validateAuthorizationCode(code);
       const githubUserResponse = await fetch("https://api.github.com/user", {
         headers: {
@@ -55,12 +58,15 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
           eq(oauthAccount.provider_id, PROVIDER_ID),
           eq(oauthAccount.provider_user_id, providerUser.id),
         ),
+        with: {
+          user: true,
+        },
       });
 
-      if (existingUser?.user_id) {
+      if (existingUser?.user_id && !currentUser?.is_guest) {
         const token = generateSessionToken();
         const session = await createSession(token, existingUser.user_id);
-        setSessionTokenCookie(token, session.expires_at);
+        setSessionTokenCookie(token, new Date(session.expires_at));
         return new Response(null, {
           status: 302,
           headers: {
@@ -68,10 +74,12 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
           },
         });
       }
+
       const existingUserEmail = await db.query.user.findFirst({
         where: eq(user.email, providerUser.email),
       });
-      if (existingUserEmail?.id) {
+
+      if (existingUserEmail?.id && !currentUser?.is_guest) {
         await db.insert(oauthAccount).values({
           provider_id: PROVIDER_ID,
           provider_user_id: providerUser.id,
@@ -79,12 +87,45 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
         });
         const token = generateSessionToken();
         const session = await createSession(token, existingUserEmail.id);
-        setSessionTokenCookie(token, session.expires_at);
+        setSessionTokenCookie(token, new Date(session.expires_at));
         return new Response(null, {
           status: 302,
           headers: {
             Location: "/",
           },
+        });
+      }
+
+      if (currentUser?.is_guest && currentUser?.guest_id) {
+        const [updatedUser] = await db.update(user).set({
+          email: providerUser.email,
+          name: providerUser.name || providerUser.login,
+          avatar_url: providerUser.avatar_url,
+          github_username: providerUser.login,
+          company: providerUser.company,
+          site: providerUser.blog,
+          location: providerUser.location,
+          bio: providerUser.bio,
+          twitter_username: providerUser.twitter_username,
+          is_guest: false,
+          guest_id: null,
+        }).where(eq(user.guest_id, currentUser.guest_id)).returning({ id: user.id });
+
+        if (!updatedUser?.id) {
+          return new Response(null, {
+            status: 500,
+          });
+        }
+
+        await db.insert(oauthAccount).values({
+          provider_id: PROVIDER_ID,
+          provider_user_id: providerUser.id,
+          user_id: updatedUser.id,
+        });
+
+        return new Response(null, {
+          status: 302,
+          headers: { Location: "/" },
         });
       }
 
@@ -114,7 +155,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 
       const token = generateSessionToken();
       const session = await createSession(token, userId[0].id);
-      setSessionTokenCookie(token, session.expires_at);
+      setSessionTokenCookie(token, new Date(session.expires_at));
       return new Response(null, {
         status: 302,
         headers: {

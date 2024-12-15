@@ -12,13 +12,15 @@ export const user = sqliteTable("user", {
   location: text(),
   bio: text(),
   twitter_username: text(),
+  setup_at: text(),
+  terms_accepted_at: text(),
+  is_guest: integer({ mode: 'boolean' }).default(false).notNull(),
+  guest_id: text("guest_id").unique(),
   created_at: text()
     .default(sql`(CURRENT_TIMESTAMP)`).notNull(),
   updated_at: text()
     .default(sql`(CURRENT_TIMESTAMP)`)
     .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
-  setup_at: text(),
-  terms_accepted_at: text(),
 });
 
 export const oauthAccount = sqliteTable(
