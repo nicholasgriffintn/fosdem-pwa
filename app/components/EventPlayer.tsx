@@ -46,17 +46,16 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
   };
 
   const containerClassName = clsx(
-    'relative h-full',
+    'relative w-full',
     {
       'fixed right-0 bottom-14 w-[450px] max-w-[60vw] border-l border-t border-border': isFloating,
-      'min-h-[340px] rounded-md': isMobile,
-      'min-h-[640px]': !isMobile && !isFloating,
+      'aspect-video': true,
     }
   );
 
   const videoWrapperClassName = clsx(
-    'flex items-center justify-center text-muted-foreground relative',
-    'aspect-video w-full h-full'
+    'flex items-center justify-center text-muted-foreground',
+    'w-full h-full'
   );
 
   return (
@@ -81,7 +80,7 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
             {isPlaying && (
               <video
                 ref={videoRef}
-                className="h-full w-full object-cover"
+                className="w-full h-full object-contain"
                 controls
                 autoPlay
               >
