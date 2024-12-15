@@ -14,7 +14,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/logout")({
     }
 
     deleteCookie(SESSION_COOKIE_NAME);
-    await invalidateSession({ env: { DB: db } }, session.id);
+    await invalidateSession(session.id);
 
     return new Response(null, {
       status: 302,

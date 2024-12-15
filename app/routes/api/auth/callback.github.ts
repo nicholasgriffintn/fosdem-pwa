@@ -8,7 +8,7 @@ import {
   github,
   setSessionTokenCookie,
 } from "~/server/auth";
-import { getDbFromContext } from "~/server/db";
+import { db } from "~/server/db";
 import { oauthAccount, user } from "~/server/db/schema";
 
 interface GitHubUser {
@@ -22,8 +22,6 @@ interface GitHubUser {
 
 export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
   GET: async ({ request }) => {
-    const db = getDbFromContext({ env: { DB: {} } });
-
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
     const state = url.searchParams.get("state");
@@ -57,8 +55,8 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 
       if (existingUser) {
         const token = generateSessionToken();
-        const session = await createSession({ env: { DB: db } }, token, existingUser.user_id);
-        setSessionTokenCookie(token, new Date(session.expires_at));
+        const session = await createSession(token, existingUser.user_id);
+        setSessionTokenCookie(token, session.expires_at);
         return new Response(null, {
           status: 302,
           headers: {
@@ -76,8 +74,8 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
             user_id: existingUserEmail.id,
           });
           const token = generateSessionToken();
-          const session = await createSession({ env: { DB: db } }, token, existingUserEmail.id);
-          setSessionTokenCookie(token, new Date(session.expires_at));
+          const session = await createSession(token, existingUserEmail.id);
+          setSessionTokenCookie(token, session.expires_at);
           return new Response(null, {
             status: 302,
             headers: {
@@ -87,7 +85,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
         }
       }
 
-      const userId = await db.transaction(async (tx: any) => {
+      const userId = await db.transaction(async (tx) => {
         const [{ newId }] = await tx
           .insert(user)
           .values({
@@ -105,8 +103,8 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
       });
 
       const token = generateSessionToken();
-      const session = await createSession({ env: { DB: db } }, token, userId);
-      setSessionTokenCookie(token, new Date(session.expires_at));
+      const session = await createSession(token, userId);
+      setSessionTokenCookie(token, session.expires_at);
       return new Response(null, {
         status: 302,
         headers: {

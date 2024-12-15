@@ -24,7 +24,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] A page to view your bookmarked tracks and events
 - [ ] A page for live content with embedded video streams
 - [ ] A search page
-- [ ] Data synced automatically from FOSDEM on a schedule, deployed separately [here](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)
+- [x] Data synced automatically from FOSDEM on a schedule, deployed separately [here](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)
 
 ## TODO
 

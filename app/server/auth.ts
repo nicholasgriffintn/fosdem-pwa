@@ -4,7 +4,7 @@ import { GitHub } from "arctic";
 import { eq } from "drizzle-orm";
 import { deleteCookie, getCookie, setCookie } from "vinxi/http";
 
-import { Env, getDbFromContext } from "~/server/db";
+import { db } from "~/server/db";
 import {
   session as sessionTable,
   user as userTable,
@@ -19,22 +19,18 @@ export function generateSessionToken(): string {
   return encodeBase32LowerCaseNoPadding(bytes);
 }
 
-export async function createSession(context: { env: Env }, token: string, userId: number): Promise<Session> {
-  const db = getDbFromContext(context);
-
+export async function createSession(token: string, userId: number): Promise<Session> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
   const session: Session = {
     id: sessionId,
     user_id: userId,
-    expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).getTime(),
+    expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
   };
   await db.insert(sessionTable).values(session);
   return session;
 }
 
-export async function validateSessionToken(context: { env: Env }, token: string) {
-  const db = getDbFromContext(context);
-
+export async function validateSessionToken(token: string) {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
   const result = await db
     .select({
@@ -57,12 +53,12 @@ export async function validateSessionToken(context: { env: Env }, token: string)
     return { session: null, user: null };
   }
   const { user, session } = result[0];
-  if (Date.now() >= session.expires_at) {
+  if (Date.now() >= session.expires_at.getTime()) {
     await db.delete(sessionTable).where(eq(sessionTable.id, session.id));
     return { session: null, user: null };
   }
-  if (Date.now() >= session.expires_at - 1000 * 60 * 60 * 24 * 15) {
-    session.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).getTime();
+  if (Date.now() >= session.expires_at.getTime() - 1000 * 60 * 60 * 24 * 15) {
+    session.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
     await db
       .update(sessionTable)
       .set({
@@ -78,9 +74,7 @@ export type SessionUser = NonNullable<
   Awaited<ReturnType<typeof validateSessionToken>>["user"]
 >;
 
-export async function invalidateSession(context: { env: Env }, sessionId: string): Promise<void> {
-  const db = getDbFromContext(context);
-
+export async function invalidateSession(sessionId: string): Promise<void> {
   await db.delete(sessionTable).where(eq(sessionTable.id, sessionId));
 }
 
@@ -110,13 +104,13 @@ export async function getAuthSession({ refreshCookie } = { refreshCookie: true }
   if (!token) {
     return { session: null, user: null };
   }
-  const { session, user } = await validateSessionToken({ env: { DB: {} } }, token);
+  const { session, user } = await validateSessionToken(token);
   if (session === null) {
     deleteCookie(SESSION_COOKIE_NAME);
     return { session: null, user: null };
   }
   if (refreshCookie) {
-    setSessionTokenCookie(token, new Date(session.expires_at));
+    setSessionTokenCookie(token, session.expires_at);
   }
   return { session, user };
 }
