@@ -162,21 +162,21 @@ export const getTestEventData = createServerFn({
       title: "THIS IS A TEST OF THE LIVE PLAYER - IGNORE",
       persons: ["Nicholas Griffin"],
       links: [{
-        href: "https://www.bbc.co.uk/sounds/play/live:bbc_radio_one",
-        title: "Listen on Sounds",
-        type: "application/vnd.apple.mpegurl"
+        href: "https://rdmedia.bbc.co.uk/testcard/simulcast/",
+        title: "BBC R&D Test Cards",
+        type: "external"
       }],
       streams: [
         {
-          href: "https://vs-hls-pushb-uk.live.fastly.md.bbci.co.uk/x=4/i=urn:bbc:pips:service:video_pop_up_channel_04/iptv_hd_abr_v1.m3u8",
-          title: "Video Stream",
+          href: "https://rdmedia.bbc.co.uk/testcard/simulcast/manifests/avc-full.m3u8",
+          title: "AVC (All representations in all languages)",
           type: "application/vnd.apple.mpegurl"
         },
         {
-          href: "http://as-hls-ww-live.akamaized.net/pool_900/live/ww/bbc_radio_one/bbc_radio_one.isml/bbc_radio_one-audio%3d96000.norewind.m3u8",
-          title: "Audio Stream",
+          href: "https://rdmedia.bbc.co.uk/testcard/simulcast/manifests/radio-en.m3u8",
+          title: "Audio Only (HE and LC AAC Stereo in English)",
           type: "application/vnd.apple.mpegurl"
-        }
+        },
       ],
       chat: 'https://fosdem.org/2025/schedule/event/test-live/chat',
       room: "UB2.147",
