@@ -105,9 +105,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
           )}
           <div className="container flex-1">
             {children}
-            <div className="bg-muted text-muted-foreground text-center py-2">
-              <p>Note: I'm reworking this at the moment, some things won't work.</p>
-            </div>
             <Toaster />
           </div>
           <Footer />
