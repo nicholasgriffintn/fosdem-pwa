@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, primaryKey, text } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
-  id: integer().primaryKey().notNull(),
+  id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text(),
   avatar_url: text(),
   email: text().unique().notNull(),
@@ -12,7 +12,7 @@ export const user = sqliteTable("user", {
     .default(sql`CURRENT_TIMESTAMP`)
     .$onUpdate(() => new Date().getTime()),
   setup_at: integer(),
-  terms_accepted_at: integer(),
+  terms_accepted_at: integer({ mode: "timestamp_ms" }),
 });
 
 export const oauthAccount = sqliteTable(
@@ -32,7 +32,7 @@ export const session = sqliteTable("session", {
   user_id: integer()
     .notNull()
     .references(() => user.id),
-  expires_at: integer().notNull(),
+  expires_at: integer({ mode: "timestamp_ms" }).notNull(),
 });
 
 export type User = typeof user.$inferSelect;
