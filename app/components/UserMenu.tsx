@@ -28,7 +28,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="outline-none">
-        <Avatar className="h-8 w-8">
+        <Avatar className="h-7 w-7">
           <AvatarImage src={user.avatar_url ?? undefined} alt={user.name ?? undefined} />
           <AvatarFallback>
             <User className="h-4 w-4" />
