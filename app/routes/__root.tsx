@@ -81,17 +81,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       >
         <main className="flex min-h-screen flex-col">
           <Header user={user} />
-          {!user && (
-            <div className="bg-muted text-muted-foreground text-center py-2">
-              <p>
-                You are not logged in.
-                <Button
-                  variant="link" asChild size="sm">
-                  <Link to="/signin">Sign in to remember your preferences</Link>
-                </Button>
-              </p>
-            </div>
-          )}
           <div className="container flex-1">
             {children}
             <Toaster />
