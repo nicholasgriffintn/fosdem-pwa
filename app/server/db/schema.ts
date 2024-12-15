@@ -1,22 +1,21 @@
-import { integer, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from 'drizzle-orm';
+import { integer, sqliteTable, primaryKey, text } from "drizzle-orm/sqlite-core";
 
-export const user = pgTable("user", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+export const user = sqliteTable("user", {
+  id: integer().primaryKey().notNull(),
   name: text(),
-  // first_name: text(),
-  // last_name: text(),
   avatar_url: text(),
   email: text().unique().notNull(),
-
-  created_at: timestamp().defaultNow().notNull(),
-  updated_at: timestamp()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-  setup_at: timestamp(),
-  terms_accepted_at: timestamp(),
+  created_at: integer()
+    .default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updated_at: integer()
+    .default(sql`CURRENT_TIMESTAMP`)
+    .$onUpdate(() => new Date().getTime()),
+  setup_at: integer(),
+  terms_accepted_at: integer(),
 });
 
-export const oauthAccount = pgTable(
+export const oauthAccount = sqliteTable(
   "oauth_account",
   {
     provider_id: text(),
@@ -25,18 +24,15 @@ export const oauthAccount = pgTable(
       .notNull()
       .references(() => user.id),
   },
-  (table) => [primaryKey({ columns: [table.provider_id, table.provider_user_id] })],
+  (table: any) => [primaryKey({ columns: [table.provider_id, table.provider_user_id] })],
 );
 
-export const session = pgTable("session", {
+export const session = sqliteTable("session", {
   id: text().primaryKey(),
   user_id: integer()
     .notNull()
     .references(() => user.id),
-  expires_at: timestamp({
-    withTimezone: true,
-    mode: "date",
-  }).notNull(),
+  expires_at: integer().notNull(),
 });
 
 export type User = typeof user.$inferSelect;

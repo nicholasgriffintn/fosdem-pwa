@@ -58,13 +58,10 @@ dependencies:
     version: 2.1.1
   drizzle-orm:
     specifier: ^0.38.0
-    version: 0.38.0(@types/react@19.0.1)(postgres@3.4.5)(react@19.0.0)
+    version: 0.38.0(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0)
   lucide-react:
     specifier: ^0.468.0
     version: 0.468.0(react@19.0.0)
-  postgres:
-    specifier: ^3.4.5
-    version: 3.4.5
   react:
     specifier: ^19.0.0
     version: 19.0.0
@@ -88,6 +85,9 @@ dependencies:
     version: 0.5.1(drizzle-orm@0.38.0)(typescript@5.7.2)
 
 devDependencies:
+  '@cloudflare/workers-types':
+    specifier: ^4.20241205.0
+    version: 4.20241205.0
   '@tanstack/eslint-plugin-query':
     specifier: ^5.62.1
     version: 5.62.1(eslint@9.17.0)(typescript@5.7.2)
@@ -347,6 +347,9 @@ packages:
     dependencies:
       mime: 3.0.0
     dev: false
+
+  /@cloudflare/workers-types@4.20241205.0:
+    resolution: {integrity: sha512-pj1VKRHT/ScQbHOIMFODZaNAlJHQHdBSZXNIdr9ebJzwBff9Qz8VdqhbhggV7f+aUEh8WSbrsPIo4a+WtgjUvw==}
 
   /@deno/shim-deno-test@0.5.0:
     resolution: {integrity: sha512-4nMhecpGlPi0cSzT67L+Tm+GOJqvuk8gqHBziqcUQOarnuIax1z96/gJHCSIz2Z0zhxE6Rzwb3IZXPtFh51j+w==}
@@ -3863,7 +3866,7 @@ packages:
       mysql2:
         optional: true
     dependencies:
-      drizzle-orm: 0.38.0(@types/react@19.0.1)(postgres@3.4.5)(react@19.0.0)
+      drizzle-orm: 0.38.0(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0)
     dev: false
 
   /debug@2.6.9:
@@ -3971,7 +3974,7 @@ packages:
       - supports-color
     dev: true
 
-  /drizzle-orm@0.38.0(@types/react@19.0.1)(postgres@3.4.5)(react@19.0.0):
+  /drizzle-orm@0.38.0(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.1)(react@19.0.0):
     resolution: {integrity: sha512-Ev1UYKOUxiVwLZZfos4hoNDMDkp313FqF0CHelhR+BeOdb76z/a6pKF6SgYQSrmj6EXH4cy6QIkmuxl2KIFW0A==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
@@ -4063,8 +4066,8 @@ packages:
       sqlite3:
         optional: true
     dependencies:
+      '@cloudflare/workers-types': 4.20241205.0
       '@types/react': 19.0.1
-      postgres: 3.4.5
       react: 19.0.0
     dev: false
 
@@ -5736,11 +5739,6 @@ packages:
       nanoid: 3.3.8
       picocolors: 1.1.1
       source-map-js: 1.2.1
-
-  /postgres@3.4.5:
-    resolution: {integrity: sha512-cDWgoah1Gez9rN3H4165peY9qfpEo+SA61oQv65O3cRUE1pOEoJWwddwcqKE8XZYjbblOJlYDlLV4h67HrEVDg==}
-    engines: {node: '>=12'}
-    dev: false
 
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}

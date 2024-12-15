@@ -1,9 +1,13 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-
+import { drizzle } from 'drizzle-orm/d1';
+import { D1Database } from '@cloudflare/workers-types';
 import * as schema from "./schema";
+export interface Env {
+  DB: D1Database;
+}
 
-const driver = postgres(process.env.DATABASE_URL as string);
+export function getDbFromContext(context: { env: Env }) {
+  const ENV = context.env as Env;
+  return drizzle(ENV.DB, { schema: schema });
+}
 
-export const db = drizzle({ client: driver, schema });
-export const table = schema;
+export * as schema from "./schema";
