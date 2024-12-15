@@ -1,8 +1,8 @@
 # FOSDEM PWA Companion App
 
-This is a companion app for [FOSDEM 2025](https://fosdem.org/2025/), built with [Remix](https://remix.run) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop.
+This is a companion app for [FOSDEM 2024](https://fosdem.org/2024/), built with [TanStack Start](https://tanstack.com/start/) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop.
 
-This is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), just in Remix.
+This is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), just in TanStack Router.
 
 ## Check it out
 
@@ -13,31 +13,24 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [x] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
 - [x] A page for each track with a list of events
 - [x] A page for each event with the event details
-- [x] Automated guest sign in (without needing any details)
-- [ ] The ability to sign in with a previously generated guest sign in
-- [ ] The ability to upgrade a guest sign in to a full account, and sign in with that instead
+- [ ] GitHub sign in
+- [ ] Guest sign in (potentially)
 - [ ] A page for the user profile, with a generated pass for the event
-- [x] The ability to bookmark tracks and events
-- [x] Bookmarks are background synced when offline
+- [ ] The ability to bookmark tracks and events
+- [ ] Bookmarks are background synced when offline
 - [ ] Sends push notifications for bookmarked events
-- [x] The ability to share tracks and events
+- [ ] The ability to share tracks and events
 - [ ] The ability to share your bookmarks
 - [ ] A page to view your bookmarked tracks and events
 - [ ] A page for live content with embedded video streams
 - [ ] A search page
+- [ ] Data synced automatically from FOSDEM on a schedule
 
-## Current Issues
+## TODO
 
-- [ ] PWA is currently caching the data from Remix, which holds the bookmarked events and doesn't get cleared until a hard refresh
-- [ ] API calls are not super efficient, and could be improved
-- [ ] The header is not very responsive at the moment, different content could be displayed
-- [ ] Logic in the lists is compelex and could be simplified
-- [ ] There are a bunch of eslint and typescript issues
-- [ ] Lists are not currently responsive
-- [ ] Unsure if the video player looks good/ works yet
-- [ ] Events and Tracks are not sorted
-- [ ] The duration is currently being displayed, instead, we should display and calculate the end time from the start time and duration
-
+- [ ] Make Fosdem PWA a PWA again
+- [ ] Images are loading in on the homepage with layout shift
+- [ ] Test the event streams somehow
 
 ## Contributing
 
