@@ -10,4 +10,4 @@ export function getDbFromContext(context: { env: Env }) {
   return drizzle(ENV.DB, { schema: schema });
 }
 
-export * as schema from "./schema";
+export { schema }
