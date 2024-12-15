@@ -1,12 +1,6 @@
 import clsx from 'clsx';
 import { useEffect, useRef } from 'react';
 import Hls from 'hls.js';
-import { Icons } from '~/components/Icons';
-interface Stream {
-  href: string;
-  title: string;
-  type: string;
-}
 
 interface EventPlayerProps {
   event: any;

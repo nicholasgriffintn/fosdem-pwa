@@ -13,7 +13,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [x] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
 - [x] A page for each track with a list of events
 - [x] A page for each event with the event details
-- [ ] GitHub sign in
+- [x] GitHub sign in
 - [ ] Guest sign in (potentially)
 - [ ] A page for the user profile, with a generated pass for the event
 - [ ] The ability to bookmark tracks and events

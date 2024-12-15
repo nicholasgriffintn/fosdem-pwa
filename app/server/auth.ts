@@ -24,7 +24,7 @@ export async function createSession(token: string, userId: number): Promise<Sess
   const session: Session = {
     id: sessionId,
     user_id: userId,
-    expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
   };
   await db.insert(sessionTable).values(session);
   return session;
@@ -32,39 +32,50 @@ export async function createSession(token: string, userId: number): Promise<Sess
 
 export async function validateSessionToken(token: string) {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-  const result = await db
-    .select({
-      user: {
-        // Only return the necessary user data for the client
-        id: userTable.id,
-        name: userTable.name,
-        // first_name: userTable.first_name,
-        // last_name: userTable.last_name,
-        avatar_url: userTable.avatar_url,
-        email: userTable.email,
-        setup_at: userTable.setup_at,
-      },
-      session: sessionTable,
-    })
+
+  const sessions = await db
+    .select()
     .from(sessionTable)
-    .innerJoin(userTable, eq(sessionTable.user_id, userTable.id))
     .where(eq(sessionTable.id, sessionId));
-  if (result.length < 1) {
+
+  if (sessions.length < 1) {
     return { session: null, user: null };
   }
-  const { user, session } = result[0];
-  if (Date.now() >= session.expires_at.getTime()) {
+
+  const session = sessions[0];
+  const now = Date.now();
+  const expiresAt = new Date(session.expires_at).getTime();
+
+  if (now >= expiresAt) {
     await db.delete(sessionTable).where(eq(sessionTable.id, session.id));
     return { session: null, user: null };
   }
-  if (Date.now() >= session.expires_at.getTime() - 1000 * 60 * 60 * 24 * 15) {
-    session.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
-    await db
-      .update(sessionTable)
+
+  const users = await db
+    .select({
+      id: userTable.id,
+      name: userTable.name,
+      avatar_url: userTable.avatar_url,
+      email: userTable.email,
+    })
+    .from(userTable)
+    .where(eq(userTable.id, session.user_id));
+
+  if (users.length < 1) {
+    return { session: null, user: null };
+  }
+
+  const user = users[0];
+
+  const shouldExtend = now >= expiresAt - 1000 * 60 * 60 * 24 * 15;
+  if (shouldExtend) {
+    session.expires_at = new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString();
+    db.update(sessionTable)
       .set({
         expires_at: session.expires_at,
       })
-      .where(eq(sessionTable.id, session.id));
+      .where(eq(sessionTable.id, session.id))
+      .catch(console.error);
   }
 
   return { session, user };
@@ -110,7 +121,7 @@ export async function getAuthSession({ refreshCookie } = { refreshCookie: true }
     return { session: null, user: null };
   }
   if (refreshCookie) {
-    setSessionTokenCookie(token, session.expires_at);
+    setSessionTokenCookie(token, new Date(session.expires_at));
   }
   return { session, user };
 }

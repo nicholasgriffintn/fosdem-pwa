@@ -80,8 +80,8 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
         )}
       >
         <main className="flex min-h-screen flex-col">
-          <Header />
-          {!user ? (
+          <Header user={user} />
+          {!user && (
             <div className="bg-muted text-muted-foreground text-center py-2">
               <p>
                 You are not logged in.
@@ -89,17 +89,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
                   variant="link" asChild size="sm">
                   <Link to="/signin">Sign in to remember your preferences</Link>
                 </Button>
-              </p>
-            </div>
-          ) : (
-            <div className="bg-muted text-muted-foreground text-center py-2">
-              <p>
-                You are logged in as {user.name}.
-                <form method="POST" action="/api/auth/logout">
-                  <Button type="submit" className="w-fit" variant="destructive" size="lg">
-                    Sign out
-                  </Button>
-                </form>
               </p>
             </div>
           )}

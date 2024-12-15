@@ -1,8 +1,11 @@
 import { Icons } from '~/components/Icons';
 import { MainNav } from '~/components/MainNav';
 import { NavSearch } from '~/components/NavSearch';
+import { SessionUser } from '~/server/auth';
+import { Button } from './ui/button';
+import { AvatarMenu } from './UserMenu';
 
-export function Header() {
+export function Header({ user }: { user: SessionUser | null }) {
   const navItems = [
     {
       title: 'Home',
@@ -31,6 +34,9 @@ export function Header() {
               <Icons.gitHub className="h-7 w-7" width="7" height="7" />
               <span className="sr-only">GitHub</span>
             </a>
+            {user && (
+              <AvatarMenu user={user} />
+            )}
           </nav>
         </div>
       </div>

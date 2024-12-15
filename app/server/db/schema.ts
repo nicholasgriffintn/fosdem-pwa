@@ -12,13 +12,13 @@ export const user = sqliteTable("user", {
   location: text(),
   bio: text(),
   twitter_username: text(),
-  created_at: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`).notNull(),
-  updated_at: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .$onUpdate(() => new Date()),
-  setup_at: integer({ mode: "timestamp" }),
-  terms_accepted_at: integer({ mode: "timestamp" }),
+  created_at: text()
+    .default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+  updated_at: text()
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+  setup_at: text(),
+  terms_accepted_at: text(),
 });
 
 export const oauthAccount = sqliteTable(
@@ -38,7 +38,7 @@ export const session = sqliteTable("session", {
   user_id: integer()
     .notNull()
     .references(() => user.id),
-  expires_at: integer({ mode: "timestamp" }).notNull(),
+  expires_at: text().notNull(),
 });
 
 export const bookmark = sqliteTable("bookmark", {
@@ -49,11 +49,11 @@ export const bookmark = sqliteTable("bookmark", {
   type: text().notNull(),
   status: text().notNull(),
   year: integer().notNull(),
-  created_at: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`).notNull(),
-  updated_at: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .$onUpdate(() => new Date()),
+  created_at: text()
+    .default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+  updated_at: text()
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
 
 export type User = typeof user.$inferSelect;
