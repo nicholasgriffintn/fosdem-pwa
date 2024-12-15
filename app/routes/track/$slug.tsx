@@ -22,8 +22,8 @@ export const Route = createFileRoute('/track/$slug')({
   head: ({ loaderData }) => ({
     meta: [
       {
-        title: `${loaderData?.fosdem.track.name} | FOSDEM PWA`,
-        description: loaderData?.fosdem.track.description,
+        title: `${loaderData?.fosdem.track?.name} | FOSDEM PWA`,
+        description: loaderData?.fosdem.track?.description,
       },
     ],
   }),
@@ -34,7 +34,13 @@ function TrackPage() {
   const { fosdem } = Route.useLoaderData()
 
   if (!fosdem.track || !fosdem.type) {
-    return <div>Loading...</div>
+    return (
+      <div className="min-h-screen">
+        <div className="relative py-6 lg:py-10">
+          <PageHeader heading="Track not found" />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -42,9 +48,7 @@ function TrackPage() {
       <div className="relative py-6 lg:py-10">
         <PageHeader
           heading={fosdem.track.name}
-          text={`${fosdem.type.name} | Room: ${fosdem.track.room} | Day ${fosdem.track.day.join(
-            ' and '
-          )}`}
+          text={`${fosdem.type.name} | Room: ${fosdem.track.room} | Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(' and ') : fosdem.track.day}`}
         />
         <Tabs defaultValue={fosdem.days[0].id} className="w-full">
           <TabsList>

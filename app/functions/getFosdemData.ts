@@ -1,6 +1,42 @@
 import { createServerFn } from '@tanstack/start'
 import { constants } from '~/constants'
 
+const testLiveEvent = {
+  day: ["1"],
+  isLive: true,
+  slug: "test-live",
+  description: "This is a test of the live player - ignore",
+  status: "running",
+  type: "devroom",
+  track: "Radio",
+  trackKey: "radio",
+  title: "THIS IS A TEST OF THE LIVE PLAYER - IGNORE",
+  persons: ["Nicholas Griffin"],
+  links: [{
+    href: "https://rdmedia.bbc.co.uk/testcard/simulcast/",
+    title: "BBC R&D Test Cards",
+    type: "external"
+  }],
+  streams: [
+    {
+      href: "https://rdmedia.bbc.co.uk/testcard/simulcast/manifests/avc-full.m3u8",
+      title: "AVC (All representations in all languages)",
+      type: "application/vnd.apple.mpegurl"
+    },
+    {
+      href: "https://rdmedia.bbc.co.uk/testcard/simulcast/manifests/radio-en.m3u8",
+      title: "Audio Only (HE and LC AAC Stereo in English)",
+      type: "application/vnd.apple.mpegurl"
+    },
+  ],
+  chat: 'https://fosdem.org/2025/schedule/event/test-live/chat',
+  room: "UB2.147",
+  id: "test-live",
+  startTime: "15:30",
+  duration: "01:00",
+  abstract: "<p>This is just a test to confirm things work before FOSDOM</p>"
+}
+
 interface Conference {
   conference: any;
   types: Record<string, any>;
@@ -126,7 +162,7 @@ export const getTrackData = createServerFn({
     const data = await getFullData(ctx.data.year);
     const days = Object.values(data.days);
     const track = data.tracks[ctx.data.slug];
-    const type = data.types[track.type];
+    const type = data.types[track?.type];
 
     const eventData = Object.values(data.events).filter(
       (event: Event) => event.trackKey === ctx.data.slug
@@ -146,44 +182,28 @@ export const getEventData = createServerFn({
     return { event: data.events[ctx.data.slug] };
   });
 
+export const getLiveData = createServerFn({
+  method: 'GET',
+})
+  .validator((data: { year: string, test: boolean }) => data)
+  .handler(async (ctx) => {
+    if (ctx.data.test) {
+      return { liveEvents: [testLiveEvent] };
+    }
+
+    const data = await getFullData(ctx.data.year);
+
+    const liveEvents = Object.values(data.events).filter(
+      (event: Event) => event.isLive
+    );
+
+    return { liveEvents };
+  });
+
 export const getTestEventData = createServerFn({
   method: 'GET',
 })
   .handler(async () => ({
-    event: {
-      day: ["1"],
-      isLive: true,
-      slug: "test-live",
-      description: "This is a test of the live player - ignore",
-      status: "running",
-      type: "devroom",
-      track: "Radio",
-      trackKey: "radio",
-      title: "THIS IS A TEST OF THE LIVE PLAYER - IGNORE",
-      persons: ["Nicholas Griffin"],
-      links: [{
-        href: "https://rdmedia.bbc.co.uk/testcard/simulcast/",
-        title: "BBC R&D Test Cards",
-        type: "external"
-      }],
-      streams: [
-        {
-          href: "https://rdmedia.bbc.co.uk/testcard/simulcast/manifests/avc-full.m3u8",
-          title: "AVC (All representations in all languages)",
-          type: "application/vnd.apple.mpegurl"
-        },
-        {
-          href: "https://rdmedia.bbc.co.uk/testcard/simulcast/manifests/radio-en.m3u8",
-          title: "Audio Only (HE and LC AAC Stereo in English)",
-          type: "application/vnd.apple.mpegurl"
-        },
-      ],
-      chat: 'https://fosdem.org/2025/schedule/event/test-live/chat',
-      room: "UB2.147",
-      id: "test-live",
-      startTime: "15:30",
-      duration: "01:00",
-      abstract: "<p>This is just a test to confirm things work before FOSDOM</p>"
-    },
+    event: testLiveEvent,
   }));
 

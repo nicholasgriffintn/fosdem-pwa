@@ -26,8 +26,8 @@ export const Route = createFileRoute('/event/$slug')({
   head: ({ loaderData }) => ({
     meta: [
       {
-        title: `${loaderData?.fosdem.event.title} | FOSDEM PWA`,
-        description: loaderData?.fosdem.event.description,
+        title: `${loaderData?.fosdem.event?.title} | FOSDEM PWA`,
+        description: loaderData?.fosdem.event?.description,
       },
     ],
   }),
@@ -37,8 +37,14 @@ export const Route = createFileRoute('/event/$slug')({
 function TrackPage() {
   const { fosdem } = Route.useLoaderData()
 
-  if (!fosdem.event) {
-    return <div>Loading...</div>
+  if (!fosdem.event?.title) {
+    return (
+      <div className="min-h-screen">
+        <div className="relative py-6 lg:py-10">
+          <PageHeader heading="Event not found" />
+        </div>
+      </div>
+    )
   }
 
   const isFavourite = {

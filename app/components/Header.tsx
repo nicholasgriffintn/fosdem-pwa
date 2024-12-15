@@ -19,8 +19,16 @@ export function Header({ user }: { user: SessionUser | null }) {
       href: '/',
     },
     {
+      title: 'Live',
+      href: '/live',
+    },
+    {
       title: 'Bookmarks',
       href: '/bookmarks/',
+    },
+    {
+      title: 'Map',
+      href: '/map',
     },
   ];
 
