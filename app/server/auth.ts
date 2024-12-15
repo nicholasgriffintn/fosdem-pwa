@@ -58,7 +58,7 @@ export async function validateSessionToken(token: string) {
   const expiresAt = new Date(session.expires_at).getTime();
 
   if (now >= expiresAt) {
-    await db.delete(sessionTable).where(eq(sessionTable.id, session.id));
+    await db.delete(sessionTable).where(eq(sessionTable.id, sessionId));
     return { session: null, user: null };
   }
 
@@ -69,7 +69,7 @@ export async function validateSessionToken(token: string) {
       .set({
         expires_at: session.expires_at,
       })
-      .where(eq(sessionTable.id, session.id))
+      .where(eq(sessionTable.id, sessionId))
       .catch(console.error);
   }
 
