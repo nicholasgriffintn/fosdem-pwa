@@ -151,8 +151,10 @@ export const getTestEventData = createServerFn({
 })
   .handler(async () => ({
     event: {
-      day: "1",
+      day: ["1"],
       isLive: true,
+      slug: "test-live",
+      description: "This is a test of the live player - ignore",
       status: "running",
       type: "devroom",
       track: "Radio",
@@ -162,7 +164,7 @@ export const getTestEventData = createServerFn({
       links: [{
         href: "https://www.bbc.co.uk/sounds/play/live:bbc_radio_one",
         title: "Listen on Sounds",
-        type: null
+        type: "application/vnd.apple.mpegurl"
       }],
       streams: [
         {
@@ -176,7 +178,7 @@ export const getTestEventData = createServerFn({
           type: "application/vnd.apple.mpegurl"
         }
       ],
-      chat: null,
+      chat: 'https://fosdem.org/2025/schedule/event/test-live/chat',
       room: "UB2.147",
       id: "test-live",
       startTime: "15:30",
