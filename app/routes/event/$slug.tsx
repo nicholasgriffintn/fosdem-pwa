@@ -1,18 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '~/components/ui/resizable'
 import { PageHeader } from '~/components/PageHeader'
-import { Icons } from '~/components/Icons'
-import { useWindowSize } from '~/hooks/use-window-size'
 import { FavouriteButton } from '~/components/FavouriteButton'
 import { ShareButton } from '~/components/ShareButton'
 import { getEventData, getTestEventData } from '~/functions/getFosdemData'
-import { EventSidebar } from '~/components/EventSidebar'
-import { EventPlayer } from '~/components/EventPlayer'
+import { EventMain } from '~/components/EventMain'
+
 
 export const Route = createFileRoute('/event/$slug')({
   component: TrackPage,
@@ -43,7 +36,6 @@ export const Route = createFileRoute('/event/$slug')({
 
 function TrackPage() {
   const { fosdem } = Route.useLoaderData()
-  const { width } = useWindowSize()
 
   if (!fosdem.event) {
     return <div>Loading...</div>
@@ -53,23 +45,6 @@ function TrackPage() {
     status: 'null',
     slug: fosdem.event.slug,
   }
-
-  const ChatAlert = () => (
-    <div className="bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75">
-      <div className="flex items-center gap-2 px-4 py-3">
-        <Icons.logo className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">Get involved in the conversation!</span>
-        <a
-          href={fosdem.event.chat}
-          target="_blank"
-          rel="noreferrer"
-          className="text-sm text-primary hover:underline"
-        >
-          Join chat
-        </a>
-      </div>
-    </div>
-  )
 
   return (
     <div className="min-h-screen">
@@ -93,35 +68,7 @@ function TrackPage() {
           </div>
         </PageHeader>
         <div className="w-full">
-          {width < 768 ? (
-            <div className="space-y-4">
-              <div className="overflow-hidden rounded-lg bg-card">
-                <div className="w-full">
-                  <EventPlayer event={fosdem.event} isMobile />
-                </div>
-                {fosdem.event.chat && <ChatAlert />}
-              </div>
-              <EventSidebar event={fosdem.event} isMobile />
-            </div>
-          ) : (
-            <ResizablePanelGroup
-              direction="horizontal"
-              className="min-h-[200px] rounded-lg border"
-            >
-              <ResizablePanel defaultSize={75}>
-                <div className="h-full flex flex-col">
-                  <div className="flex-1">
-                    <EventPlayer event={fosdem.event} />
-                  </div>
-                  {fosdem.event.chat && <ChatAlert />}
-                </div>
-              </ResizablePanel>
-              <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={25}>
-                <EventSidebar event={fosdem.event} />
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          )}
+          <EventMain event={fosdem.event} />
         </div>
       </div>
     </div>
