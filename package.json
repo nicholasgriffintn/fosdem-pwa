@@ -35,7 +35,6 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.38.0",
     "lucide-react": "^0.468.0",
-    "postgres": "^3.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-resizable-panels": "^2.1.7",
@@ -45,6 +44,7 @@
     "vinxi": "^0.5.1"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241205.0",
     "@tanstack/eslint-plugin-query": "^5.62.1",
     "@tanstack/eslint-plugin-router": "^1.87.3",
     "@types/react": "^19.0.1",
