@@ -134,3 +134,50 @@ export const getEventData = createServerFn({
       event,
     };
   })
+
+
+export const getTestEventData = createServerFn({
+  method: 'GET',
+})
+  .handler(async (ctx) => {
+    return {
+      event: {
+        "day": "1",
+        "isLive": true,
+        "status": "running",
+        "type": "devroom",
+        "track": "Radio",
+        "trackKey": "radio",
+        "title": "THIS IS A TEST OF THE LIVE PLAYER - IGNORE",
+        "persons": [
+          "Nicholas Griffin"
+        ],
+        "links": [
+          {
+            "href": "https://www.bbc.co.uk/sounds/play/live:bbc_radio_one",
+            "title": "Listen on Sounds",
+            "type": null
+          }
+        ],
+        "streams": [
+          {
+            "href": "https://vs-hls-pushb-uk.live.fastly.md.bbci.co.uk/x=4/i=urn:bbc:pips:service:video_pop_up_channel_04/iptv_hd_abr_v1.m3u8",
+            "title": "Video Stream",
+            "type": "application/vnd.apple.mpegurl"
+          },
+          {
+            "href": "http://as-hls-ww-live.akamaized.net/pool_900/live/ww/bbc_radio_one/bbc_radio_one.isml/bbc_radio_one-audio%3d96000.norewind.m3u8",
+            "title": "Audio Stream",
+            "type": "application/vnd.apple.mpegurl"
+          }
+        ],
+        "chat": null,
+        "room": "UB2.147",
+        "id": "test-live",
+        "startTime": "15:30",
+        "duration": "01:00",
+        "abstract": "<p>This is just a test to confirm things work before FOSDOM</p>"
+      },
+    };
+  })
+
