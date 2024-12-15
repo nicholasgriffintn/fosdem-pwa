@@ -17,7 +17,7 @@ interface Track {
   day: number;
 }
 
-interface Event {
+export interface Event {
   title: string;
   description: string;
   room: string;
@@ -40,6 +40,9 @@ interface Event {
   }[];
   day: string[];
   trackKey: string;
+  isLive: boolean;
+  status: string;
+  type: string;
 }
 
 interface DayGroupedData {
