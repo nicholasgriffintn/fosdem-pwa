@@ -1,58 +1,78 @@
 import { drizzle } from "drizzle-orm/sqlite-proxy";
-
 import * as schema from "./schema";
 
-export const runtime = "edge";
+const {
+  CLOUDFLARE_ACCOUNT_ID,
+  CLOUDFLARE_DATABASE_ID,
+  CLOUDFLARE_D1_TOKEN,
+} = process.env;
+
+if (
+  !CLOUDFLARE_ACCOUNT_ID ||
+  !CLOUDFLARE_DATABASE_ID ||
+  !CLOUDFLARE_D1_TOKEN
+) {
+  throw new Error("Missing required Cloudflare D1 environment variables.");
+}
+
+type D1ResponseInfo = {
+  code: number;
+  message: string;
+};
+
+type D1Response = {
+  result: {
+    meta: {
+      changed_db: boolean;
+      changes: number;
+      duration: number;
+      last_row_id: number;
+      rows_read: number;
+      rows_written: number;
+      size_after: number;
+    };
+    results: Array<unknown>;
+    success: boolean;
+  }[];
+  errors: D1ResponseInfo[];
+  messages: D1ResponseInfo[];
+  success: boolean;
+};
 
 export const db = drizzle(
-  async (sql: unknown, params: unknown, method: string) => {
-    const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID
-      }/d1/database/${process.env.CLOUDFLARE_DATABASE_ID}/${method === "values" ? "raw" : "query"
-      }`;
+  async (sql: string, params: any[], method: string) => {
+    const endpoint = method === "values" ? "raw" : "query";
+    const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_DATABASE_ID}/${endpoint}`;
 
-    const res = await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.CLOUDFLARE_D1_TOKEN}`,
+        Authorization: `Bearer ${CLOUDFLARE_D1_TOKEN}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ sql, params }),
     });
 
-    const data = await res.json() as
-      | {
-        success: true;
-        result: {
-          results:
-          | any[]
-          | {
-            columns: string[];
-            rows: any[][];
-          };
-        }[];
-      }
-      | {
-        success: false;
-        errors: { code: number; message: string }[];
-      };;
-
-    if (res.status !== 200) {
+    if (response.status !== 200)
       throw new Error(
-        `Error from sqlite proxy server: ${res.status} ${res.statusText
-        }\n${JSON.stringify(data)}`,
+        `Error from sqlite proxy server: ${response.status} ${response.statusText
+        }\n${JSON.stringify(await response.json())}`
+      );
+
+
+    const responseJson = (await response.json()) as D1Response;
+
+    if (!responseJson.success) {
+      throw new Error(
+        `Error from Cloudflare D1: ${response.status} ${response.statusText
+        }\n${JSON.stringify(responseJson)}`
       );
     }
 
-    if (!data.success) {
-      throw new Error(
-        data.errors.map((it) => `${it.code}: ${it.message}`).join('\n'),
-      );
-    }
+    const qResult = responseJson.result[0];
+    const rows = qResult.results.map((r: any) => Object.values(r));
 
-    const result = data.result[0].results;
-    const rows = Array.isArray(result) ? result : result.rows;
-
-    return { rows };
+    return { rows: method == "all" ? rows : rows[0] };
   },
-  { schema },
+  { schema, logger: true }
 );
