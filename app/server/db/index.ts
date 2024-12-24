@@ -7,14 +7,6 @@ const {
   CLOUDFLARE_D1_TOKEN,
 } = process.env;
 
-if (
-  !CLOUDFLARE_ACCOUNT_ID ||
-  !CLOUDFLARE_DATABASE_ID ||
-  !CLOUDFLARE_D1_TOKEN
-) {
-  throw new Error("Missing required Cloudflare D1 environment variables.");
-}
-
 type D1ResponseInfo = {
   code: number;
   message: string;
@@ -41,6 +33,14 @@ type D1Response = {
 
 export const db = drizzle(
   async (sql: string, params: any[], method: string) => {
+    if (
+      !CLOUDFLARE_ACCOUNT_ID ||
+      !CLOUDFLARE_DATABASE_ID ||
+      !CLOUDFLARE_D1_TOKEN
+    ) {
+      throw new Error("Missing required Cloudflare D1 environment variables.");
+    }
+
     const endpoint = method === "values" ? "raw" : "query";
     const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_DATABASE_ID}/${endpoint}`;
 

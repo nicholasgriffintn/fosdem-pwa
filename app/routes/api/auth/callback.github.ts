@@ -73,8 +73,6 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
         where: eq(user.email, providerUser.email),
       });
 
-      console.log("existingUserEmail", existingUserEmail);
-
       if (existingUserEmail?.id) {
         await db.insert(oauthAccount).values({
           provider_id: PROVIDER_ID,
@@ -126,7 +124,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
         },
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       if (e instanceof OAuth2RequestError) {
         return new Response(null, {
           status: 400,

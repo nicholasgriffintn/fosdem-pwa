@@ -10,6 +10,16 @@ export default defineConfig({
         projects: ["./tsconfig.json"],
       }),
     ],
+    build: {
+      rollupOptions: {
+        onwarn(warning, warn) {
+          if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+            return
+          }
+          warn(warning)
+        }
+      }
+    }
   },
   server: {
     preset: 'cloudflare-pages',
