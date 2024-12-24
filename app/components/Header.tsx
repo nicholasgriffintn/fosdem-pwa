@@ -1,18 +1,20 @@
+import { Link } from '@tanstack/react-router';
+
 import { Icons } from '~/components/Icons';
 import { MainNav } from '~/components/MainNav';
 import { NavSearch } from '~/components/NavSearch';
-import { SessionUser } from '~/server/auth';
 import { Button } from './ui/button';
 import { AvatarMenu } from './UserMenu';
-import { Link } from '@tanstack/react-router';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip"
+import { useAuth } from '~/hooks/use-auth';
 
-export function Header({ user }: { user: SessionUser | null }) {
+export function Header() {
+  const { user, loading } = useAuth();
   const navItems = [
     {
       title: 'Home',
@@ -59,7 +61,7 @@ export function Header({ user }: { user: SessionUser | null }) {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {user ? (
+                  {!loading && (user ? (
                     <AvatarMenu user={user} />
                   ) : (
                     <Button variant="link" size="icon" className="h-7 w-7" asChild>
@@ -68,7 +70,7 @@ export function Header({ user }: { user: SessionUser | null }) {
                         <span className="sr-only">Sign In</span>
                       </Link>
                     </Button>
-                  )}
+                  ))}
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Sign in to save favourites</p>
