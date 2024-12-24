@@ -7,37 +7,26 @@ import {
   ScriptOnce,
   ScrollRestoration,
 } from "@tanstack/react-router";
-import { createServerFn, Meta, Scripts } from "@tanstack/start";
+import { Meta, Scripts } from "@tanstack/start";
 import { lazy, Suspense } from "react";
+import { QueryClientProvider } from '@tanstack/react-query';
 
-import { getAuthSession } from "~/server/auth";
 import appCss from "~/styles/app.css?url";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { Toaster } from "~/components/ui/toaster";
-import { Button } from "~/components/ui/button";
 
 const TanStackRouterDevtools =
   process.env.NODE_ENV === "production"
-    ? () => null // Render nothing in production
+    ? () => null
     : lazy(() =>
-      // Lazy load in development
       import("@tanstack/router-devtools").then((res) => ({
         default: res.TanStackRouterDevtools,
       })),
     );
 
-const getUser = createServerFn({ method: "GET" }).handler(async () => {
-  const { user } = await getAuthSession();
-  return user;
-});
-
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  beforeLoad: async () => {
-    const user = await getUser();
-    return { user };
-  },
   head: () => ({
     meta: [
       {
@@ -57,16 +46,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
+
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
+    <QueryClientProvider client={queryClient}>
+      <RootDocument>
+        <Outlet />
+      </RootDocument>
+    </QueryClientProvider>
   );
 }
 
 function RootDocument({ children }: { readonly children: React.ReactNode }) {
-  const { user } = Route.useRouteContext();
-
   return (
     <html className="dark">
       <head>
@@ -80,7 +71,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
         )}
       >
         <main className="flex min-h-screen flex-col">
-          <Header user={user} />
+          <Header />
           <div className="container flex-1">
             {children}
             <Toaster />
