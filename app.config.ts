@@ -1,8 +1,6 @@
 import { defineConfig } from "@tanstack/start/config";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { cloudflare } from 'unenv'
-import { VitePWA } from 'vite-plugin-pwa'
-
 
 export default defineConfig({
   vite: {
@@ -10,12 +8,6 @@ export default defineConfig({
       tsConfigPaths({
         projects: ["./tsconfig.json"],
       }),
-      VitePWA({
-        injectRegister: null,
-        registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'icons/*', 'images/*'],
-        manifest: false,
-      })
     ],
     build: {
       rollupOptions: {
