@@ -38,6 +38,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         title: "FOSDEM PWA",
+        description: "A companion app for FOSDEM conference",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
@@ -62,6 +63,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
     <html className="dark">
       <head>
         <Meta />
+        <link rel="manifest" href="/manifest.webmanifest" />
       </head>
       <body
         className={cn(
@@ -89,7 +91,14 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
           {`document.documentElement.classList.toggle(
             'dark',
             localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            )`}
+            )
+            
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register(
+                '${import.meta.env.MODE === 'production' ? '/sw.js' : '/dev-sw.js?dev-sw'}',
+                { scope: '/' }
+              )
+            }`}
         </ScriptOnce>
 
         <Scripts />

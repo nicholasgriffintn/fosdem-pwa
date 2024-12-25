@@ -19,3 +19,4 @@ dist
 
 app.config.timestamp*
 count.txt
+dev-dist
