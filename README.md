@@ -19,8 +19,8 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] The ability to bookmark tracks and events
 - [ ] Bookmarks are background synced when offline
 - [ ] Sends push notifications for bookmarked events
-- [ ] The ability to share tracks and events
-- [ ] The ability to share your bookmarks
+- [x] The ability to share tracks and events
+- [x] The ability to share your bookmarks
 - [ ] A page to view your bookmarked tracks and events
 - [x] A page for finding live events
 - [x] A map page

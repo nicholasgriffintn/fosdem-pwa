@@ -6,7 +6,15 @@ import { toast } from '~/hooks/use-toast';
 
 export const shareSupported = () => {
   try {
-    return 'share' in navigator;
+    return 'share' in navigator && 'canShare' in navigator;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const clipboardSupported = () => {
+  try {
+    return 'clipboard' in navigator;
   } catch (error) {
     return false;
   }
@@ -22,15 +30,42 @@ export function ShareButton({
   url: string;
 }) {
   const handleShare = async () => {
-    toast({
-      title: 'Sharing not supported',
-      description: 'Not implemented yet',
-    });
+    try {
+      if (shareSupported() && navigator.canShare({ title, text, url })) {
+        await navigator.share({ title, text, url });
+        return;
+      }
+
+      if (clipboardSupported()) {
+        await navigator.clipboard.writeText(`${text}: ${url}`);
+        toast({
+          title: 'Link copied',
+          description: 'The link has been copied to your clipboard',
+        });
+        return;
+      }
+
+      toast({
+        title: 'Unable to share',
+        description: 'Please copy this URL manually: ' + url,
+        variant: 'destructive',
+        duration: 10000,
+      });
+    } catch (error) {
+      // Only show error if it's not a user cancellation
+      if (error instanceof Error && error.name !== 'AbortError') {
+        toast({
+          title: 'Failed to share',
+          description: 'Please try copying the URL manually',
+          variant: 'destructive',
+        });
+      }
+    }
   };
 
   return (
     <Button variant="ghost" onClick={handleShare}>
-      <Icons.share />
+      <Icons.share className="h-4 w-4" />
     </Button>
   );
 }
