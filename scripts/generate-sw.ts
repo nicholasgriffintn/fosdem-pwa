@@ -15,11 +15,12 @@ async function generateServiceWorker(outputDir = 'dist') {
     };
 
     const fosdemDataUrl = `/_server/?_serverFnId=${functionId}&_serverFnName=$$function0&payload=${encodeURIComponent(JSON.stringify(fosdemDataPayload))}`;
+    const dataUrls = [fosdemDataUrl]
 
     const files = await glob(`${outputDir}/**/*`, { nodir: true })
+    const filesAndDataUrls = [...dataUrls, ...files]
 
     const ignoredRoutes = [
-        '/manifest.webmanifest',
         '/robots.txt',
         '/nitro.json',
         '/_routes.json',
@@ -29,7 +30,7 @@ async function generateServiceWorker(outputDir = 'dist') {
         '/_worker.js',
     ]
 
-    const assetsToCache = files
+    const assetsToCache = filesAndDataUrls
         .map(file => '/' + path.relative(outputDir, file))
         .filter(file => !ignoredRoutes.includes(file))
 
@@ -62,39 +63,13 @@ async function generateServiceWorker(outputDir = 'dist') {
         self.registration.update();
       }, 15 * 60 * 1000); // 15 minutes
 
-      const fosdemDataUrl = '${fosdemDataUrl}';
+      const urlsToCache = ${JSON.stringify(assetsToCache, null, 2)};
 
-      self.addEventListener('install', (event) => {
-        event.waitUntil(
-          Promise.all([
-            caches.open(CACHE_NAME).then((cache) => {
-              return cache.addAll(${JSON.stringify(assetsToCache, null, 2)});
-            }),
-            caches.open('server-functions').then((cache) => {
-              return fetch(fosdemDataUrl, {
-                headers: {
-                  'accept': 'application/json',
-                  'content-type': 'application/json'
-                }
-              })
-              .then(response => {
-                return cache.put(fosdemDataUrl, response.clone());
-              });
-            })
-          ])
-        );
-      });
-
-      registerRoute(
-        ({ url }) => url.pathname.startsWith('/_server'),
-        new StaleWhileRevalidate({
-          cacheName: 'server-functions',
-          plugins: [
-            new CacheableResponsePlugin({
-              statuses: [0, 200]
-            })
-          ]
-        })
+      workbox.precaching.precacheAndRoute(
+        urlsToCache.map(url => ({
+          url,
+          revision: CACHE_NAME
+        }))
       );
 
       registerRoute(
@@ -144,6 +119,18 @@ async function generateServiceWorker(outputDir = 'dist') {
             ]
           })
         )
+      );
+
+      registerRoute(
+        ({ url }) => url.pathname.startsWith('/_server'),
+        new StaleWhileRevalidate({
+          cacheName: 'server-functions',
+          plugins: [
+            new CacheableResponsePlugin({
+              statuses: [0, 200]
+            })
+          ]
+        })
       );
 
       setDefaultHandler(
