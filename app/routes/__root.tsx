@@ -93,9 +93,11 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
           {`document.documentElement.classList.toggle(
             'dark',
             localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            )
-            
-            (async () => {
+            )`}
+        </ScriptOnce>
+
+        <ScriptOnce>
+          {`(async () => {
               if ('serviceWorker' in navigator) {
                 const registration = await navigator.serviceWorker.register('/sw.js');
                 
