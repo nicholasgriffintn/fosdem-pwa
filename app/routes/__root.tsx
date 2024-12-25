@@ -2,7 +2,6 @@ import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   createRootRouteWithContext,
-  Link,
   Outlet,
   ScriptOnce,
   ScrollRestoration,
@@ -16,6 +15,7 @@ import { cn } from "~/lib/utils";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { Toaster } from "~/components/ui/toaster";
+import { OfflineIndicator } from "~/components/OfflineIndicator";
 
 const TanStackRouterDevtools =
   process.env.NODE_ENV === "production"
@@ -72,6 +72,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       >
         <main className="flex min-h-screen flex-col">
           <Header />
+          <OfflineIndicator />
           <div className="container flex-1">
             {children}
             <Toaster />

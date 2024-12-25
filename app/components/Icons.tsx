@@ -14,10 +14,11 @@ import {
   Map,
   Building2,
   Globe,
-  Github,
   MapPin,
   Twitter,
   User,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 
 export const Icons = {
@@ -63,6 +64,8 @@ export const Icons = {
   twitter: Twitter,
   mapPin: MapPin,
   user: User,
+  wifi: Wifi,
+  wifiOff: WifiOff,
   gitHub: ({ ...props }) => (
     <svg
       aria-hidden="true"
