@@ -16,7 +16,7 @@ export function createRouter() {
           if (error instanceof Error && error.message === 'Failed to fetch') {
             return false;
           }
-          return failureCount < 3;
+          return failureCount < 1;
         },
       },
     },

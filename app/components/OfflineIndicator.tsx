@@ -1,9 +1,19 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { useOnlineStatus } from '~/hooks/use-online-status';
 import { cn } from '~/lib/utils';
 import { Icons } from './Icons';
 
 export function OfflineIndicator() {
+    const [isMounted, setIsMounted] = useState(false);
     const isOnline = useOnlineStatus();
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) return null;
 
     if (isOnline) return null;
 
@@ -13,7 +23,7 @@ export function OfflineIndicator() {
             'flex items-center gap-2 px-4 py-2 rounded-md',
             'bg-destructive text-destructive-foreground'
         )}>
-            <Icons.wifiOff className="h-4 w-4" />
+            <Icons.wifi className="h-4 w-4" />
             <span className="text-sm font-medium">You are offline</span>
         </div>
     );
