@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip"
 import { useAuth } from '~/hooks/use-auth';
+import { Spinner } from "~/components/Spinner";
 
 export function Header() {
   const { user, loading } = useAuth();
@@ -65,7 +66,11 @@ export function Header() {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {!loading && (user ? (
+                  {loading ? (
+                    <div className="h-7 w-7 flex items-center justify-center">
+                      <Spinner />
+                    </div>
+                  ) : user ? (
                     <AvatarMenu user={user} />
                   ) : (
                     <Button variant="link" size="icon" className="h-7 w-7" asChild>
@@ -74,7 +79,7 @@ export function Header() {
                         <span className="sr-only">Sign In</span>
                       </Link>
                     </Button>
-                  ))}
+                  )}
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Sign in to save favourites</p>
