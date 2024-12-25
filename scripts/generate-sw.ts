@@ -30,7 +30,12 @@ async function generateServiceWorker(outputDir = 'dist') {
     ]
 
     const assetsToCache = filesAndDataUrls
-        .map(file => '/' + path.relative(outputDir, file))
+        .map(file => {
+            if (file.startsWith('/_server') || file.startsWith('/offline')) {
+                return file
+            }
+            return '/' + file.replace(new RegExp(`^${outputDir}/`), '')
+        })
         .filter(file => !ignoredRoutes.includes(file))
 
     const sw = `
