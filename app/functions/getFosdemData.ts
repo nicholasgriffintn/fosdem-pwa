@@ -128,7 +128,7 @@ export const getHomepageData = createServerFn({
   method: 'GET',
 })
   .validator((data: { year: string }) => data)
-  .handler(async (ctx) => {
+  .handler(async (ctx: any) => {
     const data = await getFullData(ctx.data.year);
     return {
       conference: data.conference,
@@ -140,7 +140,7 @@ export const getTypesData = createServerFn({
   method: 'GET',
 })
   .validator((data: { year: string; slug: string }) => data)
-  .handler(async (ctx) => {
+  .handler(async (ctx: any) => {
     const data = await getFullData(ctx.data.year);
     const days = Object.values(data.days);
     const type = data.types[ctx.data.slug];
@@ -158,7 +158,7 @@ export const getTrackData = createServerFn({
   method: 'GET',
 })
   .validator((data: { year: string; slug: string }) => data)
-  .handler(async (ctx) => {
+  .handler(async (ctx: any) => {
     const data = await getFullData(ctx.data.year);
     const days = Object.values(data.days);
     const track = data.tracks[ctx.data.slug];
@@ -177,7 +177,7 @@ export const getEventData = createServerFn({
   method: 'GET',
 })
   .validator((data: { year: string; slug: string }) => data)
-  .handler(async (ctx) => {
+  .handler(async (ctx: any) => {
     const data = await getFullData(ctx.data.year);
     return { event: data.events[ctx.data.slug] };
   });
@@ -186,7 +186,7 @@ export const getLiveData = createServerFn({
   method: 'GET',
 })
   .validator((data: { year: string, test: boolean }) => data)
-  .handler(async (ctx) => {
+  .handler(async (ctx: any) => {
     if (ctx.data.test) {
       return { liveEvents: [testLiveEvent] };
     }
