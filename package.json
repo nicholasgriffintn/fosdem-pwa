@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build && tsx scripts/generate-sw.ts",
-    "build:vercel": "vinxi build --preset vercel && tsx scripts/generate-sw.ts",
+    "build:vercel": "vinxi build --preset vercel && tsx scripts/generate-sw.ts .vercel/output/static",
     "start": "vinxi start",
     "format": "prettier --write . \"!**/{routeTree.gen.ts,pnpm-lock.yaml,drizzle}\"",
     "db": "drizzle-kit",
