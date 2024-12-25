@@ -1,14 +1,26 @@
 import { glob } from 'glob'
-import { writeFileSync } from 'fs'
+import { writeFileSync, readFileSync } from 'fs'
 import path from 'path'
 
 async function generateServiceWorker(outputDir = 'dist') {
+    const manifest = JSON.parse(
+        readFileSync('.vinxi/build/server/_server/.vite/manifest.json', 'utf-8')
+    )
+
+    const functionId = manifest['app/functions/getFosdemData.ts'].name
+
+    const fosdemDataPayload = {
+        data: { year: "2025" },
+        context: {}
+    };
+
+    const fosdemDataUrl = `/_server/?_serverFnId=${functionId}&_serverFnName=$$function0&payload=${encodeURIComponent(JSON.stringify(fosdemDataPayload))}`;
+
     const files = await glob(`${outputDir}/**/*`, { nodir: true })
 
     const ignoredRoutes = [
         '/robots.txt',
         '/nitro.json',
-        '/manifest.webmanifest',
         '/_routes.json',
         '/_redirects',
         '/_headers',
@@ -49,13 +61,35 @@ async function generateServiceWorker(outputDir = 'dist') {
         self.registration.update();
       }, 15 * 60 * 1000); // 15 minutes
 
-      const urlsToCache = ${JSON.stringify(assetsToCache, null, 2)};
+      self.addEventListener('install', (event) => {
+        event.waitUntil(
+          Promise.all([
+            caches.open(CACHE_NAME).then((cache) => {
+              return cache.addAll(${JSON.stringify(assetsToCache, null, 2)});
+            }),
+            caches.open('server-functions').then((cache) => {
+              return fetch(${fosdemDataUrl}, {
+                headers: {
+                  'accept': 'application/json',
+                  'content-type': 'application/json'
+                }
+              })
+              .then(response => cache.put(${fosdemDataUrl}, response));
+            })
+          ])
+        );
+      });
 
-      workbox.precaching.precacheAndRoute(
-        urlsToCache.map(url => ({
-          url,
-          revision: CACHE_NAME
-        }))
+      registerRoute(
+        ({ url }) => url.pathname.startsWith('/_server'),
+        new StaleWhileRevalidate({
+          cacheName: 'server-functions',
+          plugins: [
+            new CacheableResponsePlugin({
+              statuses: [0, 200]
+            })
+          ]
+        })
       );
 
       registerRoute(
