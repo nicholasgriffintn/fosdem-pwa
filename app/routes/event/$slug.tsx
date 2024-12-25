@@ -3,7 +3,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '~/components/PageHeader'
 import { FavouriteButton } from '~/components/FavouriteButton'
 import { ShareButton } from '~/components/ShareButton'
-import { getEventData, getTestEventData } from '~/functions/getFosdemData'
+import { testLiveEvent } from '~/data/test-data'
+import { getAllData } from '~/functions/getFosdemData'
 import { EventMain } from '~/components/EventMain'
 
 
@@ -13,15 +14,11 @@ export const Route = createFileRoute('/event/$slug')({
   loaderDeps: ({ search: { test } }) => ({ test }),
   loader: async ({ params, deps: { test } }) => {
     if (test) {
-      const fosdem = await getTestEventData({})
-
-      return { fosdem: fosdem ?? {} }
+      return { fosdem: { event: testLiveEvent } }
     }
 
-    const fosdem = await getEventData({
-      data: { year: '2025', slug: params.slug },
-    })
-    return { fosdem: fosdem ?? {} }
+    const fosdem = await getAllData({ data: { year: '2025' } });
+    return { fosdem: { event: fosdem.events[params.slug] } };
   },
   head: ({ loaderData }) => ({
     meta: [
