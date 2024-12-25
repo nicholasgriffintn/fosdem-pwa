@@ -19,6 +19,7 @@ async function generateServiceWorker(outputDir = 'dist') {
     const files = await glob(`${outputDir}/**/*`, { nodir: true })
 
     const ignoredRoutes = [
+        '/manifest.webmanifest',
         '/robots.txt',
         '/nitro.json',
         '/_routes.json',
