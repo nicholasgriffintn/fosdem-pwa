@@ -1,14 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Types } from "~/components/Types";
-import { getHomepageData } from "~/functions/getFosdemData";
+import { getAllData } from "~/functions/getFosdemData";
 import { PageHeader } from "../components/PageHeader";
 
 export const Route = createFileRoute("/")({
   component: Home,
   loader: async () => {
-    const fosdem = await getHomepageData({ data: { year: '2025' } });
-    return { fosdem };
+    const data = await getAllData({ data: { year: '2025' } });
+    return {
+      fosdem: {
+        conference: data.conference,
+        types: data.types
+      }
+    };
   },
   staleTime: 10_000,
 });

@@ -1,16 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { PageHeader } from '~/components/PageHeader'
-import { getLiveData } from '../../functions/getFosdemData';
 import { EventList } from '~/components/EventList'
+import { getAllData } from '../../functions/getFosdemData';
+import { testLiveEvent } from '~/data/test-data'
+import { Conference, Event } from '~/types/fosdem'
 
 export const Route = createFileRoute('/live/')({
   component: LivePage,
   validateSearch: ({ test }) => ({ test: test === true }),
   loaderDeps: ({ search: { test } }) => ({ test }),
   loader: async ({ deps: { test } }) => {
-    const liveEvents = await getLiveData({ data: { year: '2025', test } });
-    return liveEvents;
+    if (test) {
+      return { liveEvents: [testLiveEvent] };
+    }
+    const data = await getAllData({ data: { year: '2025' } }) as Conference;
+    const liveEvents = Object.values(data.events).filter(
+      (event: Event) => event.isLive
+    );
+    return { liveEvents };
   },
   head: ({ }) => ({
     meta: [

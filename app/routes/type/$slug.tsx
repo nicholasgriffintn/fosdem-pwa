@@ -1,15 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getTypesData } from "~/functions/getFosdemData";
+import { getAllData } from "~/functions/getFosdemData";
 import { PageHeader } from "~/components/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { TrackList } from '~/components/TrackList';
+import { Conference, Track } from '~/types/fosdem';
+import { groupByDay } from '~/lib/fosdem';
 
 export const Route = createFileRoute("/type/$slug")({
   component: TypePage,
   loader: async ({ params }) => {
-    const fosdem = await getTypesData({ data: { year: '2025', slug: params.slug } });
-    return { fosdem: fosdem ?? {} }
+    const data = await getAllData({ data: { year: '2025' } }) as Conference;
+    const days = Object.values(data.days);
+    const type = data.types[params.slug];
+
+    const trackData = Object.values(data.tracks).filter(
+      (track: any): track is Track => track.type === params.slug
+    );
+
+    const trackDataSplitByDay = groupByDay(trackData, track => track.day);
+
+    return { fosdem: { days, type, trackDataSplitByDay } };
   },
   head: ({ loaderData }) => ({
     meta: [

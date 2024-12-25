@@ -1,9 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { getTrackData } from '~/functions/getFosdemData'
+import { getAllData } from '~/functions/getFosdemData'
 import { PageHeader } from '~/components/PageHeader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { EventList } from '~/components/EventList'
+import { Conference, Event } from '~/types/fosdem'
+import { groupByDay } from '~/lib/fosdem'
 
 function get24HrFormat(str: string) {
   const _t = str.split(/[^0-9]/g);
@@ -14,10 +16,18 @@ function get24HrFormat(str: string) {
 export const Route = createFileRoute('/track/$slug')({
   component: TrackPage,
   loader: async ({ params }) => {
-    const fosdem = await getTrackData({
-      data: { year: '2025', slug: params.slug },
-    })
-    return { fosdem: fosdem ?? {} }
+    const data = await getAllData({ data: { year: '2025' } }) as Conference;
+    const days = Object.values(data.days);
+    const track = data.tracks[params.slug];
+    const type = data.types[track?.type];
+
+    const eventData = Object.values(data.events).filter(
+      (event: any): event is Event => event.trackKey === params.slug
+    );
+
+    const eventDataSplitByDay = groupByDay(eventData, event => event.day);
+
+    return { fosdem: { days, track, type, eventDataSplitByDay } };
   },
   head: ({ loaderData }) => ({
     meta: [
