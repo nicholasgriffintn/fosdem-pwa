@@ -7,18 +7,17 @@ async function generateServiceWorker(outputDir = 'dist') {
         readFileSync('.vinxi/build/server/_server/.vite/manifest.json', 'utf-8')
     )
 
-    const functionId = manifest['app/functions/getFosdemData.ts'].name
-
+    const fosdemFunctionId = manifest['app/functions/getFosdemData.ts'].name
     const fosdemDataPayload = {
         data: { year: "2025" },
         context: {}
     };
+    const fosdemDataUrl = `/_server/?_serverFnId=${fosdemFunctionId}&_serverFnName=$$function0&payload=${encodeURIComponent(JSON.stringify(fosdemDataPayload))}`;
 
-    const fosdemDataUrl = `/_server/?_serverFnId=${functionId}&_serverFnName=$$function0&payload=${encodeURIComponent(JSON.stringify(fosdemDataPayload))}`;
     const dataUrls = [fosdemDataUrl]
 
     const files = await glob(`${outputDir}/**/*`, { nodir: true })
-    const filesAndDataUrls = [...dataUrls, ...files]
+    const filesAndDataUrls = [...dataUrls, ...files, '/offline']
 
     const ignoredRoutes = [
         '/robots.txt',
@@ -38,7 +37,7 @@ async function generateServiceWorker(outputDir = 'dist') {
     importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js');
 
     const { registerRoute, NavigationRoute, setDefaultHandler } = workbox.routing;
-    const { NetworkFirst, CacheFirst, StaleWhileRevalidate } = workbox.strategies;
+    const { NetworkFirst, CacheFirst, StaleWhileRevalidate, NetworkOnly } = workbox.strategies;
     const { CacheableResponsePlugin } = workbox.cacheableResponse;
     const { ExpirationPlugin } = workbox.expiration;
 
@@ -144,6 +143,18 @@ async function generateServiceWorker(outputDir = 'dist') {
               maxEntries: 50,
               maxAgeSeconds: 24 * 60 * 60 // 24 hours
             })
+          ]
+        })
+      );
+
+      setDefaultHandler(
+        new NetworkOnly({
+          plugins: [
+            {
+              handlerDidError: async () => {
+                return caches.match('/offline');
+              }
+            }
           ]
         })
       );

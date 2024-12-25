@@ -15,6 +15,7 @@ import { Route as SigninImport } from './routes/signin'
 import { Route as BookmarksImport } from './routes/bookmarks'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProfileIndexImport } from './routes/profile/index'
+import { Route as OfflineIndexImport } from './routes/offline/index'
 import { Route as MapIndexImport } from './routes/map/index'
 import { Route as LiveIndexImport } from './routes/live/index'
 import { Route as TypeSlugImport } from './routes/type/$slug'
@@ -45,6 +46,12 @@ const IndexRoute = IndexImport.update({
 const ProfileIndexRoute = ProfileIndexImport.update({
   id: '/profile/',
   path: '/profile/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const OfflineIndexRoute = OfflineIndexImport.update({
+  id: '/offline/',
+  path: '/offline/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -144,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapIndexImport
       parentRoute: typeof rootRoute
     }
+    '/offline/': {
+      id: '/offline/'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/profile/': {
       id: '/profile/'
       path: '/profile'
@@ -172,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/type/$slug': typeof TypeSlugRoute
   '/live': typeof LiveIndexRoute
   '/map': typeof MapIndexRoute
+  '/offline': typeof OfflineIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
 }
@@ -185,6 +200,7 @@ export interface FileRoutesByTo {
   '/type/$slug': typeof TypeSlugRoute
   '/live': typeof LiveIndexRoute
   '/map': typeof MapIndexRoute
+  '/offline': typeof OfflineIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
 }
@@ -199,6 +215,7 @@ export interface FileRoutesById {
   '/type/$slug': typeof TypeSlugRoute
   '/live/': typeof LiveIndexRoute
   '/map/': typeof MapIndexRoute
+  '/offline/': typeof OfflineIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/profile/$userId/': typeof ProfileUserIdIndexRoute
 }
@@ -214,6 +231,7 @@ export interface FileRouteTypes {
     | '/type/$slug'
     | '/live'
     | '/map'
+    | '/offline'
     | '/profile'
     | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
@@ -226,6 +244,7 @@ export interface FileRouteTypes {
     | '/type/$slug'
     | '/live'
     | '/map'
+    | '/offline'
     | '/profile'
     | '/profile/$userId'
   id:
@@ -238,6 +257,7 @@ export interface FileRouteTypes {
     | '/type/$slug'
     | '/live/'
     | '/map/'
+    | '/offline/'
     | '/profile/'
     | '/profile/$userId/'
   fileRoutesById: FileRoutesById
@@ -252,6 +272,7 @@ export interface RootRouteChildren {
   TypeSlugRoute: typeof TypeSlugRoute
   LiveIndexRoute: typeof LiveIndexRoute
   MapIndexRoute: typeof MapIndexRoute
+  OfflineIndexRoute: typeof OfflineIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
 }
@@ -265,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   TypeSlugRoute: TypeSlugRoute,
   LiveIndexRoute: LiveIndexRoute,
   MapIndexRoute: MapIndexRoute,
+  OfflineIndexRoute: OfflineIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
 }
@@ -287,6 +309,7 @@ export const routeTree = rootRoute
         "/type/$slug",
         "/live/",
         "/map/",
+        "/offline/",
         "/profile/",
         "/profile/$userId/"
       ]
@@ -314,6 +337,9 @@ export const routeTree = rootRoute
     },
     "/map/": {
       "filePath": "map/index.tsx"
+    },
+    "/offline/": {
+      "filePath": "offline/index.tsx"
     },
     "/profile/": {
       "filePath": "profile/index.tsx"
