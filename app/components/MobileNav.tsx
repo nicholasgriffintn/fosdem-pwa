@@ -30,7 +30,7 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
               key={index}
               to={item.disabled ? '#' : item.href}
               className={cn(
-                'nav-link flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium hover:underline',
+                'flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium hover:underline',
                 item.disabled && 'cursor-not-allowed opacity-60'
               )}
               onClick={onCloseMenu}
@@ -59,17 +59,29 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
           </Button>
 
           {user ? (
-            <Button
-              variant="ghost"
-              className="flex items-center justify-start gap-2 w-full"
-              onClick={() => {
-                logout();
-                onCloseMenu();
-              }}
-            >
-              <Icons.logout className="h-5 w-5" />
-              Sign Out
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                className="flex items-center justify-start gap-2 w-full"
+                asChild
+              >
+                <Link to="/profile" onClick={onCloseMenu}>
+                  <Icons.user className="h-5 w-5" />
+                  View Profile
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                className="flex items-center justify-start gap-2 w-full"
+                onClick={() => {
+                  logout();
+                  onCloseMenu();
+                }}
+              >
+                <Icons.logout className="h-5 w-5" />
+                Sign Out
+              </Button>
+            </>
           ) : (
             <Button
               variant="ghost"
