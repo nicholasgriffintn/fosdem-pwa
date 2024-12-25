@@ -40,6 +40,10 @@ async function generateServiceWorker(outputDir = 'dist') {
       clients.claim();
     } else {
       const CACHE_NAME = 'fosdem-pwa-v${Date.now()}';
+
+      self.addEventListener('activate', event => {
+        event.waitUntil(clients.claim());
+      });
       
       setInterval(() => {
         self.registration.update();
