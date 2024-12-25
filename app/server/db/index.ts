@@ -74,5 +74,5 @@ export const db = drizzle(
 
     return { rows: method == "all" ? rows : rows[0] };
   },
-  { schema, logger: true }
+  { schema, logger: process.env.NODE_ENV === 'development' }
 );

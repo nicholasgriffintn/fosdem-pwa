@@ -3,15 +3,19 @@ import { Link } from "@tanstack/react-router";
 
 import { cn } from '~/lib/utils';
 import { useLockBody } from '~/hooks/use-lock-body';
+import { useAuth } from '~/hooks/use-auth';
+import { Icons } from './Icons';
+import { Button } from './ui/button';
 
 interface MobileNavProps {
-  items: { title: string; href: string; disabled?: boolean }[];
+  items: { title: string; href: string; icon?: React.ReactNode; disabled?: boolean }[];
   onCloseMenu: () => void;
   children?: ReactNode;
 }
 
 export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
   useLockBody();
+  const { user, logout } = useAuth();
 
   return (
     <div
@@ -26,14 +30,58 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
               key={index}
               to={item.disabled ? '#' : item.href}
               className={cn(
-                'flex w-full items-center rounded-md p-2 text-sm font-medium hover:underline',
+                'nav-link flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium hover:underline',
                 item.disabled && 'cursor-not-allowed opacity-60'
               )}
               onClick={onCloseMenu}
             >
+              {item.icon}
               {item.title}
             </Link>
           ))}
+
+          <div className="border-t my-4" />
+
+          <Button
+            variant="ghost"
+            className="flex items-center justify-start gap-2 w-full"
+            asChild
+          >
+            <a
+              href="https://github.com/nicholasgriffintn/fosdem-pwa"
+              target="_blank"
+              rel="noreferrer"
+              onClick={onCloseMenu}
+            >
+              <Icons.gitHub className="h-5 w-5" />
+              View Source
+            </a>
+          </Button>
+
+          {user ? (
+            <Button
+              variant="ghost"
+              className="flex items-center justify-start gap-2 w-full"
+              onClick={() => {
+                logout();
+                onCloseMenu();
+              }}
+            >
+              <Icons.logout className="h-5 w-5" />
+              Sign Out
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              className="flex items-center justify-start gap-2 w-full"
+              asChild
+            >
+              <Link to="/signin" onClick={onCloseMenu}>
+                <Icons.login className="h-5 w-5" />
+                Sign In
+              </Link>
+            </Button>
+          )}
         </nav>
       </div>
     </div>

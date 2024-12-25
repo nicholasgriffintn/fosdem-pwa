@@ -10,7 +10,7 @@ export function MainNav({
   items,
 }: {
   title: string;
-  items?: { title: string; href: string; disabled?: boolean }[];
+  items?: { title: string; href: string; icon?: React.ReactNode; disabled?: boolean }[];
 }) {
   const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
 
@@ -27,11 +27,12 @@ export function MainNav({
               key={index}
               to={item.disabled ? '#' : item.href}
               className={cn(
-                'flex items-center text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm',
+                'nav-link flex items-center gap-2 text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm',
                 'text-foreground/60',
                 item.disabled && 'cursor-not-allowed opacity-80'
               )}
             >
+              {item.icon}
               {item.title}
             </Link>
           ))}
