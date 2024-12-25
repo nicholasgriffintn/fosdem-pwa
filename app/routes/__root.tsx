@@ -72,7 +72,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       >
         <main className="flex min-h-screen flex-col">
           <Header />
-          <OfflineIndicator />
           <div className="container flex-1">
             {children}
             <Toaster />
@@ -82,6 +81,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
           <Suspense>
             <TanStackRouterDevtools position="bottom-right" />
           </Suspense>
+          <OfflineIndicator />
         </main>
         <ScrollRestoration />
 

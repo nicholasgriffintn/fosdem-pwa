@@ -124,7 +124,11 @@ export async function getAuthSession({ refreshCookie } = { refreshCookie: true }
 export async function getFullAuthSession() {
   const { session, user } = await getAuthSession();
 
-  if (user) {
+  if (!session) {
+    return { session: null, user: null };
+  }
+
+  if (user && user.email) {
     const userData = await db.select().from(userTable).where(eq(userTable.email, user.email));
     return { session, user: userData[0] };
   }

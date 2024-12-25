@@ -8,9 +8,18 @@ export function useUserId({
     const { data: user, isLoading } = useQuery({
         queryKey: ['profile', userId],
         queryFn: async () => {
-            const response = await fetch(`/api/user/${userId}`);
-            if (!response.ok) return null;
+            const response = await fetch(`/api/user/github/${userId}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
+            }
+
             const data = await response.json();
+
+            if (!data.user) {
+                throw new Error('Not found');
+            }
+
             return data.user;
         },
     });

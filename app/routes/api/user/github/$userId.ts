@@ -1,12 +1,10 @@
 import { createAPIFileRoute } from '@tanstack/start/api'
-import { eq } from "drizzle-orm";
+import { eq } from 'drizzle-orm'
 
-import { db } from "~/server/db";
-import {
-  user as userTable,
-} from "~/server/db/schema";
+import { db } from '~/server/db'
+import { user as userTable } from '~/server/db/schema'
 
-export const APIRoute = createAPIFileRoute('/api/user/$userId')({
+export const APIRoute = createAPIFileRoute('/api/user/github/$userId')({
   GET: async ({ params }) => {
     const userId = params.userId
 
@@ -17,6 +15,11 @@ export const APIRoute = createAPIFileRoute('/api/user/$userId')({
     const user = await db.query.user.findFirst({
       where: eq(userTable.github_username, userId),
     })
+
+    if (!user) {
+      return Response.json({ error: 'User not found' }, { status: 404 })
+    }
+
     return Response.json({ user })
   },
 })
