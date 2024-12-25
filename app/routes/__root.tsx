@@ -16,6 +16,7 @@ import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { Toaster } from "~/components/ui/toaster";
 import { OfflineIndicator } from "~/components/OfflineIndicator";
+import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
 
 const TanStackRouterDevtools =
   process.env.NODE_ENV === "production"
@@ -84,6 +85,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
             <TanStackRouterDevtools position="bottom-right" />
           </Suspense>
           <OfflineIndicator />
+          <ServiceWorkerUpdater />
         </main>
         <ScrollRestoration />
 
@@ -94,10 +96,16 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
             )
             
             if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.register(
-                '${import.meta.env.MODE === 'production' ? '/sw.js' : '/dev-sw.js?dev-sw'}',
-                { scope: '/' }
-              )
+              const registration = await navigator.serviceWorker.register('/sw.js');
+              
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    dispatchEvent(new CustomEvent('swUpdated'));
+                  }
+                });
+              });
             }`}
         </ScriptOnce>
 
