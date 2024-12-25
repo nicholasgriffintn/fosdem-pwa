@@ -95,18 +95,20 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
             localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
             )
             
-            if ('serviceWorker' in navigator) {
-              const registration = await navigator.serviceWorker.register('/sw.js');
-              
-              registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    dispatchEvent(new CustomEvent('swUpdated'));
-                  }
+            (async () => {
+              if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                
+                registration.addEventListener('updatefound', () => {
+                  const newWorker = registration.installing;
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      dispatchEvent(new CustomEvent('swUpdated'));
+                    }
+                  });
                 });
-              });
-            }`}
+              }
+            })();`}
         </ScriptOnce>
 
         <Scripts />

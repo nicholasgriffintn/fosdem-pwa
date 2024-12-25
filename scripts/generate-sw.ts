@@ -2,8 +2,8 @@ import { glob } from 'glob'
 import { writeFileSync } from 'fs'
 import path from 'path'
 
-async function generateServiceWorker() {
-    const files = await glob('dist/**/*', { nodir: true })
+async function generateServiceWorker(outputDir = 'dist') {
+    const files = await glob(`${outputDir}/**/*`, { nodir: true })
 
     const ignoredRoutes = [
         '/robots.txt',
@@ -17,7 +17,7 @@ async function generateServiceWorker() {
     ]
 
     const assetsToCache = files
-        .map(file => '/' + path.relative('dist', file))
+        .map(file => '/' + path.relative(outputDir, file))
         .filter(file => !ignoredRoutes.includes(file))
 
     const sw = `
@@ -138,8 +138,9 @@ async function generateServiceWorker() {
     }
   `
 
-    writeFileSync('dist/sw.js', sw);
+    writeFileSync(`${outputDir}/sw.js`, sw);
     console.log('Service worker generated successfully!');
 }
 
-generateServiceWorker().catch(console.error)
+const outputDir = process.argv[2] || 'dist';
+generateServiceWorker(outputDir).catch(console.error)
