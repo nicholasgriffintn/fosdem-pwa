@@ -47,17 +47,17 @@ export function ShareButton({
 
       toast({
         title: 'Unable to share',
-        description: 'Please copy this URL manually: ' + url,
+        description: `Please copy this URL manually: ${url}`,
         variant: 'destructive',
         duration: 10000,
       });
     } catch (error) {
-      // Only show error if it's not a user cancellation
       if (error instanceof Error && error.name !== 'AbortError') {
         toast({
           title: 'Failed to share',
-          description: 'Please try copying the URL manually',
+          description: `Please copy this URL manually: ${url}`,
           variant: 'destructive',
+          duration: 10000,
         });
       }
     }
