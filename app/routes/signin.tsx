@@ -3,6 +3,7 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useAuth } from '~/hooks/use-auth';
 import { Button } from "~/components/ui/button";
 import { PageHeader } from "~/components/PageHeader";
+import { Spinner } from "~/components/Spinner";
 
 export const Route = createFileRoute("/signin")({
   component: SignInPage,
@@ -20,7 +21,11 @@ function SignInPage() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null; // Or a loading spinner
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner className="h-8 w-8" />
+      </div>
+    );
   }
 
   if (user) {

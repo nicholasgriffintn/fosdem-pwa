@@ -15,7 +15,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [x] A page for each event with the event details
 - [x] GitHub sign in
 - [ ] Guest sign in (potentially)
-- [ ] A page for the user profile, with a generated pass for the event
+- [x] A page for the user profile, with a generated pass for the event
 - [ ] The ability to bookmark tracks and events
 - [ ] Bookmarks are background synced when offline
 - [ ] Sends push notifications for bookmarked events

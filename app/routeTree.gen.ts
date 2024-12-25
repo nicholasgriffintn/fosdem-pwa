@@ -14,11 +14,13 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SigninImport } from './routes/signin'
 import { Route as BookmarksImport } from './routes/bookmarks'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProfileIndexImport } from './routes/profile/index'
 import { Route as MapIndexImport } from './routes/map/index'
 import { Route as LiveIndexImport } from './routes/live/index'
 import { Route as TypeSlugImport } from './routes/type/$slug'
 import { Route as TrackSlugImport } from './routes/track/$slug'
 import { Route as EventSlugImport } from './routes/event/$slug'
+import { Route as ProfileUserIdIndexImport } from './routes/profile/$userId/index'
 
 // Create/Update Routes
 
@@ -37,6 +39,12 @@ const BookmarksRoute = BookmarksImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileIndexRoute = ProfileIndexImport.update({
+  id: '/profile/',
+  path: '/profile/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,6 +75,12 @@ const TrackSlugRoute = TrackSlugImport.update({
 const EventSlugRoute = EventSlugImport.update({
   id: '/event/$slug',
   path: '/event/$slug',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileUserIdIndexRoute = ProfileUserIdIndexImport.update({
+  id: '/profile/$userId/',
+  path: '/profile/$userId/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -130,6 +144,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapIndexImport
       parentRoute: typeof rootRoute
     }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/profile/$userId/': {
+      id: '/profile/$userId/'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof ProfileUserIdIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -144,6 +172,8 @@ export interface FileRoutesByFullPath {
   '/type/$slug': typeof TypeSlugRoute
   '/live': typeof LiveIndexRoute
   '/map': typeof MapIndexRoute
+  '/profile': typeof ProfileIndexRoute
+  '/profile/$userId': typeof ProfileUserIdIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -155,6 +185,8 @@ export interface FileRoutesByTo {
   '/type/$slug': typeof TypeSlugRoute
   '/live': typeof LiveIndexRoute
   '/map': typeof MapIndexRoute
+  '/profile': typeof ProfileIndexRoute
+  '/profile/$userId': typeof ProfileUserIdIndexRoute
 }
 
 export interface FileRoutesById {
@@ -167,6 +199,8 @@ export interface FileRoutesById {
   '/type/$slug': typeof TypeSlugRoute
   '/live/': typeof LiveIndexRoute
   '/map/': typeof MapIndexRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/profile/$userId/': typeof ProfileUserIdIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -180,6 +214,8 @@ export interface FileRouteTypes {
     | '/type/$slug'
     | '/live'
     | '/map'
+    | '/profile'
+    | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -190,6 +226,8 @@ export interface FileRouteTypes {
     | '/type/$slug'
     | '/live'
     | '/map'
+    | '/profile'
+    | '/profile/$userId'
   id:
     | '__root__'
     | '/'
@@ -200,6 +238,8 @@ export interface FileRouteTypes {
     | '/type/$slug'
     | '/live/'
     | '/map/'
+    | '/profile/'
+    | '/profile/$userId/'
   fileRoutesById: FileRoutesById
 }
 
@@ -212,6 +252,8 @@ export interface RootRouteChildren {
   TypeSlugRoute: typeof TypeSlugRoute
   LiveIndexRoute: typeof LiveIndexRoute
   MapIndexRoute: typeof MapIndexRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
+  ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -223,6 +265,8 @@ const rootRouteChildren: RootRouteChildren = {
   TypeSlugRoute: TypeSlugRoute,
   LiveIndexRoute: LiveIndexRoute,
   MapIndexRoute: MapIndexRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
+  ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -242,7 +286,9 @@ export const routeTree = rootRoute
         "/track/$slug",
         "/type/$slug",
         "/live/",
-        "/map/"
+        "/map/",
+        "/profile/",
+        "/profile/$userId/"
       ]
     },
     "/": {
@@ -268,6 +314,12 @@ export const routeTree = rootRoute
     },
     "/map/": {
       "filePath": "map/index.tsx"
+    },
+    "/profile/": {
+      "filePath": "profile/index.tsx"
+    },
+    "/profile/$userId/": {
+      "filePath": "profile/$userId/index.tsx"
     }
   }
 }
