@@ -77,7 +77,9 @@ async function generateServiceWorker(outputDir = 'dist') {
                   'content-type': 'application/json'
                 }
               })
-              .then(response => cache.put(fosdemDataUrl, response));
+              .then(response => {
+                return cache.put(fosdemDataUrl, response.clone());
+              });
             })
           ])
         );
