@@ -28,7 +28,6 @@ async function generateServiceWorker() {
     const { CacheableResponsePlugin } = workbox.cacheableResponse;
     const { ExpirationPlugin } = workbox.expiration;
 
-    // Add message handling for updates
     self.addEventListener('message', (event) => {
       if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
@@ -42,10 +41,9 @@ async function generateServiceWorker() {
     } else {
       const CACHE_NAME = 'fosdem-pwa-v${Date.now()}';
       
-      // Add periodic update check
       setInterval(() => {
         self.registration.update();
-      }, 15 * 60 * 1000); // Check every 15 minutes
+      }, 15 * 60 * 1000); // 15 minutes
 
       const urlsToCache = ${JSON.stringify(assetsToCache, null, 2)};
 
