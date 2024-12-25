@@ -61,6 +61,8 @@ async function generateServiceWorker(outputDir = 'dist') {
         self.registration.update();
       }, 15 * 60 * 1000); // 15 minutes
 
+      const fosdemDataUrl = '${fosdemDataUrl}';
+
       self.addEventListener('install', (event) => {
         event.waitUntil(
           Promise.all([
@@ -68,13 +70,13 @@ async function generateServiceWorker(outputDir = 'dist') {
               return cache.addAll(${JSON.stringify(assetsToCache, null, 2)});
             }),
             caches.open('server-functions').then((cache) => {
-              return fetch(${fosdemDataUrl}, {
+              return fetch(fosdemDataUrl, {
                 headers: {
                   'accept': 'application/json',
                   'content-type': 'application/json'
                 }
               })
-              .then(response => cache.put(${fosdemDataUrl}, response));
+              .then(response => cache.put(fosdemDataUrl, response));
             })
           ])
         );
