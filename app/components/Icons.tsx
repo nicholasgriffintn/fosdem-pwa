@@ -1,4 +1,4 @@
-import { X, SunMedium, Moon, Star, Share, Megaphone, ArrowLeft, LogIn } from 'lucide-react';
+import { X, SunMedium, Moon, Star, Share, Megaphone, ArrowLeft, LogIn, LogOut, Bookmark, Video, Home, Map } from 'lucide-react';
 
 export const Icons = {
   logo: ({ ...props }) => (
@@ -26,6 +26,7 @@ export const Icons = {
     </svg>
   ),
   login: LogIn,
+  logout: LogOut,
   arrowLeft: ArrowLeft,
   close: X,
   sun: SunMedium,
@@ -33,6 +34,10 @@ export const Icons = {
   star: Star,
   share: Share,
   megaphone: Megaphone,
+  home: Home,
+  video: Video,
+  bookmark: Bookmark,
+  map: Map,
   gitHub: ({ ...props }) => (
     <svg
       aria-hidden="true"

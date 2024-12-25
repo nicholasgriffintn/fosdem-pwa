@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 
 import { Button } from '~/components/ui/button';
 import { Icons } from '~/components/Icons';
@@ -18,7 +17,6 @@ export function FavouriteButton({
   status: string;
 }) {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [currentStatus, setCurrentStatus] = useState(status);
 
   const handleFavourite = () => {
@@ -27,7 +25,6 @@ export function FavouriteButton({
         title: 'You must be signed in to favourite',
         variant: 'destructive',
       });
-      navigate({ to: '/signin' });
       return;
     }
 

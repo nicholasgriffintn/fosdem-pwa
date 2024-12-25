@@ -93,6 +93,14 @@ a:hover {
   text-decoration-line: underline;
 }
 
+.nav-link {
+  text-decoration-line: none;
+}
+
+.nav-link:hover {
+  text-decoration-line: underline;
+}
+
 .prose p {
   font-size: 1rem;
   line-height: 1.5rem;

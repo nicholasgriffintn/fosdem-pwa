@@ -19,18 +19,22 @@ export function Header() {
     {
       title: 'Home',
       href: '/',
+      icon: <Icons.home className="h-4 w-4" />,
     },
     {
       title: 'Live',
       href: '/live',
+      icon: <Icons.video className="h-4 w-4" />,
     },
     {
       title: 'Bookmarks',
       href: '/bookmarks/',
+      icon: <Icons.bookmark className="h-4 w-4" />,
     },
     {
       title: 'Map',
       href: '/map',
+      icon: <Icons.map className="h-4 w-4" />,
     },
   ];
 
