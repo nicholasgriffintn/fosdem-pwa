@@ -29,8 +29,9 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## TODO
 
-- [ ] Make Fosdem PWA a PWA again
+- [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
 - [ ] Images are loading in on the homepage with layout shift
+- [ ] maybe get some new images?
 
 ## Contributing
 
