@@ -22,6 +22,14 @@ export function Footer() {
             >
               CloudFlare
             </a>{' '}
+            and{' '}
+            <a
+              href="https://vercel.com/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Vercel
+            </a>{' '}
             |{' '}
             <a
               href="https://github.com/nicholasgriffintn/fosdem-pwa"
