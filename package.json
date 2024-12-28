@@ -39,6 +39,7 @@
     "@tanstack/react-router-with-query": "^1.87.3",
     "@tanstack/router-devtools": "^1.87.3",
     "@tanstack/start": "^1.87.4",
+    "@unpic/react": "^0.1.15",
     "@vitejs/plugin-react": "^4.3.4",
     "arctic": "^2.3.0",
     "class-variance-authority": "^0.7.1",
@@ -74,5 +75,6 @@
     "typescript-eslint": "^8.18.0",
     "vite-tsconfig-paths": "^5.1.4",
     "wrangler": "^3.95.0"
-  }
+  },
+  "packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
 }
