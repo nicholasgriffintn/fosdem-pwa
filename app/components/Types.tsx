@@ -34,7 +34,11 @@ export function Types({
           >
             <Card className="lg:max-w-md w-full">
               <CardHeader>
-                <CardTitle>{types[typeKey].name}</CardTitle>
+                <CardTitle>
+                  <Link to={`/type/${types[typeKey].id}`} className="no-underline">
+                    {types[typeKey].name}
+                  </Link>
+                </CardTitle>
                 <CardDescription>
                   {types[typeKey].trackCount} TRACKS
                 </CardDescription>
@@ -49,7 +53,7 @@ export function Types({
               </CardContent>
               <CardFooter>
                 <Button asChild className="w-full">
-                  <Link to={`/type/${types[typeKey].id}`}>View Track</Link>
+                  <Link to={`/type/${types[typeKey].id}`}>View Tracks</Link>
                 </Button>
               </CardFooter>
             </Card>

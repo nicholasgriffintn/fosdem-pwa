@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect } from 'react';
 
 // @see https://usehooks.com/useLockBodyScroll.

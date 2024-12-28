@@ -85,18 +85,14 @@ a:hover {
   text-decoration-line: none;
 }
 
-.logo-link {
-  text-decoration-line: none;
-}
-
-.logo-link:hover {
-  text-decoration-line: underline;
-}
-
+.logo-link,
+.no-underline,
 .nav-link {
   text-decoration-line: none;
 }
 
+.logo-link:hover,
+.no-underline:hover,
 .nav-link:hover {
   text-decoration-line: underline;
 }

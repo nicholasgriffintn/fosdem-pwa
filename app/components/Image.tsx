@@ -1,24 +1,29 @@
+import { Source, Image as UnpicImage } from '@unpic/react'
+
 export function Image({
   src,
   alt,
   className,
   useWebP = true,
+  width,
+  height,
   ...props
 }: {
   src: string;
   alt: string;
   className?: string;
   useWebP?: boolean;
-  loading?: 'lazy' | 'eager';
+    loading?: 'lazy' | 'eager';
+    width?: number;
+    height?: number;
 }) {
   return (
     <div className={className}>
       <picture>
         {useWebP && (
-          <source srcSet={src.replace('.jpg', '.webp')} type="image/webp" />
+          <Source src={src.replace('.jpg', '.webp')} type="image/webp" layout="fullWidth" />
         )}
-        <source srcSet={src} type="image/jpeg" />
-        <img src={src} alt={alt} {...props} />
+        <UnpicImage src={src} alt={alt} layout="fullWidth" {...props} />
       </picture>
     </div>
   );
