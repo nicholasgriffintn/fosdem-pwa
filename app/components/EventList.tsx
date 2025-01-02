@@ -59,7 +59,7 @@ function EventListItem({
             text={`Check out ${event.title} at FOSDEM`}
             url={`https://fosdempwa.com/event/${event.id}`}
           />
-          <Button variant="secondary" asChild className="w-full">
+          <Button variant="secondary" asChild className="w-full no-underline">
             <Link to={`/event/${event.id}`}>View Event</Link>
           </Button>
         </div>
