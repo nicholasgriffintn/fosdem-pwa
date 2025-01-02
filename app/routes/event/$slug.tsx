@@ -6,7 +6,7 @@ import { ShareButton } from '~/components/ShareButton'
 import { testLiveEvent } from '~/data/test-data'
 import { getAllData } from '~/functions/getFosdemData'
 import { EventMain } from '~/components/EventMain'
-
+import { constants } from '~/constants'
 
 export const Route = createFileRoute('/event/$slug')({
   component: TrackPage,
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/event/$slug')({
       return { fosdem: { event: testLiveEvent } }
     }
 
-    const fosdem = await getAllData({ data: { year: '2025' } });
+    const fosdem = await getAllData({ data: { year: constants.YEAR } });
     return { fosdem: { event: fosdem.events[params.slug] } };
   },
   head: ({ loaderData }) => ({

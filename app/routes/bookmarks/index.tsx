@@ -8,7 +8,7 @@ export const Route = createFileRoute('/bookmarks/')({
     meta: [
       {
         title: 'Bookmarks | FOSDEM PWA',
-        description: 'Bookmarks from FOSDEM 2025',
+        description: 'Bookmarks from FOSDEM',
       },
     ],
   }),

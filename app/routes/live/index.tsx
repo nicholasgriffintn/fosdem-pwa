@@ -2,9 +2,10 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { PageHeader } from '~/components/PageHeader'
 import { EventList } from '~/components/EventList'
-import { getAllData } from '../../functions/getFosdemData';
+import { getAllData } from '~/functions/getFosdemData'
 import { testLiveEvent } from '~/data/test-data'
-import { Conference, Event } from '~/types/fosdem'
+import type { Conference, Event } from '~/types/fosdem'
+import { constants } from '~/constants'
 
 export const Route = createFileRoute('/live/')({
   component: LivePage,
@@ -14,16 +15,16 @@ export const Route = createFileRoute('/live/')({
     if (test) {
       return { liveEvents: [testLiveEvent] };
     }
-    const data = await getAllData({ data: { year: '2025' } }) as Conference;
+    const data = await getAllData({ data: { year: constants.YEAR } }) as Conference;
     const liveEvents = Object.values(data.events).filter(
       (event: Event) => event.isLive
     );
     return { liveEvents };
   },
-  head: ({ }) => ({
+  head: () => ({
     meta: [
       {
-        title: `Live | FOSDEM PWA`,
+        title: 'Live | FOSDEM PWA',
         description: 'All events that are currently live',
       },
     ],
@@ -39,7 +40,7 @@ function LivePage() {
       <div className="relative py-6 lg:py-10">
         <PageHeader
           heading="Live"
-          text={`All events that are currently live`}
+          text={'All events that are currently live'}
         />
         <div className="w-full">
           {liveEvents.length > 0 ? (
