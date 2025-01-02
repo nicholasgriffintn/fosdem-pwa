@@ -1,6 +1,6 @@
 export const constants = {
-  DEFAULT_YEAR: '2025',
-  AVAILABLE_YEARS: ['2024', '2025'],
+  DEFAULT_YEAR: 2025,
+  AVAILABLE_YEARS: [2024, 2025],
   DATA_LINK: 'https://r2.fosdempwa.com/fosdem-${YEAR}.json',
   STREAM_LINK: 'https://stream.fosdem.org/${ROOM_ID}.m3u8',
   CHAT_LINK: 'https://chat.fosdem.org/#/room/#${ROOM_ID}:fosdem.org',

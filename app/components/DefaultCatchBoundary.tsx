@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
+import { constants } from "../constants";
 
 export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
   const router = useRouter();
@@ -32,12 +33,13 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
         </Button>
         {isRoot ? (
           <Button asChild variant="secondary">
-            <Link to="/">Home</Link>
+            <Link to="/" search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })}>Home</Link>
           </Button>
         ) : (
           <Button asChild variant="secondary">
             <Link
               to="/"
+              search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })}
               onClick={(e) => {
                 e.preventDefault();
                 window.history.back();

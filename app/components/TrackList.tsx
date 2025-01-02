@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '~/components/ui/button';
 import { FavouriteButton } from '~/components/FavouriteButton';
 import { ShareButton } from '~/components/ShareButton';
-
+import { constants } from '~/constants';
 type TrackListItem = {
   id: string;
   name: string;
@@ -57,7 +57,7 @@ function TrackListItem({
             url={`https://fosdempwa.com/track/${track.id}`}
           />
           <Button variant="secondary" asChild className="w-full no-underline">
-            <Link to={`/track/${track.id}`}>View Track</Link>
+            <Link to={`/track/${track.id}`} search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })}>View Track</Link>
           </Button>
         </div>
       </div>

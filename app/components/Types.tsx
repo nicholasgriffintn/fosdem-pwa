@@ -10,6 +10,7 @@ import {
 } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
 import { FeaturedFosdemImage } from '~/components/FeaturedFosdemImage';
+import { constants } from '~/constants';
 
 type FosdemImageType = "keynote" | "maintrack" | "devroom" | "lightningtalk" | "other";
 
@@ -37,7 +38,7 @@ export function Types({
             <Card className="lg:max-w-md w-full">
               <CardHeader>
                 <CardTitle>
-                  <Link to={`/type/${types[typeKey].id}`} className="no-underline">
+                  <Link search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })} to={`/type/${types[typeKey].id}`} className="no-underline">
                     {types[typeKey].name}
                   </Link>
                 </CardTitle>
@@ -58,7 +59,7 @@ export function Types({
               </CardContent>
               <CardFooter>
                 <Button variant="secondary" asChild className="w-full no-underline">
-                  <Link to={`/type/${types[typeKey].id}`}>View Tracks</Link>
+                  <Link search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })} to={`/type/${types[typeKey].id}`}>View Tracks</Link>
                 </Button>
               </CardFooter>
             </Card>

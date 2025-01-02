@@ -6,7 +6,7 @@ import { useLockBody } from '~/hooks/use-lock-body';
 import { useAuth } from '~/hooks/use-auth';
 import { Icons } from './Icons';
 import { Button } from './ui/button';
-
+import { constants } from '~/constants';
 interface MobileNavProps {
   items: { title: string; href: string; icon?: React.ReactNode; disabled?: boolean }[];
   onCloseMenu: () => void;
@@ -27,13 +27,14 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
         <nav className="grid grid-flow-row auto-rows-max text-sm">
           {items.map((item, index) => (
             <Link
-              key={index}
+              key={item.href}
               to={item.disabled ? '#' : item.href}
               className={cn(
                 'flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium hover:underline',
                 item.disabled && 'cursor-not-allowed opacity-60'
               )}
               onClick={onCloseMenu}
+              search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })}
             >
               {item.icon}
               {item.title}
@@ -65,7 +66,7 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
                 className="flex items-center justify-start gap-2 w-full"
                 asChild
               >
-                <Link to="/profile" onClick={onCloseMenu}>
+                <Link search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })} to="/profile" onClick={onCloseMenu}>
                   <Icons.user className="h-5 w-5" />
                   View Profile
                 </Link>

@@ -3,11 +3,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Types } from "~/components/Types";
 import { getAllData } from "~/functions/getFosdemData";
 import { PageHeader } from "~/components/PageHeader";
+import { constants } from "~/constants";
 
 export const Route = createFileRoute("/")({
   component: Home,
-  loader: async ({ context }) => {
-    const data = await getAllData({ data: { year: context.year } });
+  validateSearch: ({ year }: { year: number }) => ({ year: constants.AVAILABLE_YEARS.includes(year) && year || constants.DEFAULT_YEAR }),
+  loaderDeps: ({ search: { year } }) => ({ year }),
+  loader: async ({ deps: { year } }) => {
+    const data = await getAllData({ data: { year } });
     return {
       fosdem: {
         conference: data.conference,

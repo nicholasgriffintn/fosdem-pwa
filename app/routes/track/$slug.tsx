@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { EventList } from '~/components/EventList'
 import type { Conference, Event } from '~/types/fosdem'
 import { groupByDay } from '~/lib/fosdem'
+import { constants } from '../../constants'
 
 function get24HrFormat(str: string) {
   const _t = str.split(/[^0-9]/g);
@@ -15,8 +16,10 @@ function get24HrFormat(str: string) {
 
 export const Route = createFileRoute('/track/$slug')({
   component: TrackPage,
-  loader: async ({ context, params }) => {
-    const data = await getAllData({ data: { year: context.year } }) as Conference;
+  validateSearch: ({ year }: { year: number }) => ({ year: constants.AVAILABLE_YEARS.includes(year) && year || constants.DEFAULT_YEAR }),
+  loaderDeps: ({ search: { year } }) => ({ year }),
+  loader: async ({ params, deps: { year } }) => {
+    const data = await getAllData({ data: { year } }) as Conference;
     const days = Object.values(data.days);
     const track = data.tracks[params.slug];
     const type = data.types[track?.type];

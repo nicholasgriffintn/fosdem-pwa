@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '~/components/ui/button';
 import { FavouriteButton } from '~/components/FavouriteButton';
 import { ShareButton } from '~/components/ShareButton';
-
+import { constants } from '~/constants';
 type EventListItem = {
   id: string;
   title: string;
@@ -60,7 +60,7 @@ function EventListItem({
             url={`https://fosdempwa.com/event/${event.id}`}
           />
           <Button variant="secondary" asChild className="w-full no-underline">
-            <Link to={`/event/${event.id}`}>View Event</Link>
+            <Link to={`/event/${event.id}`} search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })}>View Event</Link>
           </Button>
         </div>
       </div>
