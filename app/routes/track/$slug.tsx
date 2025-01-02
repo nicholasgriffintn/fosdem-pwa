@@ -60,11 +60,19 @@ function TrackPage() {
           heading={fosdem.track.name}
           text={`${fosdem.type.name} | Room: ${fosdem.track.room} | Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(' and ') : fosdem.track.day}`}
         />
-        <Tabs defaultValue={fosdem.days[0].id} className="w-full">
+        <Tabs
+          defaultValue={Object.keys(fosdem.eventDataSplitByDay)[0] || fosdem.days[0].id}
+          className="w-full"
+        >
           <TabsList>
             {fosdem.days.map((day) => {
+              const hasEvents = Boolean(fosdem.eventDataSplitByDay[day.id]);
               return (
-                <TabsTrigger key={day.id} value={day.id}>
+                <TabsTrigger
+                  key={day.id}
+                  value={day.id}
+                  disabled={!hasEvents}
+                >
                   {day.name}
                 </TabsTrigger>
               );
