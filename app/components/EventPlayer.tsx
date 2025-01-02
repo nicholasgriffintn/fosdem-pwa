@@ -23,18 +23,23 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  useEffect(() => {
-    if (!videoRef.current || !event.streams.length || !isPlaying) return;
+  const videoRecordings = event.links?.filter(link => link.type?.startsWith('video/')) || [];
+  const hasRecordings = videoRecordings.length > 0;
 
-    const stream = event.streams[0];
-    if (stream.type === 'application/vnd.apple.mpegurl') {
-      if (Hls.isSupported()) {
-        const hls = new Hls();
-        hlsRef.current = hls;
-        hls.attachMedia(videoRef.current);
-        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-          hls.loadSource(stream.href);
-        });
+  useEffect(() => {
+    if (!videoRef.current || !isPlaying) return;
+
+    if (event.isLive && event.streams?.length) {
+      const stream = event.streams[0];
+      if (stream.type === 'application/vnd.apple.mpegurl') {
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hlsRef.current = hls;
+          hls.attachMedia(videoRef.current);
+          hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            hls.loadSource(stream.href);
+          });
+        }
       }
     }
 
@@ -43,7 +48,7 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
         hlsRef.current.destroy();
       }
     };
-  }, [event.streams, isPlaying]);
+  }, [event.streams, event.isLive, isPlaying]);
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -74,32 +79,43 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
       )}
 
       <div className={videoWrapperClassName}>
-        {event.isLive && event.streams?.length ? (
+        {(event.isLive && event.streams?.length) || hasRecordings ? (
           <>
             {!isPlaying && (
               <button
                 type="button"
                 onClick={handlePlay}
-                className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 hover:bg-black/60 transition-colors"
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
               >
                 <Play className="w-16 h-16 text-white" />
+                <span className="text-white text-lg font-medium">Play Video</span>
               </button>
             )}
             {isPlaying && (
-              // biome-ignore lint/a11y/useMediaCaption: <explanation>
+              // biome-ignore lint/a11y/useMediaCaption: We don't have captions for the streams
               <video
                 ref={videoRef}
                 className="w-full h-full object-contain"
                 controls
                 autoPlay
               >
-                {event.streams.map((stream) => (
-                  <source
-                    key={stream.href}
-                    src={stream.href}
-                    type={stream.type}
-                  />
-                ))}
+                {event.isLive ? (
+                  event.streams.map((stream) => (
+                    <source
+                      key={stream.href}
+                      src={stream.href}
+                      type={stream.type}
+                    />
+                  ))
+                ) : (
+                  videoRecordings.map((recording) => (
+                    <source
+                      key={recording.href}
+                      src={recording.href}
+                      type={recording.type}
+                    />
+                  ))
+                )}
               </video>
             )}
           </>
