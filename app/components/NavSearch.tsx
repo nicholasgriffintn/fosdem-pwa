@@ -22,6 +22,7 @@ interface DocsSearchProps extends React.HTMLAttributes<HTMLFormElement> {
 
 export function NavSearch({ year, className, ...props }: DocsSearchProps) {
   const { fosdemData, loading } = useFosdemData({ year });
+
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);

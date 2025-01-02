@@ -23,7 +23,7 @@ export function useAuth() {
         },
         onSuccess: () => {
             queryClient.setQueryData(['auth'], null);
-            navigate({ to: '/' });
+            navigate({ to: '/', search: { year: 2025 } });
         },
     });
 
