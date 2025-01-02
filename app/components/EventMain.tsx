@@ -47,14 +47,17 @@ export function EventMain({ event }: { event: Event }) {
       )}
       <div className="w-full">
         {event.links?.length > 0 && (
-          <div>
-            <hr className="my-4" />
-            <h2>Links</h2>
-            <ul>
+          <div className="mt-4">
+            <h2 className="text-xl font-medium">Links</h2>
+            <ul className="mt-2 space-y-2 list-disc list-inside">
               {event.links.map((link) => {
                 return (
                   <li key={link.href}>
-                    <a href={link.href} target="_blank" rel="noreferrer">
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       {link.title}
                     </a>
                   </li>
