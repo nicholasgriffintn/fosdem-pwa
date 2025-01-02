@@ -20,10 +20,17 @@ export const Route = createFileRoute('/search/')({
       },
     ],
   }),
+  loader: async ({ context }) => {
+    return {
+      year: context.year,
+    };
+  },
 })
 
 export default function SearchPage() {
-  const { fosdemData, loading } = useFosdemData()
+  const { year } = Route.useLoaderData();
+
+  const { fosdemData, loading } = useFosdemData({ year })
   const search = useSearch({ from: '/search/' }) as SearchParams
   const query = search.q || ''
 

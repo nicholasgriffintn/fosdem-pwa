@@ -56,8 +56,8 @@ export function FeaturedFosdemImage({
           Licensed under {imageDetails.license} • <a href={imageDetails.original} target="_blank" rel="noopener noreferrer" className={`${showCaptionOnHover ? 'text-blue-300 hover:text-blue-200' : 'text-blue-500 hover:underline'}`}>View original</a>
         </span>
         {imageDetails.changes && (
-          <span className="text-xs block">
-            {imageDetails.changes}
+          <span className="text-xs block mt-2">
+            Changes: {imageDetails.changes}
           </span>
         )}
       </figcaption>

@@ -4,7 +4,7 @@ import { useProfile } from '~/hooks/use-user-me'
 import { PageHeader } from '~/components/PageHeader'
 import { ConferenceBadge } from '~/components/ConferenceBadge'
 import { Spinner } from "~/components/Spinner";
-import { constants } from '~/constants';
+
 export const Route = createFileRoute('/profile/')({
     component: ProfilePage,
     head: () => ({
@@ -15,9 +15,15 @@ export const Route = createFileRoute('/profile/')({
             },
         ],
     }),
+    loader: async ({ context }) => {
+        return {
+            year: context.year,
+        };
+    },
 })
 
 function ProfilePage() {
+    const { year } = Route.useLoaderData();
     const { user, loading } = useProfile()
 
     if (loading) {
@@ -36,7 +42,7 @@ function ProfilePage() {
         <div className="min-h-screen">
             <div className="relative py-6 lg:py-10">
                 <PageHeader heading="Profile" displayHeading={false} />
-                <ConferenceBadge user={user} conferenceYear={constants.YEAR} />
+                <ConferenceBadge user={user} conferenceYear={year} />
             </div>
         </div>
     )

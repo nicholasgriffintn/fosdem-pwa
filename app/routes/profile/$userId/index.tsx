@@ -4,7 +4,7 @@ import { useUserId } from '~/hooks/use-user-id'
 import { PageHeader } from '~/components/PageHeader'
 import { ConferenceBadge } from '~/components/ConferenceBadge'
 import { Spinner } from '~/components/Spinner'
-import { constants } from '~/constants'
+
 export const Route = createFileRoute('/profile/$userId/')({
     component: ProfilePage,
     head: () => ({
@@ -15,9 +15,16 @@ export const Route = createFileRoute('/profile/$userId/')({
             },
         ],
     }),
+    loader: async ({ context }) => {
+        return {
+            year: context.year,
+        };
+    },
 })
 
 function ProfilePage() {
+    const { year } = Route.useLoaderData();
+
     const { user, loading } = useUserId({
         userId: Route.useParams().userId,
     })
@@ -38,7 +45,7 @@ function ProfilePage() {
         <div className="min-h-screen">
             <div className="relative py-6 lg:py-10">
                 <PageHeader heading="Profile" displayHeading={false} />
-                <ConferenceBadge user={user} conferenceYear={constants.YEAR} />
+                <ConferenceBadge user={user} conferenceYear={year} />
             </div>
         </div>
     )

@@ -6,18 +6,17 @@ import { ShareButton } from '~/components/ShareButton'
 import { testLiveEvent } from '~/data/test-data'
 import { getAllData } from '~/functions/getFosdemData'
 import { EventMain } from '~/components/EventMain'
-import { constants } from '~/constants'
 
 export const Route = createFileRoute('/event/$slug')({
   component: TrackPage,
   validateSearch: ({ test }) => ({ test: test === true }),
   loaderDeps: ({ search: { test } }) => ({ test }),
-  loader: async ({ params, deps: { test } }) => {
+  loader: async ({ context, params, deps: { test } }) => {
     if (test) {
       return { fosdem: { event: testLiveEvent } }
     }
 
-    const fosdem = await getAllData({ data: { year: constants.YEAR } });
+    const fosdem = await getAllData({ data: { year: context.year } });
     return { fosdem: { event: fosdem.events[params.slug] } };
   },
   head: ({ loaderData }) => ({
