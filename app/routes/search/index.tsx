@@ -5,6 +5,7 @@ import { useFosdemData } from '~/hooks/use-fosdem-data'
 import { EventList } from '~/components/EventList'
 import { TrackList } from '~/components/TrackList'
 import { Spinner } from '~/components/Spinner'
+import { constants } from '../../constants'
 
 interface SearchParams {
   q?: string
@@ -20,19 +21,24 @@ export const Route = createFileRoute('/search/')({
       },
     ],
   }),
-  loader: async ({ context }) => {
+  validateSearch: ({ year, q }: { year: number, q: string }) => ({
+    year: constants.AVAILABLE_YEARS.includes(year) && year || constants.DEFAULT_YEAR,
+    q: q || ''
+  }),
+  loaderDeps: ({ search: { year, q } }) => ({ year, q }),
+  loader: async ({ deps: { year, q } }) => {
     return {
-      year: context.year,
+      year,
+      q,
     };
   },
 })
 
 export default function SearchPage() {
-  const { year } = Route.useLoaderData();
+  const { year, q } = Route.useLoaderData();
 
   const { fosdemData, loading } = useFosdemData({ year })
-  const search = useSearch({ from: '/search/' }) as SearchParams
-  const query = search.q || ''
+  const query = q || ''
 
   const getSearchResults = () => {
     if (!fosdemData || !query) return { tracks: [], events: [] }

@@ -22,7 +22,7 @@ interface User {
 
 interface ConferenceBadgeProps {
     user: User
-    conferenceYear: string
+    conferenceYear: number
 }
 
 export function ConferenceBadge({

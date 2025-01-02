@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
+import { constants } from '~/constants';
 import { Button } from "~/components/ui/button";
 
 export function NotFound() {
@@ -11,7 +12,7 @@ export function NotFound() {
           Go back
         </Button>
         <Button asChild variant="secondary">
-          <Link to="/">Home</Link>
+          <Link to="/" search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })}>Home</Link>
         </Button>
       </p>
     </div>

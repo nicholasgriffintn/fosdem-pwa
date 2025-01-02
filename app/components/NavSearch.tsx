@@ -17,7 +17,7 @@ interface SearchResult {
 }
 
 interface DocsSearchProps extends React.HTMLAttributes<HTMLFormElement> {
-  year: string;
+  year: number;
 }
 
 export function NavSearch({ year, className, ...props }: DocsSearchProps) {
@@ -97,10 +97,10 @@ export function NavSearch({ year, className, ...props }: DocsSearchProps) {
   const handleResultClick = (result: SearchResult) => {
     switch (result.type) {
       case 'track':
-        navigate({ to: '/track/$slug', params: { slug: result.item.id }, search: { test: false } });
+        navigate({ to: '/track/$slug', params: { slug: result.item.id }, search: { year } });
         break;
       case 'event':
-        navigate({ to: '/event/$slug', params: { slug: result.item.id }, search: { test: false } });
+        navigate({ to: '/event/$slug', params: { slug: result.item.id }, search: { year, test: false } });
         break;
     }
     setSearchResults([]);
@@ -115,7 +115,7 @@ export function NavSearch({ year, className, ...props }: DocsSearchProps) {
         setFocusedIndex(-1);
         navigate({
           to: '/search',
-          search: { q: inputValue.trim() }
+          search: { year, q: inputValue.trim() }
         });
         return;
       }
@@ -167,7 +167,7 @@ export function NavSearch({ year, className, ...props }: DocsSearchProps) {
           e.preventDefault();
           navigate({
             to: '/search',
-            search: { q: inputValue.trim() }
+            search: { year, q: inputValue.trim() }
           });
         }
         break;

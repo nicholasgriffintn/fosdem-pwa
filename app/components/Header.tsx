@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useSearch } from '@tanstack/react-router';
 
 import { Icons } from '~/components/Icons';
 import { MainNav } from '~/components/MainNav';
@@ -13,9 +13,14 @@ import {
 } from "~/components/ui/tooltip"
 import { useAuth } from '~/hooks/use-auth';
 import { Spinner } from "~/components/Spinner";
+import { constants } from '~/constants';
 
-export function Header({ year }: { year: string }) {
+export function Header() {
+  const { year } = useSearch({ strict: false, });
+  const selectedYear = Number(year) || constants.DEFAULT_YEAR;
+
   const { user, loading } = useAuth();
+
   const navItems = [
     {
       title: 'Home',
@@ -75,7 +80,7 @@ export function Header({ year }: { year: string }) {
                     <AvatarMenu user={user} />
                   ) : (
                     <Button variant="link" size="icon" className="h-7 w-7" asChild>
-                      <Link to="/signin">
+                      <Link to="/signin" search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })}>
                         <Icons.login className="h-7 w-7" width="7" height="7" />
                         <span className="sr-only">Sign In</span>
                       </Link>
@@ -89,7 +94,7 @@ export function Header({ year }: { year: string }) {
             </TooltipProvider>
           </nav>
           <div className="flex-1 sm:grow-0">
-            <NavSearch year={year} />
+            <NavSearch year={selectedYear} />
           </div>
         </div>
       </div>

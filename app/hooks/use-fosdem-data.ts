@@ -7,7 +7,7 @@ import { getAllData } from "~/functions/getFosdemData";
 export function useFosdemData({
   year,
 }: {
-  year: string;
+  year: number;
 }) {
   const { data: fosdemData, isLoading } = useQuery({
     queryKey: ['fosdem', 'full'],

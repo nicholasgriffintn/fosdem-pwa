@@ -26,7 +26,7 @@ const getFullData = async (year: string): Promise<Conference> => {
 export const getAllData = createServerFn({
   method: 'GET',
 })
-  .validator((data: { year: string }) => data)
+  .validator((data: { year: number }) => data)
   .handler(async (ctx: any) => {
     const data = await getFullData(ctx.data.year);
     return data;

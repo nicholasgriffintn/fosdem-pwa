@@ -27,7 +27,7 @@ const TanStackRouterDevtools =
       })),
     );
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient, year: string }>()({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       {
@@ -48,18 +48,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient, year
 });
 
 function RootComponent() {
-  const { queryClient, year } = Route.useRouteContext();
+  const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <RootDocument year={year}>
+      <RootDocument>
         <Outlet />
       </RootDocument>
     </QueryClientProvider>
   );
 }
 
-function RootDocument({ children, year }: { readonly children: React.ReactNode, year: string }) {
+function RootDocument({ children }: { readonly children: React.ReactNode }) {
   return (
     <html className="dark" lang="en">
       <head>
@@ -74,7 +74,7 @@ function RootDocument({ children, year }: { readonly children: React.ReactNode, 
         )}
       >
         <main className="flex min-h-screen flex-col">
-          <Header year={year} />
+          <Header />
           <div className="container flex-1">
             {children}
             <Toaster />

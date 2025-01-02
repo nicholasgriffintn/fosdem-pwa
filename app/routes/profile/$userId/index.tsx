@@ -4,6 +4,7 @@ import { useUserId } from '~/hooks/use-user-id'
 import { PageHeader } from '~/components/PageHeader'
 import { ConferenceBadge } from '~/components/ConferenceBadge'
 import { Spinner } from '~/components/Spinner'
+import { constants } from '~/constants';
 
 export const Route = createFileRoute('/profile/$userId/')({
     component: ProfilePage,
@@ -15,9 +16,11 @@ export const Route = createFileRoute('/profile/$userId/')({
             },
         ],
     }),
-    loader: async ({ context }) => {
+    validateSearch: ({ year }: { year: number }) => ({ year: constants.AVAILABLE_YEARS.includes(year) && year || constants.DEFAULT_YEAR }),
+    loaderDeps: ({ search: { year } }) => ({ year }),
+    loader: async ({ deps: { year } }) => {
         return {
-            year: context.year,
+            year,
         };
     },
 })
@@ -38,7 +41,7 @@ function ProfilePage() {
     }
 
     if (!user) {
-        return <Navigate to="/" />
+        return <Navigate to="/" search={{ year }} />
     }
 
     return (

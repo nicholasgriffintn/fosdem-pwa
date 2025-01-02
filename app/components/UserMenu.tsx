@@ -12,7 +12,7 @@ import {
 } from "~/components/ui/dropdown-menu"
 import { User as UserIcon } from 'lucide-react'
 import type { SessionUser } from "../server/auth";
-
+import { constants } from '~/constants';
 interface AvatarMenuProps {
   user: SessionUser
 }
@@ -39,7 +39,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/profile">View profile</Link>
+          <Link search={(prev) => ({ ...prev, year: prev.year || constants.DEFAULT_YEAR })} to="/profile">View profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <a href="/api/auth/logout">Sign out</a>
