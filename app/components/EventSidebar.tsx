@@ -19,6 +19,7 @@ export function EventSidebar({ event, isMobile = false }: { event: Event; isMobi
     <div className={sidebarClassName}>
       {event.abstract && (
         <div className={abstractClassName}>
+          {/* biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation> */}
           <div dangerouslySetInnerHTML={{ __html: event.abstract }} />
         </div>
       )}

@@ -38,29 +38,31 @@ function EventListItem({
 
   return (
     <div className={className}>
-      <div className="flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1">
-        <h3 className="font-semibold leading-none tracking-tight">
-          {event.title}
-        </h3>
-        <p className="text-gray-500">
-          {event.room} | {event.startTime} | {event.duration}
-          {event.persons?.length > 0 && ` | ${event.persons.join(', ')}`}
-        </p>
-      </div>
-      <div className="flex items-center pl-6 pr-3 gap-2">
-        <FavouriteButton
-          type="event"
-          slug={event.id}
-          status={event.isFavourited ? 'favourited' : 'unfavourited'}
-        />
-        <ShareButton
-          title={event.title}
-          text={`Check out ${event.title} at FOSDEM`}
-          url={`https://fosdempwa.com/event/${event.id}`}
-        />
-        <Button asChild className="w-full">
-          <Link to={`/event/${event.id}`}>View</Link>
-        </Button>
+      <div className="flex flex-col md:flex-row md:justify-between w-full">
+        <div className="flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1">
+          <h3 className="font-semibold leading-none tracking-tight">
+            {event.title}
+          </h3>
+          <p className="text-gray-500">
+            {event.room} | {event.startTime} | {event.duration}
+            {event.persons?.length > 0 && ` | ${event.persons.join(', ')}`}
+          </p>
+        </div>
+        <div className="flex items-center pl-1 pr-1 md:pl-6 md:pr-3 gap-2 pb-3 md:pb-0">
+          <FavouriteButton
+            type="event"
+            slug={event.id}
+            status={event.isFavourited ? 'favourited' : 'unfavourited'}
+          />
+          <ShareButton
+            title={event.title}
+            text={`Check out ${event.title} at FOSDEM`}
+            url={`https://fosdempwa.com/event/${event.id}`}
+          />
+          <Button variant="secondary" asChild className="w-full">
+            <Link to={`/event/${event.id}`}>View Event</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );

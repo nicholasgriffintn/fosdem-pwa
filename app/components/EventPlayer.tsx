@@ -86,6 +86,7 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
               </button>
             )}
             {isPlaying && (
+              // biome-ignore lint/a11y/useMediaCaption: <explanation>
               <video
                 ref={videoRef}
                 className="w-full h-full object-contain"
