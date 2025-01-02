@@ -7,6 +7,7 @@ export interface Conference {
 }
 
 export interface Track {
+    id: string;
     name: string;
     description: string;
     room: string;

@@ -11,13 +11,14 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as SigninImport } from './routes/signin'
-import { Route as BookmarksImport } from './routes/bookmarks'
 import { Route as IndexImport } from './routes/index'
+import { Route as SigninIndexImport } from './routes/signin/index'
+import { Route as SearchIndexImport } from './routes/search/index'
 import { Route as ProfileIndexImport } from './routes/profile/index'
 import { Route as OfflineIndexImport } from './routes/offline/index'
 import { Route as MapIndexImport } from './routes/map/index'
 import { Route as LiveIndexImport } from './routes/live/index'
+import { Route as BookmarksIndexImport } from './routes/bookmarks/index'
 import { Route as TypeSlugImport } from './routes/type/$slug'
 import { Route as TrackSlugImport } from './routes/track/$slug'
 import { Route as EventSlugImport } from './routes/event/$slug'
@@ -25,21 +26,21 @@ import { Route as ProfileUserIdIndexImport } from './routes/profile/$userId/inde
 
 // Create/Update Routes
 
-const SigninRoute = SigninImport.update({
-  id: '/signin',
-  path: '/signin',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const BookmarksRoute = BookmarksImport.update({
-  id: '/bookmarks',
-  path: '/bookmarks',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SigninIndexRoute = SigninIndexImport.update({
+  id: '/signin/',
+  path: '/signin/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SearchIndexRoute = SearchIndexImport.update({
+  id: '/search/',
+  path: '/search/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -64,6 +65,12 @@ const MapIndexRoute = MapIndexImport.update({
 const LiveIndexRoute = LiveIndexImport.update({
   id: '/live/',
   path: '/live/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BookmarksIndexRoute = BookmarksIndexImport.update({
+  id: '/bookmarks/',
+  path: '/bookmarks/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,20 +109,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/bookmarks': {
-      id: '/bookmarks'
-      path: '/bookmarks'
-      fullPath: '/bookmarks'
-      preLoaderRoute: typeof BookmarksImport
-      parentRoute: typeof rootRoute
-    }
-    '/signin': {
-      id: '/signin'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof SigninImport
-      parentRoute: typeof rootRoute
-    }
     '/event/$slug': {
       id: '/event/$slug'
       path: '/event/$slug'
@@ -135,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/type/$slug'
       fullPath: '/type/$slug'
       preLoaderRoute: typeof TypeSlugImport
+      parentRoute: typeof rootRoute
+    }
+    '/bookmarks/': {
+      id: '/bookmarks/'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof BookmarksIndexImport
       parentRoute: typeof rootRoute
     }
     '/live/': {
@@ -165,6 +165,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileIndexImport
       parentRoute: typeof rootRoute
     }
+    '/search/': {
+      id: '/search/'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/signin/': {
+      id: '/signin/'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/profile/$userId/': {
       id: '/profile/$userId/'
       path: '/profile/$userId'
@@ -179,44 +193,47 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/bookmarks': typeof BookmarksRoute
-  '/signin': typeof SigninRoute
   '/event/$slug': typeof EventSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
+  '/bookmarks': typeof BookmarksIndexRoute
   '/live': typeof LiveIndexRoute
   '/map': typeof MapIndexRoute
   '/offline': typeof OfflineIndexRoute
   '/profile': typeof ProfileIndexRoute
+  '/search': typeof SearchIndexRoute
+  '/signin': typeof SigninIndexRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/bookmarks': typeof BookmarksRoute
-  '/signin': typeof SigninRoute
   '/event/$slug': typeof EventSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
+  '/bookmarks': typeof BookmarksIndexRoute
   '/live': typeof LiveIndexRoute
   '/map': typeof MapIndexRoute
   '/offline': typeof OfflineIndexRoute
   '/profile': typeof ProfileIndexRoute
+  '/search': typeof SearchIndexRoute
+  '/signin': typeof SigninIndexRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/bookmarks': typeof BookmarksRoute
-  '/signin': typeof SigninRoute
   '/event/$slug': typeof EventSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
+  '/bookmarks/': typeof BookmarksIndexRoute
   '/live/': typeof LiveIndexRoute
   '/map/': typeof MapIndexRoute
   '/offline/': typeof OfflineIndexRoute
   '/profile/': typeof ProfileIndexRoute
+  '/search/': typeof SearchIndexRoute
+  '/signin/': typeof SigninIndexRoute
   '/profile/$userId/': typeof ProfileUserIdIndexRoute
 }
 
@@ -224,70 +241,75 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/bookmarks'
-    | '/signin'
     | '/event/$slug'
     | '/track/$slug'
     | '/type/$slug'
+    | '/bookmarks'
     | '/live'
     | '/map'
     | '/offline'
     | '/profile'
+    | '/search'
+    | '/signin'
     | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/bookmarks'
-    | '/signin'
     | '/event/$slug'
     | '/track/$slug'
     | '/type/$slug'
+    | '/bookmarks'
     | '/live'
     | '/map'
     | '/offline'
     | '/profile'
+    | '/search'
+    | '/signin'
     | '/profile/$userId'
   id:
     | '__root__'
     | '/'
-    | '/bookmarks'
-    | '/signin'
     | '/event/$slug'
     | '/track/$slug'
     | '/type/$slug'
+    | '/bookmarks/'
     | '/live/'
     | '/map/'
     | '/offline/'
     | '/profile/'
+    | '/search/'
+    | '/signin/'
     | '/profile/$userId/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BookmarksRoute: typeof BookmarksRoute
-  SigninRoute: typeof SigninRoute
   EventSlugRoute: typeof EventSlugRoute
   TrackSlugRoute: typeof TrackSlugRoute
   TypeSlugRoute: typeof TypeSlugRoute
+  BookmarksIndexRoute: typeof BookmarksIndexRoute
   LiveIndexRoute: typeof LiveIndexRoute
   MapIndexRoute: typeof MapIndexRoute
   OfflineIndexRoute: typeof OfflineIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
+  SearchIndexRoute: typeof SearchIndexRoute
+  SigninIndexRoute: typeof SigninIndexRoute
   ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BookmarksRoute: BookmarksRoute,
-  SigninRoute: SigninRoute,
   EventSlugRoute: EventSlugRoute,
   TrackSlugRoute: TrackSlugRoute,
   TypeSlugRoute: TypeSlugRoute,
+  BookmarksIndexRoute: BookmarksIndexRoute,
   LiveIndexRoute: LiveIndexRoute,
   MapIndexRoute: MapIndexRoute,
   OfflineIndexRoute: OfflineIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
+  SearchIndexRoute: SearchIndexRoute,
+  SigninIndexRoute: SigninIndexRoute,
   ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
 }
 
@@ -302,26 +324,21 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/bookmarks",
-        "/signin",
         "/event/$slug",
         "/track/$slug",
         "/type/$slug",
+        "/bookmarks/",
         "/live/",
         "/map/",
         "/offline/",
         "/profile/",
+        "/search/",
+        "/signin/",
         "/profile/$userId/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/bookmarks": {
-      "filePath": "bookmarks.tsx"
-    },
-    "/signin": {
-      "filePath": "signin.tsx"
     },
     "/event/$slug": {
       "filePath": "event/$slug.tsx"
@@ -331,6 +348,9 @@ export const routeTree = rootRoute
     },
     "/type/$slug": {
       "filePath": "type/$slug.tsx"
+    },
+    "/bookmarks/": {
+      "filePath": "bookmarks/index.tsx"
     },
     "/live/": {
       "filePath": "live/index.tsx"
@@ -343,6 +363,12 @@ export const routeTree = rootRoute
     },
     "/profile/": {
       "filePath": "profile/index.tsx"
+    },
+    "/search/": {
+      "filePath": "search/index.tsx"
+    },
+    "/signin/": {
+      "filePath": "signin/index.tsx"
     },
     "/profile/$userId/": {
       "filePath": "profile/$userId/index.tsx"
