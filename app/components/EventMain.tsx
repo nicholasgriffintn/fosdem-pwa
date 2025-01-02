@@ -9,9 +9,9 @@ import {
   ResizablePanelGroup,
 } from '~/components/ui/resizable'
 import { useWindowSize } from '~/hooks/use-window-size'
-import type { Event } from '~/types/fosdem'
+import type { Event, ConferenceData } from '~/types/fosdem'
 
-export function EventMain({ event }: { event: Event }) {
+export function EventMain({ event, conference }: { event: Event, conference: ConferenceData }) {
   const { width } = useWindowSize()
 
   return (
@@ -20,7 +20,7 @@ export function EventMain({ event }: { event: Event }) {
         <div className="space-y-4">
           <div className="overflow-hidden rounded-lg border bg-card">
             <div className="w-full">
-              <EventPlayer event={event} isMobile />
+              <EventPlayer event={event} isMobile conference={conference} />
             </div>
             {event.chat && <ChatAlert chatUrl={event.chat} />}
           </div>
@@ -34,7 +34,7 @@ export function EventMain({ event }: { event: Event }) {
           <ResizablePanel defaultSize={75}>
             <div className="h-full flex flex-col">
               <div className="flex-1">
-                <EventPlayer event={event} />
+                <EventPlayer event={event} conference={conference} />
               </div>
               {event.chat && <ChatAlert chatUrl={event.chat} />}
             </div>
