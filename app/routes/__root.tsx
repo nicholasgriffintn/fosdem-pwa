@@ -9,7 +9,6 @@ import {
 import { Meta, Scripts } from "@tanstack/start";
 import { lazy, Suspense } from "react";
 import { QueryClientProvider } from '@tanstack/react-query';
-import { YearProvider } from '~/context/year';
 
 import appCss from "~/styles/app.css?url";
 import { cn } from "~/lib/utils";
@@ -53,11 +52,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <YearProvider>
-        <RootDocument year={year}>
-          <Outlet />
-        </RootDocument>
-      </YearProvider>
+      <RootDocument year={year}>
+        <Outlet />
+      </RootDocument>
     </QueryClientProvider>
   );
 }
