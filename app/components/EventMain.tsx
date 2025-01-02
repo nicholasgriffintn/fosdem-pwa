@@ -9,7 +9,7 @@ import {
   ResizablePanelGroup,
 } from '~/components/ui/resizable'
 import { useWindowSize } from '~/hooks/use-window-size'
-import { Event } from '~/functions/getFosdemData'
+import type { Event } from '~/types/fosdem'
 
 export function EventMain({ event }: { event: Event }) {
   const { width } = useWindowSize()
@@ -45,6 +45,25 @@ export function EventMain({ event }: { event: Event }) {
           </ResizablePanel>
         </ResizablePanelGroup>
       )}
+      <div className="w-full">
+        {event.links?.length > 0 && (
+          <div>
+            <hr className="my-4" />
+            <h2>Links</h2>
+            <ul>
+              {event.links.map((link) => {
+                return (
+                  <li key={link.href}>
+                    <a href={link.href} target="_blank" rel="noreferrer">
+                      {link.title}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </div>
     </>
   )
 }
