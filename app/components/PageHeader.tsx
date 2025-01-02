@@ -27,7 +27,7 @@ export function PageHeader({ heading, text, className, children, displayHeading 
           </div>
         )}
       </div>
-      {displayHeading && <hr className="my-4" />}
+      {displayHeading && <div className="my-4" />}
     </>
   );
 }
