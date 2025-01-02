@@ -140,8 +140,8 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
                     </a>
                   </span>
                   {fosdemImageDetails[event.type as FosdemImageType].changes && (
-                    <span className="text-xs block">
-                      {fosdemImageDetails[event.type as FosdemImageType].changes}
+                    <span className="text-xs block mt-1">
+                      Changes: {fosdemImageDetails[event.type as FosdemImageType].changes}
                     </span>
                   )}
                 </>
