@@ -96,13 +96,13 @@ export default function SearchPage() {
           {tracks.length > 0 && (
             <section>
               <h2 className="text-xl font-semibold mb-4">Tracks</h2>
-              <TrackList tracks={formattedTracks} />
+              <TrackList tracks={formattedTracks} year={year} />
             </section>
           )}
           {events.length > 0 && (
             <section>
               <h2 className="text-xl font-semibold mb-4">Events</h2>
-              <EventList events={formattedEvents} />
+              <EventList events={formattedEvents} year={year} />
             </section>
           )}
         </div>

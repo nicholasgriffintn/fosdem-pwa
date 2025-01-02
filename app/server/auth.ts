@@ -128,7 +128,7 @@ export async function getFullAuthSession() {
     return { session: null, user: null };
   }
 
-  if (user && user.email) {
+  if (user?.email) {
     const userData = await db.select().from(userTable).where(eq(userTable.email, user.email));
     return { session, user: userData[0] };
   }

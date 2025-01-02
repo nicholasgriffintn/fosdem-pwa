@@ -20,13 +20,16 @@ type EventListProps = {
   favourites?: {
     [key: string]: string;
   }[];
+  year: number;
 };
 
 function EventListItem({
+  year,
   event,
   index,
   isLast,
 }: {
+  year: number;
   event: EventListItem;
   index: number;
   isLast: boolean;
@@ -50,6 +53,7 @@ function EventListItem({
         </div>
         <div className="flex items-center pl-1 pr-1 md:pl-6 md:pr-3 gap-2 pb-3 md:pb-0">
           <FavouriteButton
+            year={year}
             type="event"
             slug={event.id}
             status={event.isFavourited ? 'favourited' : 'unfavourited'}
@@ -68,7 +72,7 @@ function EventListItem({
   );
 }
 
-export function EventList({ events, favourites }: EventListProps) {
+export function EventList({ events, favourites, year }: EventListProps) {
   const eventsWithFavourites = events?.length
     ? events.map((event) => {
       return {
@@ -86,6 +90,7 @@ export function EventList({ events, favourites }: EventListProps) {
         eventsWithFavourites.map((event, index) => (
           <li key={event.id}>
             <EventListItem
+              year={year}
               event={event}
               index={index}
               isLast={events.length === index + 1}

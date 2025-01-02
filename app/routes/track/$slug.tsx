@@ -30,7 +30,7 @@ export const Route = createFileRoute('/track/$slug')({
 
     const eventDataSplitByDay = groupByDay(eventData, event => event.day);
 
-    return { fosdem: { days, track, type, eventDataSplitByDay } };
+    return { fosdem: { days, track, type, eventDataSplitByDay }, year };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -44,7 +44,7 @@ export const Route = createFileRoute('/track/$slug')({
 })
 
 function TrackPage() {
-  const { fosdem } = Route.useLoaderData()
+  const { fosdem, year } = Route.useLoaderData()
 
   if (!fosdem.track || !fosdem.type) {
     return (
@@ -98,7 +98,7 @@ function TrackPage() {
 
             return (
               <TabsContent key={day.id} value={day.id}>
-                <EventList events={event} />
+                <EventList events={event} year={year} />
               </TabsContent>
             );
           })}
