@@ -16,13 +16,13 @@ export const Route = createFileRoute('/live/')({
   loaderDeps: ({ search: { test, year } }) => ({ test, year }),
   loader: async ({ deps: { test, year } }) => {
     if (test) {
-      return { liveEvents: [testLiveEvent] };
+      return { liveEvents: [testLiveEvent], year };
     }
     const data = await getAllData({ data: { year } }) as Conference;
     const liveEvents = Object.values(data.events).filter(
       (event: Event) => event.isLive
     );
-    return { liveEvents };
+    return { liveEvents, year };
   },
   head: () => ({
     meta: [
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/live/')({
 })
 
 function LivePage() {
-  const { liveEvents } = Route.useLoaderData()
+  const { liveEvents, year } = Route.useLoaderData()
 
   return (
     <div className="min-h-screen">
@@ -47,7 +47,7 @@ function LivePage() {
         />
         <div className="w-full">
           {liveEvents.length > 0 ? (
-            <EventList events={liveEvents} />
+            <EventList events={liveEvents} year={year} />
           ) : (
             <div>No live events found</div>
           )}

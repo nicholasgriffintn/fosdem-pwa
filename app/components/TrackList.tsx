@@ -18,13 +18,16 @@ type TrackListProps = {
   favourites?: {
     [key: string]: string;
   }[];
+  year: number;
 };
 
 function TrackListItem({
+  year,
   track,
   index,
   isLast,
 }: {
+  year: number;
   track: TrackListItem;
   index: number;
   isLast: boolean;
@@ -47,6 +50,7 @@ function TrackListItem({
         </div>
         <div className="flex items-center pl-1 pr-1 md:pl-6 md:pr-3 gap-2 pb-3 md:pb-0">
           <FavouriteButton
+            year={year}
             type="track"
             slug={track.id}
             status={track.isFavourited ? 'favourited' : 'unfavourited'}
@@ -65,7 +69,7 @@ function TrackListItem({
   );
 }
 
-export function TrackList({ tracks, favourites }: TrackListProps) {
+export function TrackList({ tracks, favourites, year }: TrackListProps) {
   const tracksWithFavourites = tracks?.length
     ? tracks.map((track) => {
       return {
@@ -83,6 +87,7 @@ export function TrackList({ tracks, favourites }: TrackListProps) {
         tracksWithFavourites.map((track, index) => (
           <li key={track.id}>
             <TrackListItem
+              year={year}
               track={track}
               index={index}
               isLast={tracks.length === index + 1}

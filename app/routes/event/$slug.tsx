@@ -17,11 +17,11 @@ export const Route = createFileRoute('/event/$slug')({
   loaderDeps: ({ search: { test, year } }) => ({ test, year }),
   loader: async ({ params, deps: { test, year } }) => {
     if (test) {
-      return { fosdem: { event: testLiveEvent } }
+      return { fosdem: { event: testLiveEvent }, conference: {}, year };
     }
 
     const fosdem = await getAllData({ data: { year } });
-    return { fosdem: { event: fosdem.events[params.slug], conference: fosdem.conference } };
+    return { fosdem: { event: fosdem.events[params.slug], conference: fosdem.conference }, year };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -35,7 +35,7 @@ export const Route = createFileRoute('/event/$slug')({
 })
 
 function TrackPage() {
-  const { fosdem } = Route.useLoaderData()
+  const { fosdem, year } = Route.useLoaderData()
 
   if (!fosdem.event?.title || !fosdem.conference) {
     return (
@@ -62,8 +62,9 @@ function TrackPage() {
         >
           <div className="flex items-center md:pl-6 md:pr-3 gap-2">
             <FavouriteButton
+              year={year}
               type="event"
-              slug={fosdem.event.slug}
+              slug={fosdem.event.id}
               status={isFavourite?.status ?? 'unfavourited'}
             />
             <ShareButton
