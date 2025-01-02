@@ -14,7 +14,7 @@ import {
 import { useAuth } from '~/hooks/use-auth';
 import { Spinner } from "~/components/Spinner";
 
-export function Header() {
+export function Header({ year }: { year: string }) {
   const { user, loading } = useAuth();
   const navItems = [
     {
@@ -89,7 +89,7 @@ export function Header() {
             </TooltipProvider>
           </nav>
           <div className="flex-1 sm:grow-0">
-            <NavSearch />
+            <NavSearch year={year} />
           </div>
         </div>
       </div>

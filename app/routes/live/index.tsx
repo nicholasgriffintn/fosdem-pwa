@@ -5,17 +5,16 @@ import { EventList } from '~/components/EventList'
 import { getAllData } from '~/functions/getFosdemData'
 import { testLiveEvent } from '~/data/test-data'
 import type { Conference, Event } from '~/types/fosdem'
-import { constants } from '~/constants'
 
 export const Route = createFileRoute('/live/')({
   component: LivePage,
   validateSearch: ({ test }) => ({ test: test === true }),
   loaderDeps: ({ search: { test } }) => ({ test }),
-  loader: async ({ deps: { test } }) => {
+  loader: async ({ context, deps: { test } }) => {
     if (test) {
       return { liveEvents: [testLiveEvent] };
     }
-    const data = await getAllData({ data: { year: constants.YEAR } }) as Conference;
+    const data = await getAllData({ data: { year: context.year } }) as Conference;
     const liveEvents = Object.values(data.events).filter(
       (event: Event) => event.isLive
     );

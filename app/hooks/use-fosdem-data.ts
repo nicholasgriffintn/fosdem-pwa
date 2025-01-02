@@ -3,15 +3,18 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { getAllData } from "~/functions/getFosdemData";
-import { constants } from '~/constants';
 
-export function useFosdemData() {
+export function useFosdemData({
+  year,
+}: {
+  year: string;
+}) {
   const { data: fosdemData, isLoading } = useQuery({
     queryKey: ['fosdem', 'full'],
     queryFn: async () => {
       const data = await getAllData({
         data: {
-          year: constants.YEAR,
+          year,
         },
       });
 

@@ -9,6 +9,7 @@ import {
 import { Meta, Scripts } from "@tanstack/start";
 import { lazy, Suspense } from "react";
 import { QueryClientProvider } from '@tanstack/react-query';
+import { YearProvider } from '~/context/year';
 
 import appCss from "~/styles/app.css?url";
 import { cn } from "~/lib/utils";
@@ -27,7 +28,7 @@ const TanStackRouterDevtools =
       })),
     );
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient, year: string }>()({
   head: () => ({
     meta: [
       {
@@ -48,20 +49,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
+  const { queryClient, year } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
+      <YearProvider>
+        <RootDocument year={year}>
+          <Outlet />
+        </RootDocument>
+      </YearProvider>
     </QueryClientProvider>
   );
 }
 
-function RootDocument({ children }: { readonly children: React.ReactNode }) {
+function RootDocument({ children, year }: { readonly children: React.ReactNode, year: string }) {
   return (
-    <html className="dark">
+    <html className="dark" lang="en">
       <head>
         <Meta />
         <link rel="manifest" href="/manifest.webmanifest" />
@@ -74,7 +77,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
         )}
       >
         <main className="flex min-h-screen flex-col">
-          <Header />
+          <Header year={year} />
           <div className="container flex-1">
             {children}
             <Toaster />
