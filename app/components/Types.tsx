@@ -9,14 +9,16 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
-import { Image } from '~/components/Image';
+import { FeaturedFosdemImage } from '~/components/FeaturedFosdemImage';
+
+type FosdemImageType = "keynote" | "maintrack" | "devroom" | "lightningtalk" | "other";
 
 export function Types({
   types,
 }: {
   types: {
     [key: string]: {
-      id: string;
+      id: FosdemImageType;
       name: string;
       trackCount: number;
     };
@@ -44,11 +46,12 @@ export function Types({
                 </CardDescription>
               </CardHeader>
               <CardContent className="w-full">
-                <Image
-                  src={`/images/${types[typeKey].id}-featured.jpg`}
-                  alt={types[typeKey].name}
+                <FeaturedFosdemImage
+                  type={types[typeKey].id}
+                  size="featured"
                   className="w-full rounded-md"
                   loading="lazy"
+                  showCaptionOnHover
                 />
               </CardContent>
               <CardFooter>
