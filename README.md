@@ -24,14 +24,12 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] A page to view your bookmarked tracks and events
 - [x] A page for finding live events
 - [x] A map page
-- [ ] A search page
+- [x] A search page
 - [x] Data synced automatically from FOSDEM on a schedule, deployed separately [here](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)
 
 ## TODO
 
 - [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
-- [ ] Images are loading in on the homepage with layout shift
-- [ ] maybe get some new images?
 
 ## Contributing
 

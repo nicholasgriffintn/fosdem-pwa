@@ -4,7 +4,7 @@ import { getAllData } from '~/functions/getFosdemData'
 import { PageHeader } from '~/components/PageHeader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { EventList } from '~/components/EventList'
-import { Conference, Event } from '~/types/fosdem'
+import type { Conference, Event } from '~/types/fosdem'
 import { groupByDay } from '~/lib/fosdem'
 
 function get24HrFormat(str: string) {
@@ -79,7 +79,7 @@ function TrackPage() {
               )
             }
 
-            const event = fosdem.eventDataSplitByDay[day.id]?.sort(function (a, b) {
+            const event = fosdem.eventDataSplitByDay[day.id]?.sort((a, b) => {
               const t1 = get24HrFormat(a.startTime);
               const t2 = get24HrFormat(b.startTime);
               return t1 > t2 ? 1 : t1 < t2 ? -1 : 0;

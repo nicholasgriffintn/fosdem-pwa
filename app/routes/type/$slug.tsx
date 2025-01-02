@@ -4,7 +4,7 @@ import { getAllData } from "~/functions/getFosdemData";
 import { PageHeader } from "~/components/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { TrackList } from '~/components/TrackList';
-import { Conference, Track } from '~/types/fosdem';
+import type { Conference, Track } from '~/types/fosdem';
 import { groupByDay } from '~/lib/fosdem';
 
 export const Route = createFileRoute("/type/$slug")({
