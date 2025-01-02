@@ -10,15 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { User } from 'lucide-react'
-import { SessionUser } from "../server/auth";
-
-interface User {
-  id: number
-  name: string
-  avatar_url: string
-  email: string
-}
+import { User as UserIcon } from 'lucide-react'
+import type { SessionUser } from "../server/auth";
 
 interface AvatarMenuProps {
   user: SessionUser
@@ -31,7 +24,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
         <Avatar className="h-7 w-7">
           <AvatarImage src={user.avatar_url ?? undefined} alt={user.name ?? undefined} />
           <AvatarFallback>
-            <User className="h-4 w-4" />
+            <UserIcon className="h-4 w-4" />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { Event } from '~/functions/getFosdemData';
+import type { Event } from '~/types/fosdem';
 
 export function EventSidebar({ event, isMobile = false }: { event: Event; isMobile?: boolean }) {
   const sidebarClassName = clsx('h-full', {
@@ -11,7 +11,7 @@ export function EventSidebar({ event, isMobile = false }: { event: Event; isMobi
   const abstractClassName = clsx(
     'w-full prose prose-lg prose-indigo overflow-scroll',
     {
-      'max-h-[420px]': !isMobile,
+      'max-h-[465px]': !isMobile,
     }
   );
 
@@ -20,23 +20,6 @@ export function EventSidebar({ event, isMobile = false }: { event: Event; isMobi
       {event.abstract && (
         <div className={abstractClassName}>
           <div dangerouslySetInnerHTML={{ __html: event.abstract }} />
-        </div>
-      )}
-      {event.links?.length > 0 && (
-        <div>
-          <hr className="my-4" />
-          <h2>Links</h2>
-          <ul>
-            {event.links.map((link) => {
-              return (
-                <li key={link.href}>
-                  <a href={link.href} target="_blank" rel="noreferrer">
-                    {link.title}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
         </div>
       )}
     </div>
