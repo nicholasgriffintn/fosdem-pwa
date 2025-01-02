@@ -21,7 +21,7 @@ export const Route = createFileRoute('/event/$slug')({
     }
 
     const fosdem = await getAllData({ data: { year } });
-    return { fosdem: { event: fosdem.events[params.slug] } };
+    return { fosdem: { event: fosdem.events[params.slug], conference: fosdem.conference } };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -37,7 +37,7 @@ export const Route = createFileRoute('/event/$slug')({
 function TrackPage() {
   const { fosdem } = Route.useLoaderData()
 
-  if (!fosdem.event?.title) {
+  if (!fosdem.event?.title || !fosdem.conference) {
     return (
       <div className="min-h-screen">
         <div className="relative py-6 lg:py-10">
@@ -74,7 +74,7 @@ function TrackPage() {
           </div>
         </PageHeader>
         <div className="w-full">
-          <EventMain event={fosdem.event} />
+          <EventMain event={fosdem.event} conference={fosdem.conference} />
         </div>
       </div>
     </div>

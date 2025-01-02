@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
 import { Play } from 'lucide-react';
 
-import type { Event } from '~/types/fosdem';
+import type { ConferenceData, Event } from '~/types/fosdem';
 import { FeaturedFosdemImage } from '~/components/FeaturedFosdemImage';
 import { fosdemImageDetails } from "~/data/fosdem-image-details";
 
@@ -13,18 +13,41 @@ type FosdemImageType = "keynote" | "maintrack" | "devroom" | "lightningtalk" | "
 
 interface EventPlayerProps {
   event: Event;
+  conference: ConferenceData;
   isMobile?: boolean;
   onClose?: () => void;
   isFloating?: boolean;
 }
 
-export function EventPlayer({ event, isMobile = false, onClose, isFloating = false }: EventPlayerProps) {
+export function EventPlayer({ event, conference, isMobile = false, onClose, isFloating = false }: EventPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const videoRecordings = event.links?.filter(link => link.type?.startsWith('video/')) || [];
   const hasRecordings = videoRecordings.length > 0;
+
+  const isEventInPast = () => {
+    try {
+      const conferenceStartDate = new Date(conference.start._text);
+      const eventDay = Number.parseInt(event.day) - 1;
+      const [hours, minutes] = event.startTime.split(':').map(Number);
+      const [durationHours, durationMinutes] = event.duration.split(':').map(Number);
+
+      const eventStart = new Date(conferenceStartDate);
+      eventStart.setDate(eventStart.getDate() + eventDay);
+      eventStart.setHours(hours, minutes, 0);
+
+      const eventEnd = new Date(eventStart);
+      eventEnd.setHours(eventStart.getHours() + durationHours);
+      eventEnd.setMinutes(eventStart.getMinutes() + durationMinutes);
+
+      return new Date() > eventEnd;
+    } catch (error) {
+      console.error('Error calculating event end time:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     if (!videoRef.current || !isPlaying) return;
@@ -122,7 +145,12 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
         ) : (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 transition-colors">
             <div className="p-6 relative bg-muted rounded-md">
-              <span>The stream isn't available yet! Check back at {event.startTime}.</span>
+              <span>
+                {isEventInPast()
+                  ? "This event has ended and no recording is available yet, it may be available in the future."
+                  : `The stream isn't available yet! Check back at ${event.startTime}.`
+                }
+              </span>
 
               {fosdemImageDetails[event.type as FosdemImageType] && (
                 <>

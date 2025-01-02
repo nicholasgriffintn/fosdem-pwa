@@ -1,5 +1,32 @@
+export interface ConferenceData {
+    title: {
+        _text: string;
+    },
+    subtitle: {
+        _text: string;
+    },
+    city: {
+        _text: string;
+    },
+    end: {
+        _text: string;
+    },
+    start: {
+        _text: string;
+    },
+    days: {
+        _text: string;
+    },
+    day_change: {
+        _text: string;
+    },
+    timeslot_duration: {
+        _text: string;
+    },
+}
+
 export interface Conference {
-    conference: any;
+    conference: ConferenceData;
     types: Record<string, any>;
     days: Record<string, any>;
     tracks: Record<string, Track>;
@@ -36,7 +63,7 @@ export interface Event {
         title: string;
         type: string;
     }[];
-    day: string[];
+    day: string;
     trackKey: string;
     isLive: boolean;
     status: string;
