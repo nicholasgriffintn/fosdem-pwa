@@ -10,9 +10,12 @@ import { constants } from "../../constants";
 
 export const Route = createFileRoute("/type/$slug")({
   component: TypePage,
-  validateSearch: ({ year }: { year: number }) => ({ year: constants.AVAILABLE_YEARS.includes(year) && year || constants.DEFAULT_YEAR }),
-  loaderDeps: ({ search: { year } }) => ({ year }),
-  loader: async ({ params, deps: { year } }) => {
+  validateSearch: ({ year, day }: { year: number, day: string }) => ({
+    year: constants.AVAILABLE_YEARS.includes(year) && year || constants.DEFAULT_YEAR,
+    day: day || null
+  }),
+  loaderDeps: ({ search: { year, day } }) => ({ year, day }),
+  loader: async ({ params, deps: { year, day } }) => {
     const data = await getAllData({ data: { year } }) as Conference;
     const days = Object.values(data.days);
     const type = data.types[params.slug];
@@ -23,7 +26,7 @@ export const Route = createFileRoute("/type/$slug")({
 
     const trackDataSplitByDay = groupByDay(trackData, track => track.day);
 
-    return { fosdem: { days, type, trackDataSplitByDay }, year };
+    return { fosdem: { days, type, trackDataSplitByDay }, year, day };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -37,7 +40,7 @@ export const Route = createFileRoute("/type/$slug")({
 });
 
 function TypePage() {
-  const { fosdem, year } = Route.useLoaderData();
+  const { fosdem, year, day } = Route.useLoaderData();
 
   if (!fosdem.type) {
     return (
@@ -53,7 +56,7 @@ function TypePage() {
     <div className="min-h-screen" >
       <div className="relative py-6 lg:py-10" >
         <PageHeader heading={fosdem.type.name} />
-        <Tabs defaultValue={fosdem.days[0].id} className="w-full">
+        <Tabs defaultValue={day ? day.toString() : fosdem.days[0].id} className="w-full">
           <TabsList>
             {fosdem.days.map((day) => {
               return (
