@@ -46,13 +46,15 @@ export function Types({
                 </CardDescription>
               </CardHeader>
               <CardContent className="w-full">
-                <FeaturedFosdemImage
-                  type={types[typeKey].id}
-                  size="featured"
-                  className="w-full rounded-md"
-                  loading="lazy"
-                  showCaptionOnHover
-                />
+                <div className="min-h-[302px] bg-muted rounded-md">
+                  <FeaturedFosdemImage
+                    type={types[typeKey].id}
+                    size="featured"
+                    className="w-full rounded-md"
+                    loading="lazy"
+                    showCaptionOnHover
+                  />
+                </div>
               </CardContent>
               <CardFooter>
                 <Button variant="secondary" asChild className="w-full no-underline">

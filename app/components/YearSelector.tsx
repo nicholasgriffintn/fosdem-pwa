@@ -28,6 +28,7 @@ export function YearSelector() {
       <Select
         value={selectedYear}
         onValueChange={(value) => handleYearChange(value)}
+        disabled={true}
       >
         <SelectTrigger>
           <SelectValue placeholder="Select year" />
