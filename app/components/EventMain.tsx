@@ -18,7 +18,7 @@ export function EventMain({ event }: { event: Event }) {
     <>
       {width < 768 ? (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-lg bg-card">
+          <div className="overflow-hidden rounded-lg border bg-card">
             <div className="w-full">
               <EventPlayer event={event} isMobile />
             </div>

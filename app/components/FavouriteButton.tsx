@@ -35,7 +35,7 @@ export function FavouriteButton({
   };
 
   return (
-    <Button variant="ghost" onClick={handleFavourite}>
+    <Button variant="outline" onClick={handleFavourite}>
       <Icons.star
         className={currentStatus === 'favourited' ? 'icon--filled' : ''}
       />

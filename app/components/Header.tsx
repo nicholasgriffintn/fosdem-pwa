@@ -25,6 +25,7 @@ export function Header() {
     {
       title: 'Live',
       href: '/live',
+      // biome-ignore lint/a11y/useMediaCaption: <explanation>
       icon: <Icons.video className="h-4 w-4" />,
     },
     {

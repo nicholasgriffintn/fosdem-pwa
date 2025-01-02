@@ -64,7 +64,7 @@ export function ShareButton({
   };
 
   return (
-    <Button variant="ghost" onClick={handleShare}>
+    <Button variant="outline" onClick={handleShare}>
       <Icons.share className="h-4 w-4" />
     </Button>
   );

@@ -57,7 +57,7 @@ function TrackPage() {
           text={`Day ${fosdem.event.day} | ${fosdem.event.startTime} | ${fosdem.event.duration} | ${fosdem.event.room
             }${fosdem.event.persons?.length > 0 && ` | ${fosdem.event.persons.join(', ')}`}`}
         >
-          <div className="flex items-center pl-6 pr-3 gap-2">
+          <div className="flex items-center md:pl-6 md:pr-3 gap-2">
             <FavouriteButton
               type="event"
               slug={fosdem.event.slug}
