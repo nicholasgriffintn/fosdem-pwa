@@ -6,8 +6,8 @@ import useRafState from './use-ref-state';
 import { isBrowser, off, on } from '~/lib/utils';
 
 export const useWindowSize = (
-  initialWidth = Infinity,
-  initialHeight = Infinity
+  initialWidth = Number.POSITIVE_INFINITY,
+  initialHeight = Number.POSITIVE_INFINITY
 ) => {
   const [state, setState] = useRafState<{ width: number; height: number }>({
     width: isBrowser ? window.innerWidth : initialWidth,

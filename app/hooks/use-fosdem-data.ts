@@ -10,7 +10,7 @@ export function useFosdemData({
   year: number;
 }) {
   const { data: fosdemData, isLoading } = useQuery({
-    queryKey: ['fosdem', 'full'],
+    queryKey: ['fosdem', 'full', year],
     queryFn: async () => {
       const data = await getAllData({
         data: {
