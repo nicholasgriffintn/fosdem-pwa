@@ -6,11 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { TrackList } from '~/components/TrackList';
 import type { Conference, Track } from '~/types/fosdem';
 import { groupByDay } from '~/lib/fosdem';
-
+import { constants } from '~/constants';
 export const Route = createFileRoute("/type/$slug")({
   component: TypePage,
   loader: async ({ params }) => {
-    const data = await getAllData({ data: { year: '2025' } }) as Conference;
+    const data = await getAllData({ data: { year: constants.YEAR } }) as Conference;
     const days = Object.values(data.days);
     const type = data.types[params.slug];
 

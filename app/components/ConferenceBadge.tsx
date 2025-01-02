@@ -6,6 +6,7 @@ import { Card } from "~/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Badge } from "~/components/ui/badge"
 import { Icons } from './Icons'
+import { constants } from '~/constants'
 
 interface User {
     id: number
@@ -27,7 +28,7 @@ interface ConferenceBadgeProps {
 
 export function ConferenceBadge({
     user,
-    conferenceYear = "2025"
+    conferenceYear = constants.YEAR
 }: ConferenceBadgeProps) {
     if (!user) {
         return null;
