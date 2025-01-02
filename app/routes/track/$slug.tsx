@@ -16,9 +16,12 @@ function get24HrFormat(str: string) {
 
 export const Route = createFileRoute('/track/$slug')({
   component: TrackPage,
-  validateSearch: ({ year }: { year: number }) => ({ year: constants.AVAILABLE_YEARS.includes(year) && year || constants.DEFAULT_YEAR }),
-  loaderDeps: ({ search: { year } }) => ({ year }),
-  loader: async ({ params, deps: { year } }) => {
+  validateSearch: ({ year, day }: { year: number, day: string }) => ({
+    year: constants.AVAILABLE_YEARS.includes(year) && year || constants.DEFAULT_YEAR,
+    day: day || null
+  }),
+  loaderDeps: ({ search: { year, day } }) => ({ year, day }),
+  loader: async ({ params, deps: { year, day } }) => {
     const data = await getAllData({ data: { year } }) as Conference;
     const days = Object.values(data.days);
     const track = data.tracks[params.slug];
@@ -30,7 +33,7 @@ export const Route = createFileRoute('/track/$slug')({
 
     const eventDataSplitByDay = groupByDay(eventData, event => event.day);
 
-    return { fosdem: { days, track, type, eventDataSplitByDay }, year };
+    return { fosdem: { days, track, type, eventDataSplitByDay }, year, day };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -44,7 +47,7 @@ export const Route = createFileRoute('/track/$slug')({
 })
 
 function TrackPage() {
-  const { fosdem, year } = Route.useLoaderData()
+  const { fosdem, year, day } = Route.useLoaderData()
 
   if (!fosdem.track || !fosdem.type) {
     return (
@@ -64,7 +67,7 @@ function TrackPage() {
           text={`${fosdem.type.name} | Room: ${fosdem.track.room} | Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(' and ') : fosdem.track.day}`}
         />
         <Tabs
-          defaultValue={Object.keys(fosdem.eventDataSplitByDay)[0] || fosdem.days[0].id}
+          defaultValue={day || Object.keys(fosdem.eventDataSplitByDay)[0] || fosdem.days[0].id}
           className="w-full"
         >
           <TabsList>
