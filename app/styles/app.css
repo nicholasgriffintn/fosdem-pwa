@@ -103,26 +103,6 @@ a:hover {
   margin-bottom: 1.2rem;
 }
 
-.bg-devroom {
-  background-image: url('/images/devroom.jpg');
-}
-
-.bg-keynote {
-  background-image: url('/images/keynote.jpg');
-}
-
-.bg-lightningtalk {
-  background-image: url('/images/lightningtalk.jpg');
-}
-
-.bg-maintrack {
-  background-image: url('/images/maintrack.jpg');
-}
-
-.bg-other {
-  background-image: url('/images/other.jpg');
-}
-
 .icon--filled {
   fill: hsl(var(--primary));
 }

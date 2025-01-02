@@ -5,7 +5,11 @@ import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
 import { Play } from 'lucide-react';
 
-import { Event } from '~/functions/getFosdemData';
+import type { Event } from '~/types/fosdem';
+import { FeaturedFosdemImage } from '~/components/FeaturedFosdemImage';
+import { fosdemImageDetails } from "~/data/fosdem-image-details";
+
+type FosdemImageType = "keynote" | "maintrack" | "devroom" | "lightningtalk" | "other";
 
 interface EventPlayerProps {
   event: Event;
@@ -61,8 +65,11 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
   return (
     <div className={containerClassName}>
       {!isPlaying && (
-        <div
-          className={`bg-${event.type} w-full h-full absolute top-0 left-0 z-0'`}
+        <FeaturedFosdemImage
+          type={event.type as FosdemImageType}
+          size="full"
+          className="w-full h-full absolute top-0 left-0 z-0 object-cover"
+          displayCaption={false}
         />
       )}
 
@@ -71,6 +78,7 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
           <>
             {!isPlaying && (
               <button
+                type="button"
                 onClick={handlePlay}
                 className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 hover:bg-black/60 transition-colors"
               >
@@ -98,6 +106,29 @@ export function EventPlayer({ event, isMobile = false, onClose, isFloating = fal
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 transition-colors">
             <div className="p-6 relative bg-muted rounded-md">
               <span>The stream isn't available yet! Check back at {event.startTime}.</span>
+
+              {fosdemImageDetails[event.type as FosdemImageType] && (
+                <>
+                  <hr className="my-4" />
+                  <span className="text-sm block mb-2">Image details: {fosdemImageDetails[event.type as FosdemImageType].alt}</span>
+                  <span className="text-xs block">
+                    Licensed under {fosdemImageDetails[event.type as FosdemImageType].license} •
+                    <a
+                      href={fosdemImageDetails[event.type as FosdemImageType].original}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-300 hover:text-blue-200 ml-1"
+                    >
+                      View original
+                    </a>
+                  </span>
+                  {fosdemImageDetails[event.type as FosdemImageType].changes && (
+                    <span className="text-xs block">
+                      {fosdemImageDetails[event.type as FosdemImageType].changes}
+                    </span>
+                  )}
+                </>
+              )}
             </div>
           </div>
         )}

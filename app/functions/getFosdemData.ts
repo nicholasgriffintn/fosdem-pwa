@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/start'
 
 import { constants } from '~/constants'
-import { Conference, Track, Event } from '~/types/fosdem'
+import type { Conference } from '~/types/fosdem'
 
 /**
  * Fetches and validates conference data for a given year
