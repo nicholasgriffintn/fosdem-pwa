@@ -24,9 +24,6 @@ export function PageHeader({ heading, text, className, children, displayHeading 
         {children}
       </div>
       {displayHeading && <hr className="my-4" />}
-      <div className="bg-muted text-muted-foreground text-center py-2 mb-4">
-        <p>Note: I'm reworking this at the moment, some things won't work.</p>
-      </div>
     </>
   );
 }
