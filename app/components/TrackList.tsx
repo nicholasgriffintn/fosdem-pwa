@@ -56,7 +56,7 @@ function TrackListItem({
             text={`Check out ${track.name} at FOSDEM`}
             url={`https://fosdempwa.com/track/${track.id}`}
           />
-          <Button variant="secondary" asChild className="w-full">
+          <Button variant="secondary" asChild className="w-full no-underline">
             <Link to={`/track/${track.id}`}>View Track</Link>
           </Button>
         </div>

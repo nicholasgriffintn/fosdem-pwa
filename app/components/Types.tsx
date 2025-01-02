@@ -55,7 +55,7 @@ export function Types({
                 />
               </CardContent>
               <CardFooter>
-                <Button asChild className="w-full">
+                <Button variant="secondary" asChild className="w-full no-underline">
                   <Link to={`/type/${types[typeKey].id}`}>View Tracks</Link>
                 </Button>
               </CardFooter>
