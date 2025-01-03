@@ -54,24 +54,6 @@ export function Header() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="link" size="icon" className="h-7 w-7" asChild>
-                    <a
-                      href="https://github.com/nicholasgriffintn/fosdem-pwa"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <Icons.gitHub className="h-7 w-7" width="7" height="7" />
-                      <span className="sr-only">Source Code</span>
-                    </a>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>View source code on GitHub</p>
-                </TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
                   {loading ? (
                     <div className="h-7 w-7 flex items-center justify-center">
                       <Spinner />
