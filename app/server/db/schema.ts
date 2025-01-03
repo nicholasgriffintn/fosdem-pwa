@@ -43,6 +43,7 @@ export const session = sqliteTable("session", {
 
 export const bookmark = sqliteTable("bookmark", {
   id: text().primaryKey(),
+  slug: text().notNull(),
   user_id: integer()
     .notNull()
     .references(() => user.id),
