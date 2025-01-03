@@ -7,6 +7,7 @@ import { Icons } from '~/components/Icons';
 import { toast } from '~/hooks/use-toast';
 import { useAuth } from '~/hooks/use-auth';
 import { useBookmarks } from '~/hooks/use-bookmarks';
+import { Spinner } from '~/components/Spinner';
 
 export function FavouriteButton({
   year,
@@ -48,9 +49,13 @@ export function FavouriteButton({
 
   return (
     <Button variant="outline" onClick={handleFavourite}>
-      <Icons.star
-        className={currentStatus === 'favourited' ? 'icon--filled' : ''}
-      />
+      {currentStatus === 'loading' ? (
+        <Spinner />
+      ) : (
+        <Icons.star
+          className={currentStatus === 'favourited' ? 'icon--filled' : ''}
+        />
+      )}
     </Button>
   );
 }

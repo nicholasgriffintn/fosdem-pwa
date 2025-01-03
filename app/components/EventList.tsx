@@ -5,6 +5,9 @@ import { Button } from '~/components/ui/button';
 import { FavouriteButton } from '~/components/FavouriteButton';
 import { ShareButton } from '~/components/ShareButton';
 import { constants } from '~/constants';
+import { useBookmarks } from '~/hooks/use-bookmarks';
+import { Spinner } from './Spinner';
+
 type EventListItem = {
   id: string;
   title: string;
@@ -28,11 +31,13 @@ function EventListItem({
   event,
   index,
   isLast,
+  bookmarksLoading,
 }: {
   year: number;
   event: EventListItem;
   index: number;
   isLast: boolean;
+  bookmarksLoading: boolean;
 }) {
   const className = clsx('flex justify-between', {
     'border-t-2 border-solid border-muted': index % 2 === 1,
@@ -52,12 +57,16 @@ function EventListItem({
           </p>
         </div>
         <div className="flex items-center pl-1 pr-1 md:pl-6 md:pr-3 gap-2 pb-3 md:pb-0">
-          <FavouriteButton
-            year={year}
-            type="event"
-            slug={event.id}
-            status={event.isFavourited ? 'favourited' : 'unfavourited'}
-          />
+          {bookmarksLoading ? (
+            <Spinner />
+          ) : (
+            <FavouriteButton
+              year={year}
+              type="event"
+              slug={event.id}
+              status={event.isFavourited ? 'favourited' : 'unfavourited'}
+            />
+          )}
           <ShareButton
             title={event.title}
             text={`Check out ${event.title} at FOSDEM`}
@@ -72,13 +81,15 @@ function EventListItem({
   );
 }
 
-export function EventList({ events, favourites, year }: EventListProps) {
+export function EventList({ events, year }: EventListProps) {
+  const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
+
   const eventsWithFavourites = events?.length
     ? events.map((event) => {
       return {
         ...event,
-        isFavourited: favourites?.length
-          ? Boolean(favourites.find((bookmark) => bookmark.slug === event.id)?.status === 'favourited')
+        isFavourited: bookmarks?.length
+          ? Boolean(bookmarks.find((bookmark: any) => bookmark.id === event.id)?.status === 'favourited')
           : undefined,
       };
     })
@@ -94,6 +105,7 @@ export function EventList({ events, favourites, year }: EventListProps) {
               event={event}
               index={index}
               isLast={events.length === index + 1}
+              bookmarksLoading={bookmarksLoading}
             />
           </li>
         ))
