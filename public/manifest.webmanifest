@@ -6,7 +6,7 @@
     "theme_color": "#000000",
     "background_color": "#d3d7dd",
     "start_url": "/",
-    "display": "minimal-ui",
+    "display": "standalone",
     "orientation": "portrait",
     "shortcuts": [
         {
