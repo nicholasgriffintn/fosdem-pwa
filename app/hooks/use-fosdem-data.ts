@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 import { getAllData } from "~/functions/getFosdemData";
 
 export function useFosdemData({
-  year,
+	year,
 }: {
-  year: number;
+	year: number;
 }) {
-  const { data: fosdemData, isLoading } = useQuery({
-    queryKey: ['fosdem', 'full', year],
-    queryFn: async () => {
-      const data = await getAllData({
-        data: {
-          year,
-        },
-      });
+	const { data: fosdemData, isLoading } = useQuery({
+		queryKey: ["fosdem", "full", year],
+		queryFn: async () => {
+			const data = await getAllData({
+				data: {
+					year,
+				},
+			});
 
-      return data;
-    },
-  });
+			return data;
+		},
+	});
 
-  return {
-    fosdemData,
-    loading: isLoading,
-  };
+	return {
+		fosdemData,
+		loading: isLoading,
+	};
 }

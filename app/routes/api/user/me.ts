@@ -1,15 +1,15 @@
-import { createAPIFileRoute } from '@tanstack/start/api'
+import { createAPIFileRoute } from "@tanstack/start/api";
 
-import { getFullAuthSession } from '~/server/auth'
+import { getFullAuthSession } from "~/server/auth";
 
-export const APIRoute = createAPIFileRoute('/api/user/me')({
-  GET: async () => {
-    const { user } = await getFullAuthSession()
+export const APIRoute = createAPIFileRoute("/api/user/me")({
+	GET: async () => {
+		const { user } = await getFullAuthSession();
 
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+		if (!user) {
+			return Response.json({ error: "Unauthorized" }, { status: 401 });
+		}
 
-    return Response.json({ user })
-  },
-})
+		return Response.json({ user });
+	},
+});

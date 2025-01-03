@@ -1,28 +1,34 @@
-'use client';
+"use client";
 
-import { type Dispatch, type SetStateAction, useCallback, useRef, useState } from 'react';
+import {
+	type Dispatch,
+	type SetStateAction,
+	useCallback,
+	useRef,
+	useState,
+} from "react";
 
-import useUnmount from './use-unmount';
+import useUnmount from "./use-unmount";
 
 const useRefState = <S>(
-  initialState: S | (() => S)
+	initialState: S | (() => S),
 ): [S, Dispatch<SetStateAction<S>>] => {
-  const frame = useRef(0);
-  const [state, setState] = useState(initialState);
+	const frame = useRef(0);
+	const [state, setState] = useState(initialState);
 
-  const setRafState = useCallback((value: S | ((prevState: S) => S)) => {
-    cancelAnimationFrame(frame.current);
+	const setRafState = useCallback((value: S | ((prevState: S) => S)) => {
+		cancelAnimationFrame(frame.current);
 
-    frame.current = requestAnimationFrame(() => {
-      setState(value);
-    });
-  }, []);
+		frame.current = requestAnimationFrame(() => {
+			setState(value);
+		});
+	}, []);
 
-  useUnmount(() => {
-    cancelAnimationFrame(frame.current);
-  });
+	useUnmount(() => {
+		cancelAnimationFrame(frame.current);
+	});
 
-  return [state, setRafState];
+	return [state, setRafState];
 };
 
 export default useRefState;

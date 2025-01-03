@@ -1,35 +1,35 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 
 export function useAuth() {
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
-    const { data: user, isLoading } = useQuery({
-        queryKey: ['auth'],
-        queryFn: async () => {
-            const response = await fetch('/api/auth/session');
-            if (!response.ok) return null;
-            const data = await response.json();
-            return data.user;
-        },
-    });
+	const { data: user, isLoading } = useQuery({
+		queryKey: ["auth"],
+		queryFn: async () => {
+			const response = await fetch("/api/auth/session");
+			if (!response.ok) return null;
+			const data = await response.json();
+			return data.user;
+		},
+	});
 
-    const logout = useMutation({
-        mutationFn: async () => {
-            await fetch('/api/auth/logout', { method: 'POST' });
-        },
-        onSuccess: () => {
-            queryClient.setQueryData(['auth'], null);
-            navigate({ to: '/', search: { year: 2025 } });
-        },
-    });
+	const logout = useMutation({
+		mutationFn: async () => {
+			await fetch("/api/auth/logout", { method: "POST" });
+		},
+		onSuccess: () => {
+			queryClient.setQueryData(["auth"], null);
+			navigate({ to: "/", search: { year: 2025 } });
+		},
+	});
 
-    return {
-        user,
-        loading: isLoading,
-        logout: logout.mutate,
-    };
+	return {
+		user,
+		loading: isLoading,
+		logout: logout.mutate,
+	};
 }
