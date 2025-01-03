@@ -86,7 +86,7 @@ function TrackPage() {
             }${fosdem.event.persons?.length > 0 && ` | ${fosdem.event.persons.join(', ')}`}`}
           breadcrumbs={[
             { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
-            { title: fosdem.track.name, href: `/track/${fosdem.track.id}`, search: { day: Number(fosdem.event.day) } },
+            { title: fosdem.track.name, href: `/track/${fosdem.track.id}` },
           ]}
         >
           <div className="flex items-center md:pl-6 md:pr-3 gap-2">
