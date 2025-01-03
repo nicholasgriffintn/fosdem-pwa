@@ -63,13 +63,13 @@ function ProfilePage() {
 			<div className="relative py-6 lg:py-10">
 				<PageHeader heading="Profile" displayHeading={false} />
 				<div className="space-y-8">
-					<div className="flex items-start gap-8">
-						<div className="w-full max-w-md">
+					<div className="flex flex-col lg:flex-row items-start gap-8">
+						<div className="w-full lg:w-auto lg:max-w-md">
 							<ConferenceBadge user={user} conferenceYear={year} />
 						</div>
 
 						{user.bookmarks_visibility === "public" ? (
-							<div className="flex-1 space-y-8">
+							<div className="w-full lg:flex-1 space-y-8">
 								<div className="space-y-4">
 									<h2 className="text-2xl font-bold">Shared Bookmarks</h2>
 									<BookmarksList
