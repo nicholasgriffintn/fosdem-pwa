@@ -62,16 +62,15 @@ function ProfilePage() {
 						</div>
 
 						<div className="flex-1 space-y-8">
-							{user?.github_username && (
-								<SetBookmarksVisability
-									year={year}
-									userId={user.github_username}
-									bookmarksVisibility={user.bookmarks_visibility}
-								/>
-							)}
-
 							<div className="space-y-4">
 								<h2 className="text-2xl font-bold">Your Bookmarks</h2>
+								{user?.github_username && (
+									<SetBookmarksVisability
+										year={year}
+										userId={user.github_username}
+										bookmarksVisibility={user.bookmarks_visibility}
+									/>
+								)}
 								<BookmarksList
 									bookmarks={bookmarks}
 									fosdemData={fosdemData}
