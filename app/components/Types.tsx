@@ -46,7 +46,7 @@ export function Types({
                   {types[typeKey].trackCount} TRACKS
                 </CardDescription>
               </CardHeader>
-              <CardContent className="w-full">
+              <CardContent className="w-full hidden md:block">
                 <div className="min-h-[302px] bg-muted rounded-md">
                   <FeaturedFosdemImage
                     type={types[typeKey].id}
