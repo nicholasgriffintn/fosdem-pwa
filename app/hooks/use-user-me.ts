@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 export function useProfile() {
-    const { data: user, isLoading } = useQuery({
-        queryKey: ['profile', 'me'],
-        queryFn: async () => {
-            const response = await fetch('/api/user/me');
+	const { data: user, isLoading } = useQuery({
+		queryKey: ["profile", "me"],
+		queryFn: async () => {
+			const response = await fetch("/api/user/me");
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch user data');
-            }
+			if (!response.ok) {
+				throw new Error("Failed to fetch user data");
+			}
 
-            const data = await response.json();
+			const data = await response.json();
 
-            if (!data.user) {
-                throw new Error('Unauthorized');
-            }
+			if (!data.user) {
+				throw new Error("Unauthorized");
+			}
 
-            return data.user;
-        },
-    });
+			return data.user;
+		},
+	});
 
-    return {
-        user,
-        loading: isLoading,
-    };
+	return {
+		user,
+		loading: isLoading,
+	};
 }

@@ -1,20 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import useRefState from './use-ref-state';
-import { isBrowser, off, on } from '~/lib/utils';
+import useRefState from "./use-ref-state";
+import { isBrowser, off, on } from "~/lib/utils";
 
-export const useWindowSize = (
-  initialWidth = 0,
-  initialHeight = 0
-) => {
+export const useWindowSize = (initialWidth = 0, initialHeight = 0) => {
   const [state, setState] = useRefState<{ width: number; height: number }>({
     width: isBrowser ? window.innerWidth : initialWidth,
     height: isBrowser ? window.innerHeight : initialHeight,
   });
 
-  useEffect((): (() => void) | void => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: CBA
+  useEffect((): (() => void) | undefined => {
     if (isBrowser) {
       const handler = () => {
         setState({
@@ -23,10 +21,10 @@ export const useWindowSize = (
         });
       };
 
-      on(window, 'resize', handler);
+      on(window, "resize", handler);
 
       return () => {
-        off(window, 'resize', handler);
+        off(window, "resize", handler);
       };
     }
   }, []);
