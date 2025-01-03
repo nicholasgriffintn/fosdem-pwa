@@ -77,7 +77,7 @@ function BookmarksHome() {
         const event = fosdemData.events[bookmark.slug];
         if (!event) return null;
         return {
-          id: event.slug,
+          id: event.id,
           title: event.title,
           startTime: event.startTime,
           duration: event.duration,
@@ -92,7 +92,7 @@ function BookmarksHome() {
         const track = fosdemData.tracks[bookmark.slug];
         if (!track) return null;
         return {
-          id: track.slug,
+          id: track.id,
           name: track.name,
           room: track.room,
           eventCount: Object.values(fosdemData.events).filter(
