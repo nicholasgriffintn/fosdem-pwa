@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { PageHeader } from '~/components/PageHeader'
 import { FavouriteButton } from '~/components/FavouriteButton'
 import { ShareButton } from '~/components/ShareButton'
-import { testLiveEvent } from '~/data/test-data'
+import { testLiveEvent, testConference } from '~/data/test-data'
 import { getAllData } from '~/functions/getFosdemData'
 import { EventMain } from '~/components/EventMain'
 import { constants } from '~/constants'
@@ -17,11 +17,31 @@ export const Route = createFileRoute('/event/$slug')({
   loaderDeps: ({ search: { test, year } }) => ({ test, year }),
   loader: async ({ params, deps: { test, year } }) => {
     if (test) {
-      return { fosdem: { event: testLiveEvent }, conference: {}, year };
+      return {
+        fosdem: {
+          event: testLiveEvent,
+          conference: testConference,
+          track: {
+            id: 'radio',
+            name: 'Radio',
+          },
+          type: {
+            id: 'devroom',
+            name: 'Developer Room',
+          },
+        }, year
+      };
     }
 
     const fosdem = await getAllData({ data: { year } });
-    return { fosdem: { event: fosdem.events[params.slug], conference: fosdem.conference }, year };
+    return {
+      fosdem: {
+        event: fosdem.events[params.slug],
+        conference: fosdem.conference,
+        track: fosdem.tracks[fosdem.events[params.slug].trackKey],
+        type: fosdem.types[fosdem.tracks[fosdem.events[params.slug].trackKey].type],
+      }, year
+    };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -41,7 +61,12 @@ function TrackPage() {
     return (
       <div className="min-h-screen">
         <div className="relative py-6 lg:py-10">
-          <PageHeader heading="Event not found" />
+          <PageHeader heading="Event not found"
+            breadcrumbs={[
+              { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
+              { title: fosdem.track.name, href: `/track/${fosdem.track.id}` },
+            ]}
+          />
         </div>
       </div>
     )
@@ -59,6 +84,10 @@ function TrackPage() {
           heading={fosdem.event.title}
           text={`Day ${fosdem.event.day} | ${fosdem.event.startTime} | ${fosdem.event.duration} | ${fosdem.event.room
             }${fosdem.event.persons?.length > 0 && ` | ${fosdem.event.persons.join(', ')}`}`}
+          breadcrumbs={[
+            { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
+            { title: fosdem.track.name, href: `/track/${fosdem.track.id}`, search: { day: Number(fosdem.event.day) } },
+          ]}
         >
           <div className="flex items-center md:pl-6 md:pr-3 gap-2">
             <FavouriteButton

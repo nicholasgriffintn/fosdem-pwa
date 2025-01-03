@@ -33,3 +33,40 @@ export const testLiveEvent = {
     duration: "01:00",
     abstract: "<p>This is just a test to confirm things work before FOSDOM</p>"
 }
+
+export const testConference = {
+    "acronym": {
+        "_text": "fosdem-2025"
+    },
+    "title": {
+        "_text": "FOSDEM 2025"
+    },
+    "subtitle": {},
+    "venue": {
+        "_text": "ULB (Université Libre de Bruxelles)"
+    },
+    "city": {
+        "_text": "Brussels"
+    },
+    "start": {
+        "_text": "2025-02-01"
+    },
+    "end": {
+        "_text": "2025-02-02"
+    },
+    "days": {
+        "_text": "2"
+    },
+    "day_change": {
+        "_text": "09:00:00"
+    },
+    "timeslot_duration": {
+        "_text": "00:05:00"
+    },
+    "base_url": {
+        "_text": "https://fosdem.org/2025/schedule/"
+    },
+    "time_zone_name": {
+        "_text": "Europe/Brussels"
+    }
+}

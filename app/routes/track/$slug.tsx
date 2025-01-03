@@ -53,7 +53,9 @@ function TrackPage() {
     return (
       <div className="min-h-screen">
         <div className="relative py-6 lg:py-10">
-          <PageHeader heading="Track not found" />
+          <PageHeader heading="Track not found" breadcrumbs={[
+            { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
+          ]} />
         </div>
       </div>
     )
@@ -65,9 +67,12 @@ function TrackPage() {
         <PageHeader
           heading={fosdem.track.name}
           text={`${fosdem.type.name} | Room: ${fosdem.track.room} | Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(' and ') : fosdem.track.day}`}
+          breadcrumbs={[
+            { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
+          ]}
         />
         <Tabs
-          defaultValue={day || Object.keys(fosdem.eventDataSplitByDay)[0] || fosdem.days[0].id}
+          defaultValue={day?.toString() || Object.keys(fosdem.eventDataSplitByDay)[0] || fosdem.days[0].id}
           className="w-full"
         >
           <TabsList>
