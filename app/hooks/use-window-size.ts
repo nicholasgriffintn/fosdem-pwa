@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import useRafState from './use-ref-state';
+import useRefState from './use-ref-state';
 import { isBrowser, off, on } from '~/lib/utils';
 
 export const useWindowSize = (
-  initialWidth = Number.POSITIVE_INFINITY,
-  initialHeight = Number.POSITIVE_INFINITY
+  initialWidth = 0,
+  initialHeight = 0
 ) => {
-  const [state, setState] = useRafState<{ width: number; height: number }>({
+  const [state, setState] = useRefState<{ width: number; height: number }>({
     width: isBrowser ? window.innerWidth : initialWidth,
     height: isBrowser ? window.innerHeight : initialHeight,
   });
@@ -31,5 +31,5 @@ export const useWindowSize = (
     }
   }, []);
 
-  return state;
+  return { ...state };
 };

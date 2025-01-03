@@ -4,7 +4,7 @@ import { type Dispatch, type SetStateAction, useCallback, useRef, useState } fro
 
 import useUnmount from './use-unmount';
 
-const useRafState = <S>(
+const useRefState = <S>(
   initialState: S | (() => S)
 ): [S, Dispatch<SetStateAction<S>>] => {
   const frame = useRef(0);
@@ -25,4 +25,4 @@ const useRafState = <S>(
   return [state, setRafState];
 };
 
-export default useRafState;
+export default useRefState;

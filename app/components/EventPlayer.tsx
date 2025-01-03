@@ -30,7 +30,7 @@ export function EventPlayer({ event, conference, isMobile = false, onClose, isFl
   const isEventInPast = () => {
     try {
       const conferenceStartDate = new Date(conference.start._text);
-      const eventDay = Number.parseInt(event.day) - 1;
+      const eventDay = Number.parseInt(event.day as string) - 1;
       const [hours, minutes] = event.startTime.split(':').map(Number);
       const [durationHours, durationMinutes] = event.duration.split(':').map(Number);
 
@@ -92,7 +92,7 @@ export function EventPlayer({ event, conference, isMobile = false, onClose, isFl
 
   return (
     <div className={containerClassName}>
-      {!isPlaying && (
+      {!isPlaying && !isMobile && (
         <FeaturedFosdemImage
           type={event.type as FosdemImageType}
           size="full"
@@ -144,7 +144,7 @@ export function EventPlayer({ event, conference, isMobile = false, onClose, isFl
           </>
         ) : (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 transition-colors">
-            <div className="p-6 relative bg-muted rounded-md">
+            <div className="p-6 relative md:bg-muted md:rounded-md">
               <span>
                 {isEventInPast()
                   ? "This event has ended and no recording is available yet, it may be available in the future."
@@ -152,7 +152,7 @@ export function EventPlayer({ event, conference, isMobile = false, onClose, isFl
                 }
               </span>
 
-              {fosdemImageDetails[event.type as FosdemImageType] && (
+              {!isMobile && fosdemImageDetails[event.type as FosdemImageType] && (
                 <>
                   <hr className="my-4" />
                   <span className="text-sm block mb-2">Image details: {fosdemImageDetails[event.type as FosdemImageType].alt}</span>

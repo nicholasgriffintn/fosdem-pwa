@@ -16,7 +16,7 @@ export function EventMain({ event, conference }: { event: Event, conference: Con
 
   return (
     <>
-      {width < 768 ? (
+      {width < 768 && (
         <div className="space-y-4">
           <div className="overflow-hidden rounded-lg border bg-card">
             <div className="w-full">
@@ -26,7 +26,8 @@ export function EventMain({ event, conference }: { event: Event, conference: Con
           </div>
           <EventSidebar event={event} isMobile />
         </div>
-      ) : (
+      )}
+      {width >= 768 && (
         <ResizablePanelGroup
           direction="horizontal"
           className="min-h-[200px] rounded-lg border"
