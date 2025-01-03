@@ -5,11 +5,13 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export const noop = () => { };
+export const noop = () => {};
 
 export function on<T extends Window | Document | HTMLElement | EventTarget>(
 	obj: T | null,
-	...args: Parameters<T["addEventListener"]> | [string, (() => void) | null, ...any]
+	...args:
+		| Parameters<T["addEventListener"]>
+		| [string, (() => void) | null, ...any]
 ): void {
 	if (obj?.addEventListener) {
 		obj.addEventListener(

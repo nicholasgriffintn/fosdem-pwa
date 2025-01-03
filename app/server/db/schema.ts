@@ -23,6 +23,7 @@ export const user = sqliteTable("user", {
 		.$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 	setup_at: text(),
 	terms_accepted_at: text(),
+	bookmarks_visibility: text().default("private"),
 });
 
 export const oauthAccount = sqliteTable(

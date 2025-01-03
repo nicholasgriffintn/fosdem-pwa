@@ -5,6 +5,9 @@ import { PageHeader } from "~/components/PageHeader";
 import { ConferenceBadge } from "~/components/ConferenceBadge";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "~/constants";
+import { BookmarksList } from "~/components/BookmarksList";
+import { useUserBookmarks } from "~/hooks/use-user-bookmarks";
+import { useFosdemData } from "~/hooks/use-fosdem-data";
 
 export const Route = createFileRoute("/profile/$userId/")({
 	component: ProfilePage,
@@ -36,6 +39,13 @@ function ProfilePage() {
 		userId: Route.useParams().userId,
 	});
 
+	const { bookmarks, loading: bookmarksLoading } = useUserBookmarks({
+		year,
+		userId: Route.useParams().userId,
+	});
+
+	const { fosdemData } = useFosdemData({ year });
+
 	if (loading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
@@ -52,8 +62,38 @@ function ProfilePage() {
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
 				<PageHeader heading="Profile" displayHeading={false} />
-				<ConferenceBadge user={user} conferenceYear={year} />
+				<div className="space-y-8">
+					<div className="flex items-start gap-8">
+						<div className="w-full max-w-md">
+							<ConferenceBadge user={user} conferenceYear={year} />
+						</div>
+
+						{user.bookmarks_visibility === "public" ? (
+							<div className="flex-1 space-y-8">
+								<div className="space-y-4">
+									<h2 className="text-2xl font-bold">Shared Bookmarks</h2>
+									<BookmarksList
+										bookmarks={bookmarks}
+										fosdemData={fosdemData}
+										year={year}
+										loading={bookmarksLoading}
+									/>
+								</div>
+							</div>
+						) : (
+							<div className="flex-1 space-y-8">
+								<div className="space-y-4">
+									<h2 className="text-2xl font-bold">Shared Bookmarks</h2>
+									<p className="text-sm text-muted-foreground">
+										This user has not shared their bookmarks with you.
+									</p>
+								</div>
+							</div>
+						)}
+					</div>
+				</div>
 			</div>
 		</div>
 	);
 }
+
