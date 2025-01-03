@@ -8,6 +8,13 @@
       "when": 1734275336527,
       "tag": "0000_equal_kingpin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1735863008069,
+      "tag": "0001_perpetual_maelstrom",
+      "breakpoints": true
     }
   ]
 }

@@ -38,25 +38,34 @@ export const APIRoute = createAPIFileRoute('/api/bookmarks/$year')({
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const bookmarkData = await db.insert(bookmark).values({
-      type: `bookmark_${type}`,
-      id: slug,
-      year: Number.parseInt(year),
-      status,
-      user_id: user.id,
+    const existingBookmark = await db.query.bookmark.findFirst({
+      where: and(
+        eq(bookmark.user_id, user.id),
+        eq(bookmark.year, Number.parseInt(year)),
+        eq(bookmark.slug, slug),
+      ),
     })
-      .onConflictDoUpdate({
-        target: [bookmark.id, bookmark.user_id, bookmark.year],
-        set: {
-          status,
-        },
-      })
-      .returning()
 
-    if (!bookmarkData) {
-      return Response.json({ error: 'Failed to create bookmark' }, { status: 500 })
+    if (existingBookmark) {
+      await db.update(bookmark).set({
+        status,
+      }).where(eq(bookmark.id, existingBookmark.id))
+    } else {
+      await db
+        .insert(bookmark)
+        .values({
+          id: `${user.id}_${year}_${slug}`,
+          slug,
+          type: `bookmark_${type}`,
+          year: Number.parseInt(year),
+          status,
+          user_id: user.id,
+        })
+        .returning();
     }
 
-    return Response.json(bookmarkData)
+    return Response.json({
+      success: true,
+    })
   },
 })

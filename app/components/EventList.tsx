@@ -89,7 +89,7 @@ export function EventList({ events, year }: EventListProps) {
       return {
         ...event,
         isFavourited: bookmarks?.length
-          ? Boolean(bookmarks.find((bookmark: any) => bookmark.id === event.id)?.status === 'favourited')
+          ? Boolean(bookmarks.find((bookmark: any) => bookmark.slug === event.id)?.status === 'favourited')
           : undefined,
       };
     })

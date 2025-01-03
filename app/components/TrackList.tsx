@@ -86,7 +86,7 @@ export function TrackList({ tracks, year }: TrackListProps) {
       return {
         ...track,
         isFavourited: bookmarks?.length
-          ? Boolean(bookmarks.find((bookmark: any) => bookmark.id === track.id)?.status === 'favourited')
+          ? Boolean(bookmarks.find((bookmark: any) => bookmark.slug === track.id)?.status === 'favourited')
           : undefined,
       };
     })

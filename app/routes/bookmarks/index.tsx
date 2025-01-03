@@ -10,6 +10,7 @@ import { useFosdemData } from '~/hooks/use-fosdem-data';
 
 interface Bookmark {
   id: string;
+  slug: string;
   user_id: number;
   type: 'bookmark_event' | 'bookmark_track';
   status: string;
@@ -73,10 +74,10 @@ function BookmarksHome() {
 
     const formattedEvents = bookmarkedEvents
       .map(bookmark => {
-        const event = fosdemData.events[bookmark.id];
+        const event = fosdemData.events[bookmark.slug];
         if (!event) return null;
         return {
-          id: event.id,
+          id: event.slug,
           title: event.title,
           startTime: event.startTime,
           duration: event.duration,
@@ -88,10 +89,10 @@ function BookmarksHome() {
 
     const formattedTracks = bookmarkedTracks
       .map(bookmark => {
-        const track = fosdemData.tracks[bookmark.id];
+        const track = fosdemData.tracks[bookmark.slug];
         if (!track) return null;
         return {
-          id: track.id,
+          id: track.slug,
           name: track.name,
           room: track.room,
           eventCount: Object.values(fosdemData.events).filter(
