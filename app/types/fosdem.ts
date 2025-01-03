@@ -3,7 +3,7 @@ export interface ConferenceData {
         _text: string;
     },
     subtitle: {
-        _text: string;
+        _text?: string;
     },
     city: {
         _text: string;
@@ -63,7 +63,7 @@ export interface Event {
         title: string;
         type: string;
     }[];
-    day: string;
+    day: string | number | string[] | number[];
     trackKey: string;
     isLive: boolean;
     status: string;
