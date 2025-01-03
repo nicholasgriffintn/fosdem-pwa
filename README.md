@@ -14,14 +14,11 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [x] A page for each track with a list of events
 - [x] A page for each event with the event details
 - [x] GitHub sign in
-- [ ] Guest sign in (potentially)
 - [x] A page for the user profile, with a generated pass for the event
-- [ ] The ability to bookmark tracks and events
-- [ ] Bookmarks are background synced when offline
-- [ ] Sends push notifications for bookmarked events
+- [x] The ability to bookmark tracks and events
 - [x] The ability to share tracks and events
 - [x] The ability to share your bookmarks
-- [ ] A page to view your bookmarked tracks and events
+- [x] A page to view your bookmarked tracks and events
 - [x] A page for finding live events
 - [x] A map page
 - [x] A search page
@@ -30,6 +27,10 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 ## TODO
 
 - [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
+- [ ] Bookmarks are background synced when offline
+- [ ] Guest sign in (potentially)
+- [ ] Configure push notifications, will need a new database table
+- [ ] Send notifications for bookmarked events (should be configurable)
 
 ## Contributing
 
