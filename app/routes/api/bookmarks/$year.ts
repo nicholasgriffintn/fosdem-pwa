@@ -74,7 +74,10 @@ export const APIRoute = createAPIFileRoute("/api/bookmarks/$year")({
 		} catch (error) {
 			console.error(error);
 
-			return Response.json({ error: "Failed to save bookmark" }, { status: 500 });
+			return Response.json(
+				{ error: "Failed to save bookmark" },
+				{ status: 500 },
+			);
 		}
 	},
 });

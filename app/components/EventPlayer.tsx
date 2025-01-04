@@ -99,7 +99,7 @@ export function EventPlayer({
 
   return (
     <div className={containerClassName}>
-      {!isPlaying && !isMobile && (
+      {!isPlaying && (
         <FeaturedFosdemImage
           type={event.type as FosdemImageType}
           size="full"
@@ -153,52 +153,12 @@ export function EventPlayer({
           </>
         ) : (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 transition-colors">
-            <div className="p-6 relative md:bg-muted md:rounded-md">
-              <span>
+            <div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md">
+              <span className="text-sm md:text-base">
                 {isEventInPast()
                   ? "This event has ended and no recording is available yet, it may be available in the future."
                   : `The stream isn't available yet! Check back at ${event.startTime}.`}
               </span>
-
-              {!isMobile &&
-                fosdemImageDetails[event.type as FosdemImageType] && (
-                  <>
-                    <hr className="my-4" />
-                    <span className="text-sm block mb-2">
-                      Image details:{" "}
-                      {fosdemImageDetails[event.type as FosdemImageType].alt}
-                    </span>
-                    <span className="text-xs block">
-                      Licensed under{" "}
-                      {
-                        fosdemImageDetails[event.type as FosdemImageType]
-                          .license
-                      }{" "}
-                      •
-                      <a
-                        href={
-                          fosdemImageDetails[event.type as FosdemImageType]
-                            .original
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-300 hover:text-blue-200 ml-1"
-                      >
-                        View original
-                      </a>
-                    </span>
-                    {fosdemImageDetails[event.type as FosdemImageType]
-                      .changes && (
-                        <span className="text-xs block mt-1">
-                          Changes:{" "}
-                          {
-                            fosdemImageDetails[event.type as FosdemImageType]
-                              .changes
-                          }
-                        </span>
-                      )}
-                  </>
-                )}
             </div>
           </div>
         )}

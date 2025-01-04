@@ -12,7 +12,8 @@ import {
 	ResizablePanelGroup,
 } from "~/components/ui/resizable";
 import { useWindowSize } from "~/hooks/use-window-size";
-import type { Event, ConferenceData } from "~/types/fosdem";
+import type { Event, ConferenceData, FosdemImageType } from "~/types/fosdem";
+import { fosdemImageDetails } from "~/data/fosdem-image-details";
 
 export function EventMain({
 	event,
@@ -70,7 +71,10 @@ export function EventMain({
 					<div className="prose prose-lg prose-indigo overflow-scroll mt-4">
 						<h2 className="text-xl font-medium">Description</h2>
 						{/* biome-ignore lint/security/noDangerouslySetInnerHtml: We want to render the abstract as HTML */}
-						<div className="mt-2" dangerouslySetInnerHTML={{ __html: event.abstract }} />
+						<div
+							className="mt-2"
+							dangerouslySetInnerHTML={{ __html: event.abstract }}
+						/>
 					</div>
 				)}
 				{event.links?.length > 0 && (
@@ -89,6 +93,29 @@ export function EventMain({
 						</ul>
 					</div>
 				)}
+				<div className="mt-4">
+					{(event.abstract || event.links?.length > 0) && (
+						<hr className="my-4" />
+					)}
+					<span className="text-sm block mb-2">
+						Notice: The placeholder video image is licensed under{" "}
+						{fosdemImageDetails[event.type as FosdemImageType].license} and is
+						, {" "}
+						<a
+							href={fosdemImageDetails[event.type as FosdemImageType].original}
+							target="_blank"
+							rel="noreferrer"
+						>
+							the original image can be found here
+						</a>.
+					</span>
+					{fosdemImageDetails[event.type as FosdemImageType].changes && (
+						<span className="text-xs block mt-1">
+							Changes made to the image are:{" "}
+							{fosdemImageDetails[event.type as FosdemImageType].changes}
+						</span>
+					)}
+				</div>
 			</div>
 		</>
 	);
