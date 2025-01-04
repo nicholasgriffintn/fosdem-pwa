@@ -52,7 +52,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 						View profile
 					</Link>
 				</DropdownMenuItem>
-				<DropdownMenuItem>
+				<DropdownMenuItem asChild>
 					<a href="/api/auth/logout">Sign out</a>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
