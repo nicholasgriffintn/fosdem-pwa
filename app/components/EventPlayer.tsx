@@ -129,6 +129,8 @@ export function EventPlayer({
                 className="w-full h-full object-contain"
                 controls
                 autoPlay
+                playsInline
+                webkit-playsinline="true"
               >
                 {event.isLive
                   ? event.streams.map((stream) => (
