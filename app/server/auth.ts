@@ -71,13 +71,18 @@ export async function validateSessionToken(token: string) {
 
 	const shouldExtend = now >= expiresAt - 1000 * 60 * 60 * 24 * 15;
 	if (shouldExtend) {
-		session.expires_at = new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString();
-		db.update(sessionTable)
-			.set({
-				expires_at: session.expires_at,
-			})
-			.where(eq(sessionTable.id, sessionId))
-			.catch(console.error);
+		const lastExtensionTime = new Date(session.expires_at).getTime() - (30 * 24 * 60 * 60 * 1000);
+		const timeSinceLastExtension = now - lastExtensionTime;
+
+		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
+			session.expires_at = new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString();
+			db.update(sessionTable)
+				.set({
+					expires_at: session.expires_at,
+				})
+				.where(eq(sessionTable.id, sessionId))
+				.catch(console.error);
+		}
 	}
 
 	return { session, user };
