@@ -26,6 +26,13 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## TODO
 
+- [ ] Add a feature for note taking potentially?
+This would show in the sidebar instead of the summary that's currently there, summary would just display below now. On mobile, would maybe show in a modal?
+
+Should record the time that the note was started and saved based on the video timestamp.
+
+Should record the note in the database and then display it in the sidebar as a list.
+- [ ] Add bookmark status from DB to the event page.
 - [ ] Allow users to search within specific tracks or time slots
 - [ ] Organise bookmarks by day and time, allow for filtering potentially.
 - [ ] Display events below bookmarked tracks
@@ -35,11 +42,10 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] Guest sign in (potentially)
 - [ ] Configure push notifications, will need a new database table
 - [ ] Send notifications for bookmarked events (should be configurable)
-- [ ] Add a feature for note taking potentially?
 - [ ] Add a track progress feature? https://capture.dropbox.com/tmn4M77IN4F7IJUl
 - [ ] Maybe a visual indicator for progress?: https://capture.dropbox.com/YiTleZxrLM539GKc
 - [ ] Add personalised recommendations based on bookmarks? Maybe could give users the ability to st their interests? https://capture.dropbox.com/2UZpDyZp0R2YcKDn
-- [ ] Maybe we could put the events in Vectorize and then have a RAG AI suggest events?
+- [ ] Maybe we could put the events in Vectorize and then have a RAG AI suggest events? This would also include notes, would need to be personalised to the user, maybe with namespaces?
 - [ ] Add a room page (should show tracks and events in that room): https://fosdem.org/2025/schedule/room/k4201/, page might be able to show the single stream?
 
 ## Contributing
