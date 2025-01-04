@@ -32,7 +32,9 @@ export async function createSession(
 	const session: Session = {
 		id: sessionId,
 		user_id: userId,
-		expires_at: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+		expires_at: new Date(
+			now.getTime() + 1000 * 60 * 60 * 24 * 30,
+		).toISOString(),
 		last_extended_at: now.toISOString(),
 	};
 	await db.insert(sessionTable).values(session);
@@ -50,7 +52,7 @@ export async function validateSessionToken(token: string) {
 				expires_at: sessionTable.expires_at,
 				last_extended_at: sessionTable.last_extended_at,
 			},
-			user: userTable
+			user: userTable,
 		})
 		.from(sessionTable)
 		.innerJoin(userTable, eq(sessionTable.user_id, userTable.id))
@@ -74,7 +76,9 @@ export async function validateSessionToken(token: string) {
 		const timeSinceLastExtension = now - lastExtendedAt;
 
 		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
-			const newExpiresAt = new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString();
+			const newExpiresAt = new Date(
+				now + 1000 * 60 * 60 * 24 * 30,
+			).toISOString();
 			const newLastExtendedAt = new Date(now).toISOString();
 
 			session.expires_at = newExpiresAt;

@@ -13,7 +13,7 @@ interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 		href: string;
 		search?: Record<string, string | number | string[] | number[]>;
 	}[];
-	metadata?: string[]
+	metadata?: string[];
 }
 
 export function PageHeader({
@@ -55,7 +55,11 @@ export function PageHeader({
 					>
 						{heading}
 					</h1>
-					{metadata && <p className="text-base text-muted-foreground">{metadata.join(" | ")}</p>}
+					{metadata && (
+						<p className="text-base text-muted-foreground">
+							{metadata.join(" | ")}
+						</p>
+					)}
 					{text && <p className="text-xl text-muted-foreground">{text}</p>}
 				</div>
 				{children && <div className="flex justify-end">{children}</div>}

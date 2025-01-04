@@ -60,7 +60,11 @@ function TypePage() {
 			<div className="relative py-6 lg:py-10">
 				<PageHeader
 					heading={fosdem.type.name}
-					text={fosdemTypeDescriptions[fosdem.type.id as keyof typeof fosdemTypeDescriptions]}
+					text={
+						fosdemTypeDescriptions[
+							fosdem.type.id as keyof typeof fosdemTypeDescriptions
+						]
+					}
 					metadata={[`${fosdem.type.trackCount} TRACKS`]}
 				/>
 				<Tabs

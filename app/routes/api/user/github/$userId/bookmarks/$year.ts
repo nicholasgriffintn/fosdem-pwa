@@ -5,7 +5,9 @@ import { db } from "~/server/db";
 import { user as userTable } from "~/server/db/schema";
 import { bookmark as bookmarkSchema } from "~/server/db/schema";
 
-export const APIRoute = createAPIFileRoute("/api/user/github/$userId/bookmarks/$year")({
+export const APIRoute = createAPIFileRoute(
+	"/api/user/github/$userId/bookmarks/$year",
+)({
 	GET: async ({ params }) => {
 		const userId = params.userId;
 		const year = params.year;
@@ -23,10 +25,14 @@ export const APIRoute = createAPIFileRoute("/api/user/github/$userId/bookmarks/$
 		}
 
 		if (user.bookmarks_visibility === "private") {
-			return Response.json({ error: "User has private bookmarks" }, { status: 403 });
+			return Response.json(
+				{ error: "User has private bookmarks" },
+				{ status: 403 },
+			);
 		}
 
-		const bookmarks = await db.select()
+		const bookmarks = await db
+			.select()
 			.from(bookmarkSchema)
 			.where(
 				and(

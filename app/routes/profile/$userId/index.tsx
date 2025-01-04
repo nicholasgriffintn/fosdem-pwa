@@ -96,4 +96,3 @@ function ProfilePage() {
 		</div>
 	);
 }
-
