@@ -43,7 +43,7 @@ export function EventNotes({
     const newValue = e.target.value;
     setNote(newValue);
 
-    if (!note && newValue && videoRef.current) {
+    if (!note && !noteTime && newValue && videoRef.current) {
       setNoteTime(videoRef.current.currentTime);
     }
 
