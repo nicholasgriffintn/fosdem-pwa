@@ -60,6 +60,9 @@ const SheetContent = React.forwardRef<
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ side }), className)}
+      onOpenAutoFocus={event => {
+        event.preventDefault()
+      }}
       {...props}
     >
       {children}
