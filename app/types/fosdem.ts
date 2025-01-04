@@ -40,6 +40,7 @@ export interface Track {
 	room: string;
 	type: string;
 	day: number;
+	eventCount: number;
 }
 
 export interface Event {
@@ -73,3 +74,10 @@ export interface Event {
 export interface DayGroupedData {
 	[key: string]: any[];
 }
+
+export type FosdemImageType =
+	| "keynote"
+	| "maintrack"
+	| "devroom"
+	| "lightningtalk"
+	| "other";

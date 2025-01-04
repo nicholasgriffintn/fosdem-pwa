@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { TrackList } from "~/components/TrackList";
 import type { Conference, Track } from "~/types/fosdem";
 import { groupByDay } from "~/lib/fosdem";
-import { constants } from "../../constants";
+import { constants } from "~/constants";
+import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -57,7 +58,11 @@ function TypePage() {
 	return (
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
-				<PageHeader heading={fosdem.type.name} />
+				<PageHeader
+					heading={fosdem.type.name}
+					text={fosdemTypeDescriptions[fosdem.type.id as keyof typeof fosdemTypeDescriptions]}
+					metadata={[`${fosdem.type.trackCount} TRACKS`]}
+				/>
 				<Tabs
 					defaultValue={day ? day.toString() : fosdem.days[0].id}
 					className="w-full"

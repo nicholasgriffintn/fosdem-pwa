@@ -5,13 +5,7 @@ import clsx from "clsx";
 
 import { fosdemImageDetails } from "~/data/fosdem-image-details";
 import { Image } from "~/components/Image";
-
-type FosdemImageType =
-	| "keynote"
-	| "maintrack"
-	| "devroom"
-	| "lightningtalk"
-	| "other";
+import type { FosdemImageType } from "~/types/fosdem";
 
 export function FeaturedFosdemImage({
 	type,
