@@ -26,14 +26,21 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## TODO
 
-- [ ] 
-- [ ] Organise bookmarks by day and time
+- [ ] Allow users to search within specific tracks or time slots
+- [ ] Organise bookmarks by day and time, allow for filtering potentially.
 - [ ] Display events below bookmarked tracks
+- [ ] Potentially add a calendar view of bookmarked events, maybe a calendar export?
 - [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
 - [ ] Bookmarks are background synced when offline
 - [ ] Guest sign in (potentially)
 - [ ] Configure push notifications, will need a new database table
 - [ ] Send notifications for bookmarked events (should be configurable)
+- [ ] Add a feature for note taking potentially?
+- [ ] Add a track progress feature? https://capture.dropbox.com/tmn4M77IN4F7IJUl
+- [ ] Maybe a visual indicator for progress?: https://capture.dropbox.com/YiTleZxrLM539GKc
+- [ ] Add personalised recommendations based on bookmarks? Maybe could give users the ability to st their interests? https://capture.dropbox.com/2UZpDyZp0R2YcKDn
+- [ ] Maybe we could put the events in Vectorize and then have a RAG AI suggest events?
+- [ ] Add a room page (should show tracks and events in that room): https://fosdem.org/2025/schedule/room/k4201/, page might be able to show the single stream?
 
 ## Contributing
 

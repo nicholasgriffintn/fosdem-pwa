@@ -66,8 +66,6 @@ function TrackPage() {
     );
   }
 
-  console.log(fosdem.track);
-
   return (
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
