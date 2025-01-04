@@ -19,6 +19,7 @@ import {
 	User,
 	Wifi,
 	WifiOff,
+	Pencil,
 } from "lucide-react";
 
 export const Icons = {
@@ -66,6 +67,7 @@ export const Icons = {
 	user: User,
 	wifi: Wifi,
 	wifiOff: WifiOff,
+	pencil: Pencil,
 	gitHub: ({ ...props }) => (
 		<svg
 			aria-hidden="true"
