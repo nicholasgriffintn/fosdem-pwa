@@ -26,6 +26,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## TODO
 
+- [ ] 
 - [ ] Organise bookmarks by day and time
 - [ ] Display events below bookmarked tracks
 - [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
