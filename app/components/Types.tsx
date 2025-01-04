@@ -26,8 +26,6 @@ export function Types({
 }) {
   const typeKeys = Object.keys(types);
 
-  console.log(types)
-
   return (
     <ul className="flex flex-wrap -mx-1 lg:-mx-4">
       {typeKeys.map((typeKey: string) => {
