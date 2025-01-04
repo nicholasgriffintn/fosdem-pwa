@@ -47,11 +47,7 @@ export async function validateSessionToken(token: string) {
 				user_id: sessionTable.user_id,
 				expires_at: sessionTable.expires_at,
 			},
-			user: {
-				name: userTable.name,
-				avatar_url: userTable.avatar_url,
-				email: userTable.email,
-			},
+			user: userTable
 		})
 		.from(sessionTable)
 		.innerJoin(userTable, eq(sessionTable.user_id, userTable.id))
@@ -135,20 +131,4 @@ export async function getAuthSession(
 	return { session, user };
 }
 
-export async function getFullAuthSession() {
-	const { session, user } = await getAuthSession();
-
-	if (!session) {
-		return { session: null, user: null };
-	}
-
-	if (user?.email) {
-		const userData = await db
-			.select()
-			.from(userTable)
-			.where(eq(userTable.email, user.email));
-		return { session, user: userData[0] };
-	}
-
-	return { session, user: null };
-}
+export const getFullAuthSession = getAuthSession;
