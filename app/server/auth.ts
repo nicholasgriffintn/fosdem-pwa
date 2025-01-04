@@ -19,14 +19,15 @@ export const SESSION_COOKIE_NAME = "session";
 export function generateSessionToken(): string {
 	const bytes = new Uint8Array(20);
 	crypto.getRandomValues(bytes);
-	return encodeBase32LowerCaseNoPadding(bytes);
+	const token = encodeBase32LowerCaseNoPadding(bytes);
+	return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 }
 
 export async function createSession(
 	token: string,
 	userId: number,
 ): Promise<Session> {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+	const sessionId = token;
 	const session: Session = {
 		id: sessionId,
 		user_id: userId,
@@ -37,7 +38,7 @@ export async function createSession(
 }
 
 export async function validateSessionToken(token: string) {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+	const sessionId = token;
 	const now = Date.now();
 
 	const results = await db
