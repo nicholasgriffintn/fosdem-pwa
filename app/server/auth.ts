@@ -125,9 +125,18 @@ export async function getAuthSession(
 		deleteCookie(SESSION_COOKIE_NAME);
 		return { session: null, user: null };
 	}
+
 	if (refreshCookie) {
-		setSessionTokenCookie(token, new Date(session.expires_at));
+		const now = Date.now();
+		const expiresAt = new Date(session.expires_at).getTime();
+		const lastExtensionTime = expiresAt - (30 * 24 * 60 * 60 * 1000);
+		const timeSinceLastExtension = now - lastExtensionTime;
+
+		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
+			setSessionTokenCookie(token, new Date(session.expires_at));
+		}
 	}
+
 	return { session, user };
 }
 
