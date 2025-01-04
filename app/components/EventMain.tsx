@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { cn } from "~/lib/utils";
 
 import { EventSidebar } from "~/components/EventSidebar";
 import { EventPlayer } from "~/components/EventPlayer";
@@ -19,59 +20,51 @@ export function EventMain({
 	year,
 }: { event: Event; conference: ConferenceData; year: number }) {
 	const videoRef = useRef<HTMLVideoElement>(null);
-
 	const { width } = useWindowSize();
+	const isMobile = width < 768;
 
 	return (
 		<>
-			{width < 768 && (
-				<div className="space-y-4">
-					<div className="overflow-hidden rounded-lg border bg-card">
-						<div className="w-full">
+			<ResizablePanelGroup
+				direction={isMobile ? "vertical" : "horizontal"}
+				className={cn("rounded-lg", {
+					"!flex-col": isMobile,
+					"min-h-[200px] border": !isMobile,
+				})}
+			>
+				<ResizablePanel
+					defaultSize={isMobile ? 100 : 75}
+					className={cn({
+						"!w-full !flex-[1_1_auto]": isMobile,
+					})}
+				>
+					<div className="h-full flex flex-col">
+						<div className="flex-1">
 							<EventPlayer
 								event={event}
-								isMobile
 								conference={conference}
 								videoRef={videoRef}
+								isMobile={isMobile}
 							/>
 						</div>
 						{event.chat && <ChatAlert chatUrl={event.chat} />}
 					</div>
+				</ResizablePanel>
+				{!isMobile && <ResizableHandle withHandle />}
+				<ResizablePanel
+					defaultSize={25}
+					className={cn({
+						"!w-full mt-4 !flex-[1_1_auto]": isMobile,
+					})}
+				>
 					<EventSidebar
 						event={event}
-						isMobile
 						year={year}
 						videoRef={videoRef}
+						isMobile={isMobile}
 					/>
-				</div>
-			)}
-			{width >= 768 && (
-				<ResizablePanelGroup
-					direction="horizontal"
-					className="min-h-[200px] rounded-lg border"
-				>
-					<ResizablePanel defaultSize={75}>
-						<div className="h-full flex flex-col">
-							<div className="flex-1">
-								<EventPlayer
-									event={event}
-									conference={conference}
-									videoRef={videoRef}
-								/>
-							</div>
-							{event.chat && <ChatAlert chatUrl={event.chat} />}
-						</div>
-					</ResizablePanel>
-					<ResizableHandle withHandle />
-					<ResizablePanel defaultSize={25}>
-						<EventSidebar
-							event={event}
-							year={year}
-							videoRef={videoRef}
-						/>
-					</ResizablePanel>
-				</ResizablePanelGroup>
-			)}
+				</ResizablePanel>
+			</ResizablePanelGroup>
 			<div className="w-full">
 				{event.abstract && (
 					<div className="prose prose-lg prose-indigo overflow-scroll mt-4">
