@@ -1,0 +1,1 @@
+ALTER TABLE `session` ADD `last_extended_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL;

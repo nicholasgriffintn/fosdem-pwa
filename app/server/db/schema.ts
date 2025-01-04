@@ -45,7 +45,7 @@ export const oauthAccount = sqliteTable(
 			.notNull()
 			.references(() => user.id),
 	},
-	(table: any) => [
+	(table) => [
 		primaryKey({ columns: [table.provider_id, table.provider_user_id] }),
 	],
 );
@@ -56,6 +56,7 @@ export const session = sqliteTable("session", {
 		.notNull()
 		.references(() => user.id),
 	expires_at: text().notNull(),
+	last_extended_at: text("last_extended_at").default(sql`(CURRENT_TIMESTAMP)`).notNull()
 }, (table) => {
 	return {
 		expiresAtIdx: index("expires_at_idx").on(table.expires_at),
