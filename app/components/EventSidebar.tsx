@@ -29,7 +29,9 @@ export function EventSidebar({
 	return (
 		<div className={sidebarClassName}>
 			{loading ? (
-				<Skeleton className="h-full min-h-[40px]" />
+				<Skeleton className={clsx("h-full", {
+					"min-h-[40px] max-h-[40px]": isMobile,
+				})} />
 			) : (
 				<div>
 					{user ? (
