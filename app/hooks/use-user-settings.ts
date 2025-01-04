@@ -7,10 +7,13 @@ export function useUserSettings({ userId }: { userId: string }) {
 
   const setBookmarksVisibility = useMutation({
     mutationFn: async ({ visibility }: { visibility: string }) => {
-      await fetch("/api/user/bookmarks/visibility", {
+      const response = await fetch("/api/user/bookmarks/visibility", {
         method: "POST",
         body: JSON.stringify({ visibility }),
       });
+      if (!response.ok) throw new Error("Failed to set bookmarks visibility");
+      const data = await response.json();
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile", "me"] });

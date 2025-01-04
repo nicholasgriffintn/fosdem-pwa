@@ -36,6 +36,8 @@ export const user = sqliteTable("user", {
 	},
 );
 
+export type User = typeof user.$inferSelect;
+
 export const oauthAccount = sqliteTable(
 	"oauth_account",
 	{
@@ -63,6 +65,8 @@ export const session = sqliteTable("session", {
 	};
 });
 
+export type Session = typeof session.$inferSelect;
+
 export const bookmark = sqliteTable("bookmark", {
 	id: text().primaryKey(),
 	slug: text().notNull(),
@@ -84,6 +88,26 @@ export const bookmark = sqliteTable("bookmark", {
 	};
 });
 
-export type User = typeof user.$inferSelect;
-export type Session = typeof session.$inferSelect;
 export type Bookmark = typeof bookmark.$inferSelect;
+
+export const note = sqliteTable("note", {
+	id: integer().primaryKey({ autoIncrement: true }),
+	user_id: integer()
+		.notNull()
+		.references(() => user.id),
+	note: text().notNull(),
+	time: integer(),
+	year: integer().notNull(),
+	slug: text().notNull(),
+	created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+	updated_at: text()
+		.default(sql`(CURRENT_TIMESTAMP)`)
+		.$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+}, (table) => {
+	return {
+		yearIdx: index("note_year_idx").on(table.year),
+		slugIdx: index("note_slug_idx").on(table.slug),
+	};
+});
+
+export type Note = typeof note.$inferSelect;

@@ -46,29 +46,35 @@ export const APIRoute = createAPIFileRoute("/api/bookmarks/$year")({
 			),
 		});
 
-		if (existingBookmark) {
-			await db
-				.update(bookmark)
-				.set({
-					status,
-				})
-				.where(eq(bookmark.id, existingBookmark.id));
-		} else {
-			await db
-				.insert(bookmark)
-				.values({
-					id: `${user.id}_${year}_${slug}`,
-					slug,
-					type: `bookmark_${type}`,
-					year: Number.parseInt(year),
-					status,
-					user_id: user.id,
-				})
-				.returning();
-		}
+		try {
+			if (existingBookmark) {
+				await db
+					.update(bookmark)
+					.set({
+						status,
+					})
+					.where(eq(bookmark.id, existingBookmark.id));
+			} else {
+				await db
+					.insert(bookmark)
+					.values({
+						id: `${user.id}_${year}_${slug}`,
+						slug,
+						type: `bookmark_${type}`,
+						year: Number.parseInt(year),
+						status,
+						user_id: user.id,
+					})
+					.returning();
+			}
 
-		return Response.json({
-			success: true,
-		});
+			return Response.json({
+				success: true,
+			});
+		} catch (error) {
+			console.error(error);
+
+			return Response.json({ error: "Failed to save bookmark" }, { status: 500 });
+		}
 	},
 });

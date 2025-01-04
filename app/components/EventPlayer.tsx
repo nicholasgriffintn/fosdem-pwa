@@ -13,6 +13,7 @@ import type { FosdemImageType } from "~/types/fosdem";
 interface EventPlayerProps {
   event: Event;
   conference: ConferenceData;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
   isMobile?: boolean;
   onClose?: () => void;
   isFloating?: boolean;
@@ -21,11 +22,11 @@ interface EventPlayerProps {
 export function EventPlayer({
   event,
   conference,
+  videoRef,
   isMobile = false,
   onClose,
   isFloating = false,
 }: EventPlayerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -79,7 +80,7 @@ export function EventPlayer({
         hlsRef.current.destroy();
       }
     };
-  }, [event.streams, event.isLive, isPlaying]);
+  }, [event.streams, event.isLive, isPlaying, videoRef.current]);
 
   const handlePlay = () => {
     setIsPlaying(true);

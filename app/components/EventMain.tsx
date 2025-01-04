@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import { EventSidebar } from "~/components/EventSidebar";
 import { EventPlayer } from "~/components/EventPlayer";
 import { ChatAlert } from "~/components/ChatAlert";
@@ -14,7 +16,10 @@ import type { Event, ConferenceData } from "~/types/fosdem";
 export function EventMain({
 	event,
 	conference,
-}: { event: Event; conference: ConferenceData }) {
+	year,
+}: { event: Event; conference: ConferenceData; year: number }) {
+	const videoRef = useRef<HTMLVideoElement>(null);
+
 	const { width } = useWindowSize();
 
 	return (
@@ -23,11 +28,21 @@ export function EventMain({
 				<div className="space-y-4">
 					<div className="overflow-hidden rounded-lg border bg-card">
 						<div className="w-full">
-							<EventPlayer event={event} isMobile conference={conference} />
+							<EventPlayer
+								event={event}
+								isMobile
+								conference={conference}
+								videoRef={videoRef}
+							/>
 						</div>
 						{event.chat && <ChatAlert chatUrl={event.chat} />}
 					</div>
-					<EventSidebar event={event} isMobile />
+					<EventSidebar
+						event={event}
+						isMobile
+						year={year}
+						videoRef={videoRef}
+					/>
 				</div>
 			)}
 			{width >= 768 && (
@@ -38,20 +53,35 @@ export function EventMain({
 					<ResizablePanel defaultSize={75}>
 						<div className="h-full flex flex-col">
 							<div className="flex-1">
-								<EventPlayer event={event} conference={conference} />
+								<EventPlayer
+									event={event}
+									conference={conference}
+									videoRef={videoRef}
+								/>
 							</div>
 							{event.chat && <ChatAlert chatUrl={event.chat} />}
 						</div>
 					</ResizablePanel>
 					<ResizableHandle withHandle />
 					<ResizablePanel defaultSize={25}>
-						<EventSidebar event={event} />
+						<EventSidebar
+							event={event}
+							year={year}
+							videoRef={videoRef}
+						/>
 					</ResizablePanel>
 				</ResizablePanelGroup>
 			)}
 			<div className="w-full">
+				{event.abstract && (
+					<div className="prose prose-lg prose-indigo overflow-scroll mt-4">
+						<h2 className="text-xl font-medium">Description</h2>
+						{/* biome-ignore lint/security/noDangerouslySetInnerHtml: We want to render the abstract as HTML */}
+						<div className="mt-2" dangerouslySetInnerHTML={{ __html: event.abstract }} />
+					</div>
+				)}
 				{event.links?.length > 0 && (
-					<div className="mt-4">
+					<div className="mt-2">
 						<h2 className="text-xl font-medium">Links</h2>
 						<ul className="mt-2 space-y-2 list-disc list-inside">
 							{event.links.map((link) => {
