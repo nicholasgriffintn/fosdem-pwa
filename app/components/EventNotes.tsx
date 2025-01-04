@@ -29,11 +29,13 @@ export function EventNotes({
   event,
   userId,
   videoRef,
+  isMobile,
 }: {
   year: number;
   event: Event;
   userId?: string;
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  isMobile?: boolean;
 }) {
   const { notes, loading, create } = useNotes({ year, event, userId });
   const [note, setNote] = useState("");
@@ -78,10 +80,8 @@ export function EventNotes({
 
   return (
     <div className="flex flex-col h-full">
-      <h2 className="text-xl font-medium mb-4">Notes</h2>
-
-      <div className="flex-1 overflow-y-auto mb-4 min-h-[250px] max-h-[250px]">
-        {loading && <Skeleton className="h-full min-h-[250px]" />}
+      <div className={`flex-1 overflow-y-auto mb-4 ${isMobile ? 'min-h-[calc(100vh-250px)] max-h-[calc(100vh-250px)]' : 'min-h-[250px] max-h-[250px]'}`}>
+        {loading && <Skeleton className={`h-full ${isMobile ? 'min-h-[calc(100vh-250px)]' : 'min-h-[250px]'}`} />}
         {!loading && notes && (
           <ul className="space-y-2">
             {notes.map((note: {

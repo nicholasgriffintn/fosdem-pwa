@@ -6,6 +6,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { Skeleton } from "./ui/skeleton";
 import { Button } from "./ui/button";
 import { EventNotes } from "./EventNotes";
+import { EventNotesMobile } from "~/components/EventNotesMobile";
 
 export function EventSidebar({
 	event,
@@ -28,16 +29,30 @@ export function EventSidebar({
 	return (
 		<div className={sidebarClassName}>
 			{loading ? (
-				<Skeleton className="h-full" />
+				<Skeleton className="h-full min-h-[40px]" />
 			) : (
 				<div>
 					{user ? (
-						<EventNotes
-							event={event}
-							year={year}
-							userId={user.github_username}
-							videoRef={videoRef}
-						/>
+						<>
+							{isMobile ? (
+								<EventNotesMobile
+									event={event}
+									year={year}
+									userId={user.github_username}
+									videoRef={videoRef}
+								/>
+							) : (
+								<>
+									<h2 className="text-xl font-medium mb-4">Notes</h2>
+									<EventNotes
+										event={event}
+										year={year}
+										userId={user.github_username}
+										videoRef={videoRef}
+									/>
+								</>
+							)}
+						</>
 					) : (
 						<>
 							<p>Sign in to make notes from this session.</p>
