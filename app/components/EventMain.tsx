@@ -99,14 +99,13 @@ export function EventMain({
 					)}
 					<span className="text-sm block mb-2">
 						Notice: The placeholder video image is licensed under{" "}
-						{fosdemImageDetails[event.type as FosdemImageType].license} and is
-						, {" "}
+						{fosdemImageDetails[event.type as FosdemImageType].license}.{" "}
 						<a
 							href={fosdemImageDetails[event.type as FosdemImageType].original}
 							target="_blank"
 							rel="noreferrer"
 						>
-							the original image can be found here
+							The original image can be found here
 						</a>.
 					</span>
 					{fosdemImageDetails[event.type as FosdemImageType].changes && (
