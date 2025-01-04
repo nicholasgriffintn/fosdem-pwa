@@ -81,7 +81,13 @@ export function Header() {
 									)}
 								</TooltipTrigger>
 								<TooltipContent>
-									<p>Sign in to save favourites</p>
+									<p>
+										{loading
+											? "Loading..."
+											: user
+												? "Your profile"
+												: "Sign in to save favourites"}
+									</p>
 								</TooltipContent>
 							</Tooltip>
 						</TooltipProvider>
