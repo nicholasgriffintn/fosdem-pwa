@@ -116,7 +116,11 @@ function TrackPage() {
           </div>
         </PageHeader>
         <div className="w-full">
-          <EventMain event={fosdem.event} conference={fosdem.conference} />
+          <EventMain
+            event={fosdem.event}
+            conference={fosdem.conference}
+            year={year}
+          />
         </div>
       </div>
     </div>

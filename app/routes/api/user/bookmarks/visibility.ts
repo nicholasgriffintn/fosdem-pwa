@@ -19,15 +19,21 @@ export const APIRoute = createAPIFileRoute('/api/user/bookmarks/visibility')({
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    await db
-      .update(userSchema)
-      .set({
-        bookmarks_visibility: visibility,
-      })
-      .where(eq(userSchema.id, user.id))
+    try {
+      await db
+        .update(userSchema)
+        .set({
+          bookmarks_visibility: visibility,
+        })
+        .where(eq(userSchema.id, user.id))
 
-    return Response.json({
-      success: true,
-    })
+      return Response.json({
+        success: true,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return Response.json({ error: "Failed to update bookmarks visibility" }, { status: 500 });
+    }
   },
-})
+});

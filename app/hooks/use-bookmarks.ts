@@ -21,10 +21,13 @@ export function useBookmarks({ year }: { year: number }) {
             slug,
             status,
         }: { type: string; slug: string; status: string }) => {
-            await fetch(`/api/bookmarks/${year}`, {
+            const response = await fetch(`/api/bookmarks/${year}`, {
                 method: "POST",
                 body: JSON.stringify({ type, slug, status }),
             });
+            if (!response.ok) throw new Error("Failed to create bookmark");
+            const data = await response.json();
+            return data;
         },
         onSuccess: () => {
             queryClient.setQueryData(["bookmarks", year], null);

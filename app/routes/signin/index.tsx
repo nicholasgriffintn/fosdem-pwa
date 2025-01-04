@@ -51,16 +51,16 @@ function SignInPage() {
 									<span>Create a personal schedule by bookmarking talks and events that you're interested in.</span>
 								</li>
 								<li className="flex items-start gap-2">
-									<span className="text-xl">🔍</span>
-									<span>Get personalized recommendations based on your bookmarks (coming soon).</span>
-								</li>
-								<li className="flex items-start gap-2">
 									<span className="text-xl">📝</span>
-									<span>Take notes during sessions to capture key insights and ideas (coming soon).</span>
+									<span>Take notes during sessions to capture key insights and ideas.</span>
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-xl">🔗</span>
 									<span>Share your curated schedule and discover others through profile pages.</span>
+								</li>
+								<li className="flex items-start gap-2">
+									<span className="text-xl">🔍</span>
+									<span>Get personalized recommendations based on your bookmarks (coming soon).</span>
 								</li>
 							</ul>
 						</div>

@@ -2,7 +2,7 @@
 
 This is a companion app for [FOSDEM 2024](https://fosdem.org/2024/), built with [TanStack Start](https://tanstack.com/start/) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop.
 
-This is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), just in TanStack Router.
+This is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), just in TanStack Router. This is mostly a passion project to get a chance to play with some other technologies, alongside that, I personally attend FOSDEM, a lot of the features in this app are to make my experience better, such as tracking sessions I want to attend, taking notes, and sharing my bookmarks.
 
 ## Check it out
 
@@ -13,6 +13,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [x] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
 - [x] A page for each track with a list of events
 - [x] A page for each event with the event details
+- [x] The ability to take notes during sessions and save them to the database
 - [x] GitHub sign in
 - [x] A page for the user profile, with a generated pass for the event
 - [x] The ability to bookmark tracks and events
@@ -26,12 +27,6 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## TODO
 
-- [ ] Add a feature for note taking potentially?
-This would show in the sidebar instead of the summary that's currently there, summary would just display below now. On mobile, would maybe show in a modal?
-
-Should record the time that the note was started and saved based on the video timestamp.
-
-Should record the note in the database and then display it in the sidebar as a list.
 - [ ] Add bookmark status from DB to the event page.
 - [ ] Allow users to search within specific tracks or time slots
 - [ ] Organise bookmarks by day and time, allow for filtering potentially.

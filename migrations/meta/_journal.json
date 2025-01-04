@@ -36,6 +36,20 @@
       "when": 1735975092441,
       "tag": "0004_large_starjammers",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1736025995273,
+      "tag": "0005_pink_raider",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1736027158633,
+      "tag": "0006_white_catseye",
+      "breakpoints": true
     }
   ]
 }
