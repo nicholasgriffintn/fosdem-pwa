@@ -27,11 +27,13 @@ export async function createSession(
 	token: string,
 	userId: number,
 ): Promise<Session> {
+	const now = new Date();
 	const sessionId = token;
 	const session: Session = {
 		id: sessionId,
 		user_id: userId,
-		expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+		expires_at: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+		last_extended_at: now.toISOString(),
 	};
 	await db.insert(sessionTable).values(session);
 	return session;
@@ -46,6 +48,7 @@ export async function validateSessionToken(token: string) {
 			session: {
 				user_id: sessionTable.user_id,
 				expires_at: sessionTable.expires_at,
+				last_extended_at: sessionTable.last_extended_at,
 			},
 			user: userTable
 		})
@@ -67,14 +70,20 @@ export async function validateSessionToken(token: string) {
 
 	const shouldExtend = now >= expiresAt - 1000 * 60 * 60 * 24 * 15;
 	if (shouldExtend) {
-		const lastExtensionTime = new Date(session.expires_at).getTime() - (30 * 24 * 60 * 60 * 1000);
-		const timeSinceLastExtension = now - lastExtensionTime;
+		const lastExtendedAt = new Date(session.last_extended_at).getTime();
+		const timeSinceLastExtension = now - lastExtendedAt;
 
 		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
-			session.expires_at = new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString();
+			const newExpiresAt = new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString();
+			const newLastExtendedAt = new Date(now).toISOString();
+
+			session.expires_at = newExpiresAt;
+			session.last_extended_at = newLastExtendedAt;
+
 			db.update(sessionTable)
 				.set({
-					expires_at: session.expires_at,
+					expires_at: newExpiresAt,
+					last_extended_at: newLastExtendedAt,
 				})
 				.where(eq(sessionTable.id, sessionId))
 				.catch(console.error);
@@ -128,9 +137,8 @@ export async function getAuthSession(
 
 	if (refreshCookie) {
 		const now = Date.now();
-		const expiresAt = new Date(session.expires_at).getTime();
-		const lastExtensionTime = expiresAt - (30 * 24 * 60 * 60 * 1000);
-		const timeSinceLastExtension = now - lastExtensionTime;
+		const lastExtendedAt = new Date(session.last_extended_at).getTime();
+		const timeSinceLastExtension = now - lastExtendedAt;
 
 		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
 			setSessionTokenCookie(token, new Date(session.expires_at));
