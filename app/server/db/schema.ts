@@ -4,6 +4,8 @@ import {
 	sqliteTable,
 	primaryKey,
 	text,
+	index,
+	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
@@ -24,7 +26,15 @@ export const user = sqliteTable("user", {
 	setup_at: text(),
 	terms_accepted_at: text(),
 	bookmarks_visibility: text().default("private"),
-});
+},
+	(table) => {
+		return {
+			emailIdx: uniqueIndex("email_idx").on(table.email),
+			githubUsernameIdx: uniqueIndex("github_username_idx").on(table.github_username),
+			twitterUsernameIdx: uniqueIndex("twitter_username_idx").on(table.twitter_username),
+		};
+	},
+);
 
 export const oauthAccount = sqliteTable(
 	"oauth_account",
@@ -46,6 +56,10 @@ export const session = sqliteTable("session", {
 		.notNull()
 		.references(() => user.id),
 	expires_at: text().notNull(),
+}, (table) => {
+	return {
+		expiresAtIdx: index("expires_at_idx").on(table.expires_at),
+	};
 });
 
 export const bookmark = sqliteTable("bookmark", {
@@ -61,6 +75,12 @@ export const bookmark = sqliteTable("bookmark", {
 	updated_at: text()
 		.default(sql`(CURRENT_TIMESTAMP)`)
 		.$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+}, (table) => {
+	return {
+		yearIdx: index("year_idx").on(table.year),
+		typeIdx: index("type_idx").on(table.type),
+		slugIdx: uniqueIndex("slug_idx").on(table.slug),
+	};
 });
 
 export type User = typeof user.$inferSelect;
