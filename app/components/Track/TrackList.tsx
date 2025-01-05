@@ -6,6 +6,7 @@ import { useTrackList } from "~/hooks/use-item-list";
 type TrackListProps = {
 	tracks: Track[];
 	year: number;
+	title?: string;
 };
 
 type TrackListItemProps = {
@@ -51,34 +52,31 @@ function TrackListItem({
 	);
 }
 
-export function TrackList({ tracks, year }: TrackListProps) {
+export function TrackList({ tracks, year, title }: TrackListProps) {
 	const { items: sortedTracks, bookmarksLoading } = useTrackList({ items: tracks, year });
 
 	return (
-		<ul className="track-list w-full rounded-md">
+		<section>
+			<div className="flex justify-between items-center mb-4">
+				{title && <h2 className="text-xl font-semibold">{title}</h2>}
+			</div>
 			{sortedTracks?.length > 0 ? (
-				sortedTracks.map((track, index) => (
-					<li key={track.id}>
-						<TrackListItem
-							year={year}
-							track={track}
-							index={index}
-							isLast={tracks.length === index + 1}
-							bookmarksLoading={bookmarksLoading}
-						/>
-					</li>
-				))
+				<ul className="track-list w-full">
+					{sortedTracks.map((track, index) => (
+						<li key={track.id}>
+							<TrackListItem
+								year={year}
+								track={track}
+								index={index}
+								isLast={tracks.length === index + 1}
+								bookmarksLoading={bookmarksLoading}
+							/>
+						</li>
+					))}
+				</ul>
 			) : (
-				<li>
-					<div className="flex justify-between">
-						<div className="flex flex-col space-y-1.5 pt-6 pb-6">
-							<h3 className="font-semibold leading-none tracking-tight">
-								No tracks found
-							</h3>
-						</div>
-					</div>
-				</li>
+				<div className="text-muted-foreground">No tracks found</div>
 			)}
-		</ul>
+		</section>
 	);
 }
