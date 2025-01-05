@@ -1,11 +1,13 @@
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import Fuse from "fuse.js";
 
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { EventList } from "~/components/Event/EventList";
 import { TrackList } from "~/components/Track/TrackList";
 import { Spinner } from "~/components/Spinner";
-import { constants } from "../../constants";
+import { constants } from "~/constants";
+import { sortSearchResults } from "~/lib/sorting";
+import type { Event, Track } from "~/types/fosdem";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -79,12 +81,6 @@ export default function SearchPage() {
 
 		const tracksResults = tracksFuse
 			.search(query)
-			.sort((a, b) => {
-				const scoreA = a.score ?? 1;
-				const scoreB = b.score ?? 1;
-				if (scoreA !== scoreB) return scoreA - scoreB;
-				return String(a.item.name).length - String(b.item.name).length;
-			})
 			.slice(0, 10)
 			.map((result) => ({
 				...result.item,
@@ -93,17 +89,12 @@ export default function SearchPage() {
 
 		const eventsResults = eventsFuse
 			.search(query)
-			.sort((a, b) => {
-				const scoreA = a.score ?? 1;
-				const scoreB = b.score ?? 1;
-				if (scoreA !== scoreB) return scoreA - scoreB;
-				return String(a.item.title).length - String(b.item.title).length;
-			})
 			.slice(0, 20)
 			.map((result) => ({
 				...result.item,
 				searchScore: result.score ?? 1
-			}));
+			}))
+			.sort(sortSearchResults);
 
 		return {
 			tracks: tracksResults,
@@ -120,7 +111,7 @@ export default function SearchPage() {
 		eventCount: Object.values(fosdemData?.events || {}).filter(
 			(event) => event.trackKey === track.name,
 		).length,
-	}));
+	})) as Track[];
 
 	const formattedEvents = events.map((event) => ({
 		id: event.id,
@@ -129,7 +120,7 @@ export default function SearchPage() {
 		duration: event.duration,
 		room: event.room,
 		persons: event.persons,
-	}));
+	})) as Event[];
 
 	return (
 		<div className="container py-8">

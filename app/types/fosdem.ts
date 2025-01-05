@@ -64,6 +64,7 @@ export interface Track {
 	type: string;
 	day: number;
 	eventCount: number;
+	isFavourited?: boolean;
 }
 
 export interface Event {
@@ -101,6 +102,7 @@ export interface Event {
 	url: string;
 	feedbackUrl: string;
 	language: string;
+	isFavourited?: boolean;
 }
 
 export interface Conference {

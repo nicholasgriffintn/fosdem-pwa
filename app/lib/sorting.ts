@@ -1,0 +1,72 @@
+import type { Event, Track } from "~/types/fosdem";
+
+export function sortEvents(a: Event, b: Event): number {
+  const dayDiff = Number(a.day) - Number(b.day);
+  if (dayDiff !== 0) {
+    return dayDiff;
+  }
+
+  if (a.startTime !== b.startTime) {
+    return a.startTime.localeCompare(b.startTime);
+  }
+
+  if (a.duration !== b.duration) {
+    return a.duration.localeCompare(b.duration);
+  }
+
+  return a.title.localeCompare(b.title);
+}
+
+export function sortEventsWithFavorites(favorites: Record<string, boolean>) {
+  return (a: Event, b: Event): number => {
+    const aFav = favorites[a.id] || false;
+    const bFav = favorites[b.id] || false;
+    if (aFav !== bFav) {
+      return bFav ? 1 : -1;
+    }
+
+    return sortEvents(a, b);
+  };
+}
+
+export function sortTracksWithFavorites(favorites: Record<string, boolean>) {
+  return (a: Track, b: Track): number => {
+    const aFav = favorites[a.id] || false;
+    const bFav = favorites[b.id] || false;
+    if (aFav !== bFav) {
+      return bFav ? 1 : -1;
+    }
+
+    return a.name.localeCompare(b.name);
+  };
+}
+
+export function sortRooms(a: { name: string }, b: { name: string }): number {
+  const aOnline = a.name.toLowerCase().includes('online');
+  const bOnline = b.name.toLowerCase().includes('online');
+  if (aOnline !== bOnline) return aOnline ? 1 : -1;
+
+  return a.name.localeCompare(b.name);
+}
+
+export function sortSearchResults<T extends { searchScore?: number }>(a: T & Event, b: T & Event): number {
+  const scoreA = a.searchScore ?? 1;
+  const scoreB = b.searchScore ?? 1;
+  if (scoreA !== scoreB) {
+    return scoreA - scoreB;
+  }
+
+  return sortEvents(a, b);
+}
+
+export function sortUpcomingEvents(a: Event, b: Event): number {
+  if (a.startTime !== b.startTime) {
+    return a.startTime.localeCompare(b.startTime);
+  }
+
+  if (a.duration !== b.duration) {
+    return a.duration.localeCompare(b.duration);
+  }
+
+  return a.title.localeCompare(b.title);
+} 

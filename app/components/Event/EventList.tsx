@@ -7,19 +7,12 @@ import { ShareButton } from "~/components/ShareButton";
 import { constants } from "~/constants";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import { Spinner } from "../Spinner";
-
-type EventListItem = {
-	id: string;
-	title: string;
-	startTime: string;
-	duration: string;
-	room: string;
-	persons: string[];
-	isFavourited?: boolean;
-};
+import { sortEventsWithFavorites } from "~/lib/sorting";
+import type { Bookmark } from "~/server/db/schema";
+import type { Event } from "~/types/fosdem";
 
 type EventListProps = {
-	events: EventListItem[];
+	events: Event[];
 	favourites?: {
 		[key: string]: string;
 	}[];
@@ -34,7 +27,7 @@ function EventListItem({
 	bookmarksLoading,
 }: {
 	year: number;
-	event: EventListItem;
+	event: Event;
 	index: number;
 	isLast: boolean;
 	bookmarksLoading: boolean;
@@ -93,23 +86,30 @@ export function EventList({ events, year }: EventListProps) {
 	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
 
 	const eventsWithFavourites = events?.length
-		? events.map((event) => {
-			return {
-				...event,
-				isFavourited: bookmarks?.length
-					? Boolean(
-						bookmarks.find((bookmark: any) => bookmark.slug === event.id)
-							?.status === "favourited",
-					)
-					: undefined,
-			};
-		})
+		? events.map((event) => ({
+			...event,
+			isFavourited: bookmarks?.length
+				? Boolean(
+					bookmarks.find((bookmark: Bookmark) => bookmark.slug === event.id)
+						?.status === "favourited",
+				)
+				: undefined,
+		}))
 		: [];
+
+	const favorites = bookmarks?.reduce((acc: Record<string, boolean>, bookmark: Bookmark) => {
+		if (bookmark.status === "favourited") {
+			acc[bookmark.slug] = true;
+		}
+		return acc;
+	}, {} as Record<string, boolean>) || {};
+
+	const sortedEvents = [...eventsWithFavourites].sort(sortEventsWithFavorites(favorites));
 
 	return (
 		<ul className="event-list w-full">
-			{eventsWithFavourites?.length > 0 ? (
-				eventsWithFavourites.map((event, index) => (
+			{sortedEvents?.length > 0 ? (
+				sortedEvents.map((event, index) => (
 					<li key={event.id}>
 						<EventListItem
 							year={year}

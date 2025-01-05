@@ -7,17 +7,12 @@ import { ShareButton } from "~/components/ShareButton";
 import { constants } from "~/constants";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import { Spinner } from "../Spinner";
-
-type TrackListItem = {
-	id: string;
-	name: string;
-	room: string;
-	eventCount: number;
-	isFavourited?: boolean;
-};
+import { sortTracksWithFavorites } from "~/lib/sorting";
+import type { Track } from "~/types/fosdem";
+import type { Bookmark } from "~/server/db/schema";
 
 type TrackListProps = {
-	tracks: TrackListItem[];
+	tracks: Track[];
 	favourites?: {
 		[key: string]: string;
 	}[];
@@ -32,7 +27,7 @@ function TrackListItem({
 	bookmarksLoading,
 }: {
 	year: number;
-	track: TrackListItem;
+	track: Track;
 	index: number;
 	isLast: boolean;
 	bookmarksLoading: boolean;
@@ -95,7 +90,7 @@ export function TrackList({ tracks, year }: TrackListProps) {
 				...track,
 				isFavourited: bookmarks?.length
 					? Boolean(
-						bookmarks.find((bookmark: any) => bookmark.slug === track.id)
+						bookmarks.find((bookmark: Bookmark) => bookmark.slug === track.id)
 							?.status === "favourited",
 					)
 					: undefined,
@@ -103,10 +98,19 @@ export function TrackList({ tracks, year }: TrackListProps) {
 		})
 		: [];
 
+	const favorites = bookmarks?.reduce((acc: Record<string, boolean>, bookmark: Bookmark) => {
+		if (bookmark.status === "favourited") {
+			acc[bookmark.slug] = true;
+		}
+		return acc;
+	}, {} as Record<string, boolean>) || {};
+
+	const sortedTracks = [...tracksWithFavourites].sort(sortTracksWithFavorites(favorites));
+
 	return (
 		<ul className="track-list w-full rounded-md">
-			{tracksWithFavourites?.length > 0 ? (
-				tracksWithFavourites.map((track, index) => (
+			{sortedTracks?.length > 0 ? (
+				sortedTracks.map((track, index) => (
 					<li key={track.id}>
 						<TrackListItem
 							year={year}
