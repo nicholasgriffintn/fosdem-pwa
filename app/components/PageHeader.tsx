@@ -14,7 +14,10 @@ type PageHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 		href: string;
 		search?: Record<string, string | number | string[] | number[]>;
 	}[];
-	metadata?: string[];
+	metadata?: {
+		text: string;
+		href?: string;
+	}[];
 }
 
 export function PageHeader({
@@ -62,7 +65,16 @@ export function PageHeader({
 					)}
 					{metadata && (
 						<p className="text-base text-muted-foreground">
-							{metadata.join(" | ")}
+							{metadata.map((meta, index) => (
+								<span key={meta.text}>
+									{meta.href ? (
+										<Link to={meta.href}>{meta.text}</Link>
+									) : (
+										meta.text
+									)}
+									{index < metadata.length - 1 && " | "}
+								</span>
+							))}
 						</p>
 					)}
 					{text && <p className="text-xl text-muted-foreground">{text}</p>}

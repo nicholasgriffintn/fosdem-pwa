@@ -50,9 +50,7 @@ export interface DayData {
 export interface RoomData {
 	name: string;
 	slug: string;
-	building: {
-		id: string;
-	};
+	building?: string;
 	eventCount: number;
 }
 

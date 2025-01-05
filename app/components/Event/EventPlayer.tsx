@@ -29,6 +29,7 @@ export function EventPlayer({
 }: EventPlayerProps) {
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [streamError, setStreamError] = useState(false);
 
   const videoRecordings =
     event.links?.filter((link) => link.type?.startsWith("video/")) || [];
@@ -52,8 +53,15 @@ export function EventPlayer({
         const hls = new Hls();
         hlsRef.current = hls;
         hls.attachMedia(videoRef.current);
+
         hls.on(Hls.Events.MEDIA_ATTACHED, () => {
           hls.loadSource(hlsStream.href);
+        });
+
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          if (data.fatal) {
+            setStreamError(true);
+          }
         });
       }
     }
@@ -67,6 +75,7 @@ export function EventPlayer({
 
   const handlePlay = () => {
     setIsPlaying(true);
+    setStreamError(false);
   };
 
   const containerClassName = clsx("relative w-full", {
@@ -106,7 +115,7 @@ export function EventPlayer({
                 </span>
               </button>
             )}
-            {isPlaying && (
+            {isPlaying && !streamError && (
               // biome-ignore lint/a11y/useMediaCaption: We don't have captions for the streams
               <video
                 ref={videoRef}
@@ -132,6 +141,17 @@ export function EventPlayer({
                     />
                   ))}
               </video>
+            )}
+            {streamError && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
+                <div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md">
+                  <span className="text-sm md:text-base">
+                    {eventIsLive
+                      ? "The live stream is currently unavailable. Please try again later."
+                      : "There was an error playing the recording. Please try again later."}
+                  </span>
+                </div>
+              </div>
             )}
           </>
         ) : (

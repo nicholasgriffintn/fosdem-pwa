@@ -95,11 +95,22 @@ function TrackPage() {
           ]}
           subtitle={fosdem.event.subtitle}
           metadata={[
-            `Day ${fosdem.event.day}`,
-            `Start time: ${fosdem.event.startTime}`,
-            `Duration: ${fosdem.event.duration}`,
-            `Room: ${fosdem.event.room}`,
-            `Speakers: ${fosdem.event.persons?.join(", ")}`,
+            {
+              text: `Day ${fosdem.event.day}`,
+            },
+            {
+              text: `Starts at ${fosdem.event.startTime}`,
+            },
+            {
+              text: `${fosdem.event.duration} long`,
+            },
+            {
+              text: `${fosdem.event.room}`,
+              href: `/room/${fosdem.event.room}`,
+            },
+            {
+              text: `Speakers: ${fosdem.event.persons?.join(", ")}`,
+            },
           ]}
         >
           <div className="flex items-center md:pl-6 md:pr-3 gap-2">

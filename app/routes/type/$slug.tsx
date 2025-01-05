@@ -65,7 +65,11 @@ function TypePage() {
 						fosdem.type.id as keyof typeof fosdemTypeDescriptions
 						]
 					}
-					metadata={[`${fosdem.type.trackCount} TRACKS`]}
+					metadata={[
+						{
+							text: `${fosdem.type.trackCount} tracks`
+						}
+					]}
 				/>
 				<Tabs
 					defaultValue={day ? day.toString() : fosdem.days[0].id}
