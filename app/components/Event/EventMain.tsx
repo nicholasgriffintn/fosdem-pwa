@@ -21,15 +21,18 @@ type EventMainProps = {
 	event: Event;
 	conference: ConferenceData;
 	year: number;
+	isTest?: boolean;
 };
 
 export function EventMain({
 	event,
 	conference,
 	year,
+	isTest
 }: EventMainProps) {
 	const roomType = event.room?.[0];
 	const specialRoom = roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
+	const testTime = isTest ? new Date(conference.start) : undefined;
 
 	if (specialRoom) {
 		return (
@@ -73,6 +76,7 @@ export function EventMain({
 								conference={conference}
 								videoRef={videoRef}
 								isMobile={isMobile}
+								testTime={testTime}
 							/>
 						</div>
 						{event.chat && <ChatAlert chatUrl={event.chat} />}
