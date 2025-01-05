@@ -7,7 +7,7 @@ import { ConferenceBadge } from "~/components/ConferenceBadge";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "~/constants";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
-import { BookmarksList } from "~/components/BookmarksList";
+import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { SetBookmarksVisability } from "~/components/SetBookmarksVisability";
 
 export const Route = createFileRoute("/profile/")({

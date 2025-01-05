@@ -4,10 +4,10 @@ import { PageHeader } from "~/components/PageHeader";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import { constants } from "~/constants";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
-import { BookmarksList } from "../../components/BookmarksList";
+import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useAuth } from "~/hooks/use-auth";
-import { Spinner } from "../../components/Spinner";
-import { Button } from "../../components/ui/button";
+import { Spinner } from "~/components/Spinner";
+import { Button } from "~/components/ui/button";
 
 export const Route = createFileRoute("/bookmarks/")({
   component: BookmarksHome,

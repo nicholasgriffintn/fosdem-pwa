@@ -5,7 +5,7 @@ import { PageHeader } from "~/components/PageHeader";
 import { ConferenceBadge } from "~/components/ConferenceBadge";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "~/constants";
-import { BookmarksList } from "~/components/BookmarksList";
+import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useUserBookmarks } from "~/hooks/use-user-bookmarks";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 
