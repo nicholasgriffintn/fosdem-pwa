@@ -71,10 +71,6 @@ function TrackPage() {
           ]}
           metadata={[
             {
-              text: `${fosdem.type.name}`,
-              href: `/type/${fosdem.type.id}`,
-            },
-            {
               text: `${fosdem.track.room}`,
               href: `/rooms/${fosdem.track.room}`,
             },

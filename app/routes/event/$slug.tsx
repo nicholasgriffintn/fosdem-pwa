@@ -97,14 +97,14 @@ function EventPage() {
           subtitle={fosdem.event.subtitle}
           metadata={[
             {
+              text: `${fosdem.event.room}`,
+              href: `/rooms/${fosdem.event.room}`,
+            },
+            {
               text: `Day ${fosdem.event.day}`,
             },
             {
               text: `${fosdem.event.startTime} - ${calculateEndTime(fosdem.event.startTime, fosdem.event.duration)}`,
-            },
-            {
-              text: `${fosdem.event.room}`,
-              href: `/rooms/${fosdem.event.room}`,
             },
             {
               text: `Speakers: ${fosdem.event.persons?.join(", ")}`,
