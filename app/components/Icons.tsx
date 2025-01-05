@@ -20,6 +20,9 @@ import {
 	Wifi,
 	WifiOff,
 	Pencil,
+	AlertTriangle,
+	ChevronDown,
+	ChevronUp,
 } from "lucide-react";
 
 export const Icons = {
@@ -68,6 +71,9 @@ export const Icons = {
 	wifi: Wifi,
 	wifiOff: WifiOff,
 	pencil: Pencil,
+	alertTriangle: AlertTriangle,
+	chevronDown: ChevronDown,
+	chevronUp: ChevronUp,
 	gitHub: ({ ...props }) => (
 		<svg
 			aria-hidden="true"

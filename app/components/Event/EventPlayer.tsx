@@ -5,14 +5,14 @@ import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { Play } from "lucide-react";
 
-import type { Conference, Event } from "~/types/fosdem";
+import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
 import { isEventLive, isEventFinished } from "~/lib/eventTiming";
 
 interface EventPlayerProps {
   event: Event;
-  conference: Conference;
+  conference: ConferenceData;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   isMobile?: boolean;
   onClose?: () => void;
@@ -34,11 +34,11 @@ export function EventPlayer({
     event.links?.filter((link) => link.type?.startsWith("video/")) || [];
   const hasRecordings = videoRecordings.length > 0;
 
-  const eventIsLive = isEventLive(event, conference.conference) && event.streams?.some(
+  const eventIsLive = isEventLive(event, conference) && event.streams?.some(
     stream => stream.type === "application/vnd.apple.mpegurl"
   );
 
-  const eventIsInPast = isEventFinished(event, conference.conference);
+  const eventIsInPast = isEventFinished(event, conference);
 
   useEffect(() => {
     if (!videoRef.current || !isPlaying) return;

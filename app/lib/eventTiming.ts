@@ -28,7 +28,11 @@ export function getEventDateTime(event: Event, conference: ConferenceData): Date
     return null;
   }
 
-  const eventDate = new Date(conference.days[dayIndex].date);
+  if (!conference.days[dayIndex]) {
+    return null;
+  }
+
+  const eventDate = new Date(conference.days[dayIndex]);
   const [hours, minutes] = event.startTime.split(":").map(Number);
   eventDate.setHours(hours, minutes, 0, 0);
   return eventDate;
