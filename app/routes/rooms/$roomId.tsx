@@ -6,7 +6,7 @@ import { EventList } from '~/components/Event/EventList'
 import { RoomPlayer } from '~/components/Room/RoomPlayer'
 import { RoomStatus } from '~/components/Room/RoomStatus'
 import { getAllData } from '~/functions/getFosdemData'
-import type { Conference, Event } from '~/types/fosdem'
+import type { Conference, Event, RoomData } from '~/types/fosdem'
 import { PageHeader } from '../../components/PageHeader'
 
 export const Route = createFileRoute('/rooms/$roomId')({
@@ -20,11 +20,23 @@ export const Route = createFileRoute('/rooms/$roomId')({
   loaderDeps: ({ search: { year, day } }) => ({ year, day }),
   loader: async ({ params, deps: { year, day } }) => {
     const data = (await getAllData({ data: { year } })) as Conference
-    const room = data.rooms[params.roomId]
 
-    const roomEvents = Object.values(data.events).filter(
-      (event: Event): event is Event => event.room === params.roomId,
-    )
+    let room: RoomData | undefined;
+    if (data.rooms[params.roomId]) {
+      room = data.rooms[params.roomId];
+    } else {
+      const roomBySlug = Object.values(data.rooms).find(room => room.slug === params.roomId);
+      if (roomBySlug) {
+        room = roomBySlug;
+      }
+    }
+
+    let roomEvents: Event[] = [];
+    if (room?.name) {
+      roomEvents = Object.values(data.events).filter(
+        (event: Event): event is Event => event.room === room.name,
+      )
+    }
 
     return { fosdem: { room, roomEvents }, year, day }
   },
@@ -46,6 +58,19 @@ function RoomPage() {
   const roomEvents = fosdem.roomEvents
   const roomInfo = fosdem.room
 
+  if (!roomInfo) {
+    return (
+      <div className="min-h-screen">
+        <div className="relative py-6 lg:py-10">
+          <PageHeader
+            heading="Room not found"
+            breadcrumbs={[{ title: 'Rooms', href: '/rooms' }]}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
@@ -59,6 +84,7 @@ function RoomPage() {
               text: `${roomInfo.eventCount} events`,
             },
           ]}
+          breadcrumbs={[{ title: 'Rooms', href: '/rooms' }]}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

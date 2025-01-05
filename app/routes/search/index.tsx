@@ -1,13 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import Fuse from "fuse.js";
+import { Link } from "@tanstack/react-router";
 
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { EventList } from "~/components/Event/EventList";
 import { TrackList } from "~/components/Track/TrackList";
+import { RoomList } from "~/components/Room/RoomList";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "~/constants";
 import { sortSearchResults } from "~/lib/sorting";
-import type { Event, Track } from "~/types/fosdem";
+import type { Event, Track, RoomData } from "~/types/fosdem";
+import {
+	TRACK_SEARCH_KEYS,
+	EVENT_SEARCH_KEYS,
+	ROOM_SEARCH_KEYS,
+	createSearchIndex,
+	formatTrack,
+	formatEvent,
+	formatRoom,
+	type SearchResults
+} from "~/lib/search";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -15,7 +26,7 @@ export const Route = createFileRoute("/search/")({
 		meta: [
 			{
 				title: "Search | FOSDEM PWA",
-				description: "Search for events and tracks at FOSDEM PWA",
+				description: "Search for events, tracks and rooms at FOSDEM PWA",
 			},
 		],
 	}),
@@ -40,44 +51,12 @@ export default function SearchPage() {
 	const { fosdemData, loading } = useFosdemData({ year });
 	const query = q || "";
 
-	const getSearchResults = () => {
-		if (!fosdemData || !query) return { tracks: [], events: [] };
+	const getSearchResults = (): SearchResults => {
+		if (!fosdemData || !query) return { tracks: [], events: [], rooms: [] };
 
-		const tracksFuse = new Fuse(Object.values(fosdemData.tracks), {
-			keys: [
-				{ name: "name", weight: 1.0 },
-				{ name: "type", weight: 0.8 },
-				{ name: "description", weight: 0.6 },
-				{ name: "room", weight: 0.4 }
-			],
-			threshold: 0.4,
-			includeScore: true,
-			useExtendedSearch: true,
-			ignoreLocation: true,
-			getFn: (obj, path) => {
-				const value = Fuse.config.getFn(obj, path);
-				return value ? String(value) : "";
-			}
-		});
-
-		const eventsFuse = new Fuse(Object.values(fosdemData.events), {
-			keys: [
-				{ name: "title", weight: 1.0 },
-				{ name: "persons", weight: 0.9 },
-				{ name: "track", weight: 0.8 },
-				{ name: "abstract", weight: 0.7 },
-				{ name: "description", weight: 0.6 },
-				{ name: "room", weight: 0.4 }
-			],
-			threshold: 0.4,
-			includeScore: true,
-			useExtendedSearch: true,
-			ignoreLocation: true,
-			getFn: (obj, path) => {
-				const value = Fuse.config.getFn(obj, path);
-				return value ? String(value) : "";
-			}
-		});
+		const tracksFuse = createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS);
+		const eventsFuse = createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS);
+		const roomsFuse = createSearchIndex(Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS);
 
 		const tracksResults = tracksFuse
 			.search(query)
@@ -96,31 +75,26 @@ export default function SearchPage() {
 			}))
 			.sort(sortSearchResults);
 
+		const roomsResults = roomsFuse
+			.search(query)
+			.slice(0, 10)
+			.map((result) => ({
+				...result.item,
+				searchScore: result.score ?? 1
+			}));
+
 		return {
 			tracks: tracksResults,
 			events: eventsResults,
+			rooms: roomsResults,
 		};
 	};
 
-	const { tracks, events } = getSearchResults();
+	const { tracks, events, rooms } = getSearchResults();
 
-	const formattedTracks = tracks.map((track) => ({
-		id: track.id,
-		name: track.name,
-		room: track.room,
-		eventCount: Object.values(fosdemData?.events || {}).filter(
-			(event) => event.trackKey === track.name,
-		).length,
-	})) as Track[];
-
-	const formattedEvents = events.map((event) => ({
-		id: event.id,
-		title: event.title,
-		startTime: event.startTime,
-		duration: event.duration,
-		room: event.room,
-		persons: event.persons,
-	})) as Event[];
+	const formattedTracks = tracks.map((track) => formatTrack(track, fosdemData?.events || {})) as Track[];
+	const formattedEvents = events.map(formatEvent) as Event[];
+	const formattedRooms = rooms.map(formatRoom) as RoomData[];
 
 	return (
 		<div className="container py-8">
@@ -129,21 +103,18 @@ export default function SearchPage() {
 				<div className="flex justify-center items-center h-screen">
 					<Spinner className="h-8 w-8" />
 				</div>
-			) : tracks.length === 0 && events.length === 0 ? (
+			) : tracks.length === 0 && events.length === 0 && rooms.length === 0 ? (
 				<p className="text-muted-foreground">No results found.</p>
 			) : (
 				<div className="space-y-8">
 					{tracks.length > 0 && (
-						<section>
-							<h2 className="text-xl font-semibold mb-4">Tracks</h2>
-							<TrackList tracks={formattedTracks} year={year} />
-						</section>
+						<TrackList tracks={formattedTracks} year={year} title="Track Results" />
 					)}
 					{events.length > 0 && (
-						<section>
-							<h2 className="text-xl font-semibold mb-4">Events</h2>
-							<EventList events={formattedEvents} year={year} />
-						</section>
+						<EventList events={formattedEvents} year={year} title="Event Results" />
+					)}
+					{rooms.length > 0 && (
+						<RoomList rooms={formattedRooms} year={year} title="Room Results" />
 					)}
 				</div>
 			)}

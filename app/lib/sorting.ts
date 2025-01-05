@@ -1,4 +1,4 @@
-import type { Event, Track } from "~/types/fosdem";
+import type { Event, RoomData, Track } from "~/types/fosdem";
 
 export function sortEvents(a: Event, b: Event): number {
   const dayDiff = Number(a.day) - Number(b.day);
@@ -45,10 +45,15 @@ export function sortTracksWithFavorites(favorites: Record<string, boolean>) {
   };
 }
 
-export function sortRooms(a: { name: string }, b: { name: string }): number {
+export function sortRooms(a: RoomData, b: RoomData): number {
   const aOnline = a.name.toLowerCase().includes('online');
   const bOnline = b.name.toLowerCase().includes('online');
   if (aOnline !== bOnline) return aOnline ? 1 : -1;
+
+  const buildingA = a.buildingId || a.building?.id || "";
+  const buildingB = b.buildingId || b.building?.id || "";
+  const buildingCompare = buildingA.localeCompare(buildingB);
+  if (buildingCompare !== 0) return buildingCompare;
 
   return a.name.localeCompare(b.name);
 }
