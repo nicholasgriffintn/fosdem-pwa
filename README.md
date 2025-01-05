@@ -26,6 +26,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [x] A page for finding live events
 - [x] A map page
 - [x] A search page
+- [x] A room page with a list of events in that room and a continuous live stream view
 - [x] Data synced automatically from FOSDEM on a schedule, deployed separately [here](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)
 
 ## TODO
@@ -44,7 +45,6 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [ ] Maybe a visual indicator for progress?: https://capture.dropbox.com/YiTleZxrLM539GKc
 - [ ] Add personalised recommendations based on bookmarks? Maybe could give users the ability to st their interests? https://capture.dropbox.com/2UZpDyZp0R2YcKDn
 - [ ] Maybe we could put the events in Vectorize and then have a RAG AI suggest events? This would also include notes, would need to be personalised to the user, maybe with namespaces?
-- [ ] Add a room page (should show tracks and events in that room): https://fosdem.org/2025/schedule/room/k4201/, page might be able to show the single stream?
 
 ## Contributing
 

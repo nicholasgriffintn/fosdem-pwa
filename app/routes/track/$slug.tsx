@@ -6,13 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { EventList } from "~/components/Event/EventList";
 import type { Conference, Event } from "~/types/fosdem";
 import { groupByDay } from "~/lib/fosdem";
-import { constants } from "../../constants";
-
-function get24HrFormat(str: string) {
-  const _t = str.split(/[^0-9]/g);
-  _t[0] = String(+_t[0] + (str.indexOf("pm") > -1 && +_t[0] !== 12 ? 12 : 0));
-  return _t.join("");
-}
+import { constants } from "~/constants";
+import { get24HrFormat } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/track/$slug")({
   component: TrackPage,
@@ -75,10 +70,20 @@ function TrackPage() {
             { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
           ]}
           metadata={[
-            `Type: ${fosdem.type.name}`,
-            `Room: ${fosdem.track.room}`,
-            `Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(" and ") : fosdem.track.day}`,
-            `Events: ${fosdem.track.eventCount}`,
+            {
+              text: `${fosdem.type.name}`,
+              href: `/type/${fosdem.type.id}`,
+            },
+            {
+              text: `${fosdem.track.room}`,
+              href: `/room/${fosdem.track.room}`,
+            },
+            {
+              text: `Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(" and ") : fosdem.track.day}`,
+            },
+            {
+              text: `${fosdem.track.eventCount} events`,
+            }
           ]}
         />
         <Tabs

@@ -13,3 +13,9 @@ export function formatDate(date: Date) {
     minute: "2-digit",
   });
 }
+
+export function get24HrFormat(str: string) {
+  const _t = str.split(/[^0-9]/g);
+  _t[0] = String(+_t[0] + (str.indexOf("pm") > -1 && +_t[0] !== 12 ? 12 : 0));
+  return _t.join("");
+}
