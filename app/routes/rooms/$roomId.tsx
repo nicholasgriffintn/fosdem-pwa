@@ -38,7 +38,7 @@ export const Route = createFileRoute('/rooms/$roomId')({
       )
     }
 
-    return { fosdem: { room, roomEvents }, year, day }
+    return { fosdem: { room, roomEvents, conference: data.conference }, year, day }
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -57,6 +57,10 @@ function RoomPage() {
 
   const roomEvents = fosdem.roomEvents
   const roomInfo = fosdem.room
+  const conference = fosdem.conference
+
+  const now = new Date()
+  const isConferenceRunning = new Date(conference.start) < now && new Date(conference.end) > now
 
   if (!roomInfo) {
     return (
@@ -93,9 +97,11 @@ function RoomPage() {
           </div>
 
           <div className="space-y-6">
-            <div>
-              <RoomStatus roomId={roomInfo.slug} />
-            </div>
+            {isConferenceRunning && (
+              <div>
+                <RoomStatus roomId={roomInfo.slug} />
+              </div>
+            )}
 
             <div>
               <h2 className="text-xl font-semibold mb-2">Quick Links</h2>
