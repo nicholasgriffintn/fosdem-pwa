@@ -17,6 +17,10 @@ export function sortEvents(a: Event, b: Event): number {
   return a.title.localeCompare(b.title);
 }
 
+export function sortTracks(a: Track, b: Track): number {
+  return a.name.localeCompare(b.name);
+}
+
 export function sortEventsWithFavorites(favorites: Record<string, boolean>) {
   return (a: Event, b: Event): number => {
     const aFav = favorites[a.id] || false;

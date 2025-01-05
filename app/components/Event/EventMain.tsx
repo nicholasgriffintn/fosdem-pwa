@@ -22,7 +22,6 @@ export function EventMain({
 	conference,
 	year,
 }: { event: Event; conference: ConferenceData; year: number }) {
-	console.log(event);
 	const roomType = event.room?.[0];
 	const specialRoom = roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
 
