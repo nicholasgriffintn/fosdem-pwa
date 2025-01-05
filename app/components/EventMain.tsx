@@ -44,7 +44,7 @@ export function EventMain({
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const { width } = useWindowSize();
-	const isMobile = width < 768;
+	const isMobile = typeof window !== 'undefined' ? width < 768 : false;
 
 	return (
 		<>
