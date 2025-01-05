@@ -111,10 +111,7 @@ export function BookmarksList({
       ) : bookmarks?.length ? (
         <div className="space-y-8">
           {tracks.length > 0 && (
-            <section>
-              <h2 className="text-xl font-semibold mb-4">Bookmarked Tracks</h2>
-              <TrackList tracks={tracks} year={year} />
-            </section>
+            <TrackList tracks={tracks} year={year} title="Bookmarked Tracks" />
           )}
           {events.length > 0 && (
             <EventList
