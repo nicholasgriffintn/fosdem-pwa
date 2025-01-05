@@ -4,6 +4,7 @@ import { cn } from "~/lib/utils";
 
 interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 	heading: string;
+	subtitle?: string;
 	text?: string;
 	className?: string;
 	children?: React.ReactNode;
@@ -18,6 +19,7 @@ interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function PageHeader({
 	heading,
+	subtitle,
 	text,
 	className,
 	children,
@@ -55,6 +57,9 @@ export function PageHeader({
 					>
 						{heading}
 					</h1>
+					{subtitle && (
+						<p className="text-xl text-muted-foreground">{subtitle}</p>
+					)}
 					{metadata && (
 						<p className="text-base text-muted-foreground">
 							{metadata.join(" | ")}

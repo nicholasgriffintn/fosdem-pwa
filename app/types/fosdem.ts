@@ -45,6 +45,7 @@ export interface Track {
 
 export interface Event {
 	title: string;
+	subtitle: string;
 	description: string;
 	room: string;
 	persons: string[];

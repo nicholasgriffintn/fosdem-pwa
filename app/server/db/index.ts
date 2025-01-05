@@ -52,8 +52,7 @@ export const db = drizzle(
 
 		if (response.status !== 200)
 			throw new Error(
-				`Error from sqlite proxy server: ${response.status} ${
-					response.statusText
+				`Error from sqlite proxy server: ${response.status} ${response.statusText
 				}\n${JSON.stringify(await response.json())}`,
 			);
 
@@ -61,8 +60,7 @@ export const db = drizzle(
 
 		if (!responseJson.success) {
 			throw new Error(
-				`Error from Cloudflare D1: ${response.status} ${
-					response.statusText
+				`Error from Cloudflare D1: ${response.status} ${response.statusText
 				}\n${JSON.stringify(responseJson)}`,
 			);
 		}
