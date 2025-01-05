@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "~/components/PageHeader";
 import { FavouriteButton } from "~/components/FavouriteButton";
 import { ShareButton } from "~/components/ShareButton";
-import { testLiveEvent, testConference } from "~/data/test-data";
+import { testLiveEvent, testConferenceData } from "~/data/test-data";
 import { getAllData } from "~/functions/getFosdemData";
 import { EventMain } from "~/components/Event/EventMain";
 import { constants } from "~/constants";
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/event/$slug")({
       return {
         fosdem: {
           event: testLiveEvent,
-          conference: testConference,
+          conference: testConferenceData,
           track: {
             id: "radio",
             name: "Radio",

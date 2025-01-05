@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "~/components/PageHeader";
 import { EventList } from "~/components/Event/EventList";
 import { getAllData } from "~/functions/getFosdemData";
-import { testLiveEvent } from "~/data/test-data";
+import { testLiveEvents, testConferenceData } from "~/data/test-data";
 import type { Conference, Event } from "~/types/fosdem";
 import { constants } from "../../constants";
 import { isEventLive, isEventUpcoming } from "~/lib/eventTiming";
@@ -20,7 +20,15 @@ export const Route = createFileRoute("/live/")({
   loaderDeps: ({ search: { test, year } }) => ({ test, year }),
   loader: async ({ deps: { test, year } }) => {
     if (test) {
-      return { liveEvents: [testLiveEvent], upcomingEvents: [], year };
+      const testNow = new Date(testConferenceData.start);
+      const liveEvents = testLiveEvents.filter((event) =>
+        isEventLive(event, testConferenceData, testNow)
+      );
+      const upcomingEvents = testLiveEvents.filter((event) =>
+        isEventUpcoming(event, testConferenceData, 30, testNow)
+      );
+
+      return { liveEvents, upcomingEvents, year };
     }
     const data = (await getAllData({ data: { year } })) as Conference;
 
