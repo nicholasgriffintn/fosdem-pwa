@@ -13,7 +13,13 @@ interface RoomStatus {
 async function fetchRoomStatus(roomId: string): Promise<RoomStatus> {
   try {
     const response = await fetch(constants.ROOMS_API);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch room status");
+    }
+
     const data = await response.json();
+
     const status = data.find((room: RoomStatus) => room.room === roomId);
     return status || { room: roomId, state: "unknown", lastUpdate: "" };
   } catch (error) {

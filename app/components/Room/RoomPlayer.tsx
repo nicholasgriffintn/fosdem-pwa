@@ -6,6 +6,7 @@ import Hls from "hls.js";
 
 import { Icons } from "~/components/Icons";
 import { constants } from "~/constants";
+import { Image } from "~/components/Image";
 
 type RoomPlayerProps = {
   roomId: string;
@@ -72,6 +73,14 @@ export function RoomPlayer({
 
   return (
     <div className={containerClassName}>
+      {!isPlaying && (
+        <Image
+          src="/images/fosdem/full/fallback.png"
+          alt="The FOSDEM logo"
+          className="w-full h-full absolute top-0 left-0 z-0 object-cover"
+        />
+      )}
+
       <div className={videoWrapperClassName}>
         {!isPlaying && (
           <button
