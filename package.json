@@ -45,6 +45,7 @@
     "@tanstack/router-devtools": "^1.87.3",
     "@tanstack/start": "^1.87.4",
     "@unpic/react": "^0.1.15",
+    "@upstash/redis": "^1.34.3",
     "@vitejs/plugin-react": "^4.3.4",
     "arctic": "^2.3.0",
     "class-variance-authority": "^0.7.1",

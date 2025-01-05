@@ -7,7 +7,7 @@ import {
 } from "~/server/auth";
 
 export const APIRoute = createAPIFileRoute("/api/auth/logout")({
-	POST: async () => {
+	GET: async () => {
 		setHeader("Location", "/");
 
 		const { session } = await getAuthSession({ refreshCookie: false });

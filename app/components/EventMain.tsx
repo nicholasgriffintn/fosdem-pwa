@@ -70,9 +70,9 @@ export function EventMain({
 				{event.abstract && (
 					<div className="prose prose-lg prose-indigo overflow-scroll mt-4">
 						<h2 className="text-xl font-medium">Description</h2>
-						{/* biome-ignore lint/security/noDangerouslySetInnerHtml: We want to render the abstract as HTML */}
 						<div
 							className="mt-2"
+							// biome-ignore lint/security/noDangerouslySetInnerHtml: We want to render the abstract as HTML
 							dangerouslySetInnerHTML={{ __html: event.abstract }}
 						/>
 					</div>

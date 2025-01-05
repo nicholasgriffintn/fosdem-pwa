@@ -7,6 +7,7 @@ import { GitHub } from "arctic";
 import { eq } from "drizzle-orm";
 import { deleteCookie, getCookie, setCookie } from "vinxi/http";
 
+import { CacheManager } from "~/lib/cache";
 import { db } from "~/server/db";
 import {
 	session as sessionTable,
@@ -15,6 +16,10 @@ import {
 } from "~/server/db/schema";
 
 export const SESSION_COOKIE_NAME = "session";
+
+const TTL = 60 * 60 * 24 * 30;
+
+const cache = new CacheManager();
 
 export function generateSessionToken(): string {
 	const bytes = new Uint8Array(20);
@@ -33,7 +38,7 @@ export async function createSession(
 		id: sessionId,
 		user_id: userId,
 		expires_at: new Date(
-			now.getTime() + 1000 * 60 * 60 * 24 * 30,
+			now.getTime() + 1000 * TTL,
 		).toISOString(),
 		last_extended_at: now.toISOString(),
 	};
@@ -44,6 +49,11 @@ export async function createSession(
 export async function validateSessionToken(token: string) {
 	const sessionId = token;
 	const now = Date.now();
+
+	const cachedSession = await cache.get(`session_${sessionId}`);
+	if (cachedSession) {
+		return cachedSession;
+	}
 
 	const results = await db
 		.select({
@@ -66,7 +76,10 @@ export async function validateSessionToken(token: string) {
 	const expiresAt = new Date(session.expires_at).getTime();
 
 	if (now >= expiresAt) {
-		await db.delete(sessionTable).where(eq(sessionTable.id, sessionId));
+		await Promise.all([
+			cache.invalidate(`session_${sessionId}`),
+			db.delete(sessionTable).where(eq(sessionTable.id, sessionId)),
+		]);
 		return { session: null, user: null };
 	}
 
@@ -77,24 +90,28 @@ export async function validateSessionToken(token: string) {
 
 		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
 			const newExpiresAt = new Date(
-				now + 1000 * 60 * 60 * 24 * 30,
+				now + 1000 * TTL,
 			).toISOString();
 			const newLastExtendedAt = new Date(now).toISOString();
 
 			session.expires_at = newExpiresAt;
 			session.last_extended_at = newLastExtendedAt;
 
-			db.update(sessionTable)
-				.set({
-					expires_at: newExpiresAt,
-					last_extended_at: newLastExtendedAt,
-				})
-				.where(eq(sessionTable.id, sessionId))
-				.catch(console.error);
+			await Promise.all([
+				cache.set(`session_${sessionId}`, { session, user }, TTL),
+				db.update(sessionTable)
+					.set({
+						expires_at: newExpiresAt,
+						last_extended_at: newLastExtendedAt,
+					})
+					.where(eq(sessionTable.id, sessionId)),
+			]);
 		}
 	}
 
-	return { session, user };
+	const result = { session, user };
+	await cache.set(`session_${sessionId}`, result, TTL);
+	return result;
 }
 
 export type SessionUser = NonNullable<
@@ -102,7 +119,10 @@ export type SessionUser = NonNullable<
 >;
 
 export async function invalidateSession(sessionId: string): Promise<void> {
-	await db.delete(sessionTable).where(eq(sessionTable.id, sessionId));
+	await Promise.all([
+		cache.invalidate(`session_${sessionId}`),
+		db.delete(sessionTable).where(eq(sessionTable.id, sessionId)),
+	]);
 }
 
 export function setSessionTokenCookie(token: string, expiresAt: Date) {
@@ -133,7 +153,9 @@ export async function getAuthSession(
 	if (!token) {
 		return { session: null, user: null };
 	}
+
 	const { session, user } = await validateSessionToken(token);
+
 	if (session === null) {
 		deleteCookie(SESSION_COOKIE_NAME);
 		return { session: null, user: null };
