@@ -7,6 +7,7 @@ import { GitHub } from "arctic";
 import { eq } from "drizzle-orm";
 import { deleteCookie, getCookie, setCookie } from "vinxi/http";
 
+import { createStandardDate } from "~/lib/dateTime";
 import { CacheManager } from "~/lib/cache";
 import { db } from "~/server/db";
 import {
@@ -32,7 +33,7 @@ export async function createSession(
 	token: string,
 	userId: number,
 ): Promise<Session> {
-	const now = new Date();
+	const now = createStandardDate(new Date());
 	const sessionId = token;
 	const session: Session = {
 		id: sessionId,

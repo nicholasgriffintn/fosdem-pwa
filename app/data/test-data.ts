@@ -32,7 +32,7 @@ export const testLiveEvent = {
 	chat: "https://fosdem.org/2025/schedule/event/test-live/chat",
 	room: "UB2.147",
 	id: "test-live",
-	startTime: "15:30",
+	startTime: "08:30",
 	duration: "01:00",
 	abstract: "<p>This is just a test to confirm things work before FOSDOM</p>",
 	language: "dalek",
@@ -51,8 +51,8 @@ export const testLiveEvents = [
 	{
 		...testLiveEvent,
 		day: "1",
-		title: "Live Test Event 1 - 15 mins ago",
-		startTime: "07:30",
+		title: "Live Test Event 1 - Currently Live",
+		startTime: "07:45",
 		duration: "01:00",
 	},
 	{
@@ -60,7 +60,7 @@ export const testLiveEvents = [
 		id: "test-upcoming-1",
 		day: "1",
 		title: "Upcoming Test Event 1 - 5 mins",
-		startTime: "07:50",
+		startTime: "08:00",
 		duration: "00:45",
 	},
 	{
@@ -68,7 +68,7 @@ export const testLiveEvents = [
 		id: "test-upcoming-2",
 		day: "1",
 		title: "Upcoming Test Event 2 - 20 mins",
-		startTime: "08:05",
+		startTime: "08:15",
 		duration: "01:30",
 	},
 	{
@@ -76,7 +76,7 @@ export const testLiveEvents = [
 		id: "test-upcoming-3",
 		day: "1",
 		title: "Upcoming Test Event 3 - 50 mins",
-		startTime: "08:35",
+		startTime: "08:45",
 		duration: "01:30",
 	},
 ];
@@ -86,11 +86,11 @@ export const testConferenceData = {
 	title: "FOSDEM 2025",
 	venue: "ULB (Université Libre de Bruxelles)",
 	city: "Brussels",
-	start: "2025-01-05T07:45:00.000Z",
-	end: "2025-01-05T11:45:00.000Z",
+	start: "2025-01-05T07:45:00+01:00",
+	end: "2025-01-05T11:45:00+01:00",
 	days: [
-		"2025-01-05T07:45:00.000Z",
-		"2025-01-05T11:45:00.000Z",
+		"2025-01-05T07:45:00+01:00",
+		"2025-01-05T11:45:00+01:00",
 	],
 	day_change: "09:00:00",
 	timeslot_duration: "00:05:00",

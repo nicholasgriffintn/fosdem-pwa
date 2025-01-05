@@ -1,4 +1,5 @@
 export const constants = {
+	TIME_ZONE: "Europe/Brussels",
 	TURNSTILE_SITE_KEY: "0x4AAAAAAA4mg92kNkVgcTr6",
 	DEFAULT_YEAR: 2025,
 	AVAILABLE_YEARS: [

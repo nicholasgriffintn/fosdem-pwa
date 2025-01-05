@@ -8,6 +8,7 @@ import { RoomStatus } from '~/components/Room/RoomStatus'
 import { getAllData } from '~/functions/getFosdemData'
 import type { Conference, Event, RoomData } from '~/types/fosdem'
 import { PageHeader } from '~/components/PageHeader'
+import { createStandardDate } from '../../lib/dateTime'
 
 export const Route = createFileRoute('/rooms/$roomId')({
   component: RoomPage,
@@ -62,7 +63,7 @@ function RoomPage() {
   const conference = fosdem.conference
   const days = fosdem.days
 
-  const now = new Date()
+  const now = createStandardDate(new Date())
   const isConferenceRunning = new Date(conference.start) < now && new Date(conference.end) > now
 
   if (!roomInfo) {
@@ -139,8 +140,8 @@ function RoomPage() {
             events={roomEvents}
             year={constants.DEFAULT_YEAR}
             title={`Events in ${roomInfo?.name || roomInfo.slug}`}
-            defaultViewMode="calendar"
-            displayViewMode={true}
+            defaultViewMode="list"
+            displayViewMode={false}
             groupByDay={true}
             days={days}
           />
