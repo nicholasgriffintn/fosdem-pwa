@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-import { Button } from "./ui/button";
-import { Spinner } from "./Spinner";
-import { Icons } from "./Icons";
-import { constants } from "../constants";
+import { Button } from "~/components/ui/button";
+import { Spinner } from "~/components/Spinner";
+import { Icons } from "~/components/Icons";
+import { constants } from "~/constants";
 
 export function SignInForm() {
 	const [isSubmitting, setIsSubmitting] = useState(false);

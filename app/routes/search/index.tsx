@@ -2,8 +2,8 @@ import { createFileRoute, useSearch } from "@tanstack/react-router";
 import Fuse from "fuse.js";
 
 import { useFosdemData } from "~/hooks/use-fosdem-data";
-import { EventList } from "~/components/EventList";
-import { TrackList } from "~/components/TrackList";
+import { EventList } from "~/components/Event/EventList";
+import { TrackList } from "~/components/Track/TrackList";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "../../constants";
 

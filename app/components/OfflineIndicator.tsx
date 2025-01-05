@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { cn } from "~/lib/utils";
-import { Icons } from "./Icons";
+import { Icons } from "~/components/Icons";
 
 export function OfflineIndicator() {
 	const [isMounted, setIsMounted] = useState(false);

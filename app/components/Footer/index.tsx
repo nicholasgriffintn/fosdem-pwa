@@ -1,5 +1,5 @@
 import { Icons } from "~/components/Icons";
-import { YearSelector } from "~/components/YearSelector";
+import { YearSelector } from "~/components/Footer/YearSelector";
 
 export function Footer() {
 	return (

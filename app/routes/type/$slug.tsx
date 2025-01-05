@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getAllData } from "~/functions/getFosdemData";
 import { PageHeader } from "~/components/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { TrackList } from "~/components/TrackList";
+import { TrackList } from "~/components/Track/TrackList";
 import type { Conference, Track } from "~/types/fosdem";
 import { groupByDay } from "~/lib/fosdem";
 import { constants } from "~/constants";
@@ -62,7 +62,7 @@ function TypePage() {
 					heading={fosdem.type.name}
 					text={
 						fosdemTypeDescriptions[
-							fosdem.type.id as keyof typeof fosdemTypeDescriptions
+						fosdem.type.id as keyof typeof fosdemTypeDescriptions
 						]
 					}
 					metadata={[`${fosdem.type.trackCount} TRACKS`]}

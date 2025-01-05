@@ -3,9 +3,9 @@
 import { useState } from "react";
 
 import type { Event } from "~/types/fosdem";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useNotes } from "~/hooks/use-notes";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "../ui/skeleton";
 import { toast } from "~/hooks/use-toast";
 
 function formatTime(seconds?: number) {
@@ -100,9 +100,8 @@ export function EventNotes({
 							}) => (
 								<li
 									key={note.id}
-									className={`bg-muted/30 rounded-lg p-3 transition-opacity ${
-										note.isPending ? "opacity-50" : ""
-									}`}
+									className={`bg-muted/30 rounded-lg p-3 transition-opacity ${note.isPending ? "opacity-50" : ""
+										}`}
 								>
 									<div className="flex flex-col gap-2">
 										<p className="flex-1">{note.note}</p>

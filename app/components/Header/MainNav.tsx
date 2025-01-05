@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
 import { Icons } from "~/components/Icons";
-import { MobileNav } from "~/components/MobileNav";
+import { MobileNav } from "~/components/Header/MobileNav";
 import { constants } from "~/constants";
 export function MainNav({
 	title,

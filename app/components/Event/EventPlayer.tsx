@@ -8,6 +8,7 @@ import { Play } from "lucide-react";
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
+import { getEventTiming, isEventLive } from "~/lib/eventTiming";
 
 interface EventPlayerProps {
   event: Event;
@@ -17,32 +18,6 @@ interface EventPlayerProps {
   onClose?: () => void;
   isFloating?: boolean;
 }
-
-const getEventTiming = (event: Event, conference: ConferenceData) => {
-  try {
-    const conferenceStartDate = new Date(conference.start);
-    const eventDay = Number.parseInt(event.day as string) - 1;
-    const [hours, minutes] = event.startTime.split(":").map(Number);
-    const [durationHours, durationMinutes] = event.duration.split(":").map(Number);
-
-    const eventStart = new Date(conferenceStartDate);
-    eventStart.setDate(eventStart.getDate() + eventDay);
-    eventStart.setHours(hours, minutes, 0);
-
-    const eventEnd = new Date(eventStart);
-    eventEnd.setHours(eventStart.getHours() + durationHours);
-    eventEnd.setMinutes(eventStart.getMinutes() + durationMinutes);
-
-    return {
-      start: eventStart,
-      end: eventEnd,
-      date: eventStart.toISOString().substring(0, 10)
-    };
-  } catch (error) {
-    console.error("Error calculating event timing:", error);
-    return null;
-  }
-};
 
 export function EventPlayer({
   event,
@@ -59,23 +34,7 @@ export function EventPlayer({
     event.links?.filter((link) => link.type?.startsWith("video/")) || [];
   const hasRecordings = videoRecordings.length > 0;
 
-  const BUFFER_MINUTES = 15;
-
-  const isEventLive = () => {
-    const timing = getEventTiming(event, conference);
-    if (!timing) return false;
-
-    const now = new Date();
-    const bufferStart = new Date(timing.start);
-    const bufferEnd = new Date(timing.end);
-
-    bufferStart.setMinutes(bufferStart.getMinutes() - BUFFER_MINUTES);
-    bufferEnd.setMinutes(bufferEnd.getMinutes() + BUFFER_MINUTES);
-
-    return now >= bufferStart && now <= bufferEnd;
-  };
-
-  const eventIsLive = isEventLive();
+  const eventIsLive = isEventLive(event, conference);
 
   const isEventInPast = useCallback(() => {
     const timing = getEventTiming(event, conference);

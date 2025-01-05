@@ -6,7 +6,7 @@ import { FavouriteButton } from "~/components/FavouriteButton";
 import { ShareButton } from "~/components/ShareButton";
 import { constants } from "~/constants";
 import { useBookmarks } from "~/hooks/use-bookmarks";
-import { Spinner } from "./Spinner";
+import { Spinner } from "../Spinner";
 
 type EventListItem = {
 	id: string;
@@ -94,16 +94,16 @@ export function EventList({ events, year }: EventListProps) {
 
 	const eventsWithFavourites = events?.length
 		? events.map((event) => {
-				return {
-					...event,
-					isFavourited: bookmarks?.length
-						? Boolean(
-								bookmarks.find((bookmark: any) => bookmark.slug === event.id)
-									?.status === "favourited",
-							)
-						: undefined,
-				};
-			})
+			return {
+				...event,
+				isFavourited: bookmarks?.length
+					? Boolean(
+						bookmarks.find((bookmark: any) => bookmark.slug === event.id)
+							?.status === "favourited",
+					)
+					: undefined,
+			};
+		})
 		: [];
 
 	return (
