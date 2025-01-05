@@ -3,32 +3,19 @@
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
+import { shareSupported, clipboardSupported } from "~/lib/browserSupport";
 
-export const shareSupported = () => {
-	try {
-		return "share" in navigator && "canShare" in navigator;
-	} catch (error) {
-		return false;
-	}
-};
-
-export const clipboardSupported = () => {
-	try {
-		return "clipboard" in navigator;
-	} catch (error) {
-		return false;
-	}
+type ShareButtonProps = {
+	title: string;
+	text: string;
+	url: string;
 };
 
 export function ShareButton({
 	title,
 	text,
 	url,
-}: {
-	title: string;
-	text: string;
-	url: string;
-}) {
+}: ShareButtonProps) {
 	const handleShare = async () => {
 		try {
 			if (shareSupported() && navigator.canShare({ title, text, url })) {

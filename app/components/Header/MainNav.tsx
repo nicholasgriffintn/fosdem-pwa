@@ -5,10 +5,8 @@ import { cn } from "~/lib/utils";
 import { Icons } from "~/components/Icons";
 import { MobileNav } from "~/components/Header/MobileNav";
 import { constants } from "~/constants";
-export function MainNav({
-	title,
-	items,
-}: {
+
+type MainNavProps = {
 	title: string;
 	items?: {
 		title: string;
@@ -16,7 +14,9 @@ export function MainNav({
 		icon?: React.ReactNode;
 		disabled?: boolean;
 	}[];
-}) {
+};
+
+export function MainNav({ title, items }: MainNavProps) {
 	const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
 
 	return (

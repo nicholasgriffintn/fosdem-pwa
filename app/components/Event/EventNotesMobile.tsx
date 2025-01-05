@@ -12,17 +12,19 @@ import {
 } from "~/components/ui/sheet";
 import type { Event } from "~/types/fosdem";
 
+type EventNotesMobileProps = {
+  event: Event;
+  year: number;
+  userId?: string;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
+};
+
 export function EventNotesMobile({
   event,
   year,
   userId,
   videoRef,
-}: {
-  event: Event;
-  year: number;
-  userId?: string;
-  videoRef: React.RefObject<HTMLVideoElement | null>;
-}) {
+}: EventNotesMobileProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>

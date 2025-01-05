@@ -10,12 +10,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { User as UserIcon } from "lucide-react";
 import type { SessionUser } from "~/server/auth";
 import { constants } from "~/constants";
-interface AvatarMenuProps {
+import { Icons } from "~/components/Icons";
+
+type AvatarMenuProps = {
 	user: SessionUser;
-}
+};
 
 export function AvatarMenu({ user }: AvatarMenuProps) {
 	return (
@@ -27,7 +28,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 						alt={user.name ?? undefined}
 					/>
 					<AvatarFallback>
-						<UserIcon className="h-4 w-4" />
+						<Icons.user className="h-4 w-4" />
 					</AvatarFallback>
 				</Avatar>
 			</DropdownMenuTrigger>

@@ -7,6 +7,15 @@ import { fosdemImageDetails } from "~/data/fosdem-image-details";
 import { Image } from "~/components/Image";
 import type { TypeIds } from "~/types/fosdem";
 
+type FeaturedFosdemImageProps = {
+	type: TypeIds;
+	size: string;
+	showCaptionOnHover?: boolean;
+	displayCaption?: boolean;
+	loading?: "lazy" | "eager";
+	className?: string;
+};
+
 export function FeaturedFosdemImage({
 	type,
 	size,
@@ -15,14 +24,7 @@ export function FeaturedFosdemImage({
 	loading = "lazy",
 	className,
 	...props
-}: {
-	type: TypeIds;
-	size: string;
-	showCaptionOnHover?: boolean;
-	displayCaption?: boolean;
-	loading?: "lazy" | "eager";
-	className?: string;
-} & React.HTMLAttributes<HTMLImageElement>) {
+}: FeaturedFosdemImageProps & React.HTMLAttributes<HTMLImageElement>) {
 	const [isHovered, setIsHovered] = useState(false);
 	const imageDetails = fosdemImageDetails[type];
 

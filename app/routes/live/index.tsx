@@ -65,21 +65,11 @@ function LivePage() {
         />
         <div className="w-full space-y-8">
           <section>
-            <h2 className="text-xl font-semibold mb-4">Live Now</h2>
-            {liveEvents.length > 0 ? (
-              <EventList events={liveEvents} year={year} />
-            ) : (
-              <div className="text-muted-foreground">No live events at the moment</div>
-            )}
+            <EventList events={liveEvents} year={year} defaultViewMode="calendar" title="Live Now" />
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-4">Starting Soon</h2>
-            {upcomingEvents.length > 0 ? (
-              <EventList events={upcomingEvents} year={year} />
-            ) : (
-              <div className="text-muted-foreground">No upcoming events in the next 30 minutes</div>
-            )}
+            <EventList events={upcomingEvents} year={year} defaultViewMode="calendar" title="Starting Soon" />
           </section>
         </div>
       </div>

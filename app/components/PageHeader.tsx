@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
 
-interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+type PageHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 	heading: string;
 	subtitle?: string;
 	text?: string;
