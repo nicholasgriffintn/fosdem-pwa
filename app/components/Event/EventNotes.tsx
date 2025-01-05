@@ -7,7 +7,7 @@ import { Button } from "~/components/ui/button";
 import { useNotes } from "~/hooks/use-notes";
 import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "~/hooks/use-toast";
-import { formatDate, formatTime } from "~/lib/dateTime";
+import { formatDate, formatTime, createStandardDate } from "~/lib/dateTime";
 
 type EventNotesProps = {
 	year: number;
@@ -44,10 +44,12 @@ export function EventNotes({
 	const handleSave = () => {
 		if (!note.trim()) return;
 
+		const timestamp = createStandardDate(new Date()).getTime();
+
 		create({
 			note,
 			time: noteTime,
-			tempId: `temp-${new Date().getTime()}`,
+			tempId: `temp-${timestamp}`,
 		});
 		setNote("");
 		setNoteTime(undefined);

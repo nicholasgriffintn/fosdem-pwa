@@ -7,7 +7,7 @@ import Hls from "hls.js";
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
-import { isEventLive, isEventFinished } from "~/lib/eventTiming";
+import { isEventLive, isEventFinished } from "~/lib/dateTime";
 import { Icons } from "~/components/Icons";
 
 type EventPlayerProps = {

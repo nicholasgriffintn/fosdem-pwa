@@ -6,7 +6,7 @@ import { getAllData } from "~/functions/getFosdemData";
 import { testLiveEvents, testConferenceData } from "~/data/test-data";
 import type { Conference, Event } from "~/types/fosdem";
 import { constants } from "../../constants";
-import { isEventLive, isEventUpcoming } from "~/lib/eventTiming";
+import { isEventLive, isEventUpcoming } from "~/lib/dateTime";
 import { sortEvents, sortUpcomingEvents } from "~/lib/sorting";
 
 export const Route = createFileRoute("/live/")({
