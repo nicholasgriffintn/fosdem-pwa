@@ -14,12 +14,34 @@ import {
 import { useWindowSize } from "~/hooks/use-window-size";
 import type { Event, ConferenceData, FosdemImageType } from "~/types/fosdem";
 import { fosdemImageDetails } from "~/data/fosdem-image-details";
+import { fosdemSpecialRooms } from "~/data/fosdem-special-rooms";
+import { EventContent } from "~/components/EventContent";
 
 export function EventMain({
 	event,
 	conference,
 	year,
 }: { event: Event; conference: ConferenceData; year: number }) {
+	console.log(event);
+	const roomType = event.room?.[0];
+	const specialRoom = roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
+
+	if (specialRoom) {
+		return (
+			<div className="space-y-4">
+				<div className="prose prose-lg prose-indigo">
+					{specialRoom.description(year)}
+				</div>
+				{event.chat && (
+					<div className="border rounded-md overflow-hidden">
+						<ChatAlert chatUrl={event.chat} />
+					</div>
+				)}
+				<EventContent event={event} />
+			</div>
+		);
+	}
+
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const { width } = useWindowSize();
 	const isMobile = width < 768;
@@ -67,32 +89,7 @@ export function EventMain({
 				</ResizablePanel>
 			</ResizablePanelGroup>
 			<div className="w-full">
-				{event.abstract && (
-					<div className="prose prose-lg prose-indigo overflow-scroll mt-4">
-						<h2 className="text-xl font-medium">Description</h2>
-						<div
-							className="mt-2"
-							// biome-ignore lint/security/noDangerouslySetInnerHtml: We want to render the abstract as HTML
-							dangerouslySetInnerHTML={{ __html: event.abstract }}
-						/>
-					</div>
-				)}
-				{event.links?.length > 0 && (
-					<div className="mt-2">
-						<h2 className="text-xl font-medium">Links</h2>
-						<ul className="mt-2 space-y-2 list-disc list-inside">
-							{event.links.map((link) => {
-								return (
-									<li key={link.href}>
-										<a href={link.href} target="_blank" rel="noreferrer">
-											{link.title}
-										</a>
-									</li>
-								);
-							})}
-						</ul>
-					</div>
-				)}
+				<EventContent event={event} />
 				<div className="mt-4">
 					{(event.abstract || event.links?.length > 0) && (
 						<hr className="my-4" />
