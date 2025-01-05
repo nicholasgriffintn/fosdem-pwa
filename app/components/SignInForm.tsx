@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Spinner } from "./Spinner";
 import { Icons } from "./Icons";
+import { constants } from "../constants";
 
 export function SignInForm() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,6 +31,7 @@ export function SignInForm() {
 				)}
 				Sign in with GitHub
 			</Button>
+			<div className="cf-turnstile" data-sitekey={constants.TURNSTILE_SITE_KEY} />
 		</form>
 	);
 }

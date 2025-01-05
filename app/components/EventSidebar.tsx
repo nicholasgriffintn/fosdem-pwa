@@ -58,12 +58,12 @@ export function EventSidebar({
 							)}
 						</>
 					) : (
-						<>
+						<div className="flex flex-col">
 							<p>Sign in to make notes from this session.</p>
-							<Link to="/signin">
+							<Link to="/signin" className="mt-4">
 								<Button>Sign in</Button>
 							</Link>
-						</>
+						</div>
 					)}
 				</div>
 			)}
