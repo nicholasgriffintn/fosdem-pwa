@@ -1,18 +1,18 @@
 "use client";
 
 import clsx from "clsx";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { Play } from "lucide-react";
 
-import type { ConferenceData, Event } from "~/types/fosdem";
+import type { Conference, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
-import { getEventTiming, isEventLive } from "~/lib/eventTiming";
+import { isEventLive, isEventFinished } from "~/lib/eventTiming";
 
 interface EventPlayerProps {
   event: Event;
-  conference: ConferenceData;
+  conference: Conference;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   isMobile?: boolean;
   onClose?: () => void;
@@ -34,30 +34,27 @@ export function EventPlayer({
     event.links?.filter((link) => link.type?.startsWith("video/")) || [];
   const hasRecordings = videoRecordings.length > 0;
 
-  const eventIsLive = isEventLive(event, conference);
+  const eventIsLive = isEventLive(event, conference.conference) && event.streams?.some(
+    stream => stream.type === "application/vnd.apple.mpegurl"
+  );
 
-  const isEventInPast = useCallback(() => {
-    const timing = getEventTiming(event, conference);
-    if (!timing) return false;
-    return new Date() > timing.end;
-  }, [event, conference]);
-
-  const eventIsInPast = isEventInPast();
+  const eventIsInPast = isEventFinished(event, conference.conference);
 
   useEffect(() => {
     if (!videoRef.current || !isPlaying) return;
 
     if (eventIsLive && event.streams?.length) {
-      const stream = event.streams[0];
-      if (stream.type === "application/vnd.apple.mpegurl") {
-        if (Hls.isSupported()) {
-          const hls = new Hls();
-          hlsRef.current = hls;
-          hls.attachMedia(videoRef.current);
-          hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-            hls.loadSource(stream.href);
-          });
-        }
+      const hlsStream = event.streams.find(
+        stream => stream.type === "application/vnd.apple.mpegurl"
+      );
+
+      if (hlsStream && Hls.isSupported()) {
+        const hls = new Hls();
+        hlsRef.current = hls;
+        hls.attachMedia(videoRef.current);
+        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+          hls.loadSource(hlsStream.href);
+        });
       }
     }
 
@@ -66,7 +63,7 @@ export function EventPlayer({
         hlsRef.current.destroy();
       }
     };
-  }, [event.streams, isPlaying, videoRef.current, eventIsLive]);
+  }, [event.streams, isPlaying, videoRef, eventIsLive]);
 
   const handlePlay = () => {
     setIsPlaying(true);
