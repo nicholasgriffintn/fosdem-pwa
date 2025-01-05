@@ -43,8 +43,8 @@ function BookmarksHome() {
       <div className="relative py-6 lg:py-10">
         <PageHeader heading="Bookmarks" />
         {authLoading ? (
-          <div className="flex justify-center items-center h-screen">
-            <Spinner />
+          <div className="flex justify-center items-center">
+            <Spinner className="h-8 w-8" />
           </div>
         ) : (
           <>

@@ -3,10 +3,9 @@ import { TrackList } from "~/components/Track/TrackList";
 import { Spinner } from "~/components/Spinner";
 import type { Conference, Track, Event } from "~/types/fosdem";
 import { detectEventConflicts } from "~/lib/fosdem";
-import { Conflicts } from "~/components/Bookmarks/Conflicts";
-import { sortEvents, sortTracks } from "../../lib/sorting";
+import { sortEvents, sortTracks } from "~/lib/sorting";
 
-interface Bookmark {
+type Bookmark = {
   id: string;
   slug: string;
   user_id: number;
@@ -118,13 +117,14 @@ export function BookmarksList({
             </section>
           )}
           {events.length > 0 && (
-            <section>
-              <h2 className="text-xl font-semibold mb-4">Bookmarked Events</h2>
-              {conflicts.length > 0 && (
-                <Conflicts conflicts={conflicts} />
-              )}
-              <EventList events={events} year={year} />
-            </section>
+            <EventList
+              events={events}
+              year={year}
+              conflicts={conflicts}
+              title="Bookmarked Events"
+              defaultViewMode="calendar"
+              displayViewMode={true}
+            />
           )}
         </div>
       ) : (

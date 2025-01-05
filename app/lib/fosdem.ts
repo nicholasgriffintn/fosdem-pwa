@@ -2,6 +2,11 @@ import type { DayGroupedData } from "~/types/fosdem";
 import type { Event, ConferenceData } from "~/types/fosdem";
 import { getEventDateTime, parseEventDuration } from "./eventTiming";
 
+interface TimeSlot {
+	time: string;
+	events: Event[];
+}
+
 export const groupByDay = (
 	items: any[],
 	getDayFn: (item: any) => string[],
@@ -89,60 +94,26 @@ export function detectEventConflicts(events: Event[], conference: ConferenceData
 	return conflicts;
 }
 
-export function groupConflicts(conflicts: EventConflict[]): GroupedConflict[] {
-	const groupedMap = new Map<string, GroupedConflict>();
+export function generateTimeSlots(events: Event[]): TimeSlot[] {
+	const timeSlots: { [key: string]: Event[] } = {};
+	const sortedTimes: string[] = [];
 
-	// biome-ignore lint/complexity/noForEach: <explanation>
-	conflicts.forEach(conflict => {
-		// Try both events as the main event to find the one with more conflicts
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		[
-			{ main: conflict.event1, other: conflict.event2 },
-			{ main: conflict.event2, other: conflict.event1 }
-		].forEach(({ main, other }) => {
-			if (!groupedMap.has(main.id)) {
-				groupedMap.set(main.id, {
-					mainEvent: main,
-					conflicts: []
-				});
-			}
-
-			const group = groupedMap.get(main.id);
-			if (group) {
-				group.conflicts.push({
-					event: other,
-					duration: conflict.overlapDuration,
-					startOverlap: conflict.startOverlap,
-					endOverlap: conflict.endOverlap
-				});
-			}
-		});
-	});
-
-	// Select the version with the most conflicts for each event
-	const seen = new Set<string>();
-	const result: GroupedConflict[] = [];
-
-	for (const [eventId, group] of groupedMap) {
-		if (seen.has(eventId)) continue;
-
-		// Find all related conflicts
-		const relatedIds = new Set(group.conflicts.map(c => c.event.id));
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		relatedIds.forEach(id => seen.add(id));
-
-		// Only add groups with the most conflicts
-		if (group.conflicts.length > 1) {
-			result.push(group);
+	for (const event of events) {
+		if (!timeSlots[event.startTime]) {
+			timeSlots[event.startTime] = [];
+			sortedTimes.push(event.startTime);
 		}
+		timeSlots[event.startTime].push(event);
 	}
 
-	return result.sort((a, b) => b.conflicts.length - a.conflicts.length);
-}
+	sortedTimes.sort((a, b) => {
+		const [aHours, aMinutes] = a.split(":").map(Number);
+		const [bHours, bMinutes] = b.split(":").map(Number);
+		return (aHours * 60 + aMinutes) - (bHours * 60 + bMinutes);
+	});
 
-export function formatGroupedConflictMessage(group: GroupedConflict): string {
-	const { mainEvent, conflicts } = group;
-	const totalMinutes = conflicts.reduce((sum, c) => sum + c.duration, 0);
-
-	return `"${mainEvent.title}" has ${conflicts.length} conflicts totaling ${totalMinutes} minutes`;
+	return sortedTimes.map(time => ({
+		time,
+		events: timeSlots[time]
+	}));
 }

@@ -1,6 +1,10 @@
 import { Icons } from "~/components/Icons";
 
-export function ChatAlert({ chatUrl }: { chatUrl: string }) {
+type ChatAlertProps = {
+	chatUrl: string;
+}
+
+export function ChatAlert({ chatUrl }: ChatAlertProps) {
 	return (
 		<div className="bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75">
 			<div className="flex items-center gap-2 px-4 py-3">

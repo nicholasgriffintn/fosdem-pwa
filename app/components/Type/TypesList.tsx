@@ -13,9 +13,8 @@ import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import { constants } from "~/constants";
 import type { TypeIds } from "~/types/fosdem";
 import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
-export function Types({
-  types,
-}: {
+
+type TypesListProps = {
   types: {
     [key: string]: {
       id: TypeIds;
@@ -23,7 +22,9 @@ export function Types({
       trackCount: number;
     };
   };
-}) {
+};
+
+export function TypesList({ types }: TypesListProps) {
   const typeKeys = Object.keys(types);
 
   return (

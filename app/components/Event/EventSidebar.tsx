@@ -3,22 +3,24 @@ import { Link } from "@tanstack/react-router";
 
 import type { Event } from "~/types/fosdem";
 import { useAuth } from "~/hooks/use-auth";
-import { Skeleton } from "../ui/skeleton";
-import { Button } from "../ui/button";
-import { EventNotes } from "./EventNotes";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Button } from "~/components/ui/button";
+import { EventNotes } from "~/components/Event/EventNotes";
 import { EventNotesMobile } from "~/components/Event/EventNotesMobile";
+
+type EventSidebarProps = {
+	event: Event;
+	isMobile?: boolean;
+	year: number;
+	videoRef: React.RefObject<HTMLVideoElement | null>;
+};
 
 export function EventSidebar({
 	event,
 	isMobile = false,
 	year,
 	videoRef,
-}: {
-	event: Event;
-	isMobile?: boolean;
-	year: number;
-	videoRef: React.RefObject<HTMLVideoElement | null>;
-}) {
+}: EventSidebarProps) {
 	const { user, loading } = useAuth();
 
 	const sidebarClassName = clsx("h-full", {

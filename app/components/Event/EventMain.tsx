@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { cn } from "~/lib/utils";
 
+import { cn } from "~/lib/utils";
 import { EventSidebar } from "~/components/Event/EventSidebar";
 import { EventPlayer } from "~/components/Event/EventPlayer";
 import { ChatAlert } from "~/components/Event/ChatAlert";
@@ -17,11 +17,17 @@ import { fosdemImageDetails } from "~/data/fosdem-image-details";
 import { fosdemSpecialRooms } from "~/data/fosdem-special-rooms";
 import { EventContent } from "~/components/Event/EventContent";
 
+type EventMainProps = {
+	event: Event;
+	conference: ConferenceData;
+	year: number;
+};
+
 export function EventMain({
 	event,
 	conference,
 	year,
-}: { event: Event; conference: ConferenceData; year: number }) {
+}: EventMainProps) {
 	const roomType = event.room?.[0];
 	const specialRoom = roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
 

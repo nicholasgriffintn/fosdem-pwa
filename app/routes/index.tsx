@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Types } from "~/components/Type/Types";
+import { TypesList } from "~/components/Type/TypesList";
 import { getAllData } from "~/functions/getFosdemData";
 import { PageHeader } from "~/components/PageHeader";
 import { constants } from "~/constants";
@@ -39,7 +39,7 @@ function Home() {
 					heading={fosdem.conference.title}
 					text={`${fosdem.conference.city} / ${fosdem.conference.start} - ${fosdem.conference.end}`}
 				/>
-				<div>{fosdem.types && <Types types={fosdem.types} />}</div>
+				<div>{fosdem.types && <TypesList types={fosdem.types} />}</div>
 			</div>
 		</div>
 	);

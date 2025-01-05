@@ -4,10 +4,11 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
 import { useLockBody } from "~/hooks/use-lock-body";
 import { useAuth } from "~/hooks/use-auth";
-import { Icons } from "../Icons";
-import { Button } from "../ui/button";
+import { Icons } from "~/components/Icons";
+import { Button } from "~/components/ui/button";
 import { constants } from "~/constants";
-interface MobileNavProps {
+
+type MobileNavProps = {
 	items: {
 		title: string;
 		href: string;

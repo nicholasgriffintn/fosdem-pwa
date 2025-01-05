@@ -3,26 +3,19 @@
 import { useState } from "react";
 
 import type { Event } from "~/types/fosdem";
-import { Button } from "../ui/button";
+import { Button } from "~/components/ui/button";
 import { useNotes } from "~/hooks/use-notes";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "~/hooks/use-toast";
+import { formatDate, formatTime } from "~/lib/dateTime";
 
-function formatTime(seconds?: number) {
-	if (!seconds) return null;
-	const minutes = Math.floor(seconds / 60);
-	const remainingSeconds = Math.floor(seconds % 60);
-	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-}
-
-function formatDate(date: Date) {
-	return new Date(date).toLocaleDateString(undefined, {
-		month: "short",
-		day: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-	});
-}
+type EventNotesProps = {
+	year: number;
+	event: Event;
+	userId?: string;
+	videoRef: React.RefObject<HTMLVideoElement | null>;
+	isMobile?: boolean;
+};
 
 export function EventNotes({
 	year,
@@ -30,13 +23,7 @@ export function EventNotes({
 	userId,
 	videoRef,
 	isMobile,
-}: {
-	year: number;
-	event: Event;
-	userId?: string;
-	videoRef: React.RefObject<HTMLVideoElement | null>;
-	isMobile?: boolean;
-}) {
+}: EventNotesProps) {
 	const { notes, loading, create } = useNotes({ year, event, userId });
 	const [note, setNote] = useState("");
 	const [noteTime, setNoteTime] = useState<number | undefined>();

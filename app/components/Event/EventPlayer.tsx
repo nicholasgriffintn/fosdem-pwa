@@ -3,14 +3,14 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import { Play } from "lucide-react";
 
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
 import { isEventLive, isEventFinished } from "~/lib/eventTiming";
+import { Icons } from "~/components/Icons";
 
-interface EventPlayerProps {
+type EventPlayerProps = {
   event: Event;
   conference: ConferenceData;
   videoRef: React.RefObject<HTMLVideoElement | null>;
@@ -100,7 +100,7 @@ export function EventPlayer({
                 onClick={handlePlay}
                 className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
               >
-                <Play className="w-16 h-16 text-white" />
+                <Icons.play className="w-16 h-16 text-white" />
                 <span className="text-white text-lg font-medium">
                   Play Video
                 </span>

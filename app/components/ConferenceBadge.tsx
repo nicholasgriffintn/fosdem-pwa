@@ -6,24 +6,12 @@ import { Card } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/Icons";
+import type { User } from "~/types/user";
 
-interface User {
-	id: number;
-	name: string;
-	avatar_url: string;
-	email: string;
-	github_username: string;
-	company?: string;
-	site?: string;
-	location?: string;
-	bio?: string;
-	twitter_username?: string;
-}
-
-interface ConferenceBadgeProps {
+type ConferenceBadgeProps = {
 	user: User;
 	conferenceYear: number;
-}
+};
 
 export function ConferenceBadge({
 	user,

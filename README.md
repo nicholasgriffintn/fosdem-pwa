@@ -1,8 +1,10 @@
 # FOSDEM PWA Companion App
 
-This is a companion app for [FOSDEM 2024](https://fosdem.org/2024/), built with [TanStack Start](https://tanstack.com/start/) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop.
+This is a companion app for [FOSDEM](https://fosdem.org/), built with [TanStack Start](https://tanstack.com/start/) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop, or just used as a website.
 
-This is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), just in TanStack Router. This is mostly a passion project to get a chance to play with some other technologies, alongside that, I personally attend FOSDEM, a lot of the features in this app are to make my experience better, such as tracking sessions I want to attend, taking notes, and sharing my bookmarks.
+It is mostly a passion project to get a chance to play with some other technologies, alongside that, I personally attend FOSDEM, a lot of the features in this app are to make my experience better, such as tracking sessions I want to attend, taking notes, and sharing my bookmarks.
+
+Also, this project is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), so huge props to them!
 
 ## Check it out
 
@@ -30,13 +32,13 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 - [ ] Add bookmark status from DB to the event page.
 - [ ] Allow users to search within specific tracks or time slots
-- [ ] Organise bookmarks by day and time, allow for filtering potentially.
+- [ ] Organise bookmarks by day, allow for filtering potentially.
 - [ ] Display events below bookmarked tracks
-- [ ] Potentially add a calendar view of bookmarked events, maybe a calendar export?
+- [ ] Maybe a calendar export? Is that too hard?
 - [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
-- [ ] Bookmarks are background synced when offline
+- [ ] Bookmarks are background synced when offline (I've not validated this yet)
 - [ ] Guest sign in (potentially)
-- [ ] Configure push notifications, will need a new database table
+- [ ] Configure push notifications, will need a new database table (SW work has been started for this)
 - [ ] Send notifications for bookmarked events (should be configurable)
 - [ ] Add a track progress feature? https://capture.dropbox.com/tmn4M77IN4F7IJUl
 - [ ] Maybe a visual indicator for progress?: https://capture.dropbox.com/YiTleZxrLM539GKc

@@ -1,136 +1,75 @@
-import clsx from "clsx";
-import { Link } from "@tanstack/react-router";
+"use client";
+
+import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
-import { FavouriteButton } from "~/components/FavouriteButton";
-import { ShareButton } from "~/components/ShareButton";
-import { constants } from "~/constants";
-import { useBookmarks } from "~/hooks/use-bookmarks";
-import { Spinner } from "../Spinner";
-import { sortEventsWithFavorites } from "~/lib/sorting";
-import type { Bookmark } from "~/server/db/schema";
+import { Icons } from "~/components/Icons";
+import type { EventConflict } from "~/lib/fosdem";
 import type { Event } from "~/types/fosdem";
+import { EventItemList } from "~/components/Event/EventItemList";
+import { EventCalendarList } from "~/components/Event/EventCalendarList";
+
+type EventListViewModes = "list" | "calendar";
 
 type EventListProps = {
 	events: Event[];
-	favourites?: {
-		[key: string]: string;
-	}[];
 	year: number;
-};
-
-function EventListItem({
-	year,
-	event,
-	index,
-	isLast,
-	bookmarksLoading,
-}: {
-	year: number;
-	event: Event;
-	index: number;
-	isLast: boolean;
-	bookmarksLoading: boolean;
-}) {
-	const className = clsx("flex justify-between", {
-		"border-t-2 border-solid border-muted": index % 2 === 1,
-		"border-b-2": index % 2 === 1 && !isLast,
-	});
-
-	return (
-		<div className={className}>
-			<div className="flex flex-col md:flex-row md:justify-between w-full">
-				<div className="flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1">
-					<h3 className="font-semibold leading-none tracking-tight">
-						{event.title}
-					</h3>
-					<p className="text-gray-500">
-						{event.room} | {event.startTime} | {event.duration}
-						{event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
-					</p>
-				</div>
-				<div className="flex items-center pl-1 pr-1 md:pl-6 md:pr-3 gap-2 pb-3 md:pb-0">
-					{bookmarksLoading ? (
-						<Spinner />
-					) : (
-						<FavouriteButton
-							year={year}
-							type="event"
-							slug={event.id}
-							status={event.isFavourited ? "favourited" : "unfavourited"}
-						/>
-					)}
-					<ShareButton
-						title={event.title}
-						text={`Check out ${event.title} at FOSDEM`}
-						url={`https://fosdempwa.com/event/${event.id}`}
-					/>
-					<Button variant="secondary" asChild className="w-full no-underline">
-						<Link
-							to={`/event/${event.id}`}
-							search={(prev) => ({
-								...prev,
-								year: prev.year || constants.DEFAULT_YEAR,
-							})}
-						>
-							View Event
-						</Link>
-					</Button>
-				</div>
-			</div>
-		</div>
-	);
+	conflicts?: EventConflict[];
+	title?: string;
+	defaultViewMode?: EventListViewModes;
+	displayViewMode?: boolean;
 }
 
-export function EventList({ events, year }: EventListProps) {
-	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
-
-	const eventsWithFavourites = events?.length
-		? events.map((event) => ({
-			...event,
-			isFavourited: bookmarks?.length
-				? Boolean(
-					bookmarks.find((bookmark: Bookmark) => bookmark.slug === event.id)
-						?.status === "favourited",
-				)
-				: undefined,
-		}))
-		: [];
-
-	const favorites = bookmarks?.reduce((acc: Record<string, boolean>, bookmark: Bookmark) => {
-		if (bookmark.status === "favourited") {
-			acc[bookmark.slug] = true;
-		}
-		return acc;
-	}, {} as Record<string, boolean>) || {};
-
-	const sortedEvents = [...eventsWithFavourites].sort(sortEventsWithFavorites(favorites));
+export function EventList({
+	events,
+	year,
+	conflicts,
+	title,
+	defaultViewMode = "list",
+	displayViewMode = false,
+}: EventListProps) {
+	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 
 	return (
-		<ul className="event-list w-full">
-			{sortedEvents?.length > 0 ? (
-				sortedEvents.map((event, index) => (
-					<li key={event.id}>
-						<EventListItem
-							year={year}
-							event={event}
-							index={index}
-							isLast={events.length === index + 1}
-							bookmarksLoading={bookmarksLoading}
-						/>
-					</li>
-				))
-			) : (
-				<li>
-					<div className="flex justify-between">
-						<div className="flex flex-col space-y-1.5 pt-6 pb-6">
-							<h3 className="font-semibold leading-none tracking-tight">
-								No events found
-							</h3>
-						</div>
+		<section>
+			<div className="flex justify-between items-center mb-4">
+				{title && <h2 className="text-xl font-semibold">{title}</h2>}
+				{displayViewMode && (
+					<div className="flex gap-2">
+						<Button
+							variant={viewMode === "list" ? "default" : "outline"}
+							size="sm"
+							onClick={() => setViewMode("list")}
+						>
+							<Icons.list className="h-4 w-4 mr-1" />
+							List
+						</Button>
+						<Button
+							variant={viewMode === "calendar" ? "default" : "outline"}
+							size="sm"
+							onClick={() => setViewMode("calendar")}
+						>
+							<Icons.calendar className="h-4 w-4 mr-1" />
+							Calendar
+						</Button>
 					</div>
-				</li>
+				)}
+			</div>
+			{events.length > 0 ? (
+				<>
+					{viewMode === "list" ? (
+						<EventItemList events={events} year={year} conflicts={conflicts} />
+					) : (
+						<EventCalendarList
+							events={events}
+							year={year}
+							conflicts={conflicts}
+						/>
+					)}
+				</>
+			) : (
+				<div className="text-muted-foreground">No events found</div>
 			)}
-		</ul>
+		</section>
 	);
 }

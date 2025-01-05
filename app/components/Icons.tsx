@@ -23,6 +23,9 @@ import {
 	AlertTriangle,
 	ChevronDown,
 	ChevronUp,
+	List,
+	CalendarDays,
+	Play,
 } from "lucide-react";
 
 export const Icons = {
@@ -74,6 +77,9 @@ export const Icons = {
 	alertTriangle: AlertTriangle,
 	chevronDown: ChevronDown,
 	chevronUp: ChevronUp,
+	list: List,
+	calendar: CalendarDays,
+	play: Play,
 	gitHub: ({ ...props }) => (
 		<svg
 			aria-hidden="true"
