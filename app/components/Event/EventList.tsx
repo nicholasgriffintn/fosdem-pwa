@@ -32,29 +32,31 @@ export function EventList({
 
 	return (
 		<section>
-			<div className="flex justify-between items-center mb-4">
-				{title && <h2 className="text-xl font-semibold">{title}</h2>}
-				{displayViewMode && (
-					<div className="flex gap-2">
-						<Button
-							variant={viewMode === "list" ? "default" : "outline"}
-							size="sm"
-							onClick={() => setViewMode("list")}
-						>
-							<Icons.list className="h-4 w-4 mr-1" />
-							List
-						</Button>
-						<Button
-							variant={viewMode === "calendar" ? "default" : "outline"}
-							size="sm"
-							onClick={() => setViewMode("calendar")}
-						>
-							<Icons.calendar className="h-4 w-4 mr-1" />
-							Calendar
-						</Button>
-					</div>
-				)}
-			</div>
+			{(title || displayViewMode) && (
+				<div className="flex justify-between items-center mb-4">
+					{title && <h2 className="text-xl font-semibold">{title}</h2>}
+					{displayViewMode && (
+						<div className="flex gap-2">
+							<Button
+								variant={viewMode === "list" ? "default" : "outline"}
+								size="sm"
+								onClick={() => setViewMode("list")}
+							>
+								<Icons.list className="h-4 w-4 mr-1" />
+								List
+							</Button>
+							<Button
+								variant={viewMode === "calendar" ? "default" : "outline"}
+								size="sm"
+								onClick={() => setViewMode("calendar")}
+							>
+								<Icons.calendar className="h-4 w-4 mr-1" />
+								Calendar
+							</Button>
+						</div>
+					)}
+				</div>
+			)}
 			{events.length > 0 ? (
 				<>
 					{viewMode === "list" ? (

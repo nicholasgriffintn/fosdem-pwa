@@ -57,9 +57,11 @@ export function TrackList({ tracks, year, title }: TrackListProps) {
 
 	return (
 		<section>
-			<div className="flex justify-between items-center mb-4">
-				{title && <h2 className="text-xl font-semibold">{title}</h2>}
-			</div>
+			{title && (
+				<div className="flex justify-between items-center mb-4">
+					<h2 className="text-xl font-semibold">{title}</h2>
+				</div>
+			)}
 			{sortedTracks?.length > 0 ? (
 				<ul className="track-list w-full">
 					{sortedTracks.map((track, index) => (
