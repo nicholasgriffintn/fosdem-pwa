@@ -7,9 +7,10 @@ import { testLiveEvent, testConferenceData } from "~/data/test-data";
 import { getAllData } from "~/functions/getFosdemData";
 import { EventMain } from "~/components/Event/EventMain";
 import { constants } from "~/constants";
+import { calculateEndTime } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/event/$slug")({
-  component: TrackPage,
+  component: EventPage,
   validateSearch: ({ test, year }: { test: boolean; year: string }) => ({
     test: test === true,
     year:
@@ -60,7 +61,7 @@ export const Route = createFileRoute("/event/$slug")({
   staleTime: 10_000,
 });
 
-function TrackPage() {
+function EventPage() {
   const { fosdem, year } = Route.useLoaderData();
 
   if (!fosdem.event?.title || !fosdem.conference) {
@@ -99,10 +100,7 @@ function TrackPage() {
               text: `Day ${fosdem.event.day}`,
             },
             {
-              text: `Starts at ${fosdem.event.startTime}`,
-            },
-            {
-              text: `${fosdem.event.duration} long`,
+              text: `${fosdem.event.startTime} - ${calculateEndTime(fosdem.event.startTime, fosdem.event.duration)}`,
             },
             {
               text: `${fosdem.event.room}`,

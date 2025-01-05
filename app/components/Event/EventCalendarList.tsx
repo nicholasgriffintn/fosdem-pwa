@@ -4,6 +4,7 @@ import { generateTimeSlots, type EventConflict } from "~/lib/fosdem";
 import { useEventList } from "~/hooks/use-item-list";
 import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
 import { ItemActions } from "~/components/ItemActions";
+import { calculateEndTime } from "~/lib/dateTime";
 
 type EventCalendarListProps = {
   events: Event[];
@@ -46,7 +47,7 @@ function EventCalendarListItem({
         <div className="flex-1">
           <h4 className="font-semibold text-sm mb-1">{event.title}</h4>
           <p className="text-xs text-muted-foreground">
-            {event.room} | {event.duration}
+            {event.room} | {event.startTime} - {calculateEndTime(event.startTime, event.duration)}
             {event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
           </p>
         </div>
