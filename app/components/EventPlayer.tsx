@@ -7,7 +7,7 @@ import { Play } from "lucide-react";
 
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
-import type { FosdemImageType } from "~/types/fosdem";
+import type { TypeIds } from "~/types/fosdem";
 
 interface EventPlayerProps {
   event: Event;
@@ -20,7 +20,7 @@ interface EventPlayerProps {
 
 const getEventTiming = (event: Event, conference: ConferenceData) => {
   try {
-    const conferenceStartDate = new Date(conference.start._text);
+    const conferenceStartDate = new Date(conference.start);
     const eventDay = Number.parseInt(event.day as string) - 1;
     const [hours, minutes] = event.startTime.split(":").map(Number);
     const [durationHours, durationMinutes] = event.duration.split(":").map(Number);
@@ -128,7 +128,7 @@ export function EventPlayer({
     <div className={containerClassName}>
       {!isPlaying && (
         <FeaturedFosdemImage
-          type={event.type as FosdemImageType}
+          type={event.type as TypeIds}
           size="full"
           className="w-full h-full absolute top-0 left-0 z-0 object-cover"
           displayCaption={false}
