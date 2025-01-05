@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
 
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { EventList } from "~/components/Event/EventList";
@@ -7,7 +6,6 @@ import { TrackList } from "~/components/Track/TrackList";
 import { RoomList } from "~/components/Room/RoomList";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "~/constants";
-import { sortSearchResults } from "~/lib/sorting";
 import type { Event, Track, RoomData } from "~/types/fosdem";
 import {
 	TRACK_SEARCH_KEYS,
@@ -17,7 +15,8 @@ import {
 	formatTrack,
 	formatEvent,
 	formatRoom,
-	type SearchResults
+	type SearchResults,
+	type SearchResult
 } from "~/lib/search";
 
 export const Route = createFileRoute("/search/")({
@@ -51,50 +50,90 @@ export default function SearchPage() {
 	const { fosdemData, loading } = useFosdemData({ year });
 	const query = q || "";
 
-	const getSearchResults = (): SearchResults => {
-		if (!fosdemData || !query) return { tracks: [], events: [], rooms: [] };
+	const getSearchResults = (): SearchResults & {
+		tracksWithScores: SearchResult[];
+		eventsWithScores: SearchResult[];
+		roomsWithScores: SearchResult[];
+	} => {
+		if (!fosdemData || !query) return {
+			tracks: [], events: [], rooms: [],
+			tracksWithScores: [], eventsWithScores: [], roomsWithScores: []
+		};
 
 		const tracksFuse = createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS);
 		const eventsFuse = createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS);
 		const roomsFuse = createSearchIndex(Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS);
 
-		const tracksResults = tracksFuse
+		const tracksWithScores = tracksFuse
 			.search(query)
 			.slice(0, 10)
 			.map((result) => ({
-				...result.item,
-				searchScore: result.score ?? 1
+				type: 'track' as const,
+				item: result.item,
+				score: result.score ?? 1
 			}));
 
-		const eventsResults = eventsFuse
+		const eventsWithScores = eventsFuse
 			.search(query)
 			.slice(0, 20)
 			.map((result) => ({
-				...result.item,
-				searchScore: result.score ?? 1
+				type: 'event' as const,
+				item: result.item,
+				score: result.score ?? 1
 			}))
-			.sort(sortSearchResults);
+			.sort((a, b) => a.score - b.score);
 
-		const roomsResults = roomsFuse
+		const roomsWithScores = roomsFuse
 			.search(query)
 			.slice(0, 10)
 			.map((result) => ({
-				...result.item,
-				searchScore: result.score ?? 1
+				type: 'room' as const,
+				item: result.item,
+				score: result.score ?? 1
 			}));
 
 		return {
-			tracks: tracksResults,
-			events: eventsResults,
-			rooms: roomsResults,
+			tracks: tracksWithScores.map(r => r.item),
+			events: eventsWithScores.map(r => r.item),
+			rooms: roomsWithScores.map(r => r.item),
+			tracksWithScores,
+			eventsWithScores,
+			roomsWithScores
 		};
 	};
 
-	const { tracks, events, rooms } = getSearchResults();
+	const {
+		tracks: rawTracks,
+		events: rawEvents,
+		rooms: rawRooms,
+		tracksWithScores,
+		eventsWithScores,
+		roomsWithScores
+	} = getSearchResults();
 
-	const formattedTracks = tracks.map((track) => formatTrack(track, fosdemData?.events || {})) as Track[];
-	const formattedEvents = events.map(formatEvent) as Event[];
-	const formattedRooms = rooms.map(formatRoom) as RoomData[];
+	const formattedTracks = rawTracks.map((track) => formatTrack(track, fosdemData?.events || {})) as Track[];
+	const formattedEvents = rawEvents.map(formatEvent) as Event[];
+	const formattedRooms = rawRooms.map(formatRoom) as RoomData[];
+
+	const getBestScore = (items: Array<{ score?: number }>) => {
+		if (items.length === 0) return Number.POSITIVE_INFINITY;
+		return Math.min(...items.map(item => item.score ?? 1));
+	};
+
+	const sections = [
+		{
+			type: 'tracks', items: formattedTracks, score: getBestScore(tracksWithScores), component: () =>
+				rawTracks.length > 0 && <TrackList tracks={formattedTracks} year={year} title="Track Results" />
+		},
+		{
+			type: 'events', items: formattedEvents, score: getBestScore(eventsWithScores), component: () =>
+				rawEvents.length > 0 && <EventList events={formattedEvents} year={year} title="Event Results" />
+		},
+		{
+			type: 'rooms', items: formattedRooms, score: getBestScore(roomsWithScores), component: () =>
+				rawRooms.length > 0 && <RoomList rooms={formattedRooms} year={year} title="Room Results" />
+		}
+	].sort((a, b) => a.score - b.score);
 
 	return (
 		<div className="container py-8">
@@ -103,19 +142,11 @@ export default function SearchPage() {
 				<div className="flex justify-center items-center h-screen">
 					<Spinner className="h-8 w-8" />
 				</div>
-			) : tracks.length === 0 && events.length === 0 && rooms.length === 0 ? (
+			) : rawTracks.length === 0 && rawEvents.length === 0 && rawRooms.length === 0 ? (
 				<p className="text-muted-foreground">No results found.</p>
 			) : (
 				<div className="space-y-8">
-					{tracks.length > 0 && (
-						<TrackList tracks={formattedTracks} year={year} title="Track Results" />
-					)}
-					{events.length > 0 && (
-						<EventList events={formattedEvents} year={year} title="Event Results" />
-					)}
-					{rooms.length > 0 && (
-						<RoomList rooms={formattedRooms} year={year} title="Room Results" />
-					)}
+					{sections.map(section => section.component())}
 				</div>
 			)}
 		</div>

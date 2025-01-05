@@ -58,16 +58,6 @@ export function sortRooms(a: RoomData, b: RoomData): number {
   return a.name.localeCompare(b.name);
 }
 
-export function sortSearchResults<T extends { searchScore?: number }>(a: T & Event, b: T & Event): number {
-  const scoreA = a.searchScore ?? 1;
-  const scoreB = b.searchScore ?? 1;
-  if (scoreA !== scoreB) {
-    return scoreA - scoreB;
-  }
-
-  return sortEvents(a, b);
-}
-
 export function sortUpcomingEvents(a: Event, b: Event): number {
   if (a.startTime !== b.startTime) {
     return a.startTime.localeCompare(b.startTime);
