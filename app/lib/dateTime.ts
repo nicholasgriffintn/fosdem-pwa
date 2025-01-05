@@ -101,9 +101,9 @@ export function isEventUpcoming(event: Event, conference: ConferenceData, within
   }
 }
 
-export function isEventFinished(event: Event, conference: ConferenceData): boolean {
+export function isEventFinished(event: Event, conference: ConferenceData, referenceTime?: Date): boolean {
   try {
-    const now = createStandardDate(new Date());
+    const now = referenceTime ? createStandardDate(referenceTime) : createStandardDate(new Date());
     const eventStart = getEventDateTime(event, conference);
     if (!eventStart) return false;
 

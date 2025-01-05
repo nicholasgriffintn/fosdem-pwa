@@ -34,6 +34,7 @@ export const Route = createFileRoute("/event/$slug")({
           },
         },
         year,
+        isTest: true,
       };
     }
 
@@ -42,12 +43,13 @@ export const Route = createFileRoute("/event/$slug")({
       fosdem: {
         event: fosdem.events[params.slug],
         conference: fosdem.conference,
-        track: fosdem.tracks[fosdem.events[params.slug].trackKey],
+        track: fosdem.tracks[fosdem.events[params.slug]?.trackKey],
         type: fosdem.types[
-          fosdem.tracks[fosdem.events[params.slug].trackKey].type
+          fosdem.tracks[fosdem.events[params.slug]?.trackKey]?.type
         ],
       },
       year,
+      isTest: false,
     };
   },
   head: ({ loaderData }) => ({
@@ -62,7 +64,7 @@ export const Route = createFileRoute("/event/$slug")({
 });
 
 function EventPage() {
-  const { fosdem, year } = Route.useLoaderData();
+  const { fosdem, year, isTest } = Route.useLoaderData();
 
   if (!fosdem.event?.title || !fosdem.conference) {
     return (
@@ -70,10 +72,6 @@ function EventPage() {
         <div className="relative py-6 lg:py-10">
           <PageHeader
             heading="Event not found"
-            breadcrumbs={[
-              { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
-              { title: fosdem.track.name, href: `/track/${fosdem.track.id}` },
-            ]}
           />
         </div>
       </div>
@@ -91,8 +89,8 @@ function EventPage() {
         <PageHeader
           heading={fosdem.event.title}
           breadcrumbs={[
-            { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
-            { title: fosdem.track.name, href: `/track/${fosdem.track.id}` },
+            { title: fosdem.type?.name, href: `/type/${fosdem.type?.id}` },
+            { title: fosdem.track?.name, href: `/track/${fosdem.track?.id}` },
           ]}
           subtitle={fosdem.event.subtitle}
           metadata={[
@@ -130,6 +128,7 @@ function EventPage() {
             event={fosdem.event}
             conference={fosdem.conference}
             year={year}
+            isTest={isTest}
           />
         </div>
       </div>

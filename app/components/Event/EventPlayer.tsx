@@ -17,6 +17,7 @@ type EventPlayerProps = {
   isMobile?: boolean;
   onClose?: () => void;
   isFloating?: boolean;
+  testTime?: Date;
 }
 
 export function EventPlayer({
@@ -26,6 +27,7 @@ export function EventPlayer({
   isMobile = false,
   onClose,
   isFloating = false,
+  testTime,
 }: EventPlayerProps) {
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -35,11 +37,11 @@ export function EventPlayer({
     event.links?.filter((link) => link.type?.startsWith("video/")) || [];
   const hasRecordings = videoRecordings.length > 0;
 
-  const eventIsLive = isEventLive(event, conference) && event.streams?.some(
+  const eventIsLive = isEventLive(event, conference, testTime) && event.streams?.some(
     stream => stream.type === "application/vnd.apple.mpegurl"
   );
 
-  const eventIsInPast = isEventFinished(event, conference);
+  const eventIsInPast = isEventFinished(event, conference, testTime);
 
   useEffect(() => {
     if (!videoRef.current || !isPlaying) return;
