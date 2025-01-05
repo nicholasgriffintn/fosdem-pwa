@@ -242,6 +242,7 @@ export function NavSearch({ year, className, ...props }: DocsSearchProps) {
 				onSubmit={(e) => e.preventDefault()}
 			>
 				<Input
+					id="search"
 					ref={searchInputRef}
 					type="search"
 					value={inputValue}
