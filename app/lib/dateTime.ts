@@ -19,3 +19,20 @@ export function get24HrFormat(str: string) {
   _t[0] = String(+_t[0] + (str.indexOf("pm") > -1 && +_t[0] !== 12 ? 12 : 0));
   return _t.join("");
 }
+
+export function calculateEndTime(startTime: string, duration: string) {
+  const [startHours, startMinutes] = startTime.split(':').map(Number);
+  const [durationHours, durationMinutes] = duration.split(':').map(Number);
+
+  const startDate = new Date(2024, 0, 1);
+  startDate.setHours(startHours, startMinutes, 0);
+
+  const totalMinutes = (durationHours * 60) + durationMinutes;
+  const endDate = new Date(startDate.getTime() + totalMinutes * 60000);
+
+  return endDate.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+};

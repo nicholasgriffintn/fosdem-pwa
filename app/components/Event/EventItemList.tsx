@@ -5,6 +5,7 @@ import type { EventConflict } from "~/lib/fosdem";
 import { ConflictTooltip } from "./ConflictTooltip";
 import { ItemActions } from "~/components/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
+import { calculateEndTime } from "~/lib/dateTime";
 
 type EventListProps = {
 	events: Event[];
@@ -54,7 +55,7 @@ function EventListItem({
 						{event.title}
 					</h3>
 					<p className="text-gray-500">
-						{event.room} | {event.startTime} | {event.duration}
+						{event.room} | {event.startTime} - {calculateEndTime(event.startTime, event.duration)}
 						{event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
 					</p>
 				</div>
