@@ -7,6 +7,25 @@ import { Button } from "~/components/ui/button";
 
 export function ServiceWorkerUpdater() {
 	useEffect(() => {
+		const handleBeforeInstallPrompt = (e: any) => {
+			e.preventDefault();
+
+			if (window.matchMedia('(display-mode: standalone)').matches) {
+				return;
+			}
+		};
+
+		window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+		window.addEventListener('appinstalled', () => {
+			toast({
+				title: "Successfully Installed",
+				description: "FOSDEM PWA has been added to your home screen",
+				duration: 3000,
+			});
+			localStorage.removeItem('installPromptDismissed');
+		});
+
 		const handleSwUpdate = () => {
 			toast({
 				title: "Update Available",
@@ -28,8 +47,35 @@ export function ServiceWorkerUpdater() {
 			});
 		};
 
+		const dataChannel = new BroadcastChannel('fosdem-data-updates');
+		dataChannel.onmessage = (event) => {
+			toast({
+				title: "New Data Available",
+				description: "Refresh to see the latest content.",
+				duration: 5000,
+			});
+		};
+
+		const syncChannel = new BroadcastChannel('user-data-sync');
+		syncChannel.onmessage = (event) => {
+			if (event.data.type === 'SYNC_COMPLETE') {
+				toast({
+					title: "Sync Complete",
+					description: "Your changes have been saved.",
+					duration: 3000,
+				});
+			}
+		};
+
 		window.addEventListener("swUpdated", handleSwUpdate);
-		return () => window.removeEventListener("swUpdated", handleSwUpdate);
+
+		return () => {
+			window.removeEventListener("swUpdated", handleSwUpdate);
+			window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+			window.removeEventListener('appinstalled', () => { });
+			dataChannel.close();
+			syncChannel.close();
+		};
 	}, []);
 
 	return null;
