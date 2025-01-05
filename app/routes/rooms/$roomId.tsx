@@ -1,15 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useRef } from "react";
+import { createFileRoute } from '@tanstack/react-router'
+import { useRef } from 'react'
 
-import { constants } from "~/constants";
-import { EventList } from "~/components/Event/EventList";
-import { RoomPlayer } from "~/components/Room/RoomPlayer";
-import { RoomStatus } from "~/components/Room/RoomStatus";
-import { getAllData } from "~/functions/getFosdemData";
-import type { Conference, Event } from "~/types/fosdem";
-import { PageHeader } from "../../components/PageHeader";
+import { constants } from '~/constants'
+import { EventList } from '~/components/Event/EventList'
+import { RoomPlayer } from '~/components/Room/RoomPlayer'
+import { RoomStatus } from '~/components/Room/RoomStatus'
+import { getAllData } from '~/functions/getFosdemData'
+import type { Conference, Event } from '~/types/fosdem'
+import { PageHeader } from '../../components/PageHeader'
 
-export const Route = createFileRoute("/room/$roomId")({
+export const Route = createFileRoute('/rooms/$roomId')({
   component: RoomPage,
   validateSearch: ({ year, day }: { year: number; day: string }) => ({
     year:
@@ -19,14 +19,14 @@ export const Route = createFileRoute("/room/$roomId")({
   }),
   loaderDeps: ({ search: { year, day } }) => ({ year, day }),
   loader: async ({ params, deps: { year, day } }) => {
-    const data = (await getAllData({ data: { year } })) as Conference;
-    const room = data.rooms[params.roomId];
+    const data = (await getAllData({ data: { year } })) as Conference
+    const room = data.rooms[params.roomId]
 
     const roomEvents = Object.values(data.events).filter(
       (event: Event): event is Event => event.room === params.roomId,
-    );
+    )
 
-    return { fosdem: { room, roomEvents }, year, day };
+    return { fosdem: { room, roomEvents }, year, day }
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -37,14 +37,14 @@ export const Route = createFileRoute("/room/$roomId")({
     ],
   }),
   staleTime: 10_000,
-});
+})
 
 function RoomPage() {
-  const { fosdem } = Route.useLoaderData();
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const { fosdem } = Route.useLoaderData()
+  const videoRef = useRef<HTMLVideoElement>(null)
 
-  const roomEvents = fosdem.roomEvents;
-  const roomInfo = fosdem.room;
+  const roomEvents = fosdem.roomEvents
+  const roomInfo = fosdem.room
 
   return (
     <div className="min-h-screen">
@@ -53,20 +53,17 @@ function RoomPage() {
           heading={`Room ${roomInfo.name || roomInfo.slug}`}
           metadata={[
             {
-              text: `Building ${roomInfo.building}`,
+              text: `Building ${roomInfo.buildingId || roomInfo.building?.id}`,
             },
             {
-              text: `${roomInfo.eventCount} events`
-            }
+              text: `${roomInfo.eventCount} events`,
+            },
           ]}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-2">
-            <RoomPlayer
-              roomId={roomInfo.slug}
-              videoRef={videoRef}
-            />
+            <RoomPlayer roomId={roomInfo.slug} videoRef={videoRef} />
           </div>
 
           <div className="space-y-6">
@@ -78,14 +75,20 @@ function RoomPage() {
               <h2 className="text-xl font-semibold mb-2">Quick Links</h2>
               <div className="flex flex-col space-y-2">
                 <a
-                  href={constants.CHAT_LINK.replace("${ROOM_ID}", roomInfo.slug)}
+                  href={constants.CHAT_LINK.replace(
+                    '${ROOM_ID}',
+                    roomInfo.slug,
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Join Chat
                 </a>
                 <a
-                  href={constants.NAVIGATE_TO_LOCATION_LINK.replace("${LOCATION_ID}", roomInfo.slug)}
+                  href={constants.NAVIGATE_TO_LOCATION_LINK.replace(
+                    '${LOCATION_ID}',
+                    roomInfo.slug,
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -107,5 +110,5 @@ function RoomPage() {
         </div>
       </div>
     </div>
-  );
-} 
+  )
+}
