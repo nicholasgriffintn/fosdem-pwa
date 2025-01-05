@@ -12,7 +12,7 @@ export const APIRoute = createAPIFileRoute("/api/bookmarks/$year")({
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
-			return Response.json({ error: "Unauthorized" }, { status: 401 });
+			return Response.json([]);
 		}
 
 		const bookmarkData = await db.query.bookmark.findMany({
