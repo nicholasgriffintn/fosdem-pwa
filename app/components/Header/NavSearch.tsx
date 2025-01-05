@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useState, useRef, useEffect } from "react";
-import Fuse from "fuse.js";
 import { useNavigate } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
@@ -10,11 +9,14 @@ import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { Spinner } from "~/components/Spinner";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Card } from "~/components/ui/card";
-
-interface SearchResult {
-	type: "type" | "track" | "event";
-	item: any;
-}
+import {
+	type SearchResult,
+	TRACK_SEARCH_KEYS,
+	EVENT_SEARCH_KEYS,
+	ROOM_SEARCH_KEYS,
+	createSearchIndex,
+	formatSearchResults
+} from "~/lib/search";
 
 type NavSearchProps = {
 	year: number;
@@ -74,55 +76,15 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 			setIsSearching(true);
 			setFocusedIndex(-1);
 
-			const tracksFuse = new Fuse(Object.values(fosdemData.tracks), {
-				keys: [
-					{ name: "name", weight: 1.0 },
-					{ name: "type", weight: 0.8 },
-					{ name: "description", weight: 0.6 },
-					{ name: "room", weight: 0.4 }
-				],
-				threshold: 0.4,
-				includeScore: true,
-				useExtendedSearch: true,
-				ignoreLocation: true
-			});
+			const tracksFuse = createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS);
+			const eventsFuse = createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS);
+			const roomsFuse = createSearchIndex(Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS);
 
-			const eventsFuse = new Fuse(Object.values(fosdemData.events), {
-				keys: [
-					{ name: "title", weight: 1.0 },
-					{ name: "persons", weight: 0.9 },
-					{ name: "track", weight: 0.8 },
-					{ name: "abstract", weight: 0.7 },
-					{ name: "description", weight: 0.6 },
-					{ name: "room", weight: 0.4 }
-				],
-				threshold: 0.4,
-				includeScore: true,
-				useExtendedSearch: true,
-				ignoreLocation: true
-			});
+			const tracksResults = formatSearchResults(tracksFuse.search(query), "track", 3);
+			const eventsResults = formatSearchResults(eventsFuse.search(query), "event", 3);
+			const roomsResults = formatSearchResults(roomsFuse.search(query), "room", 3);
 
-			const tracksResults = tracksFuse
-				.search(query)
-				.sort((a, b) => (a.score || 0) - (b.score || 0))
-				.slice(0, 5)
-				.map((result) => ({
-					type: "track" as const,
-					item: result.item,
-					score: result.score
-				}));
-
-			const eventsResults = eventsFuse
-				.search(query)
-				.sort((a, b) => (a.score || 0) - (b.score || 0))
-				.slice(0, 5)
-				.map((result) => ({
-					type: "event" as const,
-					item: result.item,
-					score: result.score
-				}));
-
-			const combinedResults = [...tracksResults, ...eventsResults]
+			const combinedResults = [...tracksResults, ...eventsResults, ...roomsResults]
 				.sort((a, b) => (a.score || 0) - (b.score || 0))
 				.slice(0, 10);
 			setSearchResults(combinedResults);
@@ -145,6 +107,13 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					to: "/event/$slug",
 					params: { slug: result.item.id },
 					search: { year, test: false },
+				});
+				break;
+			case "room":
+				navigate({
+					to: "/rooms/$roomId",
+					params: { roomId: result.item.slug || result.item.id },
+					search: { year, day: null },
 				});
 				break;
 		}
@@ -258,6 +227,24 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 						<div className="font-medium">{result.item.title}</div>
 						<div className="text-sm text-muted-foreground">
 							Event • {result.item.track} • {result.item.persons?.join(", ")}
+						</div>
+					</button>
+				);
+			case "room":
+				return (
+					<button
+						ref={setRef}
+						type="button"
+						className={cn(
+							"w-full text-left p-2 hover:bg-accent cursor-pointer focus:outline-none focus:bg-accent",
+							focusedIndex === index && "bg-accent",
+						)}
+						onClick={() => handleResultClick(result)}
+						onKeyDown={handleKeyDown}
+					>
+						<div className="font-medium">{result.item.name}</div>
+						<div className="text-sm text-muted-foreground">
+							Room • Building {result.item.buildingId || result.item.building?.id}
 						</div>
 					</button>
 				);
