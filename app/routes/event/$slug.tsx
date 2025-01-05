@@ -104,7 +104,7 @@ function EventPage() {
             },
             {
               text: `${fosdem.event.room}`,
-              href: `/room/${fosdem.event.room}`,
+              href: `/rooms/${fosdem.event.room}`,
             },
             {
               text: `Speakers: ${fosdem.event.persons?.join(", ")}`,

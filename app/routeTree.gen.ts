@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as SigninIndexImport } from './routes/signin/index'
 import { Route as SearchIndexImport } from './routes/search/index'
+import { Route as RoomsIndexImport } from './routes/rooms/index'
 import { Route as ProfileIndexImport } from './routes/profile/index'
 import { Route as OfflineIndexImport } from './routes/offline/index'
 import { Route as MapIndexImport } from './routes/map/index'
@@ -21,7 +22,7 @@ import { Route as LiveIndexImport } from './routes/live/index'
 import { Route as BookmarksIndexImport } from './routes/bookmarks/index'
 import { Route as TypeSlugImport } from './routes/type/$slug'
 import { Route as TrackSlugImport } from './routes/track/$slug'
-import { Route as RoomRoomIdImport } from './routes/room/$roomId'
+import { Route as RoomsRoomIdImport } from './routes/rooms/$roomId'
 import { Route as EventSlugImport } from './routes/event/$slug'
 import { Route as ProfileUserIdIndexImport } from './routes/profile/$userId/index'
 
@@ -42,6 +43,12 @@ const SigninIndexRoute = SigninIndexImport.update({
 const SearchIndexRoute = SearchIndexImport.update({
   id: '/search/',
   path: '/search/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const RoomsIndexRoute = RoomsIndexImport.update({
+  id: '/rooms/',
+  path: '/rooms/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -87,9 +94,9 @@ const TrackSlugRoute = TrackSlugImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const RoomRoomIdRoute = RoomRoomIdImport.update({
-  id: '/room/$roomId',
-  path: '/room/$roomId',
+const RoomsRoomIdRoute = RoomsRoomIdImport.update({
+  id: '/rooms/$roomId',
+  path: '/rooms/$roomId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -123,11 +130,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventSlugImport
       parentRoute: typeof rootRoute
     }
-    '/room/$roomId': {
-      id: '/room/$roomId'
-      path: '/room/$roomId'
-      fullPath: '/room/$roomId'
-      preLoaderRoute: typeof RoomRoomIdImport
+    '/rooms/$roomId': {
+      id: '/rooms/$roomId'
+      path: '/rooms/$roomId'
+      fullPath: '/rooms/$roomId'
+      preLoaderRoute: typeof RoomsRoomIdImport
       parentRoute: typeof rootRoute
     }
     '/track/$slug': {
@@ -179,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileIndexImport
       parentRoute: typeof rootRoute
     }
+    '/rooms/': {
+      id: '/rooms/'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof RoomsIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/search/': {
       id: '/search/'
       path: '/search'
@@ -208,7 +222,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
-  '/room/$roomId': typeof RoomRoomIdRoute
+  '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
   '/bookmarks': typeof BookmarksIndexRoute
@@ -216,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapIndexRoute
   '/offline': typeof OfflineIndexRoute
   '/profile': typeof ProfileIndexRoute
+  '/rooms': typeof RoomsIndexRoute
   '/search': typeof SearchIndexRoute
   '/signin': typeof SigninIndexRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
@@ -224,7 +239,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
-  '/room/$roomId': typeof RoomRoomIdRoute
+  '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
   '/bookmarks': typeof BookmarksIndexRoute
@@ -232,6 +247,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapIndexRoute
   '/offline': typeof OfflineIndexRoute
   '/profile': typeof ProfileIndexRoute
+  '/rooms': typeof RoomsIndexRoute
   '/search': typeof SearchIndexRoute
   '/signin': typeof SigninIndexRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
@@ -241,7 +257,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
-  '/room/$roomId': typeof RoomRoomIdRoute
+  '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
   '/bookmarks/': typeof BookmarksIndexRoute
@@ -249,6 +265,7 @@ export interface FileRoutesById {
   '/map/': typeof MapIndexRoute
   '/offline/': typeof OfflineIndexRoute
   '/profile/': typeof ProfileIndexRoute
+  '/rooms/': typeof RoomsIndexRoute
   '/search/': typeof SearchIndexRoute
   '/signin/': typeof SigninIndexRoute
   '/profile/$userId/': typeof ProfileUserIdIndexRoute
@@ -259,7 +276,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/event/$slug'
-    | '/room/$roomId'
+    | '/rooms/$roomId'
     | '/track/$slug'
     | '/type/$slug'
     | '/bookmarks'
@@ -267,6 +284,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/offline'
     | '/profile'
+    | '/rooms'
     | '/search'
     | '/signin'
     | '/profile/$userId'
@@ -274,7 +292,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/event/$slug'
-    | '/room/$roomId'
+    | '/rooms/$roomId'
     | '/track/$slug'
     | '/type/$slug'
     | '/bookmarks'
@@ -282,6 +300,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/offline'
     | '/profile'
+    | '/rooms'
     | '/search'
     | '/signin'
     | '/profile/$userId'
@@ -289,7 +308,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/event/$slug'
-    | '/room/$roomId'
+    | '/rooms/$roomId'
     | '/track/$slug'
     | '/type/$slug'
     | '/bookmarks/'
@@ -297,6 +316,7 @@ export interface FileRouteTypes {
     | '/map/'
     | '/offline/'
     | '/profile/'
+    | '/rooms/'
     | '/search/'
     | '/signin/'
     | '/profile/$userId/'
@@ -306,7 +326,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventSlugRoute: typeof EventSlugRoute
-  RoomRoomIdRoute: typeof RoomRoomIdRoute
+  RoomsRoomIdRoute: typeof RoomsRoomIdRoute
   TrackSlugRoute: typeof TrackSlugRoute
   TypeSlugRoute: typeof TypeSlugRoute
   BookmarksIndexRoute: typeof BookmarksIndexRoute
@@ -314,6 +334,7 @@ export interface RootRouteChildren {
   MapIndexRoute: typeof MapIndexRoute
   OfflineIndexRoute: typeof OfflineIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
+  RoomsIndexRoute: typeof RoomsIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
   SigninIndexRoute: typeof SigninIndexRoute
   ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
@@ -322,7 +343,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventSlugRoute: EventSlugRoute,
-  RoomRoomIdRoute: RoomRoomIdRoute,
+  RoomsRoomIdRoute: RoomsRoomIdRoute,
   TrackSlugRoute: TrackSlugRoute,
   TypeSlugRoute: TypeSlugRoute,
   BookmarksIndexRoute: BookmarksIndexRoute,
@@ -330,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapIndexRoute: MapIndexRoute,
   OfflineIndexRoute: OfflineIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
+  RoomsIndexRoute: RoomsIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
   SigninIndexRoute: SigninIndexRoute,
   ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
@@ -347,7 +369,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/event/$slug",
-        "/room/$roomId",
+        "/rooms/$roomId",
         "/track/$slug",
         "/type/$slug",
         "/bookmarks/",
@@ -355,6 +377,7 @@ export const routeTree = rootRoute
         "/map/",
         "/offline/",
         "/profile/",
+        "/rooms/",
         "/search/",
         "/signin/",
         "/profile/$userId/"
@@ -366,8 +389,8 @@ export const routeTree = rootRoute
     "/event/$slug": {
       "filePath": "event/$slug.tsx"
     },
-    "/room/$roomId": {
-      "filePath": "room/$roomId.tsx"
+    "/rooms/$roomId": {
+      "filePath": "rooms/$roomId.tsx"
     },
     "/track/$slug": {
       "filePath": "track/$slug.tsx"
@@ -389,6 +412,9 @@ export const routeTree = rootRoute
     },
     "/profile/": {
       "filePath": "profile/index.tsx"
+    },
+    "/rooms/": {
+      "filePath": "rooms/index.tsx"
     },
     "/search/": {
       "filePath": "search/index.tsx"

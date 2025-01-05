@@ -76,7 +76,7 @@ function TrackPage() {
             },
             {
               text: `${fosdem.track.room}`,
-              href: `/room/${fosdem.track.room}`,
+              href: `/rooms/${fosdem.track.room}`,
             },
             {
               text: `Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(" and ") : fosdem.track.day}`,
