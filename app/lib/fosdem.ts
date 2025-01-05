@@ -7,26 +7,6 @@ interface TimeSlot {
 	events: Event[];
 }
 
-export const groupByDay = (
-	items: any[],
-	getDayFn: (item: any) => string[],
-): DayGroupedData => {
-	return items.reduce((acc: DayGroupedData, item) => {
-		const dayValue = getDayFn(item);
-		const days = Array.isArray(dayValue) ? dayValue : [String(dayValue)];
-
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		days.forEach((day) => {
-			if (!acc[day]) {
-				acc[day] = [];
-			}
-			acc[day].push(item);
-		});
-
-		return acc;
-	}, {});
-};
-
 export interface EventConflict {
 	event1: Event;
 	event2: Event;

@@ -101,6 +101,7 @@ export function BookmarksList({
   };
 
   const { tracks, events, conflicts } = getFormattedData();
+  const days = fosdemData ? Object.values(fosdemData.days) : [];
 
   return (
     <>
@@ -121,6 +122,8 @@ export function BookmarksList({
               title="Bookmarked Events"
               defaultViewMode="calendar"
               displayViewMode={true}
+              groupByDay={true}
+              days={days}
             />
           )}
         </div>

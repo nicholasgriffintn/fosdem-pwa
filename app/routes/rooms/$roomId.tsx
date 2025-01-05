@@ -7,7 +7,7 @@ import { RoomPlayer } from '~/components/Room/RoomPlayer'
 import { RoomStatus } from '~/components/Room/RoomStatus'
 import { getAllData } from '~/functions/getFosdemData'
 import type { Conference, Event, RoomData } from '~/types/fosdem'
-import { PageHeader } from '../../components/PageHeader'
+import { PageHeader } from '~/components/PageHeader'
 
 export const Route = createFileRoute('/rooms/$roomId')({
   component: RoomPage,
@@ -38,7 +38,9 @@ export const Route = createFileRoute('/rooms/$roomId')({
       )
     }
 
-    return { fosdem: { room, roomEvents, conference: data.conference }, year, day }
+    const days = Object.values(data.days);
+
+    return { fosdem: { room, roomEvents, conference: data.conference, days }, year, day }
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -58,6 +60,7 @@ function RoomPage() {
   const roomEvents = fosdem.roomEvents
   const roomInfo = fosdem.room
   const conference = fosdem.conference
+  const days = fosdem.days
 
   const now = new Date()
   const isConferenceRunning = new Date(conference.start) < now && new Date(conference.end) > now
@@ -138,6 +141,8 @@ function RoomPage() {
             title={`Events in ${roomInfo?.name || roomInfo.slug}`}
             defaultViewMode="calendar"
             displayViewMode={true}
+            groupByDay={true}
+            days={days}
           />
         </div>
       </div>

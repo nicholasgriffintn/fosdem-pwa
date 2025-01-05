@@ -2,12 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { getAllData } from "~/functions/getFosdemData";
 import { PageHeader } from "~/components/PageHeader";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { EventList } from "~/components/Event/EventList";
 import type { Conference, Event } from "~/types/fosdem";
-import { groupByDay } from "~/lib/fosdem";
 import { constants } from "~/constants";
-import { get24HrFormat } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/track/$slug")({
   component: TrackPage,
@@ -28,9 +25,7 @@ export const Route = createFileRoute("/track/$slug")({
       (event: Event): event is Event => event.trackKey === params.slug,
     );
 
-    const eventDataSplitByDay = groupByDay(eventData, (event) => event.day);
-
-    return { fosdem: { days, track, type, eventDataSplitByDay }, year, day };
+    return { fosdem: { days, track, type, eventData }, year, day };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -82,49 +77,14 @@ function TrackPage() {
             }
           ]}
         />
-        <Tabs
-          defaultValue={
-            day?.toString() ||
-            Object.keys(fosdem.eventDataSplitByDay)[0] ||
-            fosdem.days[0].id
-          }
-          className="w-full"
-        >
-          <TabsList>
-            {fosdem.days.map((day) => {
-              const hasEvents = Boolean(fosdem.eventDataSplitByDay[day.id]);
-              return (
-                <TabsTrigger key={day.id} value={day.id} disabled={!hasEvents}>
-                  {day.name}
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
-          {fosdem.days.map((day) => {
-            if (!fosdem.eventDataSplitByDay[day.id]) {
-              return (
-                <TabsContent key={day.id} value={day.id}>
-                  <p>
-                    No events are currently scheduled for this day, check the
-                    next day instead. Or check back later for updates.
-                  </p>
-                </TabsContent>
-              );
-            }
-
-            const event = fosdem.eventDataSplitByDay[day.id]?.sort((a, b) => {
-              const t1 = get24HrFormat(a.startTime);
-              const t2 = get24HrFormat(b.startTime);
-              return t1 > t2 ? 1 : t1 < t2 ? -1 : 0;
-            });
-
-            return (
-              <TabsContent key={day.id} value={day.id}>
-                <EventList events={event} year={year} />
-              </TabsContent>
-            );
-          })}
-        </Tabs>
+        <EventList
+          events={fosdem.eventData}
+          year={year}
+          groupByDay={true}
+          days={fosdem.days}
+          defaultViewMode="list"
+          displayViewMode={false}
+        />
       </div>
     </div>
   );

@@ -2,11 +2,16 @@ import clsx from "clsx";
 import type { Track } from "~/types/fosdem";
 import { ItemActions } from "~/components/ItemActions";
 import { useTrackList } from "~/hooks/use-item-list";
+import { groupTracksByDay } from "~/lib/grouping";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { cn } from "~/lib/utils";
 
 type TrackListProps = {
 	tracks: Track[];
 	year: number;
 	title?: string;
+	groupByDay?: boolean;
+	days?: Array<{ id: string; name: string }>;
 };
 
 type TrackListItemProps = {
@@ -52,16 +57,11 @@ function TrackListItem({
 	);
 }
 
-export function TrackList({ tracks, year, title }: TrackListProps) {
+function TrackListContent({ tracks, year }: { tracks: Track[]; year: number }) {
 	const { items: sortedTracks, bookmarksLoading } = useTrackList({ items: tracks, year });
 
 	return (
-		<section>
-			{title && (
-				<div className="flex justify-between items-center mb-4">
-					<h2 className="text-xl font-semibold">{title}</h2>
-				</div>
-			)}
+		<>
 			{sortedTracks?.length > 0 ? (
 				<ul className="track-list w-full">
 					{sortedTracks.map((track, index) => (
@@ -79,6 +79,74 @@ export function TrackList({ tracks, year, title }: TrackListProps) {
 			) : (
 				<div className="text-muted-foreground">No tracks found</div>
 			)}
+		</>
+	);
+}
+
+export function TrackList({ tracks, year, title, groupByDay = false, days }: TrackListProps) {
+	if (groupByDay && days) {
+		const trackDataSplitByDay = groupTracksByDay(tracks);
+
+		return (
+			<section>
+				<div className="flex flex-col space-y-4">
+					<Tabs defaultValue={days[0].id} className="w-full">
+						<div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+							<div className="flex flex-col md:flex-row md:items-center gap-4">
+								{title && <h2 className="text-xl font-semibold shrink-0">{title}</h2>}
+								<TabsList className="bg-transparent p-0 h-auto justify-start">
+									{days.map((day) => {
+										const hasTracks = Boolean(trackDataSplitByDay[day.id]);
+										return (
+											<TabsTrigger
+												key={day.id}
+												value={day.id}
+												disabled={!hasTracks}
+												className={cn(
+													"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2",
+													"border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+													"data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary"
+												)}
+											>
+												{day.name}
+											</TabsTrigger>
+										);
+									})}
+								</TabsList>
+							</div>
+						</div>
+						{days.map((day) => {
+							if (!trackDataSplitByDay[day.id]) {
+								return (
+									<TabsContent key={day.id} value={day.id}>
+										<p>
+											No tracks are currently scheduled for this day, check the
+											next day instead. Or check back later for updates.
+										</p>
+									</TabsContent>
+								);
+							}
+
+							return (
+								<TabsContent key={day.id} value={day.id}>
+									<TrackListContent tracks={trackDataSplitByDay[day.id]} year={year} />
+								</TabsContent>
+							);
+						})}
+					</Tabs>
+				</div>
+			</section>
+		);
+	}
+
+	return (
+		<section>
+			{title && (
+				<div className="flex justify-between items-center mb-4">
+					<h2 className="text-xl font-semibold">{title}</h2>
+				</div>
+			)}
+			<TrackListContent tracks={tracks} year={year} />
 		</section>
 	);
 }
