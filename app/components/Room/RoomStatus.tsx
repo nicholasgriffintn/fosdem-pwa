@@ -22,6 +22,8 @@ export function RoomStatus({ roomId, className }: RoomStatusProps) {
     className
   );
 
+  const isHallwayTrack = status?.state === "full" || status?.state === "unknown";
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-2">Room Status</h2>
@@ -30,8 +32,15 @@ export function RoomStatus({ roomId, className }: RoomStatusProps) {
           {isLoading ? "Loading..." : status?.state || "Unknown"}
         </span>
       </div>
+      {isHallwayTrack && (
+        <p className="text-sm text-muted-foreground mt-4">
+          Looks like this room likely doesn't have space right now.
+          You can watch the stream as part of the hallway track instead.
+          It's actually a really great place to have a few conversations.
+        </p>
+      )}
       {status?.lastUpdate && (
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Last updated: {new Date(status.lastUpdate).toLocaleTimeString()}
         </p>
       )}
