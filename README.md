@@ -33,11 +33,9 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 - [ ] Add bookmark status from DB to the event page.
 - [ ] Allow users to search within specific tracks or time slots
-- [ ] Organise bookmarks by day, allow for filtering potentially.
-- [ ] Display events below bookmarked tracks
 - [ ] Maybe a calendar export? Is that too hard?
 - [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
-- [ ] Bookmarks are background synced when offline (I've not validated this yet)
+- [ ] Bookmarks and Notes are background synced when offline (I've not validated this yet)
 - [ ] Guest sign in (potentially)
 - [ ] Configure push notifications, will need a new database table (SW work has been started for this)
 - [ ] Send notifications for bookmarked events (should be configurable)
