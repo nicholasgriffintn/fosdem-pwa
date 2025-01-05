@@ -4,7 +4,7 @@ import { Spinner } from "~/components/Spinner";
 import type { Conference, Track, Event } from "~/types/fosdem";
 import { detectEventConflicts } from "~/lib/fosdem";
 import { Conflicts } from "~/components/Bookmarks/Conflicts";
-import { sortEvents, sortTracks } from "../lib/sorting";
+import { sortEvents, sortTracks } from "../../lib/sorting";
 
 interface Bookmark {
   id: string;
