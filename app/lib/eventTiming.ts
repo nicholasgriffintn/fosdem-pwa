@@ -38,9 +38,9 @@ export function getEventDateTime(event: Event, conference: ConferenceData): Date
   return eventDate;
 }
 
-export function isEventLive(event: Event, conference: ConferenceData): boolean {
+export function isEventLive(event: Event, conference: ConferenceData, referenceTime?: Date): boolean {
   try {
-    const now = new Date();
+    const now = referenceTime || new Date();
     const eventStart = getEventDateTime(event, conference);
     if (!eventStart) return false;
 
@@ -54,9 +54,9 @@ export function isEventLive(event: Event, conference: ConferenceData): boolean {
   }
 }
 
-export function isEventUpcoming(event: Event, conference: ConferenceData, withinMinutes = 30): boolean {
+export function isEventUpcoming(event: Event, conference: ConferenceData, withinMinutes = 30, referenceTime?: Date): boolean {
   try {
-    const now = new Date();
+    const now = referenceTime || new Date();
     const eventStart = getEventDateTime(event, conference);
     if (!eventStart) return false;
 

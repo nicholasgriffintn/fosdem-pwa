@@ -10,6 +10,7 @@
     "build:vercel": "vinxi build --preset vercel && tsx scripts/generate-sw.ts .vercel/output/static",
     "start": "vinxi start",
     "lint": "npx @biomejs/biome lint ./app",
+    "typecheck": "tsc --noEmit",
     "format": "npx @biomejs/biome format --write ./app",
     "db": "drizzle-kit",
     "ui": "pnpm dlx shadcn@latest",

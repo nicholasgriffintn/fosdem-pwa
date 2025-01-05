@@ -6,7 +6,7 @@ export interface ConferenceData {
 	city: string;
 	end: string;
 	start: string;
-	days: string;
+	days: string[];
 	day_change: string;
 	timeslot_duration: string;
 	time_zone_name: string;

@@ -47,17 +47,52 @@ export const testLiveEvent = {
 	],
 };
 
-export const testConference = {
+export const testLiveEvents = [
+	{
+		...testLiveEvent,
+		day: "1",
+		title: "Live Test Event 1 - 15 mins ago",
+		startTime: "07:30",
+		duration: "01:00",
+	},
+	{
+		...testLiveEvent,
+		id: "test-upcoming-1",
+		day: "1",
+		title: "Upcoming Test Event 1 - 5 mins",
+		startTime: "07:50",
+		duration: "00:45",
+	},
+	{
+		...testLiveEvent,
+		id: "test-upcoming-2",
+		day: "1",
+		title: "Upcoming Test Event 2 - 20 mins",
+		startTime: "08:05",
+		duration: "01:30",
+	},
+	{
+		...testLiveEvent,
+		id: "test-upcoming-3",
+		day: "1",
+		title: "Upcoming Test Event 3 - 50 mins",
+		startTime: "08:35",
+		duration: "01:30",
+	},
+];
+
+export const testConferenceData = {
 	acronym: "fosdem-2025",
 	title: "FOSDEM 2025",
-	subtitle: "FOSDEM 2025",
 	venue: "ULB (Université Libre de Bruxelles)",
 	city: "Brussels",
-	start: "2025-02-01",
-	end: "2025-02-02",
-	days: "2",
+	start: "2025-01-05T07:45:00.000Z",
+	end: "2025-01-05T11:45:00.000Z",
+	days: [
+		"2025-01-05T07:45:00.000Z",
+		"2025-01-05T11:45:00.000Z",
+	],
 	day_change: "09:00:00",
 	timeslot_duration: "00:05:00",
-	base_url: "https://fosdem.org/2025/schedule/",
 	time_zone_name: "Europe/Brussels",
 };
