@@ -3,10 +3,10 @@ import { Link } from "@tanstack/react-router";
 
 import type { Event } from "~/types/fosdem";
 import { useAuth } from "~/hooks/use-auth";
-import { Skeleton } from "./ui/skeleton";
-import { Button } from "./ui/button";
+import { Skeleton } from "../ui/skeleton";
+import { Button } from "../ui/button";
 import { EventNotes } from "./EventNotes";
-import { EventNotesMobile } from "~/components/EventNotesMobile";
+import { EventNotesMobile } from "~/components/Event/EventNotesMobile";
 
 export function EventSidebar({
 	event,

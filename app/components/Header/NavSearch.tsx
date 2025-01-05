@@ -107,7 +107,7 @@ export function NavSearch({ year, className, ...props }: DocsSearchProps) {
 				navigate({
 					to: "/track/$slug",
 					params: { slug: result.item.id },
-					search: { year },
+					search: { year, day: null },
 				});
 				break;
 			case "event":

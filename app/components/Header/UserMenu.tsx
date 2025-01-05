@@ -11,7 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { User as UserIcon } from "lucide-react";
-import type { SessionUser } from "../server/auth";
+import type { SessionUser } from "~/server/auth";
 import { constants } from "~/constants";
 interface AvatarMenuProps {
 	user: SessionUser;

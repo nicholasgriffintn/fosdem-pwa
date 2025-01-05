@@ -6,7 +6,7 @@ import { FavouriteButton } from "~/components/FavouriteButton";
 import { ShareButton } from "~/components/ShareButton";
 import { constants } from "~/constants";
 import { useBookmarks } from "~/hooks/use-bookmarks";
-import { Spinner } from "./Spinner";
+import { Spinner } from "../Spinner";
 
 type TrackListItem = {
 	id: string;
@@ -91,16 +91,16 @@ export function TrackList({ tracks, year }: TrackListProps) {
 
 	const tracksWithFavourites = tracks?.length
 		? tracks.map((track) => {
-				return {
-					...track,
-					isFavourited: bookmarks?.length
-						? Boolean(
-								bookmarks.find((bookmark: any) => bookmark.slug === track.id)
-									?.status === "favourited",
-							)
-						: undefined,
-				};
-			})
+			return {
+				...track,
+				isFavourited: bookmarks?.length
+					? Boolean(
+						bookmarks.find((bookmark: any) => bookmark.slug === track.id)
+							?.status === "favourited",
+					)
+					: undefined,
+			};
+		})
 		: [];
 
 	return (

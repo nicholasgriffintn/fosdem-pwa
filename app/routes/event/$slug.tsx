@@ -5,7 +5,7 @@ import { FavouriteButton } from "~/components/FavouriteButton";
 import { ShareButton } from "~/components/ShareButton";
 import { testLiveEvent, testConference } from "~/data/test-data";
 import { getAllData } from "~/functions/getFosdemData";
-import { EventMain } from "~/components/EventMain";
+import { EventMain } from "~/components/Event/EventMain";
 import { constants } from "~/constants";
 
 export const Route = createFileRoute("/event/$slug")({

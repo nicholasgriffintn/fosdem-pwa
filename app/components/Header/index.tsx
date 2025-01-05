@@ -1,10 +1,10 @@
 import { Link, useSearch } from "@tanstack/react-router";
 
 import { Icons } from "~/components/Icons";
-import { MainNav } from "~/components/MainNav";
-import { NavSearch } from "~/components/NavSearch";
-import { Button } from "./ui/button";
-import { AvatarMenu } from "./UserMenu";
+import { MainNav } from "~/components/Header/MainNav";
+import { NavSearch } from "~/components/Header/NavSearch";
+import { Button } from "~/components/ui/button";
+import { AvatarMenu } from "~/components/Header/UserMenu";
 import {
 	Tooltip,
 	TooltipContent,

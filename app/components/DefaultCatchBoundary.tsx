@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
-import { constants } from "../constants";
+import { constants } from "~/constants";
 
 export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 	const router = useRouter();

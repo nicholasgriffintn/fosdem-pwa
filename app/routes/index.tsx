@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Types } from "~/components/Types";
+import { Types } from "~/components/Type/Types";
 import { getAllData } from "~/functions/getFosdemData";
 import { PageHeader } from "~/components/PageHeader";
 import { constants } from "~/constants";

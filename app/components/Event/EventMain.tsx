@@ -3,9 +3,9 @@
 import { useRef } from "react";
 import { cn } from "~/lib/utils";
 
-import { EventSidebar } from "~/components/EventSidebar";
-import { EventPlayer } from "~/components/EventPlayer";
-import { ChatAlert } from "~/components/ChatAlert";
+import { EventSidebar } from "~/components/Event/EventSidebar";
+import { EventPlayer } from "~/components/Event/EventPlayer";
+import { ChatAlert } from "~/components/Event/ChatAlert";
 import {
 	ResizableHandle,
 	ResizablePanel,
@@ -15,7 +15,7 @@ import { useWindowSize } from "~/hooks/use-window-size";
 import type { Event, ConferenceData, TypeIds } from "~/types/fosdem";
 import { fosdemImageDetails } from "~/data/fosdem-image-details";
 import { fosdemSpecialRooms } from "~/data/fosdem-special-rooms";
-import { EventContent } from "~/components/EventContent";
+import { EventContent } from "~/components/Event/EventContent";
 
 export function EventMain({
 	event,
