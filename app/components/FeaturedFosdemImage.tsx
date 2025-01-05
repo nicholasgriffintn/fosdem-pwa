@@ -5,7 +5,7 @@ import clsx from "clsx";
 
 import { fosdemImageDetails } from "~/data/fosdem-image-details";
 import { Image } from "~/components/Image";
-import type { FosdemImageType } from "~/types/fosdem";
+import type { TypeIds } from "~/types/fosdem";
 
 export function FeaturedFosdemImage({
 	type,
@@ -16,7 +16,7 @@ export function FeaturedFosdemImage({
 	className,
 	...props
 }: {
-	type: FosdemImageType;
+	type: TypeIds;
 	size: string;
 	showCaptionOnHover?: boolean;
 	displayCaption?: boolean;

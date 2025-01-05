@@ -12,7 +12,7 @@ import {
 	ResizablePanelGroup,
 } from "~/components/ui/resizable";
 import { useWindowSize } from "~/hooks/use-window-size";
-import type { Event, ConferenceData, FosdemImageType } from "~/types/fosdem";
+import type { Event, ConferenceData, TypeIds } from "~/types/fosdem";
 import { fosdemImageDetails } from "~/data/fosdem-image-details";
 import { fosdemSpecialRooms } from "~/data/fosdem-special-rooms";
 import { EventContent } from "~/components/EventContent";
@@ -96,19 +96,19 @@ export function EventMain({
 					)}
 					<span className="text-sm block mb-2">
 						Notice: The placeholder video image is licensed under{" "}
-						{fosdemImageDetails[event.type as FosdemImageType].license}.{" "}
+						{fosdemImageDetails[event.type as TypeIds].license}.{" "}
 						<a
-							href={fosdemImageDetails[event.type as FosdemImageType].original}
+							href={fosdemImageDetails[event.type as TypeIds].original}
 							target="_blank"
 							rel="noreferrer"
 						>
 							The original image can be found here
 						</a>.
 					</span>
-					{fosdemImageDetails[event.type as FosdemImageType].changes && (
+					{fosdemImageDetails[event.type as TypeIds].changes && (
 						<span className="text-xs block mt-1">
 							Changes made to the image are:{" "}
-							{fosdemImageDetails[event.type as FosdemImageType].changes}
+							{fosdemImageDetails[event.type as TypeIds].changes}
 						</span>
 					)}
 				</div>

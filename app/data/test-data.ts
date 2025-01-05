@@ -2,6 +2,7 @@ export const testLiveEvent = {
 	day: ["1"],
 	isLive: true,
 	slug: "test-live",
+	subtitle: "testing 123",
 	description: "This is a test of the live player - ignore",
 	status: "running",
 	type: "devroom",
@@ -34,41 +35,29 @@ export const testLiveEvent = {
 	startTime: "15:30",
 	duration: "01:00",
 	abstract: "<p>This is just a test to confirm things work before FOSDOM</p>",
+	language: "dalek",
+	url: "https://fosdem.org/2025/schedule/event/test-live",
+	feedbackUrl: "https://fosdem.org/2025/schedule/event/test-live/feedback",
+	attachments: [
+		{
+			type: "test",
+			href: "https://fosdem.org/2025/schedule/event/test-live/attachments/test-live.pdf",
+			title: "Test Live Attachment",
+		},
+	],
 };
 
 export const testConference = {
-	acronym: {
-		_text: "fosdem-2025",
-	},
-	title: {
-		_text: "FOSDEM 2025",
-	},
-	subtitle: {},
-	venue: {
-		_text: "ULB (Université Libre de Bruxelles)",
-	},
-	city: {
-		_text: "Brussels",
-	},
-	start: {
-		_text: "2025-02-01",
-	},
-	end: {
-		_text: "2025-02-02",
-	},
-	days: {
-		_text: "2",
-	},
-	day_change: {
-		_text: "09:00:00",
-	},
-	timeslot_duration: {
-		_text: "00:05:00",
-	},
-	base_url: {
-		_text: "https://fosdem.org/2025/schedule/",
-	},
-	time_zone_name: {
-		_text: "Europe/Brussels",
-	},
+	acronym: "fosdem-2025",
+	title: "FOSDEM 2025",
+	subtitle: "FOSDEM 2025",
+	venue: "ULB (Université Libre de Bruxelles)",
+	city: "Brussels",
+	start: "2025-02-01",
+	end: "2025-02-02",
+	days: "2",
+	day_change: "09:00:00",
+	timeslot_duration: "00:05:00",
+	base_url: "https://fosdem.org/2025/schedule/",
+	time_zone_name: "Europe/Brussels",
 };

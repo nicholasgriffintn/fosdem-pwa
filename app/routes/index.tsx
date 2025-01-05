@@ -36,8 +36,8 @@ function Home() {
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
 				<PageHeader
-					heading={fosdem.conference.title._text}
-					text={`${fosdem.conference.city._text} / ${fosdem.conference.start._text} - ${fosdem.conference.end._text}`}
+					heading={fosdem.conference.title}
+					text={`${fosdem.conference.city} / ${fosdem.conference.start} - ${fosdem.conference.end}`}
 				/>
 				<div>{fosdem.types && <Types types={fosdem.types} />}</div>
 			</div>
