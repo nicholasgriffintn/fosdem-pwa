@@ -75,26 +75,56 @@ export function NavSearch({ year, className, ...props }: DocsSearchProps) {
 			setFocusedIndex(-1);
 
 			const tracksFuse = new Fuse(Object.values(fosdemData.tracks), {
-				keys: ["name", "id", "type"],
-				threshold: 0.3,
+				keys: [
+					{ name: "name", weight: 1.0 },
+					{ name: "type", weight: 0.8 },
+					{ name: "description", weight: 0.6 },
+					{ name: "room", weight: 0.4 }
+				],
+				threshold: 0.4,
+				includeScore: true,
+				useExtendedSearch: true,
+				ignoreLocation: true
 			});
 
 			const eventsFuse = new Fuse(Object.values(fosdemData.events), {
-				keys: ["title", "track", "persons", "abstract"],
-				threshold: 0.3,
+				keys: [
+					{ name: "title", weight: 1.0 },
+					{ name: "persons", weight: 0.9 },
+					{ name: "track", weight: 0.8 },
+					{ name: "abstract", weight: 0.7 },
+					{ name: "description", weight: 0.6 },
+					{ name: "room", weight: 0.4 }
+				],
+				threshold: 0.4,
+				includeScore: true,
+				useExtendedSearch: true,
+				ignoreLocation: true
 			});
 
-			const tracksResults = tracksFuse.search(query).map((result) => ({
-				type: "track" as const,
-				item: result.item,
-			}));
+			const tracksResults = tracksFuse
+				.search(query)
+				.sort((a, b) => (a.score || 0) - (b.score || 0))
+				.slice(0, 5)
+				.map((result) => ({
+					type: "track" as const,
+					item: result.item,
+					score: result.score
+				}));
 
-			const eventsResults = eventsFuse.search(query).map((result) => ({
-				type: "event" as const,
-				item: result.item,
-			}));
+			const eventsResults = eventsFuse
+				.search(query)
+				.sort((a, b) => (a.score || 0) - (b.score || 0))
+				.slice(0, 5)
+				.map((result) => ({
+					type: "event" as const,
+					item: result.item,
+					score: result.score
+				}));
 
-			const combinedResults = [...tracksResults, ...eventsResults].slice(0, 10);
+			const combinedResults = [...tracksResults, ...eventsResults]
+				.sort((a, b) => (a.score || 0) - (b.score || 0))
+				.slice(0, 10);
 			setSearchResults(combinedResults);
 			setIsSearching(false);
 		},

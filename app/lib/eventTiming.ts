@@ -1,43 +1,88 @@
-import type { ConferenceData, Event } from "~/types/fosdem";
+import type { Event, ConferenceData } from "~/types/fosdem";
 
-const BUFFER_MINUTES = 15;
+export function parseEventTime(timeStr: string) {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
 
-export const getEventTiming = (event: Event, conference: ConferenceData) => {
-  try {
-    const conferenceStartDate = new Date(conference.start);
-    const eventDay = Number.parseInt(event.day as string) - 1;
-    const [hours, minutes] = event.startTime.split(":").map(Number);
-    const [durationHours, durationMinutes] = event.duration.split(":").map(Number);
+export function parseEventDuration(durationStr: string) {
+  const [hours, minutes] = durationStr.split(":").map(Number);
+  return (hours * 60 + minutes) * 60 * 1000;
+}
 
-    const eventStart = new Date(conferenceStartDate);
-    eventStart.setDate(eventStart.getDate() + eventDay);
-    eventStart.setHours(hours, minutes, 0);
+export function getEventEndTime(event: Event) {
+  const startTime = parseEventTime(event.startTime);
+  const duration = parseEventDuration(event.duration);
+  return new Date(startTime.getTime() + duration);
+}
 
-    const eventEnd = new Date(eventStart);
-    eventEnd.setHours(eventStart.getHours() + durationHours);
-    eventEnd.setMinutes(eventStart.getMinutes() + durationMinutes);
-
-    return {
-      start: eventStart,
-      end: eventEnd,
-      date: eventStart.toISOString().substring(0, 10)
-    };
-  } catch (error) {
-    console.error("Error calculating event timing:", error);
+export function getEventDateTime(event: Event, conference: ConferenceData): Date | null {
+  if (!conference?.days || !Array.isArray(conference.days) || conference.days.length === 0 || !event.day) {
     return null;
   }
-};
 
-export const isEventLive = (event: Event, conference: ConferenceData) => {
-  const timing = getEventTiming(event, conference);
-  if (!timing) return false;
+  const dayIndex = Number(event.day) - 1;
+  if (dayIndex < 0 || dayIndex >= conference.days.length) {
+    return null;
+  }
 
-  const now = new Date();
-  const bufferStart = new Date(timing.start);
-  const bufferEnd = new Date(timing.end);
+  const eventDate = new Date(conference.days[dayIndex].date);
+  const [hours, minutes] = event.startTime.split(":").map(Number);
+  eventDate.setHours(hours, minutes, 0, 0);
+  return eventDate;
+}
 
-  bufferStart.setMinutes(bufferStart.getMinutes() - BUFFER_MINUTES);
-  bufferEnd.setMinutes(bufferEnd.getMinutes() + BUFFER_MINUTES);
+export function isEventLive(event: Event, conference: ConferenceData): boolean {
+  try {
+    const now = new Date();
+    const eventStart = getEventDateTime(event, conference);
+    if (!eventStart) return false;
 
-  return now >= bufferStart && now <= bufferEnd;
-};
+    const duration = parseEventDuration(event.duration);
+    const eventEnd = new Date(eventStart.getTime() + duration);
+
+    return now >= eventStart && now <= eventEnd;
+  } catch (error) {
+    console.error('Error checking if event is live:', error);
+    return false;
+  }
+}
+
+export function isEventUpcoming(event: Event, conference: ConferenceData, withinMinutes = 30): boolean {
+  try {
+    const now = new Date();
+    const eventStart = getEventDateTime(event, conference);
+    if (!eventStart) return false;
+
+    const timeUntilStart = eventStart.getTime() - now.getTime();
+    return timeUntilStart > 0 && timeUntilStart <= withinMinutes * 60 * 1000;
+  } catch (error) {
+    console.error('Error checking if event is upcoming:', error);
+    return false;
+  }
+}
+
+export function isEventFinished(event: Event, conference: ConferenceData): boolean {
+  try {
+    const now = new Date();
+    const eventStart = getEventDateTime(event, conference);
+    if (!eventStart) return false;
+
+    const duration = parseEventDuration(event.duration);
+    const eventEnd = new Date(eventStart.getTime() + duration);
+
+    return now > eventEnd;
+  } catch (error) {
+    console.error('Error checking if event is finished:', error);
+    return false;
+  }
+}
+
+export function getEventStatus(event: Event, conference: ConferenceData): 'live' | 'upcoming' | 'finished' | 'scheduled' {
+  if (isEventLive(event, conference)) return 'live';
+  if (isEventUpcoming(event, conference)) return 'upcoming';
+  if (isEventFinished(event, conference)) return 'finished';
+  return 'scheduled';
+}

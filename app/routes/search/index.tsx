@@ -7,10 +7,6 @@ import { TrackList } from "~/components/Track/TrackList";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "../../constants";
 
-interface SearchParams {
-	q?: string;
-}
-
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
 	head: () => ({
@@ -46,17 +42,68 @@ export default function SearchPage() {
 		if (!fosdemData || !query) return { tracks: [], events: [] };
 
 		const tracksFuse = new Fuse(Object.values(fosdemData.tracks), {
-			keys: ["name", "type", "description"],
-			threshold: 0.3,
+			keys: [
+				{ name: "name", weight: 1.0 },
+				{ name: "type", weight: 0.8 },
+				{ name: "description", weight: 0.6 },
+				{ name: "room", weight: 0.4 }
+			],
+			threshold: 0.4,
+			includeScore: true,
+			useExtendedSearch: true,
+			ignoreLocation: true,
+			getFn: (obj, path) => {
+				const value = Fuse.config.getFn(obj, path);
+				return value ? String(value) : "";
+			}
 		});
 
 		const eventsFuse = new Fuse(Object.values(fosdemData.events), {
-			keys: ["title", "persons", "abstract", "description"],
-			threshold: 0.3,
+			keys: [
+				{ name: "title", weight: 1.0 },
+				{ name: "persons", weight: 0.9 },
+				{ name: "track", weight: 0.8 },
+				{ name: "abstract", weight: 0.7 },
+				{ name: "description", weight: 0.6 },
+				{ name: "room", weight: 0.4 }
+			],
+			threshold: 0.4,
+			includeScore: true,
+			useExtendedSearch: true,
+			ignoreLocation: true,
+			getFn: (obj, path) => {
+				const value = Fuse.config.getFn(obj, path);
+				return value ? String(value) : "";
+			}
 		});
 
-		const tracksResults = tracksFuse.search(query).map((result) => result.item);
-		const eventsResults = eventsFuse.search(query).map((result) => result.item);
+		const tracksResults = tracksFuse
+			.search(query)
+			.sort((a, b) => {
+				const scoreA = a.score ?? 1;
+				const scoreB = b.score ?? 1;
+				if (scoreA !== scoreB) return scoreA - scoreB;
+				return String(a.item.name).length - String(b.item.name).length;
+			})
+			.slice(0, 10)
+			.map((result) => ({
+				...result.item,
+				searchScore: result.score ?? 1
+			}));
+
+		const eventsResults = eventsFuse
+			.search(query)
+			.sort((a, b) => {
+				const scoreA = a.score ?? 1;
+				const scoreB = b.score ?? 1;
+				if (scoreA !== scoreB) return scoreA - scoreB;
+				return String(a.item.title).length - String(b.item.title).length;
+			})
+			.slice(0, 20)
+			.map((result) => ({
+				...result.item,
+				searchScore: result.score ?? 1
+			}));
 
 		return {
 			tracks: tracksResults,
