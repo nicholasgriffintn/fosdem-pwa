@@ -24,7 +24,7 @@ export const Route = createFileRoute("/type/$slug")({
 		const type = data.types[params.slug];
 
 		const trackData = Object.values(data.tracks).filter(
-			(track: any): track is Track => track.type === params.slug,
+			(track: Track): track is Track => track.type === params.slug,
 		);
 
 		const trackDataSplitByDay = groupByDay(trackData, (track) => track.day);
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/type/$slug")({
 		meta: [
 			{
 				title: `${loaderData?.fosdem.type?.name} | FOSDEM PWA`,
-				description: loaderData?.fosdem.type?.description,
+				description: fosdemTypeDescriptions[loaderData?.fosdem.type?.id as keyof typeof fosdemTypeDescriptions],
 			},
 		],
 	}),

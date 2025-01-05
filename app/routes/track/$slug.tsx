@@ -30,7 +30,7 @@ export const Route = createFileRoute("/track/$slug")({
     const type = data.types[track?.type];
 
     const eventData = Object.values(data.events).filter(
-      (event: any): event is Event => event.trackKey === params.slug,
+      (event: Event): event is Event => event.trackKey === params.slug,
     );
 
     const eventDataSplitByDay = groupByDay(eventData, (event) => event.day);
