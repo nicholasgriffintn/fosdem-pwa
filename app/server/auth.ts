@@ -135,7 +135,6 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
 	});
 }
 
-// OAuth2 Providers
 export const github = new GitHub(
 	process.env.GITHUB_CLIENT_ID as string,
 	process.env.GITHUB_CLIENT_SECRET as string,
