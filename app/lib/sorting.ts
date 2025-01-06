@@ -74,4 +74,23 @@ export function sortUpcomingEvents(a: Event, b: Event): number {
   }
 
   return a.title.localeCompare(b.title);
+}
+
+export function sortScheduleEvents(a: Event, b: Event): number {
+  const dayDiff = Number(a.day) - Number(b.day);
+  if (dayDiff !== 0) {
+    return dayDiff;
+  }
+
+  // Convert times to minutes for accurate comparison
+  const [aHours, aMinutes] = a.startTime.split(':').map(Number);
+  const [bHours, bMinutes] = b.startTime.split(':').map(Number);
+  const aTime = aHours * 60 + aMinutes;
+  const bTime = bHours * 60 + bMinutes;
+
+  if (aTime !== bTime) {
+    return aTime - bTime;
+  }
+
+  return a.title.localeCompare(b.title);
 } 

@@ -1,11 +1,12 @@
-import type { Event, Track } from "~/types/fosdem";
 import type { Bookmark } from "~/server/db/schema";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import { sortEventsWithFavorites, sortTracksWithFavorites } from "~/lib/sorting";
+import type { Event, Track } from "~/types/fosdem";
 
 interface UseEventListProps {
   items: Event[];
   year: number;
+  sortFn?: (a: Event, b: Event) => number;
 }
 
 interface UseTrackListProps {
@@ -13,7 +14,7 @@ interface UseTrackListProps {
   year: number;
 }
 
-export function useEventList({ items, year }: UseEventListProps) {
+export function useEventList({ items, year, sortFn }: UseEventListProps) {
   const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
 
   const itemsWithFavourites = items?.length
@@ -36,7 +37,7 @@ export function useEventList({ items, year }: UseEventListProps) {
     return acc;
   }, {} as Record<string, boolean>) || {};
 
-  const sortedItems = [...itemsWithFavourites].sort(sortEventsWithFavorites(favorites));
+  const sortedItems = [...itemsWithFavourites].sort(sortFn || sortEventsWithFavorites(favorites));
 
   return {
     items: sortedItems,

@@ -41,31 +41,37 @@ export function detectEventConflicts(events: Event[], conference: ConferenceData
 				continue;
 			}
 
-			const event1Start = getEventDateTime(event1, conference);
-			const event2Start = getEventDateTime(event2, conference);
+			const [hours1, minutes1] = event1.startTime.split(':').map(Number);
+			const [hours2, minutes2] = event2.startTime.split(':').map(Number);
+			const [durationHours1, durationMinutes1] = event1.duration.split(':').map(Number);
+			const [durationHours2, durationMinutes2] = event2.duration.split(':').map(Number);
 
-			if (!event1Start || !event2Start) {
-				continue;
-			}
+			const start1 = hours1 * 60 + minutes1;
+			const start2 = hours2 * 60 + minutes2;
+			const duration1 = durationHours1 * 60 + durationMinutes1;
+			const duration2 = durationHours2 * 60 + durationMinutes2;
 
-			const event1Duration = parseEventDuration(event1.duration);
-			const event2Duration = parseEventDuration(event2.duration);
+			const end1 = start1 + duration1;
+			const end2 = start2 + duration2;
 
-			const event1End = new Date(event1Start.getTime() + event1Duration);
-			const event2End = new Date(event2Start.getTime() + event2Duration);
-
-			const overlapStart = new Date(Math.max(event1Start.getTime(), event2Start.getTime()));
-			const overlapEnd = new Date(Math.min(event1End.getTime(), event2End.getTime()));
+			const overlapStart = Math.max(start1, start2);
+			const overlapEnd = Math.min(end1, end2);
 
 			if (overlapStart < overlapEnd) {
-				const overlapDuration = Math.round((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60));
+				const overlapDuration = overlapEnd - overlapStart;
+
+				const baseDate = new Date(2024, 0, 1);
+				const startDate = new Date(baseDate);
+				startDate.setHours(Math.floor(overlapStart / 60), overlapStart % 60);
+				const endDate = new Date(baseDate);
+				endDate.setHours(Math.floor(overlapEnd / 60), overlapEnd % 60);
 
 				conflicts.push({
 					event1,
 					event2,
 					overlapDuration,
-					startOverlap: overlapStart,
-					endOverlap: overlapEnd
+					startOverlap: startDate,
+					endOverlap: endDate
 				});
 			}
 		}

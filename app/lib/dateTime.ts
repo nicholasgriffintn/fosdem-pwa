@@ -32,18 +32,11 @@ export function calculateEndTime(startTime: string, duration: string) {
   const [startHours, startMinutes] = startTime.split(':').map(Number);
   const [durationHours, durationMinutes] = duration.split(':').map(Number);
 
-  const startDate = createStandardDate(new Date(2024, 0, 1));
-  startDate.setHours(startHours, startMinutes, 0);
+  const totalMinutes = (startHours * 60 + startMinutes) + (durationHours * 60 + durationMinutes);
+  const endHours = Math.floor(totalMinutes / 60);
+  const endMinutes = totalMinutes % 60;
 
-  const totalMinutes = (durationHours * 60) + durationMinutes;
-  const endDate = new Date(startDate.getTime() + totalMinutes * 60000);
-
-  return endDate.toLocaleTimeString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZone: constants.TIME_ZONE
-  });
+  return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
 }
 
 export function parseEventDuration(durationStr: string) {
