@@ -10,356 +10,356 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as SigninIndexImport } from './routes/signin/index'
-import { Route as SearchIndexImport } from './routes/search/index'
-import { Route as RoomsIndexImport } from './routes/rooms/index'
-import { Route as ProfileIndexImport } from './routes/profile/index'
-import { Route as OfflineIndexImport } from './routes/offline/index'
-import { Route as MapIndexImport } from './routes/map/index'
-import { Route as LiveIndexImport } from './routes/live/index'
-import { Route as BookmarksIndexImport } from './routes/bookmarks/index'
-import { Route as TypeSlugImport } from './routes/type/$slug'
-import { Route as TrackSlugImport } from './routes/track/$slug'
-import { Route as RoomsRoomIdImport } from './routes/rooms/$roomId'
-import { Route as EventSlugImport } from './routes/event/$slug'
-import { Route as ProfileUserIdIndexImport } from './routes/profile/$userId/index'
+import { Route as rootRoute } from "./routes/__root";
+import { Route as IndexImport } from "./routes/index";
+import { Route as SigninIndexImport } from "./routes/signin/index";
+import { Route as SearchIndexImport } from "./routes/search/index";
+import { Route as RoomsIndexImport } from "./routes/rooms/index";
+import { Route as ProfileIndexImport } from "./routes/profile/index";
+import { Route as OfflineIndexImport } from "./routes/offline/index";
+import { Route as MapIndexImport } from "./routes/map/index";
+import { Route as LiveIndexImport } from "./routes/live/index";
+import { Route as BookmarksIndexImport } from "./routes/bookmarks/index";
+import { Route as TypeSlugImport } from "./routes/type/$slug";
+import { Route as TrackSlugImport } from "./routes/track/$slug";
+import { Route as RoomsRoomIdImport } from "./routes/rooms/$roomId";
+import { Route as EventSlugImport } from "./routes/event/$slug";
+import { Route as ProfileUserIdIndexImport } from "./routes/profile/$userId/index";
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/",
+	path: "/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const SigninIndexRoute = SigninIndexImport.update({
-  id: '/signin/',
-  path: '/signin/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/signin/",
+	path: "/signin/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const SearchIndexRoute = SearchIndexImport.update({
-  id: '/search/',
-  path: '/search/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/search/",
+	path: "/search/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const RoomsIndexRoute = RoomsIndexImport.update({
-  id: '/rooms/',
-  path: '/rooms/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/rooms/",
+	path: "/rooms/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const ProfileIndexRoute = ProfileIndexImport.update({
-  id: '/profile/',
-  path: '/profile/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/profile/",
+	path: "/profile/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const OfflineIndexRoute = OfflineIndexImport.update({
-  id: '/offline/',
-  path: '/offline/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/offline/",
+	path: "/offline/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const MapIndexRoute = MapIndexImport.update({
-  id: '/map/',
-  path: '/map/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/map/",
+	path: "/map/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const LiveIndexRoute = LiveIndexImport.update({
-  id: '/live/',
-  path: '/live/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/live/",
+	path: "/live/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const BookmarksIndexRoute = BookmarksIndexImport.update({
-  id: '/bookmarks/',
-  path: '/bookmarks/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/bookmarks/",
+	path: "/bookmarks/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const TypeSlugRoute = TypeSlugImport.update({
-  id: '/type/$slug',
-  path: '/type/$slug',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/type/$slug",
+	path: "/type/$slug",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const TrackSlugRoute = TrackSlugImport.update({
-  id: '/track/$slug',
-  path: '/track/$slug',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/track/$slug",
+	path: "/track/$slug",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const RoomsRoomIdRoute = RoomsRoomIdImport.update({
-  id: '/rooms/$roomId',
-  path: '/rooms/$roomId',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/rooms/$roomId",
+	path: "/rooms/$roomId",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const EventSlugRoute = EventSlugImport.update({
-  id: '/event/$slug',
-  path: '/event/$slug',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/event/$slug",
+	path: "/event/$slug",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const ProfileUserIdIndexRoute = ProfileUserIdIndexImport.update({
-  id: '/profile/$userId/',
-  path: '/profile/$userId/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/profile/$userId/",
+	path: "/profile/$userId/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 // Populate the FileRoutesByPath interface
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/event/$slug': {
-      id: '/event/$slug'
-      path: '/event/$slug'
-      fullPath: '/event/$slug'
-      preLoaderRoute: typeof EventSlugImport
-      parentRoute: typeof rootRoute
-    }
-    '/rooms/$roomId': {
-      id: '/rooms/$roomId'
-      path: '/rooms/$roomId'
-      fullPath: '/rooms/$roomId'
-      preLoaderRoute: typeof RoomsRoomIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/track/$slug': {
-      id: '/track/$slug'
-      path: '/track/$slug'
-      fullPath: '/track/$slug'
-      preLoaderRoute: typeof TrackSlugImport
-      parentRoute: typeof rootRoute
-    }
-    '/type/$slug': {
-      id: '/type/$slug'
-      path: '/type/$slug'
-      fullPath: '/type/$slug'
-      preLoaderRoute: typeof TypeSlugImport
-      parentRoute: typeof rootRoute
-    }
-    '/bookmarks/': {
-      id: '/bookmarks/'
-      path: '/bookmarks'
-      fullPath: '/bookmarks'
-      preLoaderRoute: typeof BookmarksIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/live/': {
-      id: '/live/'
-      path: '/live'
-      fullPath: '/live'
-      preLoaderRoute: typeof LiveIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/map/': {
-      id: '/map/'
-      path: '/map'
-      fullPath: '/map'
-      preLoaderRoute: typeof MapIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/offline/': {
-      id: '/offline/'
-      path: '/offline'
-      fullPath: '/offline'
-      preLoaderRoute: typeof OfflineIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/profile/': {
-      id: '/profile/'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/rooms/': {
-      id: '/rooms/'
-      path: '/rooms'
-      fullPath: '/rooms'
-      preLoaderRoute: typeof RoomsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/search/': {
-      id: '/search/'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/signin/': {
-      id: '/signin/'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof SigninIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/profile/$userId/': {
-      id: '/profile/$userId/'
-      path: '/profile/$userId'
-      fullPath: '/profile/$userId'
-      preLoaderRoute: typeof ProfileUserIdIndexImport
-      parentRoute: typeof rootRoute
-    }
-  }
+declare module "@tanstack/react-router" {
+	interface FileRoutesByPath {
+		"/": {
+			id: "/";
+			path: "/";
+			fullPath: "/";
+			preLoaderRoute: typeof IndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/event/$slug": {
+			id: "/event/$slug";
+			path: "/event/$slug";
+			fullPath: "/event/$slug";
+			preLoaderRoute: typeof EventSlugImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/rooms/$roomId": {
+			id: "/rooms/$roomId";
+			path: "/rooms/$roomId";
+			fullPath: "/rooms/$roomId";
+			preLoaderRoute: typeof RoomsRoomIdImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/track/$slug": {
+			id: "/track/$slug";
+			path: "/track/$slug";
+			fullPath: "/track/$slug";
+			preLoaderRoute: typeof TrackSlugImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/type/$slug": {
+			id: "/type/$slug";
+			path: "/type/$slug";
+			fullPath: "/type/$slug";
+			preLoaderRoute: typeof TypeSlugImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/bookmarks/": {
+			id: "/bookmarks/";
+			path: "/bookmarks";
+			fullPath: "/bookmarks";
+			preLoaderRoute: typeof BookmarksIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/live/": {
+			id: "/live/";
+			path: "/live";
+			fullPath: "/live";
+			preLoaderRoute: typeof LiveIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/map/": {
+			id: "/map/";
+			path: "/map";
+			fullPath: "/map";
+			preLoaderRoute: typeof MapIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/offline/": {
+			id: "/offline/";
+			path: "/offline";
+			fullPath: "/offline";
+			preLoaderRoute: typeof OfflineIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/profile/": {
+			id: "/profile/";
+			path: "/profile";
+			fullPath: "/profile";
+			preLoaderRoute: typeof ProfileIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/rooms/": {
+			id: "/rooms/";
+			path: "/rooms";
+			fullPath: "/rooms";
+			preLoaderRoute: typeof RoomsIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/search/": {
+			id: "/search/";
+			path: "/search";
+			fullPath: "/search";
+			preLoaderRoute: typeof SearchIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/signin/": {
+			id: "/signin/";
+			path: "/signin";
+			fullPath: "/signin";
+			preLoaderRoute: typeof SigninIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/profile/$userId/": {
+			id: "/profile/$userId/";
+			path: "/profile/$userId";
+			fullPath: "/profile/$userId";
+			preLoaderRoute: typeof ProfileUserIdIndexImport;
+			parentRoute: typeof rootRoute;
+		};
+	}
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/event/$slug': typeof EventSlugRoute
-  '/rooms/$roomId': typeof RoomsRoomIdRoute
-  '/track/$slug': typeof TrackSlugRoute
-  '/type/$slug': typeof TypeSlugRoute
-  '/bookmarks': typeof BookmarksIndexRoute
-  '/live': typeof LiveIndexRoute
-  '/map': typeof MapIndexRoute
-  '/offline': typeof OfflineIndexRoute
-  '/profile': typeof ProfileIndexRoute
-  '/rooms': typeof RoomsIndexRoute
-  '/search': typeof SearchIndexRoute
-  '/signin': typeof SigninIndexRoute
-  '/profile/$userId': typeof ProfileUserIdIndexRoute
+	"/": typeof IndexRoute;
+	"/event/$slug": typeof EventSlugRoute;
+	"/rooms/$roomId": typeof RoomsRoomIdRoute;
+	"/track/$slug": typeof TrackSlugRoute;
+	"/type/$slug": typeof TypeSlugRoute;
+	"/bookmarks": typeof BookmarksIndexRoute;
+	"/live": typeof LiveIndexRoute;
+	"/map": typeof MapIndexRoute;
+	"/offline": typeof OfflineIndexRoute;
+	"/profile": typeof ProfileIndexRoute;
+	"/rooms": typeof RoomsIndexRoute;
+	"/search": typeof SearchIndexRoute;
+	"/signin": typeof SigninIndexRoute;
+	"/profile/$userId": typeof ProfileUserIdIndexRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/event/$slug': typeof EventSlugRoute
-  '/rooms/$roomId': typeof RoomsRoomIdRoute
-  '/track/$slug': typeof TrackSlugRoute
-  '/type/$slug': typeof TypeSlugRoute
-  '/bookmarks': typeof BookmarksIndexRoute
-  '/live': typeof LiveIndexRoute
-  '/map': typeof MapIndexRoute
-  '/offline': typeof OfflineIndexRoute
-  '/profile': typeof ProfileIndexRoute
-  '/rooms': typeof RoomsIndexRoute
-  '/search': typeof SearchIndexRoute
-  '/signin': typeof SigninIndexRoute
-  '/profile/$userId': typeof ProfileUserIdIndexRoute
+	"/": typeof IndexRoute;
+	"/event/$slug": typeof EventSlugRoute;
+	"/rooms/$roomId": typeof RoomsRoomIdRoute;
+	"/track/$slug": typeof TrackSlugRoute;
+	"/type/$slug": typeof TypeSlugRoute;
+	"/bookmarks": typeof BookmarksIndexRoute;
+	"/live": typeof LiveIndexRoute;
+	"/map": typeof MapIndexRoute;
+	"/offline": typeof OfflineIndexRoute;
+	"/profile": typeof ProfileIndexRoute;
+	"/rooms": typeof RoomsIndexRoute;
+	"/search": typeof SearchIndexRoute;
+	"/signin": typeof SigninIndexRoute;
+	"/profile/$userId": typeof ProfileUserIdIndexRoute;
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/event/$slug': typeof EventSlugRoute
-  '/rooms/$roomId': typeof RoomsRoomIdRoute
-  '/track/$slug': typeof TrackSlugRoute
-  '/type/$slug': typeof TypeSlugRoute
-  '/bookmarks/': typeof BookmarksIndexRoute
-  '/live/': typeof LiveIndexRoute
-  '/map/': typeof MapIndexRoute
-  '/offline/': typeof OfflineIndexRoute
-  '/profile/': typeof ProfileIndexRoute
-  '/rooms/': typeof RoomsIndexRoute
-  '/search/': typeof SearchIndexRoute
-  '/signin/': typeof SigninIndexRoute
-  '/profile/$userId/': typeof ProfileUserIdIndexRoute
+	__root__: typeof rootRoute;
+	"/": typeof IndexRoute;
+	"/event/$slug": typeof EventSlugRoute;
+	"/rooms/$roomId": typeof RoomsRoomIdRoute;
+	"/track/$slug": typeof TrackSlugRoute;
+	"/type/$slug": typeof TypeSlugRoute;
+	"/bookmarks/": typeof BookmarksIndexRoute;
+	"/live/": typeof LiveIndexRoute;
+	"/map/": typeof MapIndexRoute;
+	"/offline/": typeof OfflineIndexRoute;
+	"/profile/": typeof ProfileIndexRoute;
+	"/rooms/": typeof RoomsIndexRoute;
+	"/search/": typeof SearchIndexRoute;
+	"/signin/": typeof SigninIndexRoute;
+	"/profile/$userId/": typeof ProfileUserIdIndexRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/event/$slug'
-    | '/rooms/$roomId'
-    | '/track/$slug'
-    | '/type/$slug'
-    | '/bookmarks'
-    | '/live'
-    | '/map'
-    | '/offline'
-    | '/profile'
-    | '/rooms'
-    | '/search'
-    | '/signin'
-    | '/profile/$userId'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/event/$slug'
-    | '/rooms/$roomId'
-    | '/track/$slug'
-    | '/type/$slug'
-    | '/bookmarks'
-    | '/live'
-    | '/map'
-    | '/offline'
-    | '/profile'
-    | '/rooms'
-    | '/search'
-    | '/signin'
-    | '/profile/$userId'
-  id:
-    | '__root__'
-    | '/'
-    | '/event/$slug'
-    | '/rooms/$roomId'
-    | '/track/$slug'
-    | '/type/$slug'
-    | '/bookmarks/'
-    | '/live/'
-    | '/map/'
-    | '/offline/'
-    | '/profile/'
-    | '/rooms/'
-    | '/search/'
-    | '/signin/'
-    | '/profile/$userId/'
-  fileRoutesById: FileRoutesById
+	fileRoutesByFullPath: FileRoutesByFullPath;
+	fullPaths:
+		| "/"
+		| "/event/$slug"
+		| "/rooms/$roomId"
+		| "/track/$slug"
+		| "/type/$slug"
+		| "/bookmarks"
+		| "/live"
+		| "/map"
+		| "/offline"
+		| "/profile"
+		| "/rooms"
+		| "/search"
+		| "/signin"
+		| "/profile/$userId";
+	fileRoutesByTo: FileRoutesByTo;
+	to:
+		| "/"
+		| "/event/$slug"
+		| "/rooms/$roomId"
+		| "/track/$slug"
+		| "/type/$slug"
+		| "/bookmarks"
+		| "/live"
+		| "/map"
+		| "/offline"
+		| "/profile"
+		| "/rooms"
+		| "/search"
+		| "/signin"
+		| "/profile/$userId";
+	id:
+		| "__root__"
+		| "/"
+		| "/event/$slug"
+		| "/rooms/$roomId"
+		| "/track/$slug"
+		| "/type/$slug"
+		| "/bookmarks/"
+		| "/live/"
+		| "/map/"
+		| "/offline/"
+		| "/profile/"
+		| "/rooms/"
+		| "/search/"
+		| "/signin/"
+		| "/profile/$userId/";
+	fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  EventSlugRoute: typeof EventSlugRoute
-  RoomsRoomIdRoute: typeof RoomsRoomIdRoute
-  TrackSlugRoute: typeof TrackSlugRoute
-  TypeSlugRoute: typeof TypeSlugRoute
-  BookmarksIndexRoute: typeof BookmarksIndexRoute
-  LiveIndexRoute: typeof LiveIndexRoute
-  MapIndexRoute: typeof MapIndexRoute
-  OfflineIndexRoute: typeof OfflineIndexRoute
-  ProfileIndexRoute: typeof ProfileIndexRoute
-  RoomsIndexRoute: typeof RoomsIndexRoute
-  SearchIndexRoute: typeof SearchIndexRoute
-  SigninIndexRoute: typeof SigninIndexRoute
-  ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
+	IndexRoute: typeof IndexRoute;
+	EventSlugRoute: typeof EventSlugRoute;
+	RoomsRoomIdRoute: typeof RoomsRoomIdRoute;
+	TrackSlugRoute: typeof TrackSlugRoute;
+	TypeSlugRoute: typeof TypeSlugRoute;
+	BookmarksIndexRoute: typeof BookmarksIndexRoute;
+	LiveIndexRoute: typeof LiveIndexRoute;
+	MapIndexRoute: typeof MapIndexRoute;
+	OfflineIndexRoute: typeof OfflineIndexRoute;
+	ProfileIndexRoute: typeof ProfileIndexRoute;
+	RoomsIndexRoute: typeof RoomsIndexRoute;
+	SearchIndexRoute: typeof SearchIndexRoute;
+	SigninIndexRoute: typeof SigninIndexRoute;
+	ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  EventSlugRoute: EventSlugRoute,
-  RoomsRoomIdRoute: RoomsRoomIdRoute,
-  TrackSlugRoute: TrackSlugRoute,
-  TypeSlugRoute: TypeSlugRoute,
-  BookmarksIndexRoute: BookmarksIndexRoute,
-  LiveIndexRoute: LiveIndexRoute,
-  MapIndexRoute: MapIndexRoute,
-  OfflineIndexRoute: OfflineIndexRoute,
-  ProfileIndexRoute: ProfileIndexRoute,
-  RoomsIndexRoute: RoomsIndexRoute,
-  SearchIndexRoute: SearchIndexRoute,
-  SigninIndexRoute: SigninIndexRoute,
-  ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
-}
+	IndexRoute: IndexRoute,
+	EventSlugRoute: EventSlugRoute,
+	RoomsRoomIdRoute: RoomsRoomIdRoute,
+	TrackSlugRoute: TrackSlugRoute,
+	TypeSlugRoute: TypeSlugRoute,
+	BookmarksIndexRoute: BookmarksIndexRoute,
+	LiveIndexRoute: LiveIndexRoute,
+	MapIndexRoute: MapIndexRoute,
+	OfflineIndexRoute: OfflineIndexRoute,
+	ProfileIndexRoute: ProfileIndexRoute,
+	RoomsIndexRoute: RoomsIndexRoute,
+	SearchIndexRoute: SearchIndexRoute,
+	SigninIndexRoute: SigninIndexRoute,
+	ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
+};
 
 export const routeTree = rootRoute
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+	._addFileChildren(rootRouteChildren)
+	._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {

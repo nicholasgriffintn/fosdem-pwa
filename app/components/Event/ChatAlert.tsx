@@ -2,7 +2,7 @@ import { Icons } from "~/components/Icons";
 
 type ChatAlertProps = {
 	chatUrl: string;
-}
+};
 
 export function ChatAlert({ chatUrl }: ChatAlertProps) {
 	return (

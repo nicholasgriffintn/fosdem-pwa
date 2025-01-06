@@ -59,7 +59,10 @@ function TrackListItem({
 }
 
 function TrackListContent({ tracks, year }: { tracks: Track[]; year: number }) {
-	const { items: sortedTracks, bookmarksLoading } = useTrackList({ items: tracks, year });
+	const { items: sortedTracks, bookmarksLoading } = useTrackList({
+		items: tracks,
+		year,
+	});
 
 	return (
 		<>
@@ -84,7 +87,14 @@ function TrackListContent({ tracks, year }: { tracks: Track[]; year: number }) {
 	);
 }
 
-export function TrackList({ tracks, year, title, groupByDay = false, days, day }: TrackListProps) {
+export function TrackList({
+	tracks,
+	year,
+	title,
+	groupByDay = false,
+	days,
+	day,
+}: TrackListProps) {
 	if (groupByDay && days) {
 		const trackDataSplitByDay = groupTracksByDay(tracks);
 
@@ -96,7 +106,9 @@ export function TrackList({ tracks, year, title, groupByDay = false, days, day }
 					<Tabs defaultValue={dayId.toString()} className="w-full">
 						<div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
 							<div className="flex flex-col md:flex-row md:items-center gap-4">
-								{title && <h2 className="text-xl font-semibold shrink-0">{title}</h2>}
+								{title && (
+									<h2 className="text-xl font-semibold shrink-0">{title}</h2>
+								)}
 								<TabsList className="bg-transparent p-0 h-auto justify-start gap-2">
 									{days.map((day) => {
 										const hasTracks = Boolean(trackDataSplitByDay[day.id]);
@@ -108,7 +120,7 @@ export function TrackList({ tracks, year, title, groupByDay = false, days, day }
 												className={cn(
 													"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2",
 													"border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-													"data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary"
+													"data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary",
 												)}
 											>
 												{day.name}
@@ -132,7 +144,10 @@ export function TrackList({ tracks, year, title, groupByDay = false, days, day }
 
 							return (
 								<TabsContent key={day.id} value={day.id}>
-									<TrackListContent tracks={trackDataSplitByDay[day.id]} year={year} />
+									<TrackListContent
+										tracks={trackDataSplitByDay[day.id]}
+										year={year}
+									/>
 								</TabsContent>
 							);
 						})}

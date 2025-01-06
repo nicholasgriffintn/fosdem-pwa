@@ -25,7 +25,10 @@ export interface GroupedConflict {
 	}[];
 }
 
-export function detectEventConflicts(events: Event[], conference: ConferenceData): EventConflict[] {
+export function detectEventConflicts(
+	events: Event[],
+	conference: ConferenceData,
+): EventConflict[] {
 	const conflicts: EventConflict[] = [];
 
 	if (events.length < 2) {
@@ -41,10 +44,14 @@ export function detectEventConflicts(events: Event[], conference: ConferenceData
 				continue;
 			}
 
-			const [hours1, minutes1] = event1.startTime.split(':').map(Number);
-			const [hours2, minutes2] = event2.startTime.split(':').map(Number);
-			const [durationHours1, durationMinutes1] = event1.duration.split(':').map(Number);
-			const [durationHours2, durationMinutes2] = event2.duration.split(':').map(Number);
+			const [hours1, minutes1] = event1.startTime.split(":").map(Number);
+			const [hours2, minutes2] = event2.startTime.split(":").map(Number);
+			const [durationHours1, durationMinutes1] = event1.duration
+				.split(":")
+				.map(Number);
+			const [durationHours2, durationMinutes2] = event2.duration
+				.split(":")
+				.map(Number);
 
 			const start1 = hours1 * 60 + minutes1;
 			const start2 = hours2 * 60 + minutes2;
@@ -71,7 +78,7 @@ export function detectEventConflicts(events: Event[], conference: ConferenceData
 					event2,
 					overlapDuration,
 					startOverlap: startDate,
-					endOverlap: endDate
+					endOverlap: endDate,
 				});
 			}
 		}
@@ -95,11 +102,11 @@ export function generateTimeSlots(events: Event[]): TimeSlot[] {
 	sortedTimes.sort((a, b) => {
 		const [aHours, aMinutes] = a.split(":").map(Number);
 		const [bHours, bMinutes] = b.split(":").map(Number);
-		return (aHours * 60 + aMinutes) - (bHours * 60 + bMinutes);
+		return aHours * 60 + aMinutes - (bHours * 60 + bMinutes);
 	});
 
-	return sortedTimes.map(time => ({
+	return sortedTimes.map((time) => ({
 		time,
-		events: timeSlots[time]
+		events: timeSlots[time],
 	}));
 }

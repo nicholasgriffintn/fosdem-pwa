@@ -88,10 +88,7 @@ export const testConferenceData = {
 	city: "Brussels",
 	start: "2025-01-05T07:45:00+01:00",
 	end: "2025-01-05T11:45:00+01:00",
-	days: [
-		"2025-01-05T07:45:00+01:00",
-		"2025-01-05T11:45:00+01:00",
-	],
+	days: ["2025-01-05T07:45:00+01:00", "2025-01-05T11:45:00+01:00"],
 	day_change: "09:00:00",
 	timeslot_duration: "00:05:00",
 	time_zone_name: "Europe/Brussels",

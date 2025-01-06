@@ -25,7 +25,10 @@ type EventListProps = {
 	groupByDay?: boolean;
 	days?: Array<{ id: string; name: string }>;
 	day?: string;
-	onSetPriority?: (eventId: string, updates: { priority: number | null }) => void;
+	onSetPriority?: (
+		eventId: string,
+		updates: { priority: number | null },
+	) => void;
 	showTrack?: boolean;
 };
 
@@ -45,15 +48,18 @@ export function EventList({
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 
 	// Filter events for schedule view (priority 1 or no conflicts)
-	const scheduleEvents = events.filter(event => {
+	const scheduleEvents = events.filter((event) => {
 		const hasConflict = conflicts?.some(
-			conflict => conflict.event1.id === event.id || conflict.event2.id === event.id
+			(conflict) =>
+				conflict.event1.id === event.id || conflict.event2.id === event.id,
 		);
 		return event.priority === 1 || !hasConflict;
 	});
 
 	if (groupByDay && days && days.length > 0) {
-		const eventDataSplitByDay = groupEventsByDay(viewMode === "schedule" ? scheduleEvents : events);
+		const eventDataSplitByDay = groupEventsByDay(
+			viewMode === "schedule" ? scheduleEvents : events,
+		);
 		const uniqueDays = [...new Set(events.map((event) => event.day).sort())];
 
 		const dayId = day || uniqueDays[0] || days[0]?.id;
@@ -64,7 +70,9 @@ export function EventList({
 					<Tabs defaultValue={dayId?.toString()} className="w-full">
 						<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
 							<div className="flex flex-col md:flex-row md:items-center gap-4">
-								{title && <h2 className="text-xl font-semibold shrink-0">{title}</h2>}
+								{title && (
+									<h2 className="text-xl font-semibold shrink-0">{title}</h2>
+								)}
 								<TabsList className="bg-transparent p-0 h-auto justify-start gap-2">
 									{days.map((day) => {
 										const hasEvents = Boolean(eventDataSplitByDay[day.id]);
@@ -76,7 +84,7 @@ export function EventList({
 												className={cn(
 													"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2",
 													"border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-													"data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary"
+													"data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary",
 												)}
 											>
 												{day.name}

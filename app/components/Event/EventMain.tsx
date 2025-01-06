@@ -24,14 +24,10 @@ type EventMainProps = {
 	isTest?: boolean;
 };
 
-export function EventMain({
-	event,
-	conference,
-	year,
-	isTest
-}: EventMainProps) {
+export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 	const roomType = event.room?.[0];
-	const specialRoom = roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
+	const specialRoom =
+		roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
 	const testTime = isTest ? new Date(conference.start) : undefined;
 
 	if (specialRoom) {
@@ -52,7 +48,7 @@ export function EventMain({
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const { width } = useWindowSize();
-	const isMobile = typeof window !== 'undefined' ? width < 768 : false;
+	const isMobile = typeof window !== "undefined" ? width < 768 : false;
 
 	return (
 		<>
@@ -112,7 +108,8 @@ export function EventMain({
 							rel="noreferrer"
 						>
 							The original image can be found here
-						</a>.
+						</a>
+						.
 					</span>
 					{fosdemImageDetails[event.type as TypeIds].changes && (
 						<span className="text-xs block mt-1">

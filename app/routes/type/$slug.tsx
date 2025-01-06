@@ -31,7 +31,10 @@ export const Route = createFileRoute("/type/$slug")({
 		meta: [
 			{
 				title: `${loaderData?.fosdem.type?.name} | FOSDEM PWA`,
-				description: fosdemTypeDescriptions[loaderData?.fosdem.type?.id as keyof typeof fosdemTypeDescriptions],
+				description:
+					fosdemTypeDescriptions[
+						loaderData?.fosdem.type?.id as keyof typeof fosdemTypeDescriptions
+					],
 			},
 		],
 	}),
@@ -58,13 +61,13 @@ function TypePage() {
 					heading={fosdem.type.name}
 					text={
 						fosdemTypeDescriptions[
-						fosdem.type.id as keyof typeof fosdemTypeDescriptions
+							fosdem.type.id as keyof typeof fosdemTypeDescriptions
 						]
 					}
 					metadata={[
 						{
-							text: `${fosdem.type.trackCount} tracks`
-						}
+							text: `${fosdem.type.trackCount} tracks`,
+						},
 					]}
 				/>
 				<TrackList

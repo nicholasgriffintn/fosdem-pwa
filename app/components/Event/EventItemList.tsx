@@ -11,9 +11,12 @@ type EventListProps = {
 	events: Event[];
 	year: number;
 	conflicts?: EventConflict[];
-	onSetPriority?: (eventId: string, updates: { priority: number | null }) => void;
+	onSetPriority?: (
+		eventId: string,
+		updates: { priority: number | null },
+	) => void;
 	showTrack?: boolean;
-}
+};
 
 type EventListItemProps = {
 	year: number;
@@ -22,9 +25,12 @@ type EventListItemProps = {
 	isLast: boolean;
 	bookmarksLoading: boolean;
 	conflicts?: EventConflict[];
-	onSetPriority?: (eventId: string, updates: { priority: number | null }) => void;
+	onSetPriority?: (
+		eventId: string,
+		updates: { priority: number | null },
+	) => void;
 	showTrack?: boolean;
-}
+};
 
 function EventListItem({
 	year,
@@ -42,11 +48,18 @@ function EventListItem({
 	});
 
 	const hasConflicts = conflicts?.some(
-		conflict => conflict.event1.id === event.id || conflict.event2.id === event.id
+		(conflict) =>
+			conflict.event1.id === event.id || conflict.event2.id === event.id,
 	);
 
 	return (
-		<div className={clsx("flex items-center", className, hasConflicts && !event.priority && "border-l-4 border-l-destructive")}>
+		<div
+			className={clsx(
+				"flex items-center",
+				className,
+				hasConflicts && !event.priority && "border-l-4 border-l-destructive",
+			)}
+		>
 			<ConflictTooltip
 				event={event}
 				conflicts={conflicts}
@@ -55,12 +68,18 @@ function EventListItem({
 				priority={event.priority}
 			/>
 			<div className="flex flex-col md:flex-row md:justify-between w-full">
-				<div className={clsx("flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1", hasConflicts && "pl-2")}>
+				<div
+					className={clsx(
+						"flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1",
+						hasConflicts && "pl-2",
+					)}
+				>
 					<h3 className="font-semibold leading-none tracking-tight">
 						{event.title}
 					</h3>
 					<p className="text-gray-500">
-						{event.room} | {event.startTime} - {calculateEndTime(event.startTime, event.duration)}
+						{event.room} | {event.startTime} -{" "}
+						{calculateEndTime(event.startTime, event.duration)}
 						{event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
 						{showTrack && event.trackKey && ` | ${event.trackKey}`}
 					</p>
@@ -84,7 +103,10 @@ export function EventItemList({
 	onSetPriority,
 	showTrack,
 }: EventListProps) {
-	const { items: sortedEvents, bookmarksLoading } = useEventList({ items: events, year });
+	const { items: sortedEvents, bookmarksLoading } = useEventList({
+		items: events,
+		year,
+	});
 
 	return (
 		<ul className="event-list w-full">

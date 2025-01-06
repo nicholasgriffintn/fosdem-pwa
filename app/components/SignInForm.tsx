@@ -31,7 +31,10 @@ export function SignInForm() {
 				)}
 				Sign in with GitHub
 			</Button>
-			<div className="cf-turnstile" data-sitekey={constants.TURNSTILE_SITE_KEY} />
+			<div
+				className="cf-turnstile"
+				data-sitekey={constants.TURNSTILE_SITE_KEY}
+			/>
 		</form>
 	);
 }
