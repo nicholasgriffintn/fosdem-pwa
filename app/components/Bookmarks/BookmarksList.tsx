@@ -85,13 +85,7 @@ export function BookmarksList({
         const event = fosdemData.events[bookmark.slug];
         if (!event) return null;
         return {
-          id: event.id,
-          title: event.title,
-          startTime: event.startTime,
-          duration: event.duration,
-          room: event.room,
-          persons: event.persons,
-          day: event.day,
+          ...event,
           priority: bookmark.priority,
         } as Event;
       })
