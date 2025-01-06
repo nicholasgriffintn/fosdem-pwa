@@ -26,6 +26,7 @@ import {
 	List,
 	CalendarDays,
 	Play,
+	Clock,
 } from "lucide-react";
 
 export const Icons = {
@@ -97,4 +98,5 @@ export const Icons = {
 			/>
 		</svg>
 	),
+	clock: Clock,
 };

@@ -11,8 +11,9 @@ import { EventCalendarList } from "~/components/Event/EventCalendarList";
 import { groupEventsByDay } from "~/lib/grouping";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
+import { EventScheduleList } from "~/components/Event/EventScheduleList";
 
-type EventListViewModes = "list" | "calendar";
+type EventListViewModes = "list" | "calendar" | "schedule";
 
 type EventListProps = {
 	events: Event[];
@@ -24,7 +25,7 @@ type EventListProps = {
 	groupByDay?: boolean;
 	days?: Array<{ id: string; name: string }>;
 	day?: string;
-	onSetPriority?: (eventId: string, priority: number) => void;
+	onSetPriority?: (eventId: string, updates: { priority: number | null }) => void;
 	showTrack?: boolean;
 };
 
@@ -43,8 +44,16 @@ export function EventList({
 }: EventListProps) {
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 
+	// Filter events for schedule view (priority 1 or no conflicts)
+	const scheduleEvents = events.filter(event => {
+		const hasConflict = conflicts?.some(
+			conflict => conflict.event1.id === event.id || conflict.event2.id === event.id
+		);
+		return event.priority === 1 || !hasConflict;
+	});
+
 	if (groupByDay && days && days.length > 0) {
-		const eventDataSplitByDay = groupEventsByDay(events);
+		const eventDataSplitByDay = groupEventsByDay(viewMode === "schedule" ? scheduleEvents : events);
 		const uniqueDays = [...new Set(events.map((event) => event.day).sort())];
 
 		const dayId = day || uniqueDays[0] || days[0]?.id;
@@ -94,6 +103,14 @@ export function EventList({
 										<Icons.calendar className="h-4 w-4 mr-1" />
 										Calendar
 									</Button>
+									<Button
+										variant={viewMode === "schedule" ? "default" : "outline"}
+										size="sm"
+										onClick={() => setViewMode("schedule")}
+									>
+										<Icons.clock className="h-4 w-4 mr-1" />
+										Schedule
+									</Button>
 								</div>
 							)}
 						</div>
@@ -111,7 +128,15 @@ export function EventList({
 
 							return (
 								<TabsContent key={day.id} value={day.id}>
-									{viewMode === "list" ? (
+									{viewMode === "schedule" ? (
+										<EventScheduleList
+											events={eventDataSplitByDay[day.id]}
+											year={year}
+											conflicts={conflicts}
+											onSetPriority={onSetPriority}
+											showTrack={showTrack}
+										/>
+									) : viewMode === "list" ? (
 										<EventItemList
 											events={eventDataSplitByDay[day.id]}
 											year={year}
@@ -160,13 +185,29 @@ export function EventList({
 								<Icons.calendar className="h-4 w-4 mr-1" />
 								Calendar
 							</Button>
+							<Button
+								variant={viewMode === "schedule" ? "default" : "outline"}
+								size="sm"
+								onClick={() => setViewMode("schedule")}
+							>
+								<Icons.clock className="h-4 w-4 mr-1" />
+								Schedule
+							</Button>
 						</div>
 					)}
 				</div>
 			)}
 			{events.length > 0 ? (
 				<>
-					{viewMode === "list" ? (
+					{viewMode === "schedule" ? (
+						<EventScheduleList
+							events={scheduleEvents}
+							year={year}
+							conflicts={conflicts}
+							onSetPriority={onSetPriority}
+							showTrack={showTrack}
+						/>
+					) : viewMode === "list" ? (
 						<EventItemList
 							events={events}
 							year={year}
