@@ -42,7 +42,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 		const PROVIDER_ID = "github";
 
 		try {
-			const tokens = await github().validateAuthorizationCode(code);
+			const tokens = await github.validateAuthorizationCode(code);
 
 			if (!tokens.accessToken()) {
 				throw new Error("GitHub Callback: No access token found");
