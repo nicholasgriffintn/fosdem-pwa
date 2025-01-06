@@ -11,23 +11,39 @@ Also, this project is heavily inspired by [sojourner-web](https://github.com/loo
 You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## Features
+I'll help create a grid-like layout with images and their corresponding features in markdown. I'll pair each image with its most relevant features for a cleaner presentation:
 
-- [x] Homepage with links to the schedule tracks Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events
-- [x] A page for each track with a list of events
-- [x] A page for each event with the event details
-- [x] The ability to take notes during sessions and save them to the database
-- [x] GitHub sign in
-- [x] A page for the user profile, with a generated pass for the event
-- [x] The ability to share tracks and events
-- [x] The ability to bookmark tracks and events
-- [x] The ability to share your bookmarks
-- [x] Conflict detection for events in your bookmarks (with priority setting)
-- [x] A page to view your bookmarked tracks and events
-- [x] A page for finding live events
-- [x] A map page
-- [x] A search page
-- [x] A room page with a list of events in that room and a continuous live stream view
-- [x] Data synced automatically from FOSDEM on a schedule, deployed separately [here](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)
+# Features
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+
+| ![FOSDEM PWA Homepage](./.github/docs/images/homepage.png) |
+|:--:|
+| **Homepage & Navigation** <br> • Quickly access schedule tracks including Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events <br> • Powerful search feature to locate events, tracks, and more <br> • Automatic data sync from FOSDEM for latest information |
+
+| ![Event Page With Notes](./.github/docs/images/event_page_with_notes.png) |
+|:--:|
+| **Event Details & Note Taking** <br> • Detailed event information at your fingertips <br> • Capture and save session insights to database <br> • GitHub Sign-In for personalized experience |
+
+| ![Room View With Status](./.github/docs/images/room_view_with_status.png) |
+|:--:|
+| **Room & Live Features** <br> • View events list for each room <br> • Continuous live stream view <br> • Dedicated page for live sessions |
+
+| ![Bookmarks With Priorities](./.github/docs/images/bookmarks_with_priorities.png) |
+|:--:|
+| **Smart Bookmarking** <br> • Bookmark favorite tracks and events <br> • Priority settings for conflict detection <br> • Consolidated bookmark view |
+
+| ![Schedule With Transitions](./.github/docs/images/schedule_with_transitions.png) |
+|:--:|
+| **Track Management** <br> • Comprehensive list of events per track <br> • Interactive map for venue navigation <br> • Effortless track and event sharing |
+
+| ![Shared Profiles](./.github/docs/images/shared_profiles.png) |
+|:--:|
+| **User Features** <br> • Personal profile page with generated event pass <br> • Share bookmarks with others <br> • Collaborative planning capabilities |
+
+</div>
+
+*Data sync service deployed separately: [Build Data Repository](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)*
 
 ## TODO
 
