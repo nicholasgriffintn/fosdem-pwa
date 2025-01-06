@@ -77,6 +77,9 @@ function ProfilePage() {
 										fosdemData={fosdemData}
 										year={year}
 										loading={bookmarksLoading}
+										showConflicts={true}
+										defaultViewMode="schedule"
+										showViewMode={false}
 									/>
 								</div>
 							</div>
