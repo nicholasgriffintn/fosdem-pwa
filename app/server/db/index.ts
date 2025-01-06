@@ -2,9 +2,6 @@ import { drizzle } from "drizzle-orm/sqlite-proxy";
 import * as schema from "./schema";
 import { getCloudflareEnv } from "../config";
 
-const env = getCloudflareEnv();
-const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_DATABASE_ID, CLOUDFLARE_D1_TOKEN } = env;
-
 type D1ResponseInfo = {
 	code: number;
 	message: string;
@@ -31,6 +28,8 @@ type D1Response = {
 
 export const db = drizzle(
 	async (sql: string, params: any[], method: string) => {
+		const env = getCloudflareEnv();
+		const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_DATABASE_ID, CLOUDFLARE_D1_TOKEN } = env;
 		if (
 			!CLOUDFLARE_ACCOUNT_ID ||
 			!CLOUDFLARE_DATABASE_ID ||
@@ -71,5 +70,5 @@ export const db = drizzle(
 
 		return { rows: method === "all" ? rows : rows[0] };
 	},
-	{ schema, logger: env.NODE_ENV === "development" },
+	{ schema, logger: process.env.NODE_ENV === "development" },
 );
