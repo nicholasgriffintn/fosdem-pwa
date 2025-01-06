@@ -101,6 +101,7 @@ export const APIRoute = createAPIFileRoute("/api/bookmarks/$year")({
 		}
 
 		try {
+			console.log("updates", updates);
 			await db
 				.update(bookmark)
 				.set({ ...updates })

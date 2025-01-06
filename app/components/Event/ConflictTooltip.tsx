@@ -17,7 +17,7 @@ type ConflictTooltipProps = {
   event: Event;
   conflicts?: EventConflict[];
   className?: string;
-  onSetPriority?: (eventId: string, priority: number) => void;
+  onSetPriority?: (eventId: string, updates: { priority: number | null }) => void;
   priority?: number;
 }
 
@@ -42,17 +42,17 @@ export function ConflictTooltip({ event, conflicts, className, onSetPriority, pr
 
   const handleSetPriority = (newPriority: number) => {
     if (newPriority === 0) {
-      onSetPriority?.(event.id, 0);
+      onSetPriority?.(event.id, { priority: null });
       setIsOpen(false);
       return;
     }
 
-    onSetPriority?.(event.id, 1);
+    onSetPriority?.(event.id, { priority: 1 });
 
     // biome-ignore lint/complexity/noForEach: <explanation>
     eventConflicts.forEach(conflict => {
       const otherEvent = conflict.event1.id === event.id ? conflict.event2 : conflict.event1;
-      onSetPriority?.(otherEvent.id, 2);
+      onSetPriority?.(otherEvent.id, { priority: 2 });
     });
 
     setIsOpen(false);

@@ -10,7 +10,7 @@ type EventCalendarListProps = {
   events: Event[];
   year: number;
   conflicts?: EventConflict[];
-  onSetPriority?: (eventId: string, priority: number) => void;
+  onSetPriority?: (eventId: string, updates: { priority: number | null }) => void;
   showTrack?: boolean;
 }
 
@@ -19,7 +19,7 @@ type EventCalendarListItemProps = {
   year: number;
   bookmarksLoading: boolean;
   conflicts?: EventConflict[];
-  onSetPriority?: (eventId: string, priority: number) => void;
+  onSetPriority?: (eventId: string, updates: { priority: number | null }) => void;
   showTrack?: boolean;
 }
 

@@ -14,7 +14,7 @@ type Bookmark = {
   year: number;
   created_at: string;
   updated_at: string;
-  priority?: number;
+  priority?: number | null;
 }
 
 function organizeBookmarks(bookmarks: Bookmark[]) {
@@ -61,14 +61,14 @@ export function BookmarksList({
   const organizedBookmarks =
     bookmarks && bookmarks.length > 0 ? organizeBookmarks(bookmarks) : {};
 
-  const handleSetPriority = (eventId: string, priority: number) => {
+  const handleSetPriority = (eventId: string, updates: { priority: number | null }) => {
     const bookmark = bookmarks.find(b => {
       const event = fosdemData?.events[b.slug];
       return event?.id === eventId;
     });
 
     if (bookmark && onUpdateBookmark) {
-      onUpdateBookmark({ id: bookmark.id, updates: { priority: priority || undefined } });
+      onUpdateBookmark({ id: bookmark.id, updates });
     }
   };
 
