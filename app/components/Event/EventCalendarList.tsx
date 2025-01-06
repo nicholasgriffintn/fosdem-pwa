@@ -10,6 +10,8 @@ type EventCalendarListProps = {
   events: Event[];
   year: number;
   conflicts?: EventConflict[];
+  onSetPriority?: (eventId: string, priority: number) => void;
+  showTrack?: boolean;
 }
 
 type EventCalendarListItemProps = {
@@ -17,13 +19,17 @@ type EventCalendarListItemProps = {
   year: number;
   bookmarksLoading: boolean;
   conflicts?: EventConflict[];
+  onSetPriority?: (eventId: string, priority: number) => void;
+  showTrack?: boolean;
 }
 
 function EventCalendarListItem({
   event,
   year,
   bookmarksLoading,
-  conflicts
+  conflicts,
+  onSetPriority,
+  showTrack,
 }: EventCalendarListItemProps) {
   const durationInMinutes = Number.parseInt(event.duration.split(":")[0], 10) * 60 + Number.parseInt(event.duration.split(":")[1], 10);
   const heightClass = `h-[${Math.max(durationInMinutes * 2, 80)}px]`;
@@ -36,12 +42,14 @@ function EventCalendarListItem({
     <div className={cn(
       "bg-card border rounded-lg p-3 mb-2 hover:shadow-md transition-shadow relative",
       heightClass,
-      hasConflicts && "border-destructive/50"
+      hasConflicts && !event.priority && "border-destructive/50"
     )}>
       <ConflictTooltip
         event={event}
         conflicts={conflicts}
         className="absolute -top-2 -right-2"
+        onSetPriority={onSetPriority}
+        priority={event.priority}
       />
       <div className="flex flex-col h-full">
         <div className="flex-1">
@@ -49,6 +57,7 @@ function EventCalendarListItem({
           <p className="text-xs text-muted-foreground">
             {event.room} | {event.startTime} - {calculateEndTime(event.startTime, event.duration)}
             {event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
+            {showTrack && event.trackKey && ` | ${event.trackKey}`}
           </p>
         </div>
         <ItemActions
@@ -64,7 +73,13 @@ function EventCalendarListItem({
   );
 }
 
-export function EventCalendarList({ events, year, conflicts }: EventCalendarListProps) {
+export function EventCalendarList({
+  events,
+  year,
+  conflicts,
+  onSetPriority,
+  showTrack,
+}: EventCalendarListProps) {
   const { items: sortedEvents, bookmarksLoading } = useEventList({ items: events, year });
   const timeSlots = generateTimeSlots(sortedEvents);
 
@@ -84,6 +99,8 @@ export function EventCalendarList({ events, year, conflicts }: EventCalendarList
                   year={year}
                   bookmarksLoading={bookmarksLoading}
                   conflicts={conflicts}
+                  onSetPriority={onSetPriority}
+                  showTrack={showTrack}
                 />
               ))}
             </div>

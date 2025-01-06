@@ -36,7 +36,7 @@ export const Route = createFileRoute("/bookmarks/")({
 
 function BookmarksHome() {
   const { year, day } = Route.useLoaderData();
-  const { bookmarks, loading } = useBookmarks({ year });
+  const { bookmarks, loading, updateBookmark } = useBookmarks({ year });
   const { fosdemData } = useFosdemData({ year });
   const { user, loading: authLoading } = useAuth();
 
@@ -64,6 +64,7 @@ function BookmarksHome() {
                 year={year}
                 loading={loading}
                 day={day}
+                onUpdateBookmark={updateBookmark}
               />
             )}
           </>

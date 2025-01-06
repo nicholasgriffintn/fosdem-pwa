@@ -21,7 +21,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 - [x] The ability to share tracks and events
 - [x] The ability to bookmark tracks and events
 - [x] The ability to share your bookmarks
-- [x] Conflict detection for events in your bookmarks
+- [x] Conflict detection for events in your bookmarks (with priority setting)
 - [x] A page to view your bookmarked tracks and events
 - [x] A page for finding live events
 - [x] A map page

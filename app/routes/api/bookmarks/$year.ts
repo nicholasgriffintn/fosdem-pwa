@@ -80,4 +80,36 @@ export const APIRoute = createAPIFileRoute("/api/bookmarks/$year")({
 			);
 		}
 	},
+	PUT: async ({ request }) => {
+		const { id, updates } = await request.json();
+
+		const { user } = await getFullAuthSession();
+
+		if (!user) {
+			return Response.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
+		const existingBookmark = await db.query.bookmark.findFirst({
+			where: and(
+				eq(bookmark.id, id),
+				eq(bookmark.user_id, user.id),
+			),
+		});
+
+		if (!existingBookmark) {
+			return Response.json({ error: "Bookmark not found" }, { status: 404 });
+		}
+
+		try {
+			await db
+				.update(bookmark)
+				.set({ ...updates })
+				.where(eq(bookmark.id, id));
+		} catch (error) {
+			console.error(error);
+			return Response.json({ error: "Failed to update bookmark" }, { status: 500 });
+		}
+
+		return Response.json({ id, ...updates });
+	},
 });

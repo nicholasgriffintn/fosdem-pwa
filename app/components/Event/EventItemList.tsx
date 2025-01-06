@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import type { Event } from "~/types/fosdem";
 import type { EventConflict } from "~/lib/fosdem";
-import { ConflictTooltip } from "./ConflictTooltip";
+import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
 import { ItemActions } from "~/components/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime } from "~/lib/dateTime";
@@ -11,6 +11,8 @@ type EventListProps = {
 	events: Event[];
 	year: number;
 	conflicts?: EventConflict[];
+	onSetPriority?: (eventId: string, priority: number) => void;
+	showTrack?: boolean;
 }
 
 type EventListItemProps = {
@@ -20,6 +22,8 @@ type EventListItemProps = {
 	isLast: boolean;
 	bookmarksLoading: boolean;
 	conflicts?: EventConflict[];
+	onSetPriority?: (eventId: string, priority: number) => void;
+	showTrack?: boolean;
 }
 
 function EventListItem({
@@ -29,6 +33,8 @@ function EventListItem({
 	isLast,
 	bookmarksLoading,
 	conflicts,
+	onSetPriority,
+	showTrack,
 }: EventListItemProps) {
 	const className = clsx("flex justify-between relative", {
 		"border-t-2 border-solid border-muted": index % 2 === 1,
@@ -40,15 +46,17 @@ function EventListItem({
 	);
 
 	return (
-		<div className={clsx(className, hasConflicts && "border-l-4 border-l-destructive")}>
+		<div className={clsx(className, hasConflicts && !event.priority && "border-l-4 border-l-destructive")}>
 			<ConflictTooltip
 				event={event}
 				conflicts={conflicts}
 				className="absolute left-2 top-1/2 -translate-y-1/2"
+				onSetPriority={onSetPriority}
+				priority={event.priority}
 			/>
 			<div className={clsx(
 				"flex flex-col md:flex-row md:justify-between w-full",
-				hasConflicts && "pl-10"
+				hasConflicts && !event.priority && "pl-10"
 			)}>
 				<div className="flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1">
 					<h3 className="font-semibold leading-none tracking-tight">
@@ -57,6 +65,7 @@ function EventListItem({
 					<p className="text-gray-500">
 						{event.room} | {event.startTime} - {calculateEndTime(event.startTime, event.duration)}
 						{event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
+						{showTrack && event.trackKey && ` | ${event.trackKey}`}
 					</p>
 				</div>
 				<ItemActions
@@ -71,7 +80,13 @@ function EventListItem({
 	);
 }
 
-export function EventItemList({ events, year, conflicts }: EventListProps) {
+export function EventItemList({
+	events,
+	year,
+	conflicts,
+	onSetPriority,
+	showTrack,
+}: EventListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({ items: events, year });
 
 	return (
@@ -86,6 +101,8 @@ export function EventItemList({ events, year, conflicts }: EventListProps) {
 							isLast={events.length === index + 1}
 							bookmarksLoading={bookmarksLoading}
 							conflicts={conflicts}
+							onSetPriority={onSetPriority}
+							showTrack={showTrack}
 						/>
 					</li>
 				))

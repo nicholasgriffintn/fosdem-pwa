@@ -1,6 +1,12 @@
 import type { Event, RoomData, Track } from "~/types/fosdem";
 
 export function sortEvents(a: Event, b: Event): number {
+  const aPriority = a.priority || 3;
+  const bPriority = b.priority || 3;
+  if (aPriority !== bPriority) {
+    return aPriority - bPriority;
+  }
+
   const dayDiff = Number(a.day) - Number(b.day);
   if (dayDiff !== 0) {
     return dayDiff;
