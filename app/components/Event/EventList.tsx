@@ -24,6 +24,8 @@ type EventListProps = {
 	groupByDay?: boolean;
 	days?: Array<{ id: string; name: string }>;
 	day?: string;
+	onSetPriority?: (eventId: string, priority: number) => void;
+	showTrack?: boolean;
 };
 
 export function EventList({
@@ -36,6 +38,8 @@ export function EventList({
 	groupByDay = false,
 	days,
 	day,
+	onSetPriority,
+	showTrack = false,
 }: EventListProps) {
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 
@@ -112,12 +116,16 @@ export function EventList({
 											events={eventDataSplitByDay[day.id]}
 											year={year}
 											conflicts={conflicts}
+											onSetPriority={onSetPriority}
+											showTrack={showTrack}
 										/>
 									) : (
 										<EventCalendarList
 											events={eventDataSplitByDay[day.id]}
 											year={year}
 											conflicts={conflicts}
+											onSetPriority={onSetPriority}
+											showTrack={showTrack}
 										/>
 									)}
 								</TabsContent>
@@ -159,12 +167,20 @@ export function EventList({
 			{events.length > 0 ? (
 				<>
 					{viewMode === "list" ? (
-						<EventItemList events={events} year={year} conflicts={conflicts} />
+						<EventItemList
+							events={events}
+							year={year}
+							conflicts={conflicts}
+							onSetPriority={onSetPriority}
+							showTrack={showTrack}
+						/>
 					) : (
 						<EventCalendarList
 							events={events}
 							year={year}
 							conflicts={conflicts}
+							onSetPriority={onSetPriority}
+							showTrack={showTrack}
 						/>
 					)}
 				</>

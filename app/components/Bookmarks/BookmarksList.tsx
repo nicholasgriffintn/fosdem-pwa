@@ -14,6 +14,7 @@ type Bookmark = {
   year: number;
   created_at: string;
   updated_at: string;
+  priority?: number;
 }
 
 function organizeBookmarks(bookmarks: Bookmark[]) {
@@ -46,6 +47,7 @@ type BookmarksListProps = {
   year: number;
   loading: boolean;
   day?: string;
+  onUpdateBookmark?: (params: { id: string; updates: Partial<Bookmark> }) => void;
 };
 
 export function BookmarksList({
@@ -54,9 +56,21 @@ export function BookmarksList({
   year,
   loading,
   day,
+  onUpdateBookmark,
 }: BookmarksListProps) {
   const organizedBookmarks =
     bookmarks && bookmarks.length > 0 ? organizeBookmarks(bookmarks) : {};
+
+  const handleSetPriority = (eventId: string, priority: number) => {
+    const bookmark = bookmarks.find(b => {
+      const event = fosdemData?.events[b.slug];
+      return event?.id === eventId;
+    });
+
+    if (bookmark && onUpdateBookmark) {
+      onUpdateBookmark({ id: bookmark.id, updates: { priority: priority || undefined } });
+    }
+  };
 
   const getFormattedData = () => {
     if (!bookmarks?.length || !fosdemData) {
@@ -78,6 +92,7 @@ export function BookmarksList({
           room: event.room,
           persons: event.persons,
           day: event.day,
+          priority: bookmark.priority,
         } as Event;
       })
       .filter((event): event is NonNullable<typeof event> => event !== null)
@@ -129,6 +144,8 @@ export function BookmarksList({
               groupByDay={true}
               days={days}
               day={day}
+              onSetPriority={handleSetPriority}
+              showTrack={true}
             />
           )}
         </div>

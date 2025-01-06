@@ -102,6 +102,7 @@ export interface Event {
 	feedbackUrl: string;
 	language: string;
 	isFavourited?: boolean;
+	priority?: number;
 }
 
 export interface Conference {
