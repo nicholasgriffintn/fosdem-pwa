@@ -48,6 +48,9 @@ type BookmarksListProps = {
   loading: boolean;
   day?: string;
   onUpdateBookmark?: (params: { id: string; updates: Partial<Bookmark> }) => void;
+  showConflicts?: boolean;
+  defaultViewMode?: "list" | "schedule" | "calendar";
+  showViewMode?: boolean;
 };
 
 export function BookmarksList({
@@ -57,6 +60,9 @@ export function BookmarksList({
   loading,
   day,
   onUpdateBookmark,
+  showConflicts = true,
+  defaultViewMode = "calendar",
+  showViewMode = true,
 }: BookmarksListProps) {
   const organizedBookmarks =
     bookmarks && bookmarks.length > 0 ? organizeBookmarks(bookmarks) : {};
@@ -92,7 +98,7 @@ export function BookmarksList({
       .filter((event): event is NonNullable<typeof event> => event !== null)
       .sort(sortEvents);
 
-    const conflicts = detectEventConflicts(formattedEvents, fosdemData.conference);
+    const conflicts = showConflicts ? detectEventConflicts(formattedEvents, fosdemData.conference) : [];
 
     const formattedTracks = bookmarkedTracks
       .map((bookmark) => {
@@ -133,13 +139,13 @@ export function BookmarksList({
               year={year}
               conflicts={conflicts}
               title="Bookmarked Events"
-              defaultViewMode="calendar"
-              displayViewMode={true}
               groupByDay={true}
               days={days}
               day={day}
               onSetPriority={handleSetPriority}
               showTrack={true}
+              defaultViewMode={defaultViewMode}
+              displayViewMode={showViewMode}
             />
           )}
         </div>
