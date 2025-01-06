@@ -73,6 +73,7 @@ export const session = sqliteTable(
 	(table) => {
 		return {
 			expiresAtIdx: index("expires_at_idx").on(table.expires_at),
+			userIdIdx: index("session_user_id_idx").on(table.user_id),
 		};
 	},
 );
