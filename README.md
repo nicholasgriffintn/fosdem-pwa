@@ -11,9 +11,6 @@ Also, this project is heavily inspired by [sojourner-web](https://github.com/loo
 You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## Features
-I'll help create a grid-like layout with images and their corresponding features in markdown. I'll pair each image with its most relevant features for a cleaner presentation:
-
-# Features
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
 
