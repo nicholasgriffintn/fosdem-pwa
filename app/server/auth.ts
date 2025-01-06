@@ -23,8 +23,6 @@ const TTL = 60 * 60 * 24 * 30;
 
 const cache = new CacheManager();
 
-const env = getCloudflareEnv();
-
 export function generateSessionToken(): string {
 	const bytes = new Uint8Array(20);
 	crypto.getRandomValues(bytes);
@@ -130,18 +128,22 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
 	setCookie(SESSION_COOKIE_NAME, token, {
 		httpOnly: true,
 		sameSite: "lax",
-		secure: env.NODE_ENV === "production",
+		secure: process.env.NODE_ENV !== "development",
 		expires: expiresAt,
 		maxAge: TTL,
 		path: "/",
 	});
 }
 
-export const github = new GitHub(
-	env.GITHUB_CLIENT_ID as string,
-	env.GITHUB_CLIENT_SECRET as string,
-	env.GITHUB_REDIRECT_URI || null,
-);
+export const github = () => {
+	const env = getCloudflareEnv();
+
+	return new GitHub(
+		env.GITHUB_CLIENT_ID as string,
+		env.GITHUB_CLIENT_SECRET as string,
+		env.GITHUB_REDIRECT_URI || null,
+	);
+};
 
 /**
  * Retrieves the session and user data if valid.
