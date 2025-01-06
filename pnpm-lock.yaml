@@ -47,6 +47,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.1.5
         version: 1.1.5(@types/react-dom@19.0.2(@types/react@19.0.1))(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@sentry/react':
+        specifier: ^8.47.0
+        version: 8.47.0(react@19.0.0)
       '@tanstack/react-query':
         specifier: ^5.62.3
         version: 5.62.3(react@19.0.0)
@@ -2037,6 +2040,36 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@sentry-internal/browser-utils@8.47.0':
+    resolution: {integrity: sha512-vOXzYzHTKkahTLDzWWIA4EiVCQ+Gk+7xGWUlNcR2ZiEPBqYZVb5MjsUozAcc7syrSUy6WicyFjcomZ3rlCVQhg==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/feedback@8.47.0':
+    resolution: {integrity: sha512-IAiIemTQIalxAOYhUENs9bZ8pMNgJnX3uQSuY7v0gknEqClOGpGkG04X/cxCmtJUj1acZ9ShTGDxoh55a+ggAQ==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/replay-canvas@8.47.0':
+    resolution: {integrity: sha512-M4W9UGouEeELbGbP3QsXLDVtGiQSZoWJlKwqMWyqdQgZuLoKw0S33+60t6teLVMhuQZR0UI9VJTF5coiXysnnA==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/replay@8.47.0':
+    resolution: {integrity: sha512-G/S40ZBORj0HSMLw/uVC6YDEPN/dqVk901vf4VYfml686DEhJrZesfAfp5SydJumQ0NKZQrdtvny+BWnlI5H1w==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/browser@8.47.0':
+    resolution: {integrity: sha512-K6BzHisykmbFy/wORtGyfsAlw7ShevLALzu3ReZZZ18dVubO1bjSNjkZQU9MJD5Jcb9oLwkq89n3N9XIBfvdRA==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/core@8.47.0':
+    resolution: {integrity: sha512-iSEJZMe3DOcqBFZQAqgA3NB2lCWBc4Gv5x/SCri/TVg96wAlss4VrUunSI2Mp0J4jJ5nJcJ2ChqHSBAU48k3FA==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/react@8.47.0':
+    resolution: {integrity: sha512-SRk2Up+qBTow4rQGiRXViC2i4M5w/tae5w8I/rmX+IxFoPyh8wXERcLAj/8xbbRm8aR+A4i5gNgfFtrYsyFJFA==}
+    engines: {node: '>=14.18'}
+    peerDependencies:
+      react: ^16.14.0 || 17.x || 18.x || 19.x
+
   '@sindresorhus/merge-streams@2.3.0':
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
@@ -3316,6 +3349,9 @@ packages:
   hls.js@1.5.17:
     resolution: {integrity: sha512-wA66nnYFvQa1o4DO/BFgLNRKnBTVXpNeldGRBJ2Y0SvFtdwvFKCbqa9zhHoZLoxHhZ+jYsj3aIBkWQQCPNOhMw==}
 
+  hoist-non-react-statics@3.3.2:
+    resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
+
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
 
@@ -4071,6 +4107,9 @@ packages:
     resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
     peerDependencies:
       react: ^19.0.0
+
+  react-is@16.13.1:
+    resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
@@ -6333,6 +6372,41 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.28.1':
     optional: true
 
+  '@sentry-internal/browser-utils@8.47.0':
+    dependencies:
+      '@sentry/core': 8.47.0
+
+  '@sentry-internal/feedback@8.47.0':
+    dependencies:
+      '@sentry/core': 8.47.0
+
+  '@sentry-internal/replay-canvas@8.47.0':
+    dependencies:
+      '@sentry-internal/replay': 8.47.0
+      '@sentry/core': 8.47.0
+
+  '@sentry-internal/replay@8.47.0':
+    dependencies:
+      '@sentry-internal/browser-utils': 8.47.0
+      '@sentry/core': 8.47.0
+
+  '@sentry/browser@8.47.0':
+    dependencies:
+      '@sentry-internal/browser-utils': 8.47.0
+      '@sentry-internal/feedback': 8.47.0
+      '@sentry-internal/replay': 8.47.0
+      '@sentry-internal/replay-canvas': 8.47.0
+      '@sentry/core': 8.47.0
+
+  '@sentry/core@8.47.0': {}
+
+  '@sentry/react@8.47.0(react@19.0.0)':
+    dependencies:
+      '@sentry/browser': 8.47.0
+      '@sentry/core': 8.47.0
+      hoist-non-react-statics: 3.3.2
+      react: 19.0.0
+
   '@sindresorhus/merge-streams@2.3.0': {}
 
   '@tanstack/eslint-plugin-query@5.62.1(eslint@9.17.0(jiti@2.4.1))(typescript@5.7.2)':
@@ -7793,6 +7867,10 @@ snapshots:
 
   hls.js@1.5.17: {}
 
+  hoist-non-react-statics@3.3.2:
+    dependencies:
+      react-is: 16.13.1
+
   hookable@5.5.3: {}
 
   http-errors@2.0.0:
@@ -8570,6 +8648,8 @@ snapshots:
     dependencies:
       react: 19.0.0
       scheduler: 0.25.0
+
+  react-is@16.13.1: {}
 
   react-refresh@0.14.2: {}
 
