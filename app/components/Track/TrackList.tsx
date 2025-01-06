@@ -12,6 +12,7 @@ type TrackListProps = {
 	title?: string;
 	groupByDay?: boolean;
 	days?: Array<{ id: string; name: string }>;
+	day?: string;
 };
 
 type TrackListItemProps = {
@@ -83,18 +84,20 @@ function TrackListContent({ tracks, year }: { tracks: Track[]; year: number }) {
 	);
 }
 
-export function TrackList({ tracks, year, title, groupByDay = false, days }: TrackListProps) {
+export function TrackList({ tracks, year, title, groupByDay = false, days, day }: TrackListProps) {
 	if (groupByDay && days) {
 		const trackDataSplitByDay = groupTracksByDay(tracks);
+
+		const dayId = day || days[0].id;
 
 		return (
 			<section>
 				<div className="flex flex-col space-y-4">
-					<Tabs defaultValue={days[0].id} className="w-full">
+					<Tabs defaultValue={dayId.toString()} className="w-full">
 						<div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
 							<div className="flex flex-col md:flex-row md:items-center gap-4">
 								{title && <h2 className="text-xl font-semibold shrink-0">{title}</h2>}
-								<TabsList className="bg-transparent p-0 h-auto justify-start">
+								<TabsList className="bg-transparent p-0 h-auto justify-start gap-2">
 									{days.map((day) => {
 										const hasTracks = Boolean(trackDataSplitByDay[day.id]);
 										return (

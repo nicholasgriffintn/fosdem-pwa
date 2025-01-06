@@ -16,7 +16,7 @@ export const Route = createFileRoute('/rooms/$roomId')({
     year:
       (constants.AVAILABLE_YEARS.includes(year) && year) ||
       constants.DEFAULT_YEAR,
-    day: day || null,
+    day: day || undefined,
   }),
   loaderDeps: ({ search: { year, day } }) => ({ year, day }),
   loader: async ({ params, deps: { year, day } }) => {
@@ -55,7 +55,7 @@ export const Route = createFileRoute('/rooms/$roomId')({
 })
 
 function RoomPage() {
-  const { fosdem } = Route.useLoaderData()
+  const { fosdem, day } = Route.useLoaderData()
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const roomEvents = fosdem.roomEvents
@@ -144,6 +144,7 @@ function RoomPage() {
             displayViewMode={false}
             groupByDay={true}
             days={days}
+            day={day}
           />
         </div>
       </div>

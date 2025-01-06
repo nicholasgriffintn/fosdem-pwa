@@ -11,15 +11,17 @@ import { Button } from "~/components/ui/button";
 
 export const Route = createFileRoute("/bookmarks/")({
   component: BookmarksHome,
-  validateSearch: ({ year }: { year: number }) => ({
+  validateSearch: ({ year, day }: { year: number, day?: string }) => ({
     year:
       (constants.AVAILABLE_YEARS.includes(year) && year) ||
       constants.DEFAULT_YEAR,
+    day: day || undefined,
   }),
-  loaderDeps: ({ search: { year } }) => ({ year }),
-  loader: async ({ deps: { year } }) => {
+  loaderDeps: ({ search: { year, day } }) => ({ year, day }),
+  loader: async ({ deps: { year, day } }) => {
     return {
       year,
+      day,
     };
   },
   head: () => ({
@@ -33,7 +35,7 @@ export const Route = createFileRoute("/bookmarks/")({
 });
 
 function BookmarksHome() {
-  const { year } = Route.useLoaderData();
+  const { year, day } = Route.useLoaderData();
   const { bookmarks, loading } = useBookmarks({ year });
   const { fosdemData } = useFosdemData({ year });
   const { user, loading: authLoading } = useAuth();
@@ -61,6 +63,7 @@ function BookmarksHome() {
                 fosdemData={fosdemData}
                 year={year}
                 loading={loading}
+                day={day}
               />
             )}
           </>
