@@ -15,7 +15,7 @@ import {
 	EVENT_SEARCH_KEYS,
 	ROOM_SEARCH_KEYS,
 	createSearchIndex,
-	formatSearchResults
+	formatSearchResults,
 } from "~/lib/search";
 
 type NavSearchProps = {
@@ -76,15 +76,40 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 			setIsSearching(true);
 			setFocusedIndex(-1);
 
-			const tracksFuse = createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS);
-			const eventsFuse = createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS);
-			const roomsFuse = createSearchIndex(Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS);
+			const tracksFuse = createSearchIndex(
+				Object.values(fosdemData.tracks),
+				TRACK_SEARCH_KEYS,
+			);
+			const eventsFuse = createSearchIndex(
+				Object.values(fosdemData.events),
+				EVENT_SEARCH_KEYS,
+			);
+			const roomsFuse = createSearchIndex(
+				Object.values(fosdemData.rooms),
+				ROOM_SEARCH_KEYS,
+			);
 
-			const tracksResults = formatSearchResults(tracksFuse.search(query), "track", 3);
-			const eventsResults = formatSearchResults(eventsFuse.search(query), "event", 3);
-			const roomsResults = formatSearchResults(roomsFuse.search(query), "room", 3);
+			const tracksResults = formatSearchResults(
+				tracksFuse.search(query),
+				"track",
+				3,
+			);
+			const eventsResults = formatSearchResults(
+				eventsFuse.search(query),
+				"event",
+				3,
+			);
+			const roomsResults = formatSearchResults(
+				roomsFuse.search(query),
+				"room",
+				3,
+			);
 
-			const combinedResults = [...tracksResults, ...eventsResults, ...roomsResults]
+			const combinedResults = [
+				...tracksResults,
+				...eventsResults,
+				...roomsResults,
+			]
 				.sort((a, b) => (a.score || 0) - (b.score || 0))
 				.slice(0, 10);
 			setSearchResults(combinedResults);
@@ -244,7 +269,8 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					>
 						<div className="font-medium">{result.item.name}</div>
 						<div className="text-sm text-muted-foreground">
-							Room • Building {result.item.buildingId || result.item.building?.id}
+							Room • Building{" "}
+							{result.item.buildingId || result.item.building?.id}
 						</div>
 					</button>
 				);

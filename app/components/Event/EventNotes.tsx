@@ -89,8 +89,9 @@ export function EventNotes({
 							}) => (
 								<li
 									key={note.id}
-									className={`bg-muted/30 rounded-lg p-3 transition-opacity ${note.isPending ? "opacity-50" : ""
-										}`}
+									className={`bg-muted/30 rounded-lg p-3 transition-opacity ${
+										note.isPending ? "opacity-50" : ""
+									}`}
 								>
 									<div className="flex flex-col gap-2">
 										<p className="flex-1">{note.note}</p>

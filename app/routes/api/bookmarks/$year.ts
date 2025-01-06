@@ -90,10 +90,7 @@ export const APIRoute = createAPIFileRoute("/api/bookmarks/$year")({
 		}
 
 		const existingBookmark = await db.query.bookmark.findFirst({
-			where: and(
-				eq(bookmark.id, id),
-				eq(bookmark.user_id, user.id),
-			),
+			where: and(eq(bookmark.id, id), eq(bookmark.user_id, user.id)),
 		});
 
 		if (!existingBookmark) {
@@ -107,7 +104,10 @@ export const APIRoute = createAPIFileRoute("/api/bookmarks/$year")({
 				.where(eq(bookmark.id, id));
 		} catch (error) {
 			console.error(error);
-			return Response.json({ error: "Failed to update bookmark" }, { status: 500 });
+			return Response.json(
+				{ error: "Failed to update bookmark" },
+				{ status: 500 },
+			);
 		}
 
 		return Response.json({ id, ...updates });

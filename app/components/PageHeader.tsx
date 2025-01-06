@@ -18,7 +18,7 @@ type PageHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 		text: string;
 		href?: string;
 	}[];
-}
+};
 
 export function PageHeader({
 	heading,

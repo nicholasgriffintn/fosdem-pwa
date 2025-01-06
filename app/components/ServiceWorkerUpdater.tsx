@@ -10,20 +10,20 @@ export function ServiceWorkerUpdater() {
 		const handleBeforeInstallPrompt = (e: any) => {
 			e.preventDefault();
 
-			if (window.matchMedia('(display-mode: standalone)').matches) {
+			if (window.matchMedia("(display-mode: standalone)").matches) {
 				return;
 			}
 		};
 
-		window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+		window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-		window.addEventListener('appinstalled', () => {
+		window.addEventListener("appinstalled", () => {
 			toast({
 				title: "Successfully Installed",
 				description: "FOSDEM PWA has been added to your home screen",
 				duration: 3000,
 			});
-			localStorage.removeItem('installPromptDismissed');
+			localStorage.removeItem("installPromptDismissed");
 		});
 
 		const handleSwUpdate = () => {
@@ -47,7 +47,7 @@ export function ServiceWorkerUpdater() {
 			});
 		};
 
-		const dataChannel = new BroadcastChannel('fosdem-data-updates');
+		const dataChannel = new BroadcastChannel("fosdem-data-updates");
 		dataChannel.onmessage = (event) => {
 			toast({
 				title: "New Data Available",
@@ -56,9 +56,9 @@ export function ServiceWorkerUpdater() {
 			});
 		};
 
-		const syncChannel = new BroadcastChannel('user-data-sync');
+		const syncChannel = new BroadcastChannel("user-data-sync");
 		syncChannel.onmessage = (event) => {
-			if (event.data.type === 'SYNC_COMPLETE') {
+			if (event.data.type === "SYNC_COMPLETE") {
 				toast({
 					title: "Sync Complete",
 					description: "Your changes have been saved.",
@@ -71,8 +71,11 @@ export function ServiceWorkerUpdater() {
 
 		return () => {
 			window.removeEventListener("swUpdated", handleSwUpdate);
-			window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-			window.removeEventListener('appinstalled', () => { });
+			window.removeEventListener(
+				"beforeinstallprompt",
+				handleBeforeInstallPrompt,
+			);
+			window.removeEventListener("appinstalled", () => {});
 			dataChannel.close();
 			syncChannel.close();
 		};

@@ -38,9 +38,7 @@ export async function createSession(
 	const session: Session = {
 		id: sessionId,
 		user_id: userId,
-		expires_at: new Date(
-			now.getTime() + 1000 * TTL,
-		).toISOString(),
+		expires_at: new Date(now.getTime() + 1000 * TTL).toISOString(),
 		last_extended_at: now.toISOString(),
 	};
 	await db.insert(sessionTable).values(session);
@@ -90,9 +88,7 @@ export async function validateSessionToken(token: string) {
 		const timeSinceLastExtension = now - lastExtendedAt;
 
 		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
-			const newExpiresAt = new Date(
-				now + 1000 * TTL,
-			).toISOString();
+			const newExpiresAt = new Date(now + 1000 * TTL).toISOString();
 			const newLastExtendedAt = new Date(now).toISOString();
 
 			session.expires_at = newExpiresAt;
@@ -100,7 +96,8 @@ export async function validateSessionToken(token: string) {
 
 			await Promise.all([
 				cache.set(`session_${sessionId}`, { session, user }, TTL),
-				db.update(sessionTable)
+				db
+					.update(sessionTable)
 					.set({
 						expires_at: newExpiresAt,
 						last_extended_at: newLastExtendedAt,

@@ -17,7 +17,7 @@ type MobileNavProps = {
 	}[];
 	onCloseMenu: () => void;
 	children?: ReactNode;
-}
+};
 
 export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 	useLockBody();
