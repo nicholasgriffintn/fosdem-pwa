@@ -39,16 +39,16 @@ export function EventList({
 }: EventListProps) {
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 
-	if (groupByDay && days) {
+	if (groupByDay && days && days.length > 0) {
 		const eventDataSplitByDay = groupEventsByDay(events);
 		const uniqueDays = [...new Set(events.map((event) => event.day).sort())];
 
-		const dayId = day || uniqueDays[0] || days[0].id;
+		const dayId = day || uniqueDays[0] || days[0]?.id;
 
 		return (
 			<section>
 				<div className="flex flex-col space-y-4">
-					<Tabs defaultValue={dayId.toString()} className="w-full">
+					<Tabs defaultValue={dayId?.toString()} className="w-full">
 						<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
 							<div className="flex flex-col md:flex-row md:items-center gap-4">
 								{title && <h2 className="text-xl font-semibold shrink-0">{title}</h2>}
