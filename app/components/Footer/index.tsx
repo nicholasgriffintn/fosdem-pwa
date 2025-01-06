@@ -37,15 +37,6 @@ export function Footer() {
 						>
 							Cloudflare
 						</a>
-						<span>&</span>
-						<a
-							href="https://vercel.com/"
-							target="_blank"
-							rel="noreferrer"
-							className="font-medium text-foreground hover:underline"
-						>
-							Vercel
-						</a>
 						<span>•</span>
 						<a
 							href="https://github.com/nicholasgriffintn/fosdem-pwa"
