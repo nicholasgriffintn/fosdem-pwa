@@ -129,6 +129,7 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
 		sameSite: "lax",
 		secure: process.env.NODE_ENV === "production",
 		expires: expiresAt,
+		maxAge: TTL,
 		path: "/",
 	});
 }
