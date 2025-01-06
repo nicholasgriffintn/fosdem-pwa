@@ -42,13 +42,37 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 		const PROVIDER_ID = "github";
 
 		try {
-			const tokens = await github.validateAuthorizationCode(code);
+			const tokens = await github().validateAuthorizationCode(code);
+
+			if (!tokens.accessToken()) {
+				throw new Error("GitHub Callback: No access token found");
+			}
+
 			const githubUserResponse = await fetch("https://api.github.com/user", {
 				headers: {
 					Authorization: `Bearer ${tokens.accessToken()}`,
+					Accept: "application/json",
+					"User-Agent": "Fosdem PWA",
 				},
 			});
+
+			if (!githubUserResponse.ok) {
+				const errorText = await githubUserResponse.text();
+
+				console.error("GitHub Callback: API Error:", {
+					status: githubUserResponse.status,
+					statusText: githubUserResponse.statusText,
+					body: errorText,
+				});
+
+				throw new Error(`GitHub Callback: API Error: ${githubUserResponse.status} ${githubUserResponse.statusText}`);
+			}
+
 			const providerUser: GitHubUser = await githubUserResponse.json();
+
+			if (!providerUser.id) {
+				throw new Error("GitHub Callback: No user ID found in GitHub response");
+			}
 
 			const existingUser = await db.query.oauthAccount.findFirst({
 				where: and(
@@ -129,13 +153,13 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 				},
 			});
 		} catch (e) {
-			console.error(e);
+			console.error("GitHub Callback: Auth error:", e);
 			if (e instanceof OAuth2RequestError) {
-				return new Response(null, {
+				return new Response('OAuth2 Request Error', {
 					status: 400,
 				});
 			}
-			return new Response(null, {
+			return new Response('Internal Server Error', {
 				status: 500,
 			});
 		}

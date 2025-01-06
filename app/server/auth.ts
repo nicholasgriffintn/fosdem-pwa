@@ -10,6 +10,7 @@ import { deleteCookie, getCookie, setCookie } from "vinxi/http";
 import { createStandardDate } from "~/lib/dateTime";
 import { CacheManager } from "~/lib/cache";
 import { db } from "~/server/db";
+import { getCloudflareEnv } from "~/server/config";
 import {
 	session as sessionTable,
 	user as userTable,
@@ -127,18 +128,22 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
 	setCookie(SESSION_COOKIE_NAME, token, {
 		httpOnly: true,
 		sameSite: "lax",
-		secure: process.env.NODE_ENV === "production",
+		secure: process.env.NODE_ENV !== "development",
 		expires: expiresAt,
 		maxAge: TTL,
 		path: "/",
 	});
 }
 
-export const github = new GitHub(
-	process.env.GITHUB_CLIENT_ID as string,
-	process.env.GITHUB_CLIENT_SECRET as string,
-	process.env.GITHUB_REDIRECT_URI || null,
-);
+export const github = () => {
+	const env = getCloudflareEnv();
+
+	return new GitHub(
+		env.GITHUB_CLIENT_ID as string,
+		env.GITHUB_CLIENT_SECRET as string,
+		env.GITHUB_REDIRECT_URI || null,
+	);
+};
 
 /**
  * Retrieves the session and user data if valid.
