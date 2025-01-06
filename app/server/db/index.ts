@@ -1,8 +1,9 @@
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import * as schema from "./schema";
+import { getCloudflareEnv } from "../config";
 
-const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_DATABASE_ID, CLOUDFLARE_D1_TOKEN } =
-	process.env;
+const env = getCloudflareEnv();
+const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_DATABASE_ID, CLOUDFLARE_D1_TOKEN } = env;
 
 type D1ResponseInfo = {
 	code: number;
@@ -52,8 +53,7 @@ export const db = drizzle(
 
 		if (response.status !== 200)
 			throw new Error(
-				`Error from sqlite proxy server: ${response.status} ${
-					response.statusText
+				`Error from sqlite proxy server: ${response.status} ${response.statusText
 				}\n${JSON.stringify(await response.json())}`,
 			);
 
@@ -61,8 +61,7 @@ export const db = drizzle(
 
 		if (!responseJson.success) {
 			throw new Error(
-				`Error from Cloudflare D1: ${response.status} ${
-					response.statusText
+				`Error from Cloudflare D1: ${response.status} ${response.statusText
 				}\n${JSON.stringify(responseJson)}`,
 			);
 		}
@@ -72,5 +71,5 @@ export const db = drizzle(
 
 		return { rows: method === "all" ? rows : rows[0] };
 	},
-	{ schema, logger: process.env.NODE_ENV === "development" },
+	{ schema, logger: env.NODE_ENV === "development" },
 );

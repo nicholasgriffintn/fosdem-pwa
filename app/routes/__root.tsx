@@ -12,20 +12,23 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 import appCss from "~/styles/app.css?url";
 import { cn } from "~/lib/utils";
+import { getCloudflareEnv } from "~/server/config";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { Toaster } from "~/components/ui/toaster";
 import { OfflineIndicator } from "~/components/OfflineIndicator";
 import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
 
+const env = getCloudflareEnv();
+
 const TanStackRouterDevtools =
-	process.env.NODE_ENV === "production"
+	env.NODE_ENV === "production"
 		? () => null
 		: lazy(() =>
-				import("@tanstack/router-devtools").then((res) => ({
-					default: res.TanStackRouterDevtools,
-				})),
-			);
+			import("@tanstack/router-devtools").then((res) => ({
+				default: res.TanStackRouterDevtools,
+			})),
+		);
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 	{
