@@ -7,6 +7,8 @@ export function getCloudflareEnv() {
       return process.env
     }
 
+    console.log(cf)
+
     const envVars = {
       CLOUDFLARE_ACCOUNT_ID: cf.env.CLOUDFLARE_ACCOUNT_ID,
       CLOUDFLARE_DATABASE_ID: cf.env.CLOUDFLARE_DATABASE_ID,
