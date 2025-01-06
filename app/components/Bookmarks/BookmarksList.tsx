@@ -40,17 +40,21 @@ function organizeBookmarks(bookmarks: Bookmark[]) {
   return byYear;
 }
 
+type BookmarksListProps = {
+  bookmarks: Bookmark[];
+  fosdemData?: Conference;
+  year: number;
+  loading: boolean;
+  day?: string;
+};
+
 export function BookmarksList({
   bookmarks,
   fosdemData,
   year,
   loading,
-}: {
-  bookmarks: Bookmark[];
-  fosdemData?: Conference;
-  year: number;
-  loading: boolean;
-}) {
+  day,
+}: BookmarksListProps) {
   const organizedBookmarks =
     bookmarks && bookmarks.length > 0 ? organizeBookmarks(bookmarks) : {};
 
@@ -112,7 +116,7 @@ export function BookmarksList({
       ) : bookmarks?.length ? (
         <div className="space-y-8">
           {tracks.length > 0 && (
-            <TrackList tracks={tracks} year={year} title="Bookmarked Tracks" />
+            <TrackList tracks={tracks} year={year} title="Bookmarked Tracks" day={day} />
           )}
           {events.length > 0 && (
             <EventList
@@ -124,6 +128,7 @@ export function BookmarksList({
               displayViewMode={true}
               groupByDay={true}
               days={days}
+              day={day}
             />
           )}
         </div>

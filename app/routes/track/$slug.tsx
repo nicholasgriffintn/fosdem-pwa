@@ -12,7 +12,7 @@ export const Route = createFileRoute("/track/$slug")({
     year:
       (constants.AVAILABLE_YEARS.includes(year) && year) ||
       constants.DEFAULT_YEAR,
-    day: day || null,
+    day: day || undefined,
   }),
   loaderDeps: ({ search: { year, day } }) => ({ year, day }),
   loader: async ({ params, deps: { year, day } }) => {
@@ -84,6 +84,7 @@ function TrackPage() {
           days={fosdem.days}
           defaultViewMode="list"
           displayViewMode={false}
+          day={day}
         />
       </div>
     </div>

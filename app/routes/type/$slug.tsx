@@ -13,7 +13,7 @@ export const Route = createFileRoute("/type/$slug")({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
 			constants.DEFAULT_YEAR,
-		day: day || null,
+		day: day || undefined,
 	}),
 	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
 	loader: async ({ params, deps: { year, day } }) => {
@@ -72,6 +72,7 @@ function TypePage() {
 					year={year}
 					groupByDay={true}
 					days={fosdem.days}
+					day={day}
 				/>
 			</div>
 		</div>

@@ -23,6 +23,7 @@ type EventListProps = {
 	displayViewMode?: boolean;
 	groupByDay?: boolean;
 	days?: Array<{ id: string; name: string }>;
+	day?: string;
 };
 
 export function EventList({
@@ -34,20 +35,24 @@ export function EventList({
 	displayViewMode = false,
 	groupByDay = false,
 	days,
+	day,
 }: EventListProps) {
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 
 	if (groupByDay && days) {
 		const eventDataSplitByDay = groupEventsByDay(events);
+		const uniqueDays = [...new Set(events.map((event) => event.day).sort())];
+
+		const dayId = day || uniqueDays[0] || days[0].id;
 
 		return (
 			<section>
 				<div className="flex flex-col space-y-4">
-					<Tabs defaultValue={days[0].id} className="w-full">
+					<Tabs defaultValue={dayId.toString()} className="w-full">
 						<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
 							<div className="flex flex-col md:flex-row md:items-center gap-4">
 								{title && <h2 className="text-xl font-semibold shrink-0">{title}</h2>}
-								<TabsList className="bg-transparent p-0 h-auto justify-start">
+								<TabsList className="bg-transparent p-0 h-auto justify-start gap-2">
 									{days.map((day) => {
 										const hasEvents = Boolean(eventDataSplitByDay[day.id]);
 										return (
