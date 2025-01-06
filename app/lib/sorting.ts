@@ -82,7 +82,6 @@ export function sortScheduleEvents(a: Event, b: Event): number {
     return dayDiff;
   }
 
-  // Convert times to minutes for accurate comparison
   const [aHours, aMinutes] = a.startTime.split(':').map(Number);
   const [bHours, bMinutes] = b.startTime.split(':').map(Number);
   const aTime = aHours * 60 + aMinutes;
