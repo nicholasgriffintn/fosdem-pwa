@@ -52,6 +52,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 				headers: {
 					Authorization: `Bearer ${tokens.accessToken()}`,
 					Accept: "application/json",
+					"User-Agent": "Fosdem PWA",
 				},
 			});
 
