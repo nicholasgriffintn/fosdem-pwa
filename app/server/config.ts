@@ -4,8 +4,11 @@ export function getCloudflareEnv() {
   try {
     const cf = getContext('cloudflare')
     if (!cf) {
+      console.warn('No Cloudflare context found')
       return process.env
     }
+
+    console.log(cf)
 
     const envVars = {
       CLOUDFLARE_ACCOUNT_ID: cf.env.CLOUDFLARE_ACCOUNT_ID,
