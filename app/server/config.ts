@@ -7,7 +7,9 @@ export function getCloudflareEnv() {
       return process.env
     }
 
-    console.log(cf)
+    const AUTH_REDIRECT_URL = cf.env.CF_PAGES_URL ?
+      `https://${cf.env.CF_PAGES_URL}/api/auth/callback/github` :
+      cf.env.GITHUB_REDIRECT_URI
 
     const envVars = {
       CLOUDFLARE_ACCOUNT_ID: cf.env.CLOUDFLARE_ACCOUNT_ID,
@@ -17,9 +19,10 @@ export function getCloudflareEnv() {
       UPSTASH_REDIS_URL: cf.env.UPSTASH_REDIS_URL,
       UPSTASH_REDIS_TOKEN: cf.env.UPSTASH_REDIS_TOKEN,
       NODE_ENV: cf.env.NODE_ENV,
+      GITHUB_CLIENT_ID: cf.env.GITHUB_CLIENT_ID,
+      GITHUB_CLIENT_SECRET: cf.env.GITHUB_CLIENT_SECRET,
+      GITHUB_REDIRECT_URI: AUTH_REDIRECT_URL,
     }
-
-    console.log(envVars)
 
     for (const [key, value] of Object.entries(envVars)) {
       if (value && !process.env[key]) {
