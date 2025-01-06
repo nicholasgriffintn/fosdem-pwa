@@ -135,15 +135,12 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
 	});
 }
 
-export const github = () => {
-	const env = getCloudflareEnv();
-
-	return new GitHub(
-		env.GITHUB_CLIENT_ID as string,
-		env.GITHUB_CLIENT_SECRET as string,
-		env.GITHUB_REDIRECT_URI || null,
-	);
-};
+const env = getCloudflareEnv();
+export const github = new GitHub(
+	env.GITHUB_CLIENT_ID as string,
+	env.GITHUB_CLIENT_SECRET as string,
+	env.GITHUB_REDIRECT_URI || null,
+);
 
 /**
  * Retrieves the session and user data if valid.
