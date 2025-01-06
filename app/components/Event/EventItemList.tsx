@@ -46,19 +46,16 @@ function EventListItem({
 	);
 
 	return (
-		<div className={clsx(className, hasConflicts && !event.priority && "border-l-4 border-l-destructive")}>
+		<div className={clsx("flex items-center", className, hasConflicts && !event.priority && "border-l-4 border-l-destructive")}>
 			<ConflictTooltip
 				event={event}
 				conflicts={conflicts}
-				className="absolute left-2 top-1/2 -translate-y-1/2"
+				className="pl-2 py-3"
 				onSetPriority={onSetPriority}
 				priority={event.priority}
 			/>
-			<div className={clsx(
-				"flex flex-col md:flex-row md:justify-between w-full",
-				hasConflicts && !event.priority && "pl-10"
-			)}>
-				<div className="flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1">
+			<div className="flex flex-col md:flex-row md:justify-between w-full">
+				<div className={clsx("flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1", hasConflicts && "pl-2")}>
 					<h3 className="font-semibold leading-none tracking-tight">
 						{event.title}
 					</h3>
