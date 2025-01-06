@@ -19,23 +19,23 @@ I'll help create a grid-like layout with images and their corresponding features
 
 | ![FOSDEM PWA Homepage](./.github/docs/images/homepage.png) |
 |:--:|
-| **Homepage & Navigation** <br> • Quickly access schedule tracks including Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events <br> • Powerful search feature to locate events, tracks, and more <br> • Automatic data sync from FOSDEM for latest information |
+| **Homepage & Navigation** <br> • Quickly access scheduled tracks including Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events <br> • Powerful search feature to locate events, tracks, rooms, and more <br> • Automatic data sync from FOSDEM for latest information |
 
 | ![Event Page With Notes](./.github/docs/images/event_page_with_notes.png) |
 |:--:|
-| **Event Details & Note Taking** <br> • Detailed event information at your fingertips <br> • Capture and save session insights to database <br> • GitHub Sign-In for personalized experience |
+| **Event Details & Note Taking** <br> • Detailed event information <br> • Capture and save session insights to through notes with timestamps <br> • GitHub sign in for a personalized experience |
 
 | ![Room View With Status](./.github/docs/images/room_view_with_status.png) |
 |:--:|
-| **Room & Live Features** <br> • View events list for each room <br> • Continuous live stream view <br> • Dedicated page for live sessions |
+| **Room & Live Features** <br> • An events list for each room <br> • Continuous live stream view <br> • Dedicated page for live sessions |
 
 | ![Bookmarks With Priorities](./.github/docs/images/bookmarks_with_priorities.png) |
 |:--:|
-| **Smart Bookmarking** <br> • Bookmark favorite tracks and events <br> • Priority settings for conflict detection <br> • Consolidated bookmark view |
+| **Smart Bookmarking** <br> • Bookmark your favorite tracks and events <br> • Priority settings for conflict detection <br> • Consolidated bookmark view |
 
 | ![Schedule With Transitions](./.github/docs/images/schedule_with_transitions.png) |
 |:--:|
-| **Track Management** <br> • Comprehensive list of events per track <br> • Interactive map for venue navigation <br> • Effortless track and event sharing |
+| **Track Management** <br> • List of events per track <br> • <ap for venue navigation <br> • Track and event sharing |
 
 | ![Shared Profiles](./.github/docs/images/shared_profiles.png) |
 |:--:|
