@@ -41,7 +41,7 @@ declare module "@tanstack/react-router" {
 }
 
 Sentry.init({
-	dsn: "https://5c8755c9a53bb480eaba609533a5882d@o981760.ingest.us.sentry.io/4508599132291072",
+	dsn: "https://9c7ff6e0ee93ee6d3907270de1b3495c@o4508599344365568.ingest.de.sentry.io/4508599345807440",
 	integrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
 	tracesSampleRate: 1.0,
 	environment: import.meta.env.PROD ? "production" : "development",
