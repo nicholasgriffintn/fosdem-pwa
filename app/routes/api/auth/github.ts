@@ -10,7 +10,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/github")({
 		const env = getCloudflareEnv();
 		const state = generateState();
 
-		const url = github.createAuthorizationURL(state, ["user:email"]);
+		const url = github().createAuthorizationURL(state, ["user:email"]);
 
 		setCookie("github_oauth_state", state, {
 			path: "/",
