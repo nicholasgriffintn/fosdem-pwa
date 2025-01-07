@@ -26,11 +26,11 @@ type D1Response = {
 	success: boolean;
 };
 
-const env = getCloudflareEnv();
-const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_DATABASE_ID, CLOUDFLARE_D1_TOKEN } = env;
-
 export const db = drizzle(
 	async (sql: string, params: any[], method: string) => {
+		const env = getCloudflareEnv();
+		const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_DATABASE_ID, CLOUDFLARE_D1_TOKEN } = env;
+
 		if (
 			!CLOUDFLARE_ACCOUNT_ID ||
 			!CLOUDFLARE_DATABASE_ID ||
