@@ -68,7 +68,7 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 						</a>
 					</Button>
 
-					{user ? (
+					{user?.id ? (
 						<>
 							<Button
 								variant="ghost"

@@ -58,7 +58,7 @@ export function Header() {
 										<div className="h-7 w-7 flex items-center justify-center">
 											<Spinner />
 										</div>
-									) : user ? (
+									) : user?.id ? (
 										<AvatarMenu user={user} />
 									) : (
 										<Button

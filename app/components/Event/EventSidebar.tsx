@@ -38,7 +38,7 @@ export function EventSidebar({
 				/>
 			) : (
 				<div>
-					{user ? (
+					{user?.id ? (
 						<>
 							{isMobile ? (
 								<EventNotesMobile

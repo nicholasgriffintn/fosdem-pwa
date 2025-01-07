@@ -44,7 +44,7 @@ export function ItemActions({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {user && onCreateBookmark && (
+      {user?.id && onCreateBookmark && (
         <FavouriteButton
           year={year}
           type={type}
