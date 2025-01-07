@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/start";
 import { eq } from "drizzle-orm";
 
 import { db } from "~/server/db";
-import { bookmark as bookmarkTable } from "~/server/db/schema";
+import { bookmark as bookmarkTable, user as userTable } from "~/server/db/schema";
 import { getFullAuthSession } from "~/server/auth";
 
 export const getBookmarks = createServerFn({
@@ -132,3 +132,39 @@ export const updateBookmark = createServerFn({
     }
   });
 
+
+export const getUserBookmarks = createServerFn({
+  method: "GET",
+})
+  .validator((data: { year: number, userId: string }) => data)
+  .handler(async (ctx: any) => {
+    const { year, userId } = ctx.data;
+
+    if (!userId) {
+      throw new Error("User ID is required");
+    }
+
+    const user = await db.query.user.findFirst({
+      where: eq(userTable.github_username, userId),
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.bookmarks_visibility === "private") {
+      throw new Error("User has private bookmarks");
+    }
+
+    const bookmarks = await db
+      .select()
+      .from(bookmarkTable)
+      .where(
+        and(
+          eq(bookmarkTable.user_id, user.id),
+          eq(bookmarkTable.year, Number(year)),
+        ),
+      );
+
+    return bookmarks;
+  })
