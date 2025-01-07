@@ -5,7 +5,7 @@ import { useTrackList } from "~/hooks/use-item-list";
 import { groupTracksByDay } from "~/lib/grouping";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
-import type { User } from "~/types/user";
+import type { User } from "~/server/db/schema";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -14,8 +14,8 @@ type TrackListProps = {
 	groupByDay?: boolean;
 	days?: Array<{ id: string; name: string }>;
 	day?: string;
-	user: User | null;
-	onCreateBookmark: ({
+	user?: User | null;
+	onCreateBookmark?: ({
 		type,
 		slug,
 		status,
@@ -32,8 +32,8 @@ type TrackListItemProps = {
 	index: number;
 	isLast: boolean;
 	bookmarksLoading: boolean;
-	user: User | null;
-	onCreateBookmark: ({
+	user?: User | null;
+	onCreateBookmark?: ({
 		type,
 		slug,
 		status,
@@ -86,8 +86,8 @@ function TrackListItem({
 type TrackListContentProps = {
 	tracks: Track[];
 	year: number;
-	user: User | null;
-	onCreateBookmark: ({
+	user?: User | null;
+	onCreateBookmark?: ({
 		type,
 		slug,
 		status,

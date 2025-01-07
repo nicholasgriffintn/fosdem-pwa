@@ -5,156 +5,169 @@ import { constants } from "~/constants";
 import { EventList } from "~/components/Event/EventList";
 import { RoomPlayer } from "~/components/Room/RoomPlayer";
 import { RoomStatus } from "~/components/Room/RoomStatus";
-import { getAllData } from "~/functions/getFosdemData";
+import { getAllData } from "~/server/functions/fosdem";
 import type { Conference, Event, RoomData } from "~/types/fosdem";
 import { PageHeader } from "~/components/PageHeader";
-import { createStandardDate } from "../../lib/dateTime";
+import { createStandardDate } from "~/lib/dateTime";
+import { useAuth } from "~/hooks/use-auth";
+import { useBookmarks } from "~/hooks/use-bookmarks";
 
 export const Route = createFileRoute("/rooms/$roomId")({
-	component: RoomPage,
-	validateSearch: ({ year, day }: { year: number; day: string }) => ({
-		year:
-			(constants.AVAILABLE_YEARS.includes(year) && year) ||
-			constants.DEFAULT_YEAR,
-		day: day || undefined,
-	}),
-	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
-	loader: async ({ params, deps: { year, day } }) => {
-		const data = (await getAllData({ data: { year } })) as Conference;
+  component: RoomPage,
+  validateSearch: ({ year, day }: { year: number; day: string }) => ({
+    year:
+      (constants.AVAILABLE_YEARS.includes(year) && year) ||
+      constants.DEFAULT_YEAR,
+    day: day || undefined,
+  }),
+  loaderDeps: ({ search: { year, day } }) => ({ year, day }),
+  loader: async ({ params, deps: { year, day } }) => {
+    const data = (await getAllData({ data: { year } })) as Conference;
 
-		let room: RoomData | undefined;
-		if (data.rooms[params.roomId]) {
-			room = data.rooms[params.roomId];
-		} else {
-			const roomBySlug = Object.values(data.rooms).find(
-				(room) => room.slug === params.roomId,
-			);
-			if (roomBySlug) {
-				room = roomBySlug;
-			}
-		}
+    let room: RoomData | undefined;
+    if (data.rooms[params.roomId]) {
+      room = data.rooms[params.roomId];
+    } else {
+      const roomBySlug = Object.values(data.rooms).find(
+        (room) => room.slug === params.roomId,
+      );
+      if (roomBySlug) {
+        room = roomBySlug;
+      }
+    }
 
-		let roomEvents: Event[] = [];
-		if (room?.name) {
-			roomEvents = Object.values(data.events).filter(
-				(event: Event): event is Event => event.room === room.name,
-			);
-		}
+    let roomEvents: Event[] = [];
+    if (room?.name) {
+      roomEvents = Object.values(data.events).filter(
+        (event: Event): event is Event => event.room === room.name,
+      );
+    }
 
-		const days = Object.values(data.days);
+    const days = Object.values(data.days);
 
-		return {
-			fosdem: { room, roomEvents, conference: data.conference, days },
-			year,
-			day,
-		};
-	},
-	head: ({ loaderData }) => ({
-		meta: [
-			{
-				title: `${loaderData?.fosdem.room?.name} | FOSDEM PWA`,
-				description: `Events in ${loaderData?.fosdem.room?.name}`,
-			},
-		],
-	}),
-	staleTime: 10_000,
+    return {
+      fosdem: { room, roomEvents, conference: data.conference, days },
+      year,
+      day,
+    };
+  },
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${loaderData?.fosdem.room?.name} | FOSDEM PWA`,
+        description: `Events in ${loaderData?.fosdem.room?.name}`,
+      },
+    ],
+  }),
+  staleTime: 10_000,
 });
 
 function RoomPage() {
-	const { fosdem, day } = Route.useLoaderData();
-	const videoRef = useRef<HTMLVideoElement>(null);
+  const { fosdem, day, year } = Route.useLoaderData();
 
-	const roomEvents = fosdem.roomEvents;
-	const roomInfo = fosdem.room;
-	const conference = fosdem.conference;
-	const days = fosdem.days;
+  const { user } = useAuth();
+  const { create: createBookmark } = useBookmarks({
+    year,
+  });
+  const onCreateBookmark = (bookmark: any) => {
+    createBookmark(bookmark);
+  };
 
-	const now = createStandardDate(new Date());
-	const isConferenceRunning =
-		new Date(conference.start) < now && new Date(conference.end) > now;
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-	if (!roomInfo) {
-		return (
-			<div className="min-h-screen">
-				<div className="relative py-6 lg:py-10">
-					<PageHeader
-						heading="Room not found"
-						breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
-					/>
-				</div>
-			</div>
-		);
-	}
+  const roomEvents = fosdem.roomEvents;
+  const roomInfo = fosdem.room;
+  const conference = fosdem.conference;
+  const days = fosdem.days;
 
-	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader
-					heading={`Room ${roomInfo.name || roomInfo.slug}`}
-					metadata={[
-						{
-							text: `Building ${roomInfo.buildingId || roomInfo.building?.id}`,
-						},
-						{
-							text: `${roomInfo.eventCount} events`,
-						},
-					]}
-					breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
-				/>
+  const now = createStandardDate(new Date());
+  const isConferenceRunning =
+    new Date(conference.start) < now && new Date(conference.end) > now;
 
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-					<div className="md:col-span-2">
-						<RoomPlayer roomId={roomInfo.slug} videoRef={videoRef} />
-					</div>
+  if (!roomInfo) {
+    return (
+      <div className="min-h-screen">
+        <div className="relative py-6 lg:py-10">
+          <PageHeader
+            heading="Room not found"
+            breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
+          />
+        </div>
+      </div>
+    );
+  }
 
-					<div className="space-y-6">
-						{isConferenceRunning && (
-							<div>
-								<RoomStatus roomId={roomInfo.slug} />
-							</div>
-						)}
+  return (
+    <div className="min-h-screen">
+      <div className="relative py-6 lg:py-10">
+        <PageHeader
+          heading={`Room ${roomInfo.name || roomInfo.slug}`}
+          metadata={[
+            {
+              text: `Building ${roomInfo.buildingId || roomInfo.building?.id}`,
+            },
+            {
+              text: `${roomInfo.eventCount} events`,
+            },
+          ]}
+          breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
+        />
 
-						<div>
-							<h2 className="text-xl font-semibold mb-2">Quick Links</h2>
-							<div className="flex flex-col space-y-2">
-								<a
-									href={constants.CHAT_LINK.replace(
-										"${ROOM_ID}",
-										roomInfo.slug,
-									)}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									Join Chat
-								</a>
-								<a
-									href={constants.NAVIGATE_TO_LOCATION_LINK.replace(
-										"${LOCATION_ID}",
-										roomInfo.slug,
-									)}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									Navigate to Room
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="md:col-span-2">
+            <RoomPlayer roomId={roomInfo.slug} videoRef={videoRef} />
+          </div>
 
-				<div>
-					<EventList
-						events={roomEvents}
-						year={constants.DEFAULT_YEAR}
-						title={`Events in ${roomInfo?.name || roomInfo.slug}`}
-						defaultViewMode="list"
-						displayViewMode={false}
-						groupByDay={true}
-						days={days}
-						day={day}
-					/>
-				</div>
-			</div>
-		</div>
-	);
+          <div className="space-y-6">
+            {isConferenceRunning && (
+              <div>
+                <RoomStatus roomId={roomInfo.slug} />
+              </div>
+            )}
+
+            <div>
+              <h2 className="text-xl font-semibold mb-2">Quick Links</h2>
+              <div className="flex flex-col space-y-2">
+                <a
+                  href={constants.CHAT_LINK.replace(
+                    "${ROOM_ID}",
+                    roomInfo.slug,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Join Chat
+                </a>
+                <a
+                  href={constants.NAVIGATE_TO_LOCATION_LINK.replace(
+                    "${LOCATION_ID}",
+                    roomInfo.slug,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Navigate to Room
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <EventList
+            events={roomEvents}
+            year={constants.DEFAULT_YEAR}
+            title={`Events in ${roomInfo?.name || roomInfo.slug}`}
+            defaultViewMode="list"
+            displayViewMode={false}
+            groupByDay={true}
+            days={days}
+            day={day}
+            user={user}
+            onCreateBookmark={onCreateBookmark}
+          />
+        </div>
+      </div>
+    </div>
+  );
 }

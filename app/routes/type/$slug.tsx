@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getAllData } from "~/functions/getFosdemData";
+import { getAllData } from "~/server/functions/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { TrackList } from "~/components/Track/TrackList";
 import type { Conference, Track } from "~/types/fosdem";

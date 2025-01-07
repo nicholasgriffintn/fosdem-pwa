@@ -1,28 +1,27 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/start";
+
+import { getUserDetails } from "~/server/functions/user";
 
 export function useUserId({
 	userId,
 }: {
 	userId: string;
 }) {
+	const useGetUserDetails = useServerFn(getUserDetails);
+
 	const { data: user, isLoading } = useQuery({
 		queryKey: ["profile", userId],
 		queryFn: async () => {
-			const response = await fetch(`/api/user/github/${userId}`);
+			const user = await useGetUserDetails({ data: { userId } });
 
-			if (!response.ok) {
-				throw new Error("Failed to fetch user data");
-			}
-
-			const data = await response.json();
-
-			if (!data.user) {
+			if (!user) {
 				throw new Error("Not found");
 			}
 
-			return data.user;
+			return user;
 		},
 	});
 

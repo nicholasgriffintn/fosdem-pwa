@@ -12,6 +12,7 @@ import { groupEventsByDay } from "~/lib/grouping";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
 import { EventScheduleList } from "~/components/Event/EventScheduleList";
+import type { User } from "~/server/db/schema";
 
 type EventListViewModes = "list" | "calendar" | "schedule";
 
@@ -30,6 +31,16 @@ type EventListProps = {
 		updates: { priority: number | null },
 	) => void;
 	showTrack?: boolean;
+	user?: User | null;
+	onCreateBookmark?: ({
+		type,
+		slug,
+		status,
+	}: {
+		type: string;
+		slug: string;
+		status: string;
+	}) => void;
 };
 
 export function EventList({
@@ -44,6 +55,8 @@ export function EventList({
 	day,
 	onSetPriority,
 	showTrack = false,
+	user = null,
+	onCreateBookmark,
 }: EventListProps) {
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 
@@ -143,6 +156,8 @@ export function EventList({
 											conflicts={conflicts}
 											onSetPriority={onSetPriority}
 											showTrack={showTrack}
+											user={user}
+											onCreateBookmark={onCreateBookmark}
 										/>
 									) : viewMode === "list" ? (
 										<EventItemList
@@ -151,6 +166,8 @@ export function EventList({
 											conflicts={conflicts}
 											onSetPriority={onSetPriority}
 											showTrack={showTrack}
+											user={user}
+											onCreateBookmark={onCreateBookmark}
 										/>
 									) : (
 										<EventCalendarList
@@ -159,6 +176,8 @@ export function EventList({
 											conflicts={conflicts}
 											onSetPriority={onSetPriority}
 											showTrack={showTrack}
+											user={user}
+											onCreateBookmark={onCreateBookmark}
 										/>
 									)}
 								</TabsContent>
@@ -214,6 +233,8 @@ export function EventList({
 							conflicts={conflicts}
 							onSetPriority={onSetPriority}
 							showTrack={showTrack}
+							user={user}
+							onCreateBookmark={onCreateBookmark}
 						/>
 					) : viewMode === "list" ? (
 						<EventItemList
@@ -222,6 +243,8 @@ export function EventList({
 							conflicts={conflicts}
 							onSetPriority={onSetPriority}
 							showTrack={showTrack}
+							user={user}
+							onCreateBookmark={onCreateBookmark}
 						/>
 					) : (
 						<EventCalendarList
@@ -230,6 +253,8 @@ export function EventList({
 							conflicts={conflicts}
 							onSetPriority={onSetPriority}
 							showTrack={showTrack}
+							user={user}
+							onCreateBookmark={onCreateBookmark}
 						/>
 					)}
 				</>

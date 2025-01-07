@@ -6,10 +6,10 @@ import { Card } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/Icons";
-import type { User } from "~/types/user";
+import type { User } from "~/server/db/schema";
 
 type ConferenceBadgeProps = {
-	user: User;
+	user?: User | null;
 	conferenceYear: number;
 };
 
@@ -36,10 +36,16 @@ export function ConferenceBadge({
 
 			<div className="p-6">
 				<div className="flex items-start gap-4">
-					<Avatar className="w-24 h-24 border-4 border-[#9B3493]">
-						<AvatarImage src={user.avatar_url} alt={user.name} />
-						<AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-					</Avatar>
+					{user.avatar_url && (
+						<Avatar className="w-24 h-24 border-4 border-[#9B3493]">
+							{!user.name && (
+								<>
+									<AvatarImage src={user.avatar_url} alt={user.name || ""} />
+									<AvatarFallback>{user.email?.charAt(0)}</AvatarFallback>
+								</>
+							)}
+						</Avatar>
+					)}
 					<div className="flex-1">
 						<h2 className="text-2xl font-bold">{user.name}</h2>
 						<p className="text-muted-foreground">{user.email}</p>

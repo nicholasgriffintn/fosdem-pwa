@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { TypesList } from "~/components/Type/TypesList";
-import { getAllData } from "~/functions/getFosdemData";
+import { getAllData } from "~/server/functions/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { constants } from "~/constants";
 
