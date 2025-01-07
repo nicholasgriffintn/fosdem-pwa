@@ -5,7 +5,7 @@ import { FavouriteButton } from "~/components/FavouriteButton";
 import { ShareButton } from "~/components/ShareButton";
 import { constants } from "~/constants";
 import type { Event, Track } from "~/types/fosdem";
-import type { User } from "~/types/user";
+import type { User } from "~/server/db/schema";
 
 type ItemWithFavorite = (Event | Track) & { isFavourited?: boolean };
 
@@ -16,8 +16,8 @@ type ItemActionsProps = {
   bookmarksLoading: boolean;
   size?: "default" | "sm";
   className?: string;
-  user: User | null;
-  onCreateBookmark: ({
+  user?: User | null;
+  onCreateBookmark?: ({
     type,
     slug,
     status,
@@ -44,20 +44,22 @@ export function ItemActions({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <FavouriteButton
-        year={year}
-        type={type}
-        slug={slug}
-        status={
-          bookmarksLoading
-            ? "loading"
-            : item.isFavourited
-              ? "favourited"
-              : "unfavourited"
-        }
-        user={user}
-        onCreateBookmark={onCreateBookmark}
-      />
+      {user && onCreateBookmark && (
+        <FavouriteButton
+          year={year}
+          type={type}
+          slug={slug}
+          status={
+            bookmarksLoading
+              ? "loading"
+              : item.isFavourited
+                ? "favourited"
+                : "unfavourited"
+          }
+          user={user}
+          onCreateBookmark={onCreateBookmark}
+        />
+      )}
       <ShareButton
         title={title}
         text={`Check out ${title} at FOSDEM`}

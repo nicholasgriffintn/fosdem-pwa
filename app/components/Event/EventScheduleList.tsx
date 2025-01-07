@@ -5,7 +5,7 @@ import { ItemActions } from "~/components/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime, calculateTransitionTime } from "~/lib/dateTime";
 import { sortScheduleEvents } from "~/lib/sorting";
-import type { User } from "~/types/user";
+import type { User } from "~/server/db/schema";
 
 type EventScheduleListProps = {
   events: Event[];
@@ -16,8 +16,8 @@ type EventScheduleListProps = {
     updates: { priority: number | null },
   ) => void;
   showTrack?: boolean;
-  user: User | null;
-  onCreateBookmark: ({
+  user?: User | null;
+  onCreateBookmark?: ({
     type,
     slug,
     status,
@@ -34,8 +34,8 @@ type EventScheduleListItemProps = {
   year: number;
   bookmarksLoading: boolean;
   showTrack?: boolean;
-  user: User | null;
-  onCreateBookmark: ({
+  user?: User | null;
+  onCreateBookmark?: ({
     type,
     slug,
     status,

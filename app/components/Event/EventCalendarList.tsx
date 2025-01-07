@@ -5,7 +5,7 @@ import { useEventList } from "~/hooks/use-item-list";
 import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
 import { ItemActions } from "~/components/ItemActions";
 import { calculateEndTime } from "~/lib/dateTime";
-import type { User } from "~/types/user";
+import type { User } from "~/server/db/schema";
 
 type EventCalendarListProps = {
   events: Event[];
@@ -16,8 +16,8 @@ type EventCalendarListProps = {
     updates: { priority: number | null },
   ) => void;
   showTrack?: boolean;
-  user: User | null;
-  onCreateBookmark: ({
+  user?: User | null;
+  onCreateBookmark?: ({
     type,
     slug,
     status,
@@ -38,8 +38,8 @@ type EventCalendarListItemProps = {
     updates: { priority: number | null },
   ) => void;
   showTrack?: boolean;
-  user: User | null;
-  onCreateBookmark: ({
+  user?: User | null;
+  onCreateBookmark?: ({
     type,
     slug,
     status,

@@ -4,19 +4,8 @@ import { Spinner } from "~/components/Spinner";
 import type { Conference, Track, Event } from "~/types/fosdem";
 import { detectEventConflicts } from "~/lib/fosdem";
 import { sortEvents, sortTracks } from "~/lib/sorting";
-import type { User } from "~/types/user";
-
-type Bookmark = {
-  id: string;
-  slug: string;
-  user_id: number;
-  type: "bookmark_event" | "bookmark_track";
-  status: string;
-  year: number;
-  created_at: string;
-  updated_at: string;
-  priority?: number | null;
-};
+import type { User } from "~/server/db/schema";
+import type { Bookmark } from "~/server/db/schema";
 
 function organizeBookmarks(bookmarks: Bookmark[]) {
   const byYear = bookmarks.reduce(
@@ -43,7 +32,7 @@ function organizeBookmarks(bookmarks: Bookmark[]) {
 }
 
 type BookmarksListProps = {
-  bookmarks: Bookmark[];
+  bookmarks?: Bookmark[];
   fosdemData?: Conference;
   year: number;
   loading: boolean;
@@ -55,8 +44,8 @@ type BookmarksListProps = {
   showConflicts?: boolean;
   defaultViewMode?: "list" | "schedule" | "calendar";
   showViewMode?: boolean;
-  user: User | null;
-  onCreateBookmark: ({
+  user?: User | null;
+  onCreateBookmark?: ({
     type,
     slug,
     status,
@@ -82,6 +71,12 @@ export function BookmarksList({
 }: BookmarksListProps) {
   const organizedBookmarks =
     bookmarks && bookmarks.length > 0 ? organizeBookmarks(bookmarks) : {};
+
+  if (!bookmarks) {
+    return <div className="flex justify-center items-center">
+      <p>No bookmarks found</p>
+    </div>;
+  }
 
   const handleSetPriority = (
     eventId: string,
@@ -174,6 +169,8 @@ export function BookmarksList({
               showTrack={true}
               defaultViewMode={defaultViewMode}
               displayViewMode={showViewMode}
+              user={user}
+              onCreateBookmark={onCreateBookmark}
             />
           )}
         </div>

@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
 import { Spinner } from "~/components/Spinner";
-import type { User } from "~/types/user";
+import type { User } from "~/server/db/schema";
 
 type FavouriteButtonProps = {
   year: number;

@@ -1,27 +1,33 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/start";
+
+import { changeBookmarksVisibility } from "~/server/functions/settings";
 
 export function useUserSettings({ userId }: { userId: string }) {
-	const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
+  const useChangeBookmarksVisibility = useServerFn(changeBookmarksVisibility);
 
-	const setBookmarksVisibility = useMutation({
-		mutationFn: async ({ visibility }: { visibility: string }) => {
-			const response = await fetch("/api/user/bookmarks/visibility", {
-				method: "POST",
-				body: JSON.stringify({ visibility }),
-			});
-			if (!response.ok) throw new Error("Failed to set bookmarks visibility");
-			const data = await response.json();
-			return data;
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["profile", "me"] });
-			queryClient.invalidateQueries({ queryKey: ["userBookmarks", userId] });
-		},
-	});
+  const setBookmarksVisibility = useMutation({
+    mutationFn: async ({ visibility }: { visibility: string }) => {
+      const data = await useChangeBookmarksVisibility(
+        { data: { visibility } },
+      );
 
-	return {
-		setBookmarksVisibility: setBookmarksVisibility.mutate,
-	};
+      if (!data.success) {
+        throw new Error("Failed to set bookmarks visibility");
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile", "me"] });
+      queryClient.invalidateQueries({ queryKey: ["userBookmarks", userId] });
+    },
+  });
+
+  return {
+    setBookmarksVisibility: setBookmarksVisibility.mutate,
+  };
 }

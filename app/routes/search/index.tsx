@@ -170,6 +170,8 @@ export default function SearchPage() {
 						events={formattedEvents}
 						year={year}
 						title="Event Results"
+						user={user}
+						onCreateBookmark={onCreateBookmark}
 					/>
 				),
 		},

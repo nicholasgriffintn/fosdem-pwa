@@ -48,7 +48,7 @@ function BookmarksHome() {
     <div className="min-h-screen">
       <div className="relative py-6 lg:py-10">
         <PageHeader heading="Bookmarks" />
-        {authLoading ? (
+        {authLoading || loading ? (
           <div className="flex justify-center items-center">
             <Spinner className="h-8 w-8" />
           </div>
@@ -62,16 +62,24 @@ function BookmarksHome() {
                 </Link>
               </div>
             ) : (
-              <BookmarksList
-                bookmarks={bookmarks}
-                fosdemData={fosdemData}
-                year={year}
-                loading={loading}
-                day={day}
-                onUpdateBookmark={updateBookmark}
-                user={user}
-                onCreateBookmark={onCreateBookmark}
-              />
+              <>
+                {!bookmarks ? (
+                  <div className="flex justify-center items-center">
+                    <p>No bookmarks found</p>
+                  </div>
+                ) : (
+                  <BookmarksList
+                    bookmarks={bookmarks}
+                    fosdemData={fosdemData}
+                    year={year}
+                    loading={loading}
+                    day={day}
+                    onUpdateBookmark={updateBookmark}
+                    user={user}
+                    onCreateBookmark={onCreateBookmark}
+                  />
+                )}
+              </>
             )}
           </>
         )}
