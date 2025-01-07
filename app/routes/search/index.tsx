@@ -18,6 +18,8 @@ import {
 	type SearchResults,
 	type SearchResult,
 } from "~/lib/search";
+import { useAuth } from "~/hooks/use-auth";
+import { useBookmarks } from "~/hooks/use-bookmarks";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -46,6 +48,12 @@ export const Route = createFileRoute("/search/")({
 
 export default function SearchPage() {
 	const { year, q } = Route.useLoaderData();
+
+	const { user } = useAuth();
+	const { create: createBookmark } = useBookmarks({ year });
+	const onCreateBookmark = (bookmark: any) => {
+		createBookmark(bookmark);
+	};
 
 	const { fosdemData, loading } = useFosdemData({ year });
 	const query = q || "";
@@ -147,6 +155,8 @@ export default function SearchPage() {
 						tracks={formattedTracks}
 						year={year}
 						title="Track Results"
+						user={user}
+						onCreateBookmark={onCreateBookmark}
 					/>
 				),
 		},

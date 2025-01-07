@@ -6,6 +6,8 @@ import { TrackList } from "~/components/Track/TrackList";
 import type { Conference, Track } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
+import { useAuth } from "~/hooks/use-auth";
+import { useBookmarks } from "~/hooks/use-bookmarks";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -33,7 +35,7 @@ export const Route = createFileRoute("/type/$slug")({
 				title: `${loaderData?.fosdem.type?.name} | FOSDEM PWA`,
 				description:
 					fosdemTypeDescriptions[
-						loaderData?.fosdem.type?.id as keyof typeof fosdemTypeDescriptions
+					loaderData?.fosdem.type?.id as keyof typeof fosdemTypeDescriptions
 					],
 			},
 		],
@@ -43,6 +45,12 @@ export const Route = createFileRoute("/type/$slug")({
 
 function TypePage() {
 	const { fosdem, year, day } = Route.useLoaderData();
+
+	const { user } = useAuth();
+	const { create: createBookmark } = useBookmarks({ year });
+	const onCreateBookmark = (bookmark: any) => {
+		createBookmark(bookmark);
+	};
 
 	if (!fosdem.type) {
 		return (
@@ -61,7 +69,7 @@ function TypePage() {
 					heading={fosdem.type.name}
 					text={
 						fosdemTypeDescriptions[
-							fosdem.type.id as keyof typeof fosdemTypeDescriptions
+						fosdem.type.id as keyof typeof fosdemTypeDescriptions
 						]
 					}
 					metadata={[
@@ -76,6 +84,8 @@ function TypePage() {
 					groupByDay={true}
 					days={fosdem.days}
 					day={day}
+					user={user}
+					onCreateBookmark={onCreateBookmark}
 				/>
 			</div>
 		</div>

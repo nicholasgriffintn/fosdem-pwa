@@ -36,8 +36,12 @@ export const Route = createFileRoute("/profile/")({
 function ProfilePage() {
 	const { year } = Route.useLoaderData();
 	const { user, loading } = useProfile();
-	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
+	const { bookmarks, loading: bookmarksLoading, create: createBookmark } = useBookmarks({ year });
 	const { fosdemData } = useFosdemData({ year });
+
+	const onCreateBookmark = (bookmark: any) => {
+		createBookmark(bookmark);
+	};
 
 	if (loading) {
 		return (
@@ -79,6 +83,8 @@ function ProfilePage() {
 									showConflicts={true}
 									defaultViewMode="schedule"
 									showViewMode={false}
+									user={user}
+									onCreateBookmark={onCreateBookmark}
 								/>
 							</div>
 						</div>
