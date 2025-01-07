@@ -7,9 +7,9 @@ export function getCloudflareEnv() {
       return process.env
     }
 
-    const AUTH_REDIRECT_URL = cf.env.CF_PAGES_URL ?
-      `${cf.env.CF_PAGES_URL}/api/auth/callback/github` :
-      cf.env.GITHUB_REDIRECT_URI
+    const AUTH_REDIRECT_URL = cf.env.GITHUB_REDIRECT_URI ?
+      cf.env.GITHUB_REDIRECT_URI :
+      `${cf.env.CF_PAGES_URL}/api/auth/callback/github`
 
     const envVars = {
       CLOUDFLARE_ACCOUNT_ID: cf.env.CLOUDFLARE_ACCOUNT_ID,
