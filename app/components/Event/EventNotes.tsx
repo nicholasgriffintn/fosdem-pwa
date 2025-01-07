@@ -8,6 +8,7 @@ import { useNotes } from "~/hooks/use-notes";
 import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "~/hooks/use-toast";
 import { formatDate, formatTime, createStandardDate } from "~/lib/dateTime";
+import type { Note } from "~/server/db/schema";
 
 type EventNotesProps = {
 	year: number;
@@ -80,18 +81,10 @@ export function EventNotes({
 				{!loading && notes && (
 					<ul className="space-y-2">
 						{notes.map(
-							(note: {
-								id: string;
-								note: string;
-								time?: number;
-								created_at: Date;
-								isPending?: boolean;
-							}) => (
+							(note: { isPending?: boolean } & Note) => (
 								<li
 									key={note.id}
-									className={`bg-muted/30 rounded-lg p-3 transition-opacity ${
-										note.isPending ? "opacity-50" : ""
-									}`}
+									className={`bg-muted/30 rounded-lg p-3 transition-opacity ${note.isPending ? "opacity-50" : ""}`}
 								>
 									<div className="flex flex-col gap-2">
 										<p className="flex-1">{note.note}</p>
