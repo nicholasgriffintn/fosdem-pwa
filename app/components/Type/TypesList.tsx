@@ -42,8 +42,10 @@ export function TypesList({ types }: TypesListProps) {
 										search={(prev) => ({
 											...prev,
 											year: prev.year || constants.DEFAULT_YEAR,
+											day: prev.day || undefined,
 										})}
-										to={`/type/${types[typeKey].id}`}
+										to="/type/$slug"
+										params={{ slug: types[typeKey].id }}
 										className="no-underline"
 									>
 										{types[typeKey].name}
@@ -70,14 +72,14 @@ export function TypesList({ types }: TypesListProps) {
 								{fosdemTypeDescriptions[
 									typeKey as keyof typeof fosdemTypeDescriptions
 								] && (
-									<p className="text-sm">
-										{
-											fosdemTypeDescriptions[
+										<p className="text-sm">
+											{
+												fosdemTypeDescriptions[
 												typeKey as keyof typeof fosdemTypeDescriptions
-											]
-										}
-									</p>
-								)}
+												]
+											}
+										</p>
+									)}
 							</CardContent>
 							<CardFooter>
 								<Button
@@ -89,8 +91,10 @@ export function TypesList({ types }: TypesListProps) {
 										search={(prev) => ({
 											...prev,
 											year: prev.year || constants.DEFAULT_YEAR,
+											day: prev.day || undefined,
 										})}
-										to={`/type/${types[typeKey].id}`}
+										to="/type/$slug"
+										params={{ slug: types[typeKey].id }}
 									>
 										View Tracks
 									</Link>
