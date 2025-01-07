@@ -124,7 +124,7 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 				navigate({
 					to: "/track/$slug",
 					params: { slug: result.item.id },
-					search: { year, day: null },
+					search: { year, day: undefined },
 				});
 				break;
 			case "event":
@@ -138,7 +138,7 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 				navigate({
 					to: "/rooms/$roomId",
 					params: { roomId: result.item.slug || result.item.id },
-					search: { year, day: null },
+					search: { year, day: undefined },
 				});
 				break;
 		}

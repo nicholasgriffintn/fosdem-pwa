@@ -5,6 +5,7 @@ import { useTrackList } from "~/hooks/use-item-list";
 import { groupTracksByDay } from "~/lib/grouping";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
+import type { User } from "~/types/user";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -13,6 +14,16 @@ type TrackListProps = {
 	groupByDay?: boolean;
 	days?: Array<{ id: string; name: string }>;
 	day?: string;
+	user: User | null;
+	onCreateBookmark: ({
+		type,
+		slug,
+		status,
+	}: {
+		type: string;
+		slug: string;
+		status: string;
+	}) => void;
 };
 
 type TrackListItemProps = {
@@ -21,6 +32,16 @@ type TrackListItemProps = {
 	index: number;
 	isLast: boolean;
 	bookmarksLoading: boolean;
+	user: User | null;
+	onCreateBookmark: ({
+		type,
+		slug,
+		status,
+	}: {
+		type: string;
+		slug: string;
+		status: string;
+	}) => void;
 };
 
 function TrackListItem({
@@ -29,6 +50,8 @@ function TrackListItem({
 	index,
 	isLast,
 	bookmarksLoading,
+	user,
+	onCreateBookmark,
 }: TrackListItemProps) {
 	const className = clsx("flex justify-between", {
 		"border-t-2 border-solid border-muted": index % 2 === 1,
@@ -52,13 +75,35 @@ function TrackListItem({
 					type="track"
 					bookmarksLoading={bookmarksLoading}
 					className="pl-1 md:pl-6 pb-3 md:pb-0"
+					user={user}
+					onCreateBookmark={onCreateBookmark}
 				/>
 			</div>
 		</div>
 	);
 }
 
-function TrackListContent({ tracks, year }: { tracks: Track[]; year: number }) {
+type TrackListContentProps = {
+	tracks: Track[];
+	year: number;
+	user: User | null;
+	onCreateBookmark: ({
+		type,
+		slug,
+		status,
+	}: {
+		type: string;
+		slug: string;
+		status: string;
+	}) => void;
+};
+
+function TrackListContent({
+	tracks,
+	year,
+	user,
+	onCreateBookmark,
+}: TrackListContentProps) {
 	const { items: sortedTracks, bookmarksLoading } = useTrackList({
 		items: tracks,
 		year,
@@ -76,6 +121,8 @@ function TrackListContent({ tracks, year }: { tracks: Track[]; year: number }) {
 								index={index}
 								isLast={tracks.length === index + 1}
 								bookmarksLoading={bookmarksLoading}
+								user={user}
+								onCreateBookmark={onCreateBookmark}
 							/>
 						</li>
 					))}
@@ -94,6 +141,8 @@ export function TrackList({
 	groupByDay = false,
 	days,
 	day,
+	user,
+	onCreateBookmark,
 }: TrackListProps) {
 	if (groupByDay && days) {
 		const trackDataSplitByDay = groupTracksByDay(tracks);
@@ -147,6 +196,8 @@ export function TrackList({
 									<TrackListContent
 										tracks={trackDataSplitByDay[day.id]}
 										year={year}
+										user={user}
+										onCreateBookmark={onCreateBookmark}
 									/>
 								</TabsContent>
 							);
@@ -164,7 +215,12 @@ export function TrackList({
 					<h2 className="text-xl font-semibold">{title}</h2>
 				</div>
 			)}
-			<TrackListContent tracks={tracks} year={year} />
+			<TrackListContent
+				tracks={tracks}
+				year={year}
+				user={user}
+				onCreateBookmark={onCreateBookmark}
+			/>
 		</section>
 	);
 }

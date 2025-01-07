@@ -6,6 +6,7 @@ import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
 import { ItemActions } from "~/components/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime } from "~/lib/dateTime";
+import type { User } from "~/types/user";
 
 type EventListProps = {
 	events: Event[];
@@ -16,6 +17,16 @@ type EventListProps = {
 		updates: { priority: number | null },
 	) => void;
 	showTrack?: boolean;
+	user: User | null;
+	onCreateBookmark: ({
+		type,
+		slug,
+		status,
+	}: {
+		type: string;
+		slug: string;
+		status: string;
+	}) => void;
 };
 
 type EventListItemProps = {
@@ -30,6 +41,16 @@ type EventListItemProps = {
 		updates: { priority: number | null },
 	) => void;
 	showTrack?: boolean;
+	user: User | null;
+	onCreateBookmark: ({
+		type,
+		slug,
+		status,
+	}: {
+		type: string;
+		slug: string;
+		status: string;
+	}) => void;
 };
 
 function EventListItem({
@@ -41,6 +62,8 @@ function EventListItem({
 	conflicts,
 	onSetPriority,
 	showTrack,
+	user,
+	onCreateBookmark,
 }: EventListItemProps) {
 	const className = clsx("flex justify-between relative", {
 		"border-t-2 border-solid border-muted": index % 2 === 1,
@@ -90,6 +113,8 @@ function EventListItem({
 					type="event"
 					bookmarksLoading={bookmarksLoading}
 					className="pl-1 md:pl-6 pb-3 md:pb-0"
+					user={user}
+					onCreateBookmark={onCreateBookmark}
 				/>
 			</div>
 		</div>
@@ -102,6 +127,8 @@ export function EventItemList({
 	conflicts,
 	onSetPriority,
 	showTrack,
+	user,
+	onCreateBookmark,
 }: EventListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({
 		items: events,
@@ -122,6 +149,8 @@ export function EventItemList({
 							conflicts={conflicts}
 							onSetPriority={onSetPriority}
 							showTrack={showTrack}
+							user={user}
+							onCreateBookmark={onCreateBookmark}
 						/>
 					</li>
 				))
