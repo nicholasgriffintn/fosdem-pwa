@@ -21,6 +21,8 @@ export function ConferenceBadge({
 		return null;
 	}
 
+	console.log(user);
+
 	return (
 		<Card className="w-full max-w-md mx-auto overflow-hidden">
 			<div className="bg-[#9B3493] p-6 text-white">
@@ -38,10 +40,10 @@ export function ConferenceBadge({
 				<div className="flex items-start gap-4">
 					{user.avatar_url && (
 						<Avatar className="w-24 h-24 border-4 border-[#9B3493]">
-							{!user.name && (
+							{user.name && (
 								<>
 									<AvatarImage src={user.avatar_url} alt={user.name || ""} />
-									<AvatarFallback>{user.email?.charAt(0)}</AvatarFallback>
+									<AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
 								</>
 							)}
 						</Avatar>
