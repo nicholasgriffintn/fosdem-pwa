@@ -21,8 +21,6 @@ export function ConferenceBadge({
 		return null;
 	}
 
-	console.log(user);
-
 	return (
 		<Card className="w-full max-w-md mx-auto overflow-hidden">
 			<div className="bg-[#9B3493] p-6 text-white">

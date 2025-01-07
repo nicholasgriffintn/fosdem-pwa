@@ -15,6 +15,11 @@ export function useAuth() {
 		queryKey: ["auth"],
 		queryFn: async () => {
 			const user = await useGetSessionData();
+
+			if (!user) {
+				return {};
+			}
+
 			return user;
 		},
 	});

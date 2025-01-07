@@ -28,7 +28,7 @@ function SignInPage() {
 		);
 	}
 
-	if (user) {
+	if (user?.id) {
 		return (
 			<Navigate
 				to="/"

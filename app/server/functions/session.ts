@@ -8,6 +8,11 @@ export const getSession = createServerFn({
   .handler(async () => {
     try {
       const { user } = await getAuthSession();
+
+      if (!user) {
+        return null;
+      }
+
       return user;
     } catch (error) {
       return null;

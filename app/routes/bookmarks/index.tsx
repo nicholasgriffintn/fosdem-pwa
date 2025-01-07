@@ -54,7 +54,7 @@ function BookmarksHome() {
           </div>
         ) : (
           <>
-            {!user ? (
+            {!user?.id ? (
               <div className="flex flex-col">
                 <p>You need to sign in to view and manage your bookmarks.</p>
                 <Link to="/signin" className="mt-4">
