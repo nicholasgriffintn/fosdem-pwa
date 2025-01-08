@@ -50,6 +50,9 @@ export function Header() {
 			<div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
 				<MainNav title="FOSDEM PWA" items={navItems} />
 				<div className="flex flex-1 items-center space-x-4 sm:justify-end">
+					<div className="flex-1 sm:grow-0">
+						<NavSearch year={selectedYear} />
+					</div>
 					<nav className="hidden md:flex space-x-4">
 						<TooltipProvider>
 							<Tooltip>
@@ -92,9 +95,6 @@ export function Header() {
 							</Tooltip>
 						</TooltipProvider>
 					</nav>
-					<div className="flex-1 sm:grow-0">
-						<NavSearch year={selectedYear} />
-					</div>
 				</div>
 			</div>
 		</header>
