@@ -2,6 +2,7 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 import { useProfile } from "~/hooks/use-user-me";
 import { useBookmarks } from "~/hooks/use-bookmarks";
+import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { PageHeader } from "~/components/PageHeader";
 import { ConferenceBadge } from "~/components/ConferenceBadge";
 import { Spinner } from "~/components/Spinner";
@@ -36,7 +37,8 @@ export const Route = createFileRoute("/profile/")({
 function ProfilePage() {
 	const { year } = Route.useLoaderData();
 	const { user, loading } = useProfile();
-	const { bookmarks, loading: bookmarksLoading, create: createBookmark } = useBookmarks({ year });
+	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
+	const { create: createBookmark } = useMutateBookmark({ year });
 	const { fosdemData } = useFosdemData({ year });
 
 	const onCreateBookmark = (bookmark: any) => {

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { PageHeader } from "~/components/PageHeader";
 import { useBookmarks } from "~/hooks/use-bookmarks";
+import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { constants } from "~/constants";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
@@ -36,7 +37,8 @@ export const Route = createFileRoute("/bookmarks/")({
 
 function BookmarksHome() {
   const { year, day } = Route.useLoaderData();
-  const { bookmarks, loading, updateBookmark, create: createBookmark } = useBookmarks({ year });
+  const { bookmarks, loading } = useBookmarks({ year });
+  const { create: createBookmark, update: updateBookmark } = useMutateBookmark({ year });
   const { fosdemData } = useFosdemData({ year });
   const { user, loading: authLoading } = useAuth();
 

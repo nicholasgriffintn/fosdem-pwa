@@ -44,7 +44,6 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## TODO
 
-- [ ] Add bookmark status from DB to the event page.
 - [ ] Allow users to search within specific tracks or time slots
 - [ ] Maybe a calendar export? Is that too hard?
 - [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
