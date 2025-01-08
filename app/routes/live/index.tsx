@@ -9,7 +9,7 @@ import { constants } from "../../constants";
 import { isEventLive, isEventUpcoming } from "~/lib/dateTime";
 import { sortEvents, sortUpcomingEvents } from "~/lib/sorting";
 import { useAuth } from "~/hooks/use-auth";
-import { useBookmarks } from "~/hooks/use-bookmarks";
+import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
 export const Route = createFileRoute("/live/")({
   component: LivePage,
@@ -59,9 +59,7 @@ function LivePage() {
   const { liveEvents, upcomingEvents, year } = Route.useLoaderData();
 
   const { user } = useAuth();
-  const { create: createBookmark } = useBookmarks({
-    year,
-  });
+  const { create: createBookmark } = useMutateBookmark({ year });
   const onCreateBookmark = (bookmark: any) => {
     createBookmark(bookmark);
   };

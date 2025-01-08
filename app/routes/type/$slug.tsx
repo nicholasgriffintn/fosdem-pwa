@@ -7,7 +7,7 @@ import type { Conference, Track } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
 import { useAuth } from "~/hooks/use-auth";
-import { useBookmarks } from "~/hooks/use-bookmarks";
+import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -47,7 +47,7 @@ function TypePage() {
 	const { fosdem, year, day } = Route.useLoaderData();
 
 	const { user } = useAuth();
-	const { create: createBookmark } = useBookmarks({ year });
+	const { create: createBookmark } = useMutateBookmark({ year });
 	const onCreateBookmark = (bookmark: any) => {
 		createBookmark(bookmark);
 	};

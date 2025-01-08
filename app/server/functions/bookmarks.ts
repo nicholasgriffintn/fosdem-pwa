@@ -33,6 +33,30 @@ export const getBookmarks = createServerFn({
     return bookmarkData;
   });
 
+export const getEventBookmark = createServerFn({
+  method: "GET",
+})
+  .validator((data: { year: number; slug: string }) => data)
+  .handler(async (ctx: any) => {
+    const { year, slug } = ctx.data;
+
+    const { user } = await getFullAuthSession();
+
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    const existingBookmark = await db.query.bookmark.findFirst({
+      where: and(
+        eq(bookmarkTable.user_id, user.id),
+        eq(bookmarkTable.year, Number.parseInt(year)),
+        eq(bookmarkTable.slug, slug),
+      ),
+    });
+
+    return existingBookmark;
+  });
+
 export const createBookmark = createServerFn({
   method: "POST",
 })

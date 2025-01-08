@@ -9,7 +9,8 @@ import { EventMain } from "~/components/Event/EventMain";
 import { constants } from "~/constants";
 import { calculateEndTime } from "~/lib/dateTime";
 import { useAuth } from "~/hooks/use-auth";
-import { useBookmarks } from "~/hooks/use-bookmarks";
+import { useBookmark } from "~/hooks/use-bookmark";
+import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
 export const Route = createFileRoute("/event/$slug")({
   component: EventPage,
@@ -69,9 +70,8 @@ function EventPage() {
   const { fosdem, year, isTest } = Route.useLoaderData();
 
   const { user } = useAuth();
-  const { create: createBookmark } = useBookmarks({
-    year,
-  });
+  const { bookmark, loading: bookmarkLoading } = useBookmark({ year, slug: fosdem.event.id });
+  const { create: createBookmark, createLoading } = useMutateBookmark({ year });
   const onCreateBookmark = (bookmark: any) => {
     createBookmark(bookmark);
   };
@@ -122,7 +122,7 @@ function EventPage() {
               year={year}
               type="event"
               slug={fosdem.event.id}
-              status={isFavourite?.status ?? "unfavourited"}
+              status={bookmarkLoading || createLoading ? "loading" : bookmark?.status ?? "unfavourited"}
               user={user}
               onCreateBookmark={onCreateBookmark}
             />

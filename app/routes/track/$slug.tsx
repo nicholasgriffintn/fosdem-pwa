@@ -6,7 +6,7 @@ import { EventList } from "~/components/Event/EventList";
 import type { Conference, Event } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { useAuth } from "~/hooks/use-auth";
-import { useBookmarks } from "~/hooks/use-bookmarks";
+import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
 export const Route = createFileRoute("/track/$slug")({
   component: TrackPage,
@@ -44,9 +44,7 @@ function TrackPage() {
   const { fosdem, year, day } = Route.useLoaderData();
 
   const { user } = useAuth();
-  const { create: createBookmark } = useBookmarks({
-    year,
-  });
+  const { create: createBookmark } = useMutateBookmark({ year });
   const onCreateBookmark = (bookmark: any) => {
     createBookmark(bookmark);
   };

@@ -10,7 +10,7 @@ import type { Conference, Event, RoomData } from "~/types/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { createStandardDate } from "~/lib/dateTime";
 import { useAuth } from "~/hooks/use-auth";
-import { useBookmarks } from "~/hooks/use-bookmarks";
+import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
 export const Route = createFileRoute("/rooms/$roomId")({
   component: RoomPage,
@@ -66,9 +66,7 @@ function RoomPage() {
   const { fosdem, day, year } = Route.useLoaderData();
 
   const { user } = useAuth();
-  const { create: createBookmark } = useBookmarks({
-    year,
-  });
+  const { create: createBookmark } = useMutateBookmark({ year });
   const onCreateBookmark = (bookmark: any) => {
     createBookmark(bookmark);
   };

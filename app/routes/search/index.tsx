@@ -19,7 +19,7 @@ import {
 	type SearchResult,
 } from "~/lib/search";
 import { useAuth } from "~/hooks/use-auth";
-import { useBookmarks } from "~/hooks/use-bookmarks";
+import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -50,7 +50,7 @@ export default function SearchPage() {
 	const { year, q } = Route.useLoaderData();
 
 	const { user } = useAuth();
-	const { create: createBookmark } = useBookmarks({ year });
+	const { create: createBookmark } = useMutateBookmark({ year });
 	const onCreateBookmark = (bookmark: any) => {
 		createBookmark(bookmark);
 	};
