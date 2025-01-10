@@ -6,7 +6,7 @@ async function generateServiceWorker(outputDir = 'dist') {
     readFileSync('.vinxi/build/server/_server/.vite/manifest.json', 'utf-8')
   )
 
-  const fosdemFunctionId = manifest['app/functions/getFosdemData.ts'].name
+  const fosdemFunctionId = manifest['app/server/functions/fosdem.ts']?.name
   const fosdemDataPayload = {
     data: { year: "2025" },
     context: {}
