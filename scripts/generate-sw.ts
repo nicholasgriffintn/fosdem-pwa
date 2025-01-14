@@ -180,7 +180,18 @@ async function generateServiceWorker(outputDir = 'dist') {
               statuses: [0, 200]
             }),
             new BackgroundSyncPlugin('server-functions-queue', {
-              maxRetentionTime: 24 * 60
+              maxRetentionTime: 24 * 60,
+              onSync: async ({ queue }) => {
+                console.log('[ServiceWorker] Attempting to sync server functions queue');
+                try {
+                  await queue.replayRequests();
+                  const bc = new BroadcastChannel('server-functions-sync');
+                  bc.postMessage({ type: 'SYNC_COMPLETE' });
+                  console.log('[ServiceWorker] Server functions queue sync complete');
+                } catch (error) {
+                  console.error('[ServiceWorker] Server functions queue sync failed:', error);
+                }
+              }
             })
           ]
         })
@@ -223,7 +234,16 @@ async function generateServiceWorker(outputDir = 'dist') {
 
       self.addEventListener('sync', (event) => {
         if (event.tag === 'user-data-sync') {
+          // Handle user data requests
           event.waitUntil(backgroundSyncQueue.replayRequests());
+        } else if (event.tag === 'server-functions-queue') {
+          // Handle server function requests
+          const serverFunctionsQueue = new workbox.backgroundSync.Queue('server-functions-queue');
+          event.waitUntil(serverFunctionsQueue.replayRequests());
+        } else if (event.tag === 'fosdem-data-queue') {
+          // Handle fosdem data requests
+          const fosdemDataQueue = new workbox.backgroundSync.Queue('fosdem-data-queue');
+          event.waitUntil(fosdemDataQueue.replayRequests());
         }
       });
 

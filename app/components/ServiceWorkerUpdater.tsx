@@ -56,12 +56,23 @@ export function ServiceWorkerUpdater() {
 			});
 		};
 
-		const syncChannel = new BroadcastChannel("user-data-sync");
+		/* const syncChannel = new BroadcastChannel("user-data-sync");
 		syncChannel.onmessage = (event) => {
 			if (event.data.type === "SYNC_COMPLETE") {
 				toast({
 					title: "Sync Complete",
 					description: "Your changes have been saved.",
+					duration: 3000,
+				});
+			}
+		}; */
+
+		const serverFunctionsChannel = new BroadcastChannel("server-functions-sync");
+		serverFunctionsChannel.onmessage = (event) => {
+			if (event.data.type === "SYNC_COMPLETE") {
+				toast({
+					title: "Offline requests processed",
+					description: "Requests that were queued while offline have been processed",
 					duration: 3000,
 				});
 			}
@@ -75,9 +86,10 @@ export function ServiceWorkerUpdater() {
 				"beforeinstallprompt",
 				handleBeforeInstallPrompt,
 			);
-			window.removeEventListener("appinstalled", () => {});
+			window.removeEventListener("appinstalled", () => { });
 			dataChannel.close();
-			syncChannel.close();
+			// syncChannel.close();
+			serverFunctionsChannel.close();
 		};
 	}, []);
 
