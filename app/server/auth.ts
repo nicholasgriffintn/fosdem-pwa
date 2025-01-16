@@ -17,6 +17,7 @@ import {
 	type Session,
 	type User
 } from "~/server/db/schema";
+import type { GitHubUser } from "~/types/user";
 
 export const SESSION_COOKIE_NAME = "session";
 const TTL = 60 * 60 * 24 * 30;
@@ -219,17 +220,21 @@ export async function createGuestUser(): Promise<User> {
  */
 export async function upgradeGuestToGithub(
 	userId: number,
-	githubUsername: string,
-	githubEmail: string,
-	githubName: string
+	providerUser: GitHubUser,
 ): Promise<User> {
 	const now = createStandardDate(new Date()).toISOString();
 
 	const [updatedUser] = await db.update(userTable)
 		.set({
-			github_username: githubUsername,
-			email: githubEmail,
-			name: githubName,
+			github_username: providerUser.login,
+			email: providerUser.email || `${providerUser.id}+${providerUser.login}@users.noreply.github.com`,
+			name: providerUser.name || providerUser.login,
+			avatar_url: providerUser.avatar_url,
+			company: providerUser.company,
+			site: providerUser.blog,
+			location: providerUser.location,
+			bio: providerUser.bio,
+			twitter_username: providerUser.twitter_username,
 			is_guest: false,
 			updated_at: now,
 		})
