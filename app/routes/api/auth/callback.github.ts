@@ -82,7 +82,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 				await upgradeGuestToGithub(
 					currentUser.id,
 					providerUser.login,
-					providerUser.email,
+					providerUser.email || `${providerUser.id}+${providerUser.login}@users.noreply.github.com`,
 					providerUser.name || providerUser.login
 				);
 
