@@ -6,6 +6,7 @@ import { useLockBody } from "~/hooks/use-lock-body";
 import { useAuth } from "~/hooks/use-auth";
 import { Icons } from "~/components/Icons";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import { constants } from "~/constants";
 
 type MobileNavProps = {
@@ -30,6 +31,17 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 			)}
 		>
 			<div className="relative z-20 grid gap-6 rounded-md bg-popover p-4 text-popover-foreground shadow-md border border-border">
+				{user?.id && (
+					<div className="flex items-center gap-2 px-2">
+						<Icons.user className="h-4 w-4" />
+						<div className="flex items-center gap-2">
+							<span className="text-sm font-medium">{user.name}</span>
+							{user.is_guest && (
+								<Badge variant="secondary" className="text-xs">Guest</Badge>
+							)}
+						</div>
+					</div>
+				)}
 				<nav className="grid grid-flow-row auto-rows-max text-sm">
 					{items.map((item, index) => (
 						<Link
@@ -70,23 +82,37 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 
 					{user?.id ? (
 						<>
-							<Button
-								variant="ghost"
-								className="flex items-center justify-start gap-2 w-full"
-								asChild
-							>
-								<Link
-									search={(prev) => ({
-										...prev,
-										year: prev.year || constants.DEFAULT_YEAR,
-									})}
-									to="/profile"
-									onClick={onCloseMenu}
+							{!user.is_guest && (
+								<Button
+									variant="ghost"
+									className="flex items-center justify-start gap-2 w-full"
+									asChild
 								>
-									<Icons.user className="h-5 w-5" />
-									View Profile
-								</Link>
-							</Button>
+									<Link
+										search={(prev) => ({
+											...prev,
+											year: prev.year || constants.DEFAULT_YEAR,
+										})}
+										to="/profile"
+										onClick={onCloseMenu}
+									>
+										<Icons.user className="h-5 w-5" />
+										View Profile
+									</Link>
+								</Button>
+							)}
+							{user.is_guest && (
+								<Button
+									variant="ghost"
+									className="flex items-center justify-start gap-2 w-full"
+									asChild
+								>
+									<a href="/api/auth/upgrade-github">
+										<Icons.gitHub className="h-5 w-5" />
+										Upgrade with GitHub
+									</a>
+								</Button>
+							)}
 							<Button
 								variant="ghost"
 								className="flex items-center justify-start gap-2 w-full"

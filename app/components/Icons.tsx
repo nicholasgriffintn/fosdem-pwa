@@ -27,6 +27,7 @@ import {
 	CalendarDays,
 	Play,
 	Clock,
+	AlertCircle,
 } from "lucide-react";
 
 export const Icons = {
@@ -81,6 +82,7 @@ export const Icons = {
 	list: List,
 	calendar: CalendarDays,
 	play: Play,
+	alertCircle: AlertCircle,
 	gitHub: ({ ...props }) => (
 		<svg
 			aria-hidden="true"
