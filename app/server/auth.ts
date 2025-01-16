@@ -4,7 +4,7 @@ import {
 	encodeHexLowerCase,
 } from "@oslojs/encoding";
 import { GitHub } from "arctic";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { deleteCookie, getCookie, setCookie } from "vinxi/http";
 
 import { createStandardDate } from "~/lib/dateTime";
@@ -15,12 +15,12 @@ import {
 	session as sessionTable,
 	user as userTable,
 	type Session,
+	type User
 } from "~/server/db/schema";
+import type { GitHubUser } from "~/types/user";
 
 export const SESSION_COOKIE_NAME = "session";
-
 const TTL = 60 * 60 * 24 * 30;
-
 const cache = new CacheManager();
 
 export function generateSessionToken(): string {
@@ -171,7 +171,105 @@ export async function getAuthSession(
 		}
 	}
 
-	return { session, user };
+	return {
+		session, user,
+		isGuest: user.is_guest === true
+	};
 }
 
 export const getFullAuthSession = getAuthSession;
+
+/**
+ * Generates a random guest username
+ */
+function generateGuestUsername(): string {
+	const adjectives = ['Happy', 'Quick', 'Clever', 'Bright', 'Swift'];
+	const nouns = ['Penguin', 'Dolphin', 'Eagle', 'Lion', 'Fox'];
+	const randomNum = Math.floor(Math.random() * 10000);
+
+	const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+	const noun = nouns[Math.floor(Math.random() * nouns.length)];
+
+	return `${adjective}${noun}${randomNum}`;
+}
+
+/**
+ * Creates a guest user
+ */
+export async function createGuestUser(): Promise<User> {
+	const now = createStandardDate(new Date()).toISOString();
+	const username = generateGuestUsername();
+	const guestUser = {
+		name: username,
+		email: `guest-${username}@fosdempwa.com`,
+		github_id: null,
+		is_guest: true,
+		created_at: now,
+		updated_at: now,
+	};
+
+	const [user] = await db.insert(userTable)
+		.values(guestUser)
+		.returning();
+
+	return user;
+}
+
+/**
+ * Upgrades a guest user to a GitHub user
+ */
+export async function upgradeGuestToGithub(
+	userId: number,
+	providerUser: GitHubUser,
+): Promise<User> {
+	const now = createStandardDate(new Date()).toISOString();
+
+	const [updatedUser] = await db.update(userTable)
+		.set({
+			github_username: providerUser.login,
+			email: providerUser.email || `${providerUser.id}+${providerUser.login}@users.noreply.github.com`,
+			name: providerUser.name || providerUser.login,
+			avatar_url: providerUser.avatar_url,
+			company: providerUser.company,
+			site: providerUser.blog,
+			location: providerUser.location,
+			bio: providerUser.bio,
+			twitter_username: providerUser.twitter_username,
+			is_guest: false,
+			updated_at: now,
+		})
+		.where(
+			and(
+				eq(userTable.id, userId),
+				eq(userTable.is_guest, true)
+			)
+		)
+		.returning();
+
+	const sessions = await db.select()
+		.from(sessionTable)
+		.where(eq(sessionTable.user_id, userId));
+
+	await Promise.all(
+		sessions.map(session =>
+			cache.invalidate(`session_${session.id}`)
+		)
+	);
+
+	return updatedUser;
+}
+
+/**
+ * Creates an initial guest session
+ */
+export async function createGuestSession(): Promise<{
+	token: string;
+	session: Session;
+	user: User;
+}> {
+	const user = await createGuestUser();
+	const token = generateSessionToken();
+	const session = await createSession(token, user.id);
+
+	return { token, session, user };
+}
