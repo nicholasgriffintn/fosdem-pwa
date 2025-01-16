@@ -57,7 +57,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 							</a>
 						</DropdownMenuItem>
 						<DropdownMenuItem className="text-xs text-muted-foreground">
-							Upgrade to save your data permanently
+							Upgrade to persist your data.
 						</DropdownMenuItem>
 					</>
 				)}

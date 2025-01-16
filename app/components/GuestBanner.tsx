@@ -19,7 +19,7 @@ export function GuestBanner() {
           <p>
             <span className="font-medium">Guest Mode:</span>{" "}
             <span className="text-muted-foreground">
-              Your data will only be saved temporarily. Upgrade to a GitHub account to save your schedule permanently.
+              Your data cannot be persisted across sessions. Upgrade to a GitHub account to save your schedule permanently.
             </span>
           </p>
         </div>
