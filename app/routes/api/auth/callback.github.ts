@@ -12,19 +12,7 @@ import {
 } from "~/server/auth";
 import { db } from "~/server/db";
 import { oauthAccount, user } from "~/server/db/schema";
-
-interface GitHubUser {
-	id: string;
-	name: string | null;
-	email: string;
-	avatar_url: string;
-	location: string | null;
-	login: string;
-	company: string | null;
-	blog: string | null;
-	bio: string | null;
-	twitter_username: string | null;
-}
+import type { GitHubUser } from "~/types/user";
 
 export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 	GET: async ({ request }) => {
@@ -81,9 +69,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 			if (currentUser?.is_guest) {
 				await upgradeGuestToGithub(
 					currentUser.id,
-					providerUser.login,
-					providerUser.email || `${providerUser.id}+${providerUser.login}@users.noreply.github.com`,
-					providerUser.name || providerUser.login
+					providerUser
 				);
 
 				await db.insert(oauthAccount).values({
@@ -91,18 +77,6 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 					provider_user_id: providerUser.id,
 					user_id: currentUser.id,
 				});
-
-				await db
-					.update(user)
-					.set({
-						avatar_url: providerUser.avatar_url,
-						company: providerUser.company,
-						site: providerUser.blog,
-						location: providerUser.location,
-						bio: providerUser.bio,
-						twitter_username: providerUser.twitter_username,
-					})
-					.where(eq(user.id, currentUser.id));
 
 				return new Response(null, {
 					status: 302,
