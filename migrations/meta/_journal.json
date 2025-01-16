@@ -64,6 +64,13 @@
       "when": 1736207917284,
       "tag": "0008_kind_sway",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1737062924594,
+      "tag": "0009_optimal_white_queen",
+      "breakpoints": true
     }
   ]
 }

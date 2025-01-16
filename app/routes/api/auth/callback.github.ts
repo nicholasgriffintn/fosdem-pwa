@@ -7,6 +7,8 @@ import {
 	generateSessionToken,
 	github,
 	setSessionTokenCookie,
+	upgradeGuestToGithub,
+	getAuthSession,
 } from "~/server/auth";
 import { db } from "~/server/db";
 import { oauthAccount, user } from "~/server/db/schema";
@@ -72,6 +74,42 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 
 			if (!providerUser.id) {
 				throw new Error("GitHub Callback: No user ID found in GitHub response");
+			}
+
+			// Check if this is a guest user trying to upgrade
+			const { user: currentUser } = await getAuthSession();
+			if (currentUser?.is_guest) {
+				await upgradeGuestToGithub(
+					currentUser.id,
+					providerUser.login,
+					providerUser.email,
+					providerUser.name || providerUser.login
+				);
+
+				await db.insert(oauthAccount).values({
+					provider_id: PROVIDER_ID,
+					provider_user_id: providerUser.id,
+					user_id: currentUser.id,
+				});
+
+				await db
+					.update(user)
+					.set({
+						avatar_url: providerUser.avatar_url,
+						company: providerUser.company,
+						site: providerUser.blog,
+						location: providerUser.location,
+						bio: providerUser.bio,
+						twitter_username: providerUser.twitter_username,
+					})
+					.where(eq(user.id, currentUser.id));
+
+				return new Response(null, {
+					status: 302,
+					headers: {
+						Location: "/",
+					},
+				});
 			}
 
 			const existingUser = await db.query.oauthAccount.findFirst({
@@ -163,5 +201,5 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 				status: 500,
 			});
 		}
-	},
+	}
 });
