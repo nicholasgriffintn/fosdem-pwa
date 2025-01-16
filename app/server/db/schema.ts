@@ -28,6 +28,7 @@ export const user = sqliteTable(
 		setup_at: text(),
 		terms_accepted_at: text(),
 		bookmarks_visibility: text().default("private"),
+		is_guest: integer({ mode: "boolean" }).default(false),
 	},
 	(table) => {
 		return {

@@ -17,6 +17,7 @@ import { Footer } from "~/components/Footer";
 import { Toaster } from "~/components/ui/toaster";
 import { OfflineIndicator } from "~/components/OfflineIndicator";
 import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
+import { GuestBanner } from "~/components/GuestBanner";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
@@ -77,6 +78,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 			>
 				<main className="flex min-h-screen flex-col">
 					<Header />
+					<GuestBanner />
 					<div className="container flex-1">
 						{children}
 						<Toaster />

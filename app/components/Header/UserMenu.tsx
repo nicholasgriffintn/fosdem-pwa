@@ -10,6 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { Badge } from "~/components/ui/badge";
 import type { SessionUser } from "~/server/auth";
 import { constants } from "~/constants";
 import { Icons } from "~/components/Icons";
@@ -35,13 +36,31 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 			<DropdownMenuContent align="end" className="w-56">
 				<div className="flex items-center justify-start gap-2 p-2">
 					<div className="flex flex-col space-y-1">
-						<p className="text-sm font-medium leading-none">{user.name}</p>
+						<div className="flex items-center gap-2">
+							<p className="text-sm font-medium leading-none">{user.name}</p>
+							{user.is_guest && (
+								<Badge variant="secondary" className="text-xs">Guest</Badge>
+							)}
+						</div>
 						<p className="text-xs leading-none text-muted-foreground">
 							{user.email}
 						</p>
 					</div>
 				</div>
 				<DropdownMenuSeparator />
+				{user.is_guest && (
+					<>
+						<DropdownMenuItem asChild>
+							<a href="/api/auth/upgrade-github">
+								<Icons.gitHub className="h-4 w-4 mr-2" />
+								Upgrade with GitHub
+							</a>
+						</DropdownMenuItem>
+						<DropdownMenuItem className="text-xs text-muted-foreground">
+							Upgrade to persist your data.
+						</DropdownMenuItem>
+					</>
+				)}
 				<DropdownMenuItem asChild>
 					<Link
 						search={(prev) => ({

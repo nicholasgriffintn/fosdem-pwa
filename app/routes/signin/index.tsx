@@ -87,11 +87,6 @@ function SignInPage() {
 					</div>
 					<div className="space-y-4">
 						<SignInForm />
-						<p className="text-sm text-slate-400 text-center max-w-md mx-auto">
-							This will request read only access to your GitHub profile and
-							email only. We will use this to create your account and to send
-							notifications (if you want them).
-						</p>
 					</div>
 				</div>
 			</div>
