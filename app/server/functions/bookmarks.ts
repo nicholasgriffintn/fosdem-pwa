@@ -9,9 +9,9 @@ import { getFullAuthSession } from "~/server/auth";
 export const getBookmarks = createServerFn({
   method: "GET",
 })
-  .validator((data: { year: number }) => data)
+  .validator((data: { year: number, status: 'favourited' | 'unfavourited' }) => data)
   .handler(async (ctx: any) => {
-    const { year } = ctx.data;
+    const { year, status } = ctx.data;
 
     const { user } = await getFullAuthSession();
 
@@ -23,6 +23,7 @@ export const getBookmarks = createServerFn({
       where: and(
         eq(bookmarkTable.user_id, user.id),
         eq(bookmarkTable.year, Number.parseInt(year)),
+        eq(bookmarkTable.status, status),
       ),
     });
 
