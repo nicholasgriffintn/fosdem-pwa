@@ -14,6 +14,7 @@ import {
 import { useAuth } from "~/hooks/use-auth";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "~/constants";
+import { cn } from "../../lib/utils";
 
 export function Header() {
 	const { year } = useSearch({ strict: false });
@@ -49,10 +50,7 @@ export function Header() {
 		<header className="sticky top-0 z-40 w-full border-b bg-background">
 			<div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
 				<MainNav title="FOSDEM PWA" items={navItems} />
-				<div className="flex flex-1 items-center space-x-4 sm:justify-end">
-					<div className="flex-1 sm:grow-0">
-						<NavSearch year={selectedYear} />
-					</div>
+				<div className={cn("flex flex-1 items-center space-x-4 sm:justify-end", user?.id || loading ? "" : "gap-4")}>
 					<nav className="hidden md:flex space-x-4">
 						<TooltipProvider>
 							<Tooltip>
@@ -67,7 +65,7 @@ export function Header() {
 										<Button
 											variant="link"
 											size="icon"
-											className="h-7 w-7"
+											className={cn("h-7 text-muted-foreground no-underline", user?.id || loading ? "w-7" : "")}
 											asChild
 										>
 											<Link
@@ -78,7 +76,7 @@ export function Header() {
 												})}
 											>
 												<Icons.login className="h-7 w-7" width="7" height="7" />
-												<span className="sr-only">Sign In</span>
+												<span>Sign In</span>
 											</Link>
 										</Button>
 									)}
@@ -95,8 +93,11 @@ export function Header() {
 							</Tooltip>
 						</TooltipProvider>
 					</nav>
+					<div className="flex-1 sm:grow-0">
+						<NavSearch year={selectedYear} />
+					</div>
 				</div>
 			</div>
-		</header>
+		</header >
 	);
 }
