@@ -49,15 +49,12 @@ function TrackPage() {
     createBookmark(bookmark);
   };
 
-  if (!fosdem.track || !fosdem.type) {
+  if (!fosdem.track) {
     return (
       <div className="min-h-screen">
         <div className="relative py-6 lg:py-10">
           <PageHeader
             heading="Track not found"
-            breadcrumbs={[
-              { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
-            ]}
           />
         </div>
       </div>
@@ -69,9 +66,9 @@ function TrackPage() {
       <div className="relative py-6 lg:py-10">
         <PageHeader
           heading={fosdem.track.name}
-          breadcrumbs={[
+          breadcrumbs={fosdem.type ? [
             { title: fosdem.type.name, href: `/type/${fosdem.type.id}` },
-          ]}
+          ] : []}
           metadata={[
             {
               text: `${fosdem.track.room}`,
