@@ -74,7 +74,7 @@ export function ItemActions({
         <Link
           to={`/${type}/$slug`}
           params={{ slug }}
-          search={{ year: constants.DEFAULT_YEAR, day: undefined }}
+          search={{ year: year || constants.DEFAULT_YEAR, day: undefined }}
         >
           View {isEvent ? "Event" : "Track"}
         </Link>
