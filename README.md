@@ -46,9 +46,7 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 - [ ] Allow users to search within specific tracks or time slots
 - [ ] Maybe a calendar export? Is that too hard?
-- [ ] Make Fosdem PWA a PWA again (this is mostly done but not precaching routes so only works SPA)
-- [ ] Bookmarks and Notes are background synced when offline (I've not validated this yet)
-- [ ] Configure push notifications, will need a new database table (SW work has been started for this)
+- [ ] Create a new service for sending the push notifications out on schedule changes
 - [ ] Send notifications for bookmarked events (should be configurable)
 - [ ] Add a track progress feature? https://capture.dropbox.com/tmn4M77IN4F7IJUl
 - [ ] Maybe a visual indicator for progress?: https://capture.dropbox.com/YiTleZxrLM539GKc

@@ -10,6 +10,7 @@ import { constants } from "~/constants";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { SetBookmarksVisability } from "~/components/SetBookmarksVisability";
+import { PushNotifications } from "~/components/PushNotifications";
 
 export const Route = createFileRoute("/profile/")({
 	component: ProfilePage,
@@ -68,6 +69,7 @@ function ProfilePage() {
 						</div>
 
 						<div className="w-full lg:flex-1 space-y-8">
+							<PushNotifications />
 							<div className="space-y-4">
 								<h2 className="text-2xl font-bold">Your Bookmarks</h2>
 								{user?.github_username && (
