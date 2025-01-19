@@ -1,6 +1,4 @@
-import type { DayGroupedData } from "~/types/fosdem";
 import type { Event, ConferenceData } from "~/types/fosdem";
-import { getEventDateTime, parseEventDuration } from "./dateTime";
 
 interface TimeSlot {
 	time: string;

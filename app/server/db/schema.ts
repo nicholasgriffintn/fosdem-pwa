@@ -134,3 +134,27 @@ export const note = sqliteTable(
 );
 
 export type Note = typeof note.$inferSelect;
+
+export const subscription = sqliteTable(
+	"subscription",
+	{
+		id: integer().primaryKey({ autoIncrement: true }),
+		user_id: integer()
+			.notNull()
+			.references(() => user.id),
+		endpoint: text().notNull(),
+		auth: text().notNull(),
+		p256dh: text().notNull(),
+		created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+		updated_at: text()
+			.default(sql`(CURRENT_TIMESTAMP)`)
+			.$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+	},
+	(table) => {
+		return {
+			userIdIdx: index("subscription_user_id_idx").on(table.user_id),
+		};
+	},
+);
+
+export type Subscription = typeof subscription.$inferSelect;
