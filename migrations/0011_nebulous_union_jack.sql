@@ -1,0 +1,1 @@
+ALTER TABLE `bookmark` ADD `last_notification_sent_at` text;

@@ -93,6 +93,7 @@ export const bookmark = sqliteTable(
 		status: text().notNull(),
 		year: integer().notNull(),
 		priority: integer(),
+		last_notification_sent_at: text(),
 		created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
 		updated_at: text()
 			.default(sql`(CURRENT_TIMESTAMP)`)
