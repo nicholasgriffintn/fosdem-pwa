@@ -173,7 +173,7 @@ async function generateServiceWorker(outputDir = 'dist') {
 
       registerRoute(
         ({ url }) => url.pathname.startsWith('/_server'),
-        new StaleWhileRevalidate({
+        new NetworkFirst({
           cacheName: 'server-functions',
           plugins: [
             new CacheableResponsePlugin({
@@ -193,7 +193,8 @@ async function generateServiceWorker(outputDir = 'dist') {
                 }
               }
             })
-          ]
+          ],
+          networkTimeoutSeconds: 6
         })
       );
 
