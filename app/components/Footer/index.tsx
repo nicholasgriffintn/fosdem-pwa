@@ -46,6 +46,15 @@ export function Footer() {
 						>
 							Source Code
 						</a>
+						<span>•</span>
+						<a
+							href="https://status.fosdempwa.com/"
+							target="_blank"
+							rel="noreferrer"
+							className="font-medium text-foreground hover:underline"
+						>
+							Status
+						</a>
 					</div>
 				</div>
 			</div>
