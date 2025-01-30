@@ -12,6 +12,7 @@ export function useMutateBookmark({ year }: { year: number }) {
     const useUpdateBookmark = useServerFn(updateBookmark);
 
     const create = useMutation({
+        mutationKey: ["createBookmark"],
         mutationFn: async ({
             type,
             slug,
@@ -33,6 +34,7 @@ export function useMutateBookmark({ year }: { year: number }) {
     });
 
     const update = useMutation({
+        mutationKey: ["updateBookmark"],
         mutationFn: async ({
             id,
             updates,

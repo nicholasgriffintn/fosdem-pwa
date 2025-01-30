@@ -25,6 +25,7 @@ export function useNotes({
     });
 
     const create = useMutation({
+        mutationKey: ["createNote"],
         mutationFn: async ({
             note,
             time,
