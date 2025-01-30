@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
+import * as Sentry from "@sentry/react";
 
 import { DefaultCatchBoundary } from "./components/DefaultCatchBoundary";
 import { NotFound } from "./components/NotFound";
@@ -38,3 +39,10 @@ declare module "@tanstack/react-router" {
 		router: ReturnType<typeof createRouter>;
 	}
 }
+
+Sentry.init({
+	dsn: "https://9c7ff6e0ee93ee6d3907270de1b3495c@o4508599344365568.ingest.de.sentry.io/4508599345807440",
+	integrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
+	tracesSampleRate: 1.0,
+	environment: import.meta.env.PROD ? "production" : "development",
+});
