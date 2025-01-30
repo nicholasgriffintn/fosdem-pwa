@@ -11,6 +11,7 @@ export function useMutateSubscriptions() {
   const useDeleteSubscription = useServerFn(deleteSubscription);
 
   const create = useMutation({
+    mutationKey: ["createSubscription"],
     mutationFn: async ({
       endpoint,
       auth,
@@ -32,6 +33,7 @@ export function useMutateSubscriptions() {
   });
 
   const handleDeleteSubscription = useMutation({
+    mutationKey: ["deleteSubscription"],
     mutationFn: async ({ id }: { id: number }) => {
       const data = await useDeleteSubscription({ data: { id } });
 

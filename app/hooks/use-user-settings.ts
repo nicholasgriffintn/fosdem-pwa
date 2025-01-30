@@ -10,6 +10,7 @@ export function useUserSettings({ userId }: { userId: string }) {
   const useChangeBookmarksVisibility = useServerFn(changeBookmarksVisibility);
 
   const setBookmarksVisibility = useMutation({
+    mutationKey: ["changeBookmarksVisibility"],
     mutationFn: async ({ visibility }: { visibility: string }) => {
       const data = await useChangeBookmarksVisibility(
         { data: { visibility } },

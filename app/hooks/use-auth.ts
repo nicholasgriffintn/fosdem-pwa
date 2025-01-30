@@ -25,6 +25,7 @@ export function useAuth() {
 	});
 
 	const logout = useMutation({
+		mutationKey: ["logout"],
 		mutationFn: async () => {
 			await fetch("/api/auth/logout", { method: "POST" });
 		},
