@@ -103,7 +103,7 @@ export const bookmark = sqliteTable(
 		return {
 			yearIdx: index("year_idx").on(table.year),
 			typeIdx: index("type_idx").on(table.type),
-			slugIdx: uniqueIndex("slug_idx").on(table.slug),
+			slugIdx: index("slug_idx").on(table.slug),
 		};
 	},
 );
