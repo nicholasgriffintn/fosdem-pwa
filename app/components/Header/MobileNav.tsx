@@ -31,17 +31,6 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 			)}
 		>
 			<div className="relative z-20 grid gap-6 rounded-md bg-popover p-4 text-popover-foreground shadow-md border border-border">
-				{user?.id && (
-					<div className="flex items-center gap-2 px-2">
-						<Icons.user className="h-4 w-4" />
-						<div className="flex items-center gap-2">
-							<span className="text-sm font-medium">{user.name}</span>
-							{user.is_guest && (
-								<Badge variant="secondary" className="text-xs">Guest</Badge>
-							)}
-						</div>
-					</div>
-				)}
 				<nav className="grid grid-flow-row auto-rows-max text-sm">
 					{items.map((item, index) => (
 						<Link
@@ -64,21 +53,17 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 
 					<div className="border-t my-4" />
 
-					<Button
-						variant="ghost"
-						className="flex items-center justify-start gap-2 w-full"
-						asChild
-					>
-						<a
-							href="https://github.com/nicholasgriffintn/fosdem-pwa"
-							target="_blank"
-							rel="noreferrer"
-							onClick={onCloseMenu}
-						>
-							<Icons.gitHub className="h-5 w-5" />
-							View Source
-						</a>
-					</Button>
+					{user?.id && (
+						<div className="flex items-center gap-2 px-2">
+							<Icons.user className="h-4 w-4" />
+							<div className="flex items-center gap-2">
+								<span className="text-sm font-medium">{user.name}</span>
+								{user.is_guest && (
+									<Badge variant="secondary" className="text-xs">Guest</Badge>
+								)}
+							</div>
+						</div>
+					)}
 
 					{user?.id ? (
 						<>
@@ -137,6 +122,22 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 							</Link>
 						</Button>
 					)}
+
+					<Button
+						variant="ghost"
+						className="flex items-center justify-start gap-2 w-full"
+						asChild
+					>
+						<a
+							href="https://github.com/nicholasgriffintn/fosdem-pwa"
+							target="_blank"
+							rel="noreferrer"
+							onClick={onCloseMenu}
+						>
+							<Icons.gitHub className="h-5 w-5" />
+							View Source
+						</a>
+					</Button>
 				</nav>
 			</div>
 		</div>
