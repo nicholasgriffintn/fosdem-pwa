@@ -3,10 +3,6 @@ pages_build_output_dir = "./dist"
 compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2024-11-13"
 
-[observability]
-enabled = true
-head_sampling_rate = 1
-
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "fosdem"
