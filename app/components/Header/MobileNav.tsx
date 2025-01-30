@@ -54,7 +54,7 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 					<div className="border-t my-4" />
 
 					{user?.id && (
-						<div className="flex items-center gap-2 px-2">
+						<div className="flex items-center gap-2 p-2">
 							<Icons.user className="h-4 w-4" />
 							<div className="flex items-center gap-2">
 								<span className="text-sm font-medium">{user.name}</span>
@@ -81,7 +81,6 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 										to="/profile"
 										onClick={onCloseMenu}
 									>
-										<Icons.user className="h-5 w-5" />
 										View Profile
 									</Link>
 								</Button>
