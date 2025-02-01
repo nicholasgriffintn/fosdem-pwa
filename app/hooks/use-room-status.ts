@@ -2,17 +2,22 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { constants } from "~/constants";
-
 interface RoomStatus {
 	room: string;
 	state: "full" | "available" | "unknown";
 	lastUpdate: string;
 }
 
+function convertState(state: string): RoomStatus["state"] {
+	if (state === "1") {
+		return "full";
+	}
+	return "available";
+}
+
 async function fetchRoomStatus(roomId: string): Promise<RoomStatus> {
 	try {
-		const response = await fetch(constants.ROOMS_API);
+		const response = await fetch("/api/rooms/status");
 
 		if (!response.ok) {
 			throw new Error("Failed to fetch room status");
@@ -20,8 +25,8 @@ async function fetchRoomStatus(roomId: string): Promise<RoomStatus> {
 
 		const data = await response.json();
 
-		const status = data.find((room: RoomStatus) => room.room === roomId);
-		return status || { room: roomId, state: "unknown", lastUpdate: "" };
+		const status = data.find((room: any) => room.roomname === roomId);
+		return { room: roomId, state: status?.state ? convertState(status.state) : "unknown", lastUpdate: new Date().toISOString() };
 	} catch (error) {
 		console.error("Failed to fetch room status:", error);
 		return { room: roomId, state: "unknown", lastUpdate: "" };
