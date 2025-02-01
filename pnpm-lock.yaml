@@ -69,8 +69,8 @@ importers:
         specifier: ^1.95.1
         version: 1.95.1(@types/node@22.10.2)(@upstash/redis@1.34.3)(drizzle-orm@0.39.1(@cloudflare/workers-types@4.20241230.0)(@types/react@19.0.3)(react@19.0.0))(ioredis@5.4.1)(jiti@2.4.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(terser@5.37.0)(tsx@4.19.2)(typescript@5.7.2)(vite@6.0.3(@types/node@22.10.2)(jiti@2.4.1)(terser@5.37.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)
       '@unpic/react':
-        specifier: ^0.1.15
-        version: 0.1.15(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^1.0.0
+        version: 1.0.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@upstash/redis':
         specifier: ^1.34.3
         version: 1.34.3
@@ -2172,11 +2172,11 @@ packages:
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
 
-  '@unpic/core@0.1.0':
-    resolution: {integrity: sha512-Xw6BNChpV1klga8Qe/Y4slkohMl4GLmsQCEOxx+yRrm7cMzT6covLvUMVP606YTtIFpJauh0fSZ+N2A03y80iA==}
+  '@unpic/core@1.0.1':
+    resolution: {integrity: sha512-e0cwxOhtWPd4J32rV1V6jFmDGAi1r4p/f+lDqlnx+fhgFwMTyQQKw5lL7VEthUPBHFNaNBsXNbNKwnaIs2V71Q==}
 
-  '@unpic/react@0.1.15':
-    resolution: {integrity: sha512-Mr5cC96O1AZNRDfgDtL3VChr3xferCHLEzkj4Xg6XekdHltI/FHm9LPKHECE1V/bUn2qmJXoYOSmCB+4QDhIJg==}
+  '@unpic/react@1.0.0':
+    resolution: {integrity: sha512-lf//LZTOYR5DINKHvkG1v7HFYe3USJoKlr4kJOuk4PF8+JY+uc5MNipxlAp4OMMVJfBA6f8CGAhrOBMs74FYhQ==}
     peerDependencies:
       next: ^13.0.0 || ^14.0.0 || ^15.0.0
       react: ^17.0.0 || ^18.0.0
@@ -4058,8 +4058,8 @@ packages:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
 
-  unpic@3.22.0:
-    resolution: {integrity: sha512-NFhB8HgHHWkNzTxwWg6KHx8+3RZnhWFm4Axdqp9iI176iY3wskzfP16NRSJ2SSTfXzyK4W6GsBqs8iOOdvOB3g==}
+  unpic@4.0.1:
+    resolution: {integrity: sha512-ek65O9ciDNKVUdLxNVfv7lF6NF6jYD4PoCPfEEwUVkZJXxIpfPlHpY1RKtDzN2FJ8crm7QLXoQqU/xAuCzfx6Q==}
 
   unplugin@1.16.0:
     resolution: {integrity: sha512-5liCNPuJW8dqh3+DM6uNM2EI3MLLpCKp/KY+9pB5M2S2SR2qvvDHhKgBOaTWEbZTAws3CXfB0rKTIolWKL05VQ==}
@@ -5967,13 +5967,13 @@ snapshots:
 
   '@types/resolve@1.20.2': {}
 
-  '@unpic/core@0.1.0':
+  '@unpic/core@1.0.1':
     dependencies:
-      unpic: 3.22.0
+      unpic: 4.0.1
 
-  '@unpic/react@0.1.15(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+  '@unpic/react@1.0.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
-      '@unpic/core': 0.1.0
+      '@unpic/core': 1.0.1
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
 
@@ -7974,7 +7974,7 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unpic@3.22.0: {}
+  unpic@4.0.1: {}
 
   unplugin@1.16.0:
     dependencies:
