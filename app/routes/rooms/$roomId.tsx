@@ -119,7 +119,7 @@ function RoomPage() {
           <div className="space-y-6">
             {isConferenceRunning && (
               <div>
-                <RoomStatus roomId={roomInfo.slug} />
+                <RoomStatus roomId={roomInfo.name} />
               </div>
             )}
 
