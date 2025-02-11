@@ -14,7 +14,7 @@ export function useProfile() {
 			const user = await useGetSessionData();
 
 			if (!user) {
-				throw new Error("Unauthorized");
+				return null;
 			}
 
 			return user;

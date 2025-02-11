@@ -15,7 +15,7 @@ export const createSubscription = createServerFn({
     const { user } = await getFullAuthSession();
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return null;
     }
 
     try {
@@ -50,7 +50,7 @@ export const deleteSubscription = createServerFn({
     const { user } = await getFullAuthSession();
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return null;
     }
 
     try {
@@ -81,7 +81,7 @@ export const getSubscriptions = createServerFn({
     const { user } = await getFullAuthSession();
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return null;
     }
 
     try {

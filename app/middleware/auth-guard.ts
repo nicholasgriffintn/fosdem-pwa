@@ -10,7 +10,7 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
 
 	if (!user) {
 		setResponseStatus(401);
-		throw new Error("Unauthorized");
+		return;
 	}
 
 	return next({ context: { user } });

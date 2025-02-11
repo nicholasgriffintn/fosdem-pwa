@@ -44,7 +44,7 @@ export const getEventBookmark = createServerFn({
     const { user } = await getFullAuthSession();
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return null;
     }
 
     const existingBookmark = await db.query.bookmark.findFirst({
@@ -72,7 +72,7 @@ export const createBookmark = createServerFn({
     const { user } = await getFullAuthSession();
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return null;
     }
 
     const existingBookmark = await db.query.bookmark.findFirst({
@@ -128,7 +128,7 @@ export const updateBookmark = createServerFn({
     const { user } = await getFullAuthSession();
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return null;
     }
 
     const existingBookmark = await db.query.bookmark.findFirst({
