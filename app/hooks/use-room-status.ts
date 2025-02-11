@@ -17,7 +17,7 @@ function convertState(state: string): RoomStatus["state"] {
 
 async function fetchRoomStatus(roomId: string): Promise<RoomStatus> {
 	try {
-		const response = await fetch("/api/rooms/status");
+		const response = await fetch("/api/proxy/rooms/status");
 
 		if (!response.ok) {
 			throw new Error("Failed to fetch room status");
