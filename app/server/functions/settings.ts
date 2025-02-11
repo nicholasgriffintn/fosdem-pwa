@@ -19,7 +19,7 @@ export const changeBookmarksVisibility = createServerFn({
     const { user } = await getFullAuthSession();
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return null;
     }
 
     try {
