@@ -51,7 +51,7 @@
     "arctic": "^2.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.39.0",
+    "drizzle-orm": "^0.40.0",
     "fuse.js": "^7.0.0",
     "hls.js": "^1.5.18",
     "lucide-react": "^0.475.0",
