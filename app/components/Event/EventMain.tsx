@@ -30,6 +30,10 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 		roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
 	const testTime = isTest ? new Date(conference.start) : undefined;
 
+	const videoRef = useRef<HTMLVideoElement>(null);
+	const { width } = useWindowSize();
+	const isMobile = typeof window !== "undefined" ? width < 768 : false;
+
 	if (specialRoom) {
 		return (
 			<div className="space-y-4">
@@ -45,10 +49,6 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 			</div>
 		);
 	}
-
-	const videoRef = useRef<HTMLVideoElement>(null);
-	const { width } = useWindowSize();
-	const isMobile = typeof window !== "undefined" ? width < 768 : false;
 
 	return (
 		<>
