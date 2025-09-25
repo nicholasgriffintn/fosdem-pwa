@@ -79,7 +79,12 @@ export function PageHeader({
 							{metadata.map((meta, index) => (
 								<span key={meta.text}>
 									{meta.href ? (
-										<Link to={meta.href}>{meta.text}</Link>
+										<Link
+											to={meta.href}
+											search={(prev) => ({ ...prev })}
+										>
+											{meta.text}
+										</Link>
 									) : (
 										meta.text
 									)}
