@@ -156,7 +156,7 @@ function RoomPage() {
 				<div>
 					<EventList
 						events={roomEvents}
-						year={constants.DEFAULT_YEAR}
+						year={year}
 						title={`Events in ${roomInfo?.name || roomInfo.slug}`}
 						defaultViewMode="list"
 						displayViewMode={false}
