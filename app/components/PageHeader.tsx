@@ -39,7 +39,15 @@ export function PageHeader({
 			{year && year !== constants.DEFAULT_YEAR && (
 				<Alert variant="destructive" className="mb-4">
 					<AlertTitle>
-						<span>You are viewing the {year} edition of FOSDEM.</span>
+						<span>
+							You are viewing the {year} edition of FOSDEM.{' '}
+							<Link
+								to="/"
+								search={{ year: constants.DEFAULT_YEAR }}
+							>
+								Click here to view the {constants.DEFAULT_YEAR} edition
+							</Link>
+						</span>
 					</AlertTitle>
 				</Alert>
 			)}
