@@ -26,7 +26,11 @@ async function fetchRoomStatus(roomId: string): Promise<RoomStatus> {
 		const data = await response.json();
 
 		const status = data.find((room: any) => room.roomname === roomId);
-		return { room: roomId, state: status?.state ? convertState(status.state) : "unknown", lastUpdate: new Date().toISOString() };
+		return {
+			room: roomId,
+			state: status?.state ? convertState(status.state) : "unknown",
+			lastUpdate: new Date().toISOString(),
+		};
 	} catch (error) {
 		console.error("Failed to fetch room status:", error);
 		return { room: roomId, state: "unknown", lastUpdate: "" };

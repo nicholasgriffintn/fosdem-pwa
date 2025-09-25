@@ -13,135 +13,142 @@ import { useBookmark } from "~/hooks/use-bookmark";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
 export const Route = createFileRoute("/event/$slug")({
-  component: EventPage,
-  validateSearch: ({ test, year }: { test: boolean; year: string }) => ({
-    test: test === true,
-    year:
-      (constants.AVAILABLE_YEARS.includes(Number(year)) && Number(year)) ||
-      constants.DEFAULT_YEAR,
-  }),
-  loaderDeps: ({ search: { test, year } }) => ({ test, year }),
-  loader: async ({ params, deps: { test, year } }) => {
-    if (test) {
-      return {
-        fosdem: {
-          event: testLiveEvent,
-          conference: testConferenceData,
-          track: {
-            id: "radio",
-            name: "Radio",
-          },
-          type: {
-            id: "devroom",
-            name: "Developer Room",
-          },
-        },
-        year,
-        isTest: true,
-      };
-    }
+	component: EventPage,
+	validateSearch: ({ test, year }: { test: boolean; year: string }) => ({
+		test: test === true,
+		year:
+			(constants.AVAILABLE_YEARS.includes(Number(year)) && Number(year)) ||
+			constants.DEFAULT_YEAR,
+	}),
+	loaderDeps: ({ search: { test, year } }) => ({ test, year }),
+	loader: async ({ params, deps: { test, year } }) => {
+		if (test) {
+			return {
+				fosdem: {
+					event: testLiveEvent,
+					conference: testConferenceData,
+					track: {
+						id: "radio",
+						name: "Radio",
+					},
+					type: {
+						id: "devroom",
+						name: "Developer Room",
+					},
+				},
+				year,
+				isTest: true,
+			};
+		}
 
-    const fosdem = await getAllData({ data: { year } });
-    return {
-      fosdem: {
-        event: fosdem.events[params.slug],
-        conference: fosdem.conference,
-        track: fosdem.tracks[fosdem.events[params.slug]?.trackKey],
-        type: fosdem.types[
-          fosdem.tracks[fosdem.events[params.slug]?.trackKey]?.type
-        ],
-      },
-      year,
-      isTest: false,
-    };
-  },
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        title: `${loaderData?.fosdem.event?.title} | FOSDEM PWA`,
-        description: loaderData?.fosdem.event?.description,
-      },
-    ],
-  }),
-  staleTime: 10_000,
+		const fosdem = await getAllData({ data: { year } });
+		return {
+			fosdem: {
+				event: fosdem.events[params.slug],
+				conference: fosdem.conference,
+				track: fosdem.tracks[fosdem.events[params.slug]?.trackKey],
+				type: fosdem.types[
+					fosdem.tracks[fosdem.events[params.slug]?.trackKey]?.type
+				],
+			},
+			year,
+			isTest: false,
+		};
+	},
+	head: ({ loaderData }) => ({
+		meta: [
+			{
+				title: `${loaderData?.fosdem.event?.title} | FOSDEM PWA`,
+				description: loaderData?.fosdem.event?.description,
+			},
+		],
+	}),
+	staleTime: 10_000,
 });
 
 function EventPage() {
-  const { fosdem, year, isTest } = Route.useLoaderData();
+	const { fosdem, year, isTest } = Route.useLoaderData();
 
-  const { user } = useAuth();
-  const { bookmark, loading: bookmarkLoading } = useBookmark({ year, slug: fosdem.event.id });
-  const { create: createBookmark, createLoading } = useMutateBookmark({ year });
-  const onCreateBookmark = (bookmark: any) => {
-    createBookmark(bookmark);
-  };
+	const { user } = useAuth();
+	const { bookmark, loading: bookmarkLoading } = useBookmark({
+		year,
+		slug: fosdem.event.id,
+	});
+	const { create: createBookmark, createLoading } = useMutateBookmark({ year });
+	const onCreateBookmark = (bookmark: any) => {
+		createBookmark(bookmark);
+	};
 
-  if (!fosdem.event?.title || !fosdem.conference) {
-    return (
-      <div className="min-h-screen">
-        <div className="relative py-6 lg:py-10">
-          <PageHeader heading="Event not found" />
-        </div>
-      </div>
-    );
-  }
+	if (!fosdem.event?.title || !fosdem.conference) {
+		return (
+			<div className="min-h-screen">
+				<div className="relative py-6 lg:py-10">
+					<PageHeader heading="Event not found" />
+				</div>
+			</div>
+		);
+	}
 
-  const isFavourite = {
-    status: "null",
-    slug: fosdem.event.slug,
-  };
+	const isFavourite = {
+		status: "null",
+		slug: fosdem.event.slug,
+	};
 
-  return (
-    <div className="min-h-screen">
-      <div className="relative py-6 lg:py-10">
-        <PageHeader
-          heading={fosdem.event.title}
-          breadcrumbs={[
-            { title: fosdem.type?.name, href: `/type/${fosdem.type?.id}` },
-            { title: fosdem.track?.name, href: `/track/${fosdem.track?.id}` },
-          ]}
-          subtitle={fosdem.event.subtitle}
-          metadata={[
-            {
-              text: `${fosdem.event.room}`,
-              href: `/rooms/${fosdem.event.room}`,
-            },
-            {
-              text: `Day ${fosdem.event.day}`,
-            },
-            {
-              text: `${fosdem.event.startTime} - ${calculateEndTime(fosdem.event.startTime, fosdem.event.duration)}`,
-            },
-            {
-              text: `Speakers: ${fosdem.event.persons?.join(", ")}`,
-            },
-          ]}
-        >
-          <div className="flex items-center md:pl-6 md:pr-3 gap-2">
-            <FavouriteButton
-              year={year}
-              type="event"
-              slug={fosdem.event.id}
-              status={bookmarkLoading || createLoading ? "loading" : bookmark?.status ?? "unfavourited"}
-              user={user}
-              onCreateBookmark={onCreateBookmark}
-            />
-            <ShareButton
-              title={fosdem.event.title}
-              text={`Check out ${fosdem.event.title} at FOSDEM`}
-              url={`https://fosdempwa.com/event/${fosdem.event.id}`}
-            />
-          </div>
-        </PageHeader>
-        <div className="w-full">
-          <EventMain
-            event={fosdem.event}
-            conference={fosdem.conference}
-            year={year}
-            isTest={isTest}
-          />
-        </div>
-      </div>
-    </div>
-  );
+	return (
+		<div className="min-h-screen">
+			<div className="relative py-6 lg:py-10">
+				<PageHeader
+					heading={fosdem.event.title}
+					breadcrumbs={[
+						{ title: fosdem.type?.name, href: `/type/${fosdem.type?.id}` },
+						{ title: fosdem.track?.name, href: `/track/${fosdem.track?.id}` },
+					]}
+					subtitle={fosdem.event.subtitle}
+					metadata={[
+						{
+							text: `${fosdem.event.room}`,
+							href: `/rooms/${fosdem.event.room}`,
+						},
+						{
+							text: `Day ${fosdem.event.day}`,
+						},
+						{
+							text: `${fosdem.event.startTime} - ${calculateEndTime(fosdem.event.startTime, fosdem.event.duration)}`,
+						},
+						{
+							text: `Speakers: ${fosdem.event.persons?.join(", ")}`,
+						},
+					]}
+				>
+					<div className="flex items-center md:pl-6 md:pr-3 gap-2">
+						<FavouriteButton
+							year={year}
+							type="event"
+							slug={fosdem.event.id}
+							status={
+								bookmarkLoading || createLoading
+									? "loading"
+									: (bookmark?.status ?? "unfavourited")
+							}
+							user={user}
+							onCreateBookmark={onCreateBookmark}
+						/>
+						<ShareButton
+							title={fosdem.event.title}
+							text={`Check out ${fosdem.event.title} at FOSDEM`}
+							url={`https://fosdempwa.com/event/${fosdem.event.id}`}
+						/>
+					</div>
+				</PageHeader>
+				<div className="w-full">
+					<EventMain
+						event={fosdem.event}
+						conference={fosdem.conference}
+						year={year}
+						isTest={isTest}
+					/>
+				</div>
+			</div>
+		</div>
+	);
 }

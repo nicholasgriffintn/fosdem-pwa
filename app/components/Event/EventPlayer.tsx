@@ -35,9 +35,7 @@ export function EventPlayer({
 
 	const videoRecordings =
 		event.links?.filter((link) => link.type?.startsWith("video/")) || [];
-	const subtitleTrack = event.links?.find(
-		(link) => link.href.endsWith(".vtt")
-	);
+	const subtitleTrack = event.links?.find((link) => link.href.endsWith(".vtt"));
 	const proxiedSubtitleUrl = subtitleTrack
 		? `/api/proxy/subtitles?url=${encodeURIComponent(subtitleTrack.href)}`
 		: null;
@@ -136,19 +134,19 @@ export function EventPlayer({
 							>
 								{eventIsLive && event.streams?.length
 									? event.streams.map((stream) => (
-										<source
-											key={stream.href}
-											src={stream.href}
-											type={stream.type}
-										/>
-									))
+											<source
+												key={stream.href}
+												src={stream.href}
+												type={stream.type}
+											/>
+										))
 									: videoRecordings.map((recording) => (
-										<source
-											key={recording.href}
-											src={recording.href}
-											type={recording.type}
-										/>
-									))}
+											<source
+												key={recording.href}
+												src={recording.href}
+												type={recording.type}
+											/>
+										))}
 								{proxiedSubtitleUrl && (
 									<track
 										kind="subtitles"

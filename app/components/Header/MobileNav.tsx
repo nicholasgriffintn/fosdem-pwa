@@ -59,7 +59,9 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 							<div className="flex items-center gap-2">
 								<span className="text-sm font-medium">{user.name}</span>
 								{user.is_guest && (
-									<Badge variant="secondary" className="text-xs">Guest</Badge>
+									<Badge variant="secondary" className="text-xs">
+										Guest
+									</Badge>
 								)}
 							</div>
 						</div>

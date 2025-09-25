@@ -5,11 +5,7 @@ import { useServerFn } from "@tanstack/start";
 
 import { getUserDetails } from "~/server/functions/user";
 
-export function useUserId({
-	userId,
-}: {
-	userId: string;
-}) {
+export function useUserId({ userId }: { userId: string }) {
 	const useGetUserDetails = useServerFn(getUserDetails);
 
 	const { data: user, isLoading } = useQuery({

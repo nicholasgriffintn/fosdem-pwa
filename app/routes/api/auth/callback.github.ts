@@ -55,7 +55,9 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 					body: errorText,
 				});
 
-				throw new Error(`GitHub Callback: API Error: ${githubUserResponse.status} ${githubUserResponse.statusText}`);
+				throw new Error(
+					`GitHub Callback: API Error: ${githubUserResponse.status} ${githubUserResponse.statusText}`,
+				);
 			}
 
 			const providerUser: GitHubUser = await githubUserResponse.json();
@@ -67,10 +69,7 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 			// Check if this is a guest user trying to upgrade
 			const { user: currentUser } = await getAuthSession();
 			if (currentUser?.is_guest) {
-				await upgradeGuestToGithub(
-					currentUser.id,
-					providerUser
-				);
+				await upgradeGuestToGithub(currentUser.id, providerUser);
 
 				await db.insert(oauthAccount).values({
 					provider_id: PROVIDER_ID,
@@ -167,13 +166,13 @@ export const APIRoute = createAPIFileRoute("/api/auth/callback/github")({
 		} catch (e) {
 			console.error("GitHub Callback: Auth error:", e);
 			if (e instanceof OAuth2RequestError) {
-				return new Response('OAuth2 Request Error', {
+				return new Response("OAuth2 Request Error", {
 					status: 400,
 				});
 			}
-			return new Response('Internal Server Error', {
+			return new Response("Internal Server Error", {
 				status: 500,
 			});
 		}
-	}
+	},
 });

@@ -29,7 +29,11 @@ type D1Response = {
 export const db = drizzle(
 	async (sql: string, params: any[], method: string) => {
 		const env = getCloudflareEnv();
-		const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_DATABASE_ID, CLOUDFLARE_D1_TOKEN } = env;
+		const {
+			CLOUDFLARE_ACCOUNT_ID,
+			CLOUDFLARE_DATABASE_ID,
+			CLOUDFLARE_D1_TOKEN,
+		} = env;
 
 		if (
 			!CLOUDFLARE_ACCOUNT_ID ||
@@ -53,7 +57,8 @@ export const db = drizzle(
 
 		if (response.status !== 200)
 			throw new Error(
-				`Error from sqlite proxy server: ${response.status} ${response.statusText
+				`Error from sqlite proxy server: ${response.status} ${
+					response.statusText
 				}\n${JSON.stringify(await response.json())}`,
 			);
 
@@ -61,7 +66,8 @@ export const db = drizzle(
 
 		if (!responseJson.success) {
 			throw new Error(
-				`Error from Cloudflare D1: ${response.status} ${response.statusText
+				`Error from Cloudflare D1: ${response.status} ${
+					response.statusText
 				}\n${JSON.stringify(responseJson)}`,
 			);
 		}

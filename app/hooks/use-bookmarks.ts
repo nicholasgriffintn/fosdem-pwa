@@ -6,19 +6,21 @@ import { useServerFn } from "@tanstack/start";
 import { getBookmarks } from "~/server/functions/bookmarks";
 
 export function useBookmarks({ year }: { year: number }) {
-    const useGetBookmarks = useServerFn(getBookmarks);
+	const useGetBookmarks = useServerFn(getBookmarks);
 
-    const { data: bookmarks, isLoading } = useQuery({
-        queryKey: ["bookmarks", year],
-        queryFn: async () => {
-            const data = await useGetBookmarks({ data: { year, status: 'favourited' } });
+	const { data: bookmarks, isLoading } = useQuery({
+		queryKey: ["bookmarks", year],
+		queryFn: async () => {
+			const data = await useGetBookmarks({
+				data: { year, status: "favourited" },
+			});
 
-            return data;
-        },
-    });
+			return data;
+		},
+	});
 
-    return {
-        bookmarks,
-        loading: isLoading,
-    };
+	return {
+		bookmarks,
+		loading: isLoading,
+	};
 }
