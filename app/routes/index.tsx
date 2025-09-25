@@ -42,7 +42,7 @@ function Home() {
 					text={`${fosdem.conference.city} / ${fosdem.conference.start} - ${fosdem.conference.end}`}
 					year={year}
 				/>
-				<ConferenceScheduleNotice conference={fosdem.conference} />
+				<ConferenceScheduleNotice conference={fosdem.conference} year={year} />
 				<div>{fosdem.types && <TypesList types={fosdem.types} />}</div>
 			</div>
 		</div>
