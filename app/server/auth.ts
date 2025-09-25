@@ -15,7 +15,7 @@ import {
 	session as sessionTable,
 	user as userTable,
 	type Session,
-	type User
+	type User,
 } from "~/server/db/schema";
 import type { GitHubUser } from "~/types/user";
 
@@ -172,8 +172,9 @@ export async function getAuthSession(
 	}
 
 	return {
-		session, user,
-		isGuest: user.is_guest === true
+		session,
+		user,
+		isGuest: user.is_guest === true,
 	};
 }
 
@@ -183,8 +184,8 @@ export const getFullAuthSession = getAuthSession;
  * Generates a random guest username
  */
 function generateGuestUsername(): string {
-	const adjectives = ['Happy', 'Quick', 'Clever', 'Bright', 'Swift'];
-	const nouns = ['Penguin', 'Dolphin', 'Eagle', 'Lion', 'Fox'];
+	const adjectives = ["Happy", "Quick", "Clever", "Bright", "Swift"];
+	const nouns = ["Penguin", "Dolphin", "Eagle", "Lion", "Fox"];
 	const randomNum = Math.floor(Math.random() * 10000);
 
 	const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
@@ -208,9 +209,7 @@ export async function createGuestUser(): Promise<User> {
 		updated_at: now,
 	};
 
-	const [user] = await db.insert(userTable)
-		.values(guestUser)
-		.returning();
+	const [user] = await db.insert(userTable).values(guestUser).returning();
 
 	return user;
 }
@@ -224,10 +223,13 @@ export async function upgradeGuestToGithub(
 ): Promise<User> {
 	const now = createStandardDate(new Date()).toISOString();
 
-	const [updatedUser] = await db.update(userTable)
+	const [updatedUser] = await db
+		.update(userTable)
 		.set({
 			github_username: providerUser.login,
-			email: providerUser.email || `${providerUser.id}+${providerUser.login}@users.noreply.github.com`,
+			email:
+				providerUser.email ||
+				`${providerUser.id}+${providerUser.login}@users.noreply.github.com`,
 			name: providerUser.name || providerUser.login,
 			avatar_url: providerUser.avatar_url,
 			company: providerUser.company,
@@ -238,22 +240,16 @@ export async function upgradeGuestToGithub(
 			is_guest: false,
 			updated_at: now,
 		})
-		.where(
-			and(
-				eq(userTable.id, userId),
-				eq(userTable.is_guest, true)
-			)
-		)
+		.where(and(eq(userTable.id, userId), eq(userTable.is_guest, true)))
 		.returning();
 
-	const sessions = await db.select()
+	const sessions = await db
+		.select()
 		.from(sessionTable)
 		.where(eq(sessionTable.user_id, userId));
 
 	await Promise.all(
-		sessions.map(session =>
-			cache.invalidate(`session_${session.id}`)
-		)
+		sessions.map((session) => cache.invalidate(`session_${session.id}`)),
 	);
 
 	return updatedUser;

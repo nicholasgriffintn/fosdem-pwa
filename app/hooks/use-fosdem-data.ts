@@ -5,11 +5,7 @@ import { useServerFn } from "@tanstack/start";
 
 import { getAllData } from "~/server/functions/fosdem";
 
-export function useFosdemData({
-	year,
-}: {
-	year: number;
-}) {
+export function useFosdemData({ year }: { year: number }) {
 	const getData = useServerFn(getAllData);
 
 	const { data: fosdemData, isLoading } = useQuery({

@@ -80,35 +80,33 @@ export function EventNotes({
 				)}
 				{!loading && notes && (
 					<ul className="space-y-2">
-						{notes.map(
-							(note: { isPending?: boolean } & Note) => (
-								<li
-									key={note.id}
-									className={`bg-muted/30 rounded-lg p-3 transition-opacity ${note.isPending ? "opacity-50" : ""}`}
-								>
-									<div className="flex flex-col gap-2">
-										<p className="flex-1">{note.note}</p>
-										<div className="flex items-center gap-2 text-xs text-muted-foreground">
-											<span>{formatDate(note.created_at)}</span>
-											{note.time && (
-												<>
-													<span>•</span>
-													<button
-														type="button"
-														className="bg-primary/10 px-2 py-1 rounded-md cursor-pointer hover:bg-primary/20"
-														onClick={() => {
-															handleClickTime(note.time || 0);
-														}}
-													>
-														@{formatTime(note.time)}
-													</button>
-												</>
-											)}
-										</div>
+						{notes.map((note: { isPending?: boolean } & Note) => (
+							<li
+								key={note.id}
+								className={`bg-muted/30 rounded-lg p-3 transition-opacity ${note.isPending ? "opacity-50" : ""}`}
+							>
+								<div className="flex flex-col gap-2">
+									<p className="flex-1">{note.note}</p>
+									<div className="flex items-center gap-2 text-xs text-muted-foreground">
+										<span>{formatDate(note.created_at)}</span>
+										{note.time && (
+											<>
+												<span>•</span>
+												<button
+													type="button"
+													className="bg-primary/10 px-2 py-1 rounded-md cursor-pointer hover:bg-primary/20"
+													onClick={() => {
+														handleClickTime(note.time || 0);
+													}}
+												>
+													@{formatTime(note.time)}
+												</button>
+											</>
+										)}
 									</div>
-								</li>
-							),
-						)}
+								</div>
+							</li>
+						))}
 					</ul>
 				)}
 			</div>

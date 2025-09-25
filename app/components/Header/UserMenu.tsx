@@ -39,7 +39,9 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 						<div className="flex items-center gap-2">
 							<p className="text-sm font-medium leading-none">{user.name}</p>
 							{user.is_guest && (
-								<Badge variant="secondary" className="text-xs">Guest</Badge>
+								<Badge variant="secondary" className="text-xs">
+									Guest
+								</Badge>
 							)}
 						</div>
 						<p className="text-xs leading-none text-muted-foreground">

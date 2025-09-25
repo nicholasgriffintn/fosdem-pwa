@@ -67,12 +67,15 @@ export function ServiceWorkerUpdater() {
 			}
 		}; */
 
-		const serverFunctionsChannel = new BroadcastChannel("server-functions-sync");
+		const serverFunctionsChannel = new BroadcastChannel(
+			"server-functions-sync",
+		);
 		serverFunctionsChannel.onmessage = (event) => {
 			if (event.data.type === "SYNC_COMPLETE") {
 				toast({
 					title: "Offline requests processed",
-					description: "Requests that were queued while offline have been processed",
+					description:
+						"Requests that were queued while offline have been processed",
 					duration: 3000,
 				});
 			}
@@ -86,7 +89,7 @@ export function ServiceWorkerUpdater() {
 				"beforeinstallprompt",
 				handleBeforeInstallPrompt,
 			);
-			window.removeEventListener("appinstalled", () => { });
+			window.removeEventListener("appinstalled", () => {});
 			dataChannel.close();
 			// syncChannel.close();
 			serverFunctionsChannel.close();

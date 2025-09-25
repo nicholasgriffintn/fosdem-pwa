@@ -72,14 +72,14 @@ export function TypesList({ types }: TypesListProps) {
 								{fosdemTypeDescriptions[
 									typeKey as keyof typeof fosdemTypeDescriptions
 								] && (
-										<p className="text-sm">
-											{
-												fosdemTypeDescriptions[
+									<p className="text-sm">
+										{
+											fosdemTypeDescriptions[
 												typeKey as keyof typeof fosdemTypeDescriptions
-												]
-											}
-										</p>
-									)}
+											]
+										}
+									</p>
+								)}
 							</CardContent>
 							<CardFooter>
 								<Button

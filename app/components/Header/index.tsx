@@ -50,7 +50,12 @@ export function Header() {
 		<header className="sticky top-0 z-40 w-full border-b bg-background">
 			<div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
 				<MainNav title="FOSDEM PWA" items={navItems} />
-				<div className={cn("flex flex-1 items-center space-x-4 sm:justify-end", user?.id || loading ? "" : "gap-4")}>
+				<div
+					className={cn(
+						"flex flex-1 items-center space-x-4 sm:justify-end",
+						user?.id || loading ? "" : "gap-4",
+					)}
+				>
 					<nav className="hidden md:flex space-x-4">
 						<TooltipProvider>
 							<Tooltip>
@@ -65,7 +70,10 @@ export function Header() {
 										<Button
 											variant="link"
 											size="icon"
-											className={cn("h-7 text-muted-foreground no-underline", user?.id || loading ? "w-7" : "")}
+											className={cn(
+												"h-7 text-muted-foreground no-underline",
+												user?.id || loading ? "w-7" : "",
+											)}
 											asChild
 										>
 											<Link
@@ -98,6 +106,6 @@ export function Header() {
 					</div>
 				</div>
 			</div>
-		</header >
+		</header>
 	);
 }

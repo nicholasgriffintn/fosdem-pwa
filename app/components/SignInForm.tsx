@@ -15,7 +15,9 @@ export function SignInForm() {
 		setIsSubmitting(true);
 	};
 
-	const handleGuestSignIn = async (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleGuestSignIn = async (
+		event: React.MouseEvent<HTMLButtonElement>,
+	) => {
 		event.preventDefault();
 		setIsGuestSubmitting(true);
 		try {
@@ -57,9 +59,7 @@ export function SignInForm() {
 					<span className="w-full border-t" />
 				</div>
 				<div className="relative flex justify-center text-xs uppercase mt-4 mb-4">
-					<span className="bg-background px-2 text-muted-foreground">
-						Or
-					</span>
+					<span className="bg-background px-2 text-muted-foreground">Or</span>
 				</div>
 			</div>
 
