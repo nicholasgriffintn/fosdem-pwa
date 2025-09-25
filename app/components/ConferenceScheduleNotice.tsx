@@ -6,9 +6,10 @@ import type { ConferenceData } from "~/types/fosdem";
 
 interface ConferenceScheduleNoticeProps {
   conference: ConferenceData;
+  year: number;
 }
 
-export function ConferenceScheduleNotice({ conference }: ConferenceScheduleNoticeProps) {
+export function ConferenceScheduleNotice({ conference, year }: ConferenceScheduleNoticeProps) {
   const showNotice = isConferenceMoreThanOneMonthAway(conference);
 
   if (!showNotice) {
@@ -18,7 +19,7 @@ export function ConferenceScheduleNotice({ conference }: ConferenceScheduleNotic
   return (
     <Alert className="mb-6">
       <AlertCircle className="h-4 w-4" />
-      <AlertTitle>FOSDEM is still being scheduled</AlertTitle>
+      <AlertTitle>FOSDEM {year} is still being scheduled</AlertTitle>
       <AlertDescription>
         Events and tracks will be added as they become available closer to the event date.
       </AlertDescription>
