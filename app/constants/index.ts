@@ -3,10 +3,10 @@ export const constants = {
 	TURNSTILE_SITE_KEY: "0x4AAAAAAA4mg92kNkVgcTr6",
 	VAPID_PUBLIC_KEY:
 		"BMffAMKiYl48_xzTVOcVHwO-ZJ0FV3Vfnl8JJTwdhhQCNbLPqKrXnFToaGjH_Qcx0c7b8lMY_umIc3g9342CDSU",
-	DEFAULT_YEAR: 2025,
+	DEFAULT_YEAR: 2026,
 	AVAILABLE_YEARS: [
 		2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
-		2024, 2025,
+		2024, 2025, 2026,
 	],
 	DATA_LINK: "https://r2.fosdempwa.com/fosdem-${YEAR}.json",
 	STREAM_LINK: "https://stream.fosdem.org/${ROOM_ID}.m3u8",

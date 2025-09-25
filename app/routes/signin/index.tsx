@@ -4,6 +4,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { PageHeader } from "~/components/PageHeader";
 import { Spinner } from "~/components/Spinner";
 import { SignInForm } from "~/components/SignInForm";
+import { constants } from "~/constants";
 
 export const Route = createFileRoute("/signin/")({
 	component: SignInPage,
@@ -33,7 +34,7 @@ function SignInPage() {
 			<Navigate
 				to="/"
 				search={{
-					year: 2025,
+					year: constants.DEFAULT_YEAR,
 				}}
 			/>
 		);
