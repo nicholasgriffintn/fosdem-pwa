@@ -83,7 +83,7 @@ function EventPage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Event not found" />
+					<PageHeader heading="Event not found" year={year} />
 				</div>
 			</div>
 		);
@@ -99,6 +99,7 @@ function EventPage() {
 			<div className="relative py-6 lg:py-10">
 				<PageHeader
 					heading={fosdem.event.title}
+					year={year}
 					breadcrumbs={[
 						{ title: fosdem.type?.name, href: `/type/${fosdem.type?.id}` },
 						{ title: fosdem.track?.name, href: `/track/${fosdem.track?.id}` },

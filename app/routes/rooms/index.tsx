@@ -43,7 +43,7 @@ function RoomsPage() {
 	return (
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
-				<PageHeader heading="Rooms" />
+				<PageHeader heading="Rooms" year={year} />
 				<div className="mt-6">
 					<RoomList rooms={rooms} year={year} groupByBuilding />
 				</div>

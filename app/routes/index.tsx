@@ -27,6 +27,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
 	const { fosdem } = Route.useLoaderData();
+	const { year } = Route.useSearch();
 
 	if (!fosdem) {
 		return <div>Loading...</div>;
@@ -38,6 +39,7 @@ function Home() {
 				<PageHeader
 					heading={fosdem.conference.title}
 					text={`${fosdem.conference.city} / ${fosdem.conference.start} - ${fosdem.conference.end}`}
+					year={year}
 				/>
 				<div>{fosdem.types && <TypesList types={fosdem.types} />}</div>
 			</div>

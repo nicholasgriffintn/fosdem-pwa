@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
+import { constants } from "~/constants";
+import { Alert, AlertTitle } from "~/components/ui/alert";
 
 type PageHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 	heading: string;
@@ -18,6 +20,7 @@ type PageHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 		text: string;
 		href?: string;
 	}[];
+	year?: number;
 };
 
 export function PageHeader({
@@ -29,9 +32,17 @@ export function PageHeader({
 	displayHeading = true,
 	breadcrumbs,
 	metadata,
+	year = constants.DEFAULT_YEAR,
 }: PageHeaderProps) {
 	return (
 		<>
+			{year && year !== constants.DEFAULT_YEAR && (
+				<Alert variant="destructive" className="mb-4">
+					<AlertTitle>
+						<span>You are viewing the {year} edition of FOSDEM.</span>
+					</AlertTitle>
+				</Alert>
+			)}
 			{breadcrumbs && breadcrumbs.length > 0 && (
 				<ul className="flex flex-row gap-2 mb-4 text-sm text-muted-foreground">
 					{breadcrumbs.map((breadcrumb, index) => (
