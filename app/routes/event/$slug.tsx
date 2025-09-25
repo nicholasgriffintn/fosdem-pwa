@@ -137,7 +137,7 @@ function EventPage() {
 						<ShareButton
 							title={fosdem.event.title}
 							text={`Check out ${fosdem.event.title} at FOSDEM`}
-							url={`https://fosdempwa.com/event/${fosdem.event.id}`}
+							url={`https://fosdempwa.com/event/${fosdem.event.id}?year=${year}`}
 						/>
 					</div>
 				</PageHeader>
