@@ -61,7 +61,7 @@ function ProfilePage() {
 	return (
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
-				<PageHeader heading="Profile" displayHeading={false} />
+				<PageHeader heading="Profile" displayHeading={false} year={year} />
 				<div className="space-y-8">
 					<div className="flex flex-col lg:flex-row items-start gap-8">
 						<div className="w-full lg:w-auto lg:max-w-md">

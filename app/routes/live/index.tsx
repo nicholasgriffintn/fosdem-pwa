@@ -70,6 +70,7 @@ function LivePage() {
 				<PageHeader
 					heading="Live & Upcoming"
 					text="All events that are currently live or starting soon"
+					year={year}
 				/>
 				<div className="w-full space-y-8">
 					<section>

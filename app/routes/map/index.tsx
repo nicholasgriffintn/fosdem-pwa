@@ -1,10 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { PageHeader } from "~/components/PageHeader";
 import { Image } from "~/components/Image";
+import { constants } from "~/constants";
 
 export const Route = createFileRoute("/map/")({
 	component: MapPage,
+	validateSearch: ({ year }: { year: number }) => ({
+		year:
+			(constants.AVAILABLE_YEARS.includes(year) && year) ||
+			constants.DEFAULT_YEAR,
+	}),
 	head: () => ({
 		meta: [
 			{
@@ -18,6 +24,8 @@ export const Route = createFileRoute("/map/")({
 });
 
 function MapPage() {
+	const { year } = Route.useSearch();
+
 	return (
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
@@ -26,6 +34,7 @@ function MapPage() {
 					text={
 						"Map of the ULB Solbosch Campus, the location of the FOSDEM event"
 					}
+					year={year}
 				/>
 				<div className="w-full">
 					<Image

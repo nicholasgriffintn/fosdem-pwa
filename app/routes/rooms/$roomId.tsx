@@ -89,6 +89,7 @@ function RoomPage() {
 					<PageHeader
 						heading="Room not found"
 						breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
+						year={year}
 					/>
 				</div>
 			</div>
@@ -109,6 +110,7 @@ function RoomPage() {
 						},
 					]}
 					breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
+					year={year}
 				/>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

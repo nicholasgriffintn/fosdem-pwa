@@ -51,7 +51,7 @@ function BookmarksHome() {
 	return (
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
-				<PageHeader heading="Bookmarks" />
+				<PageHeader heading="Bookmarks" year={year} />
 				{authLoading || loading ? (
 					<div className="flex justify-center items-center">
 						<Spinner className="h-8 w-8" />

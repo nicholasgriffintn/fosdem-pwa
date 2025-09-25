@@ -53,7 +53,7 @@ function TrackPage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Track not found" />
+					<PageHeader heading="Track not found" year={year} />
 				</div>
 			</div>
 		);
@@ -64,6 +64,7 @@ function TrackPage() {
 			<div className="relative py-6 lg:py-10">
 				<PageHeader
 					heading={fosdem.track.name}
+					year={year}
 					breadcrumbs={
 						fosdem.type
 							? [{ title: fosdem.type.name, href: `/type/${fosdem.type.id}` }]
