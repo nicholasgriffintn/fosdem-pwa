@@ -151,3 +151,25 @@ export function calculateTransitionTime(event1: Event, event2: Event) {
 
 	return totalMinutes2 - totalMinutes1;
 }
+
+export function isConferenceMoreThanOneMonthAway(
+	conference: ConferenceData,
+	referenceDate?: Date,
+): boolean {
+	try {
+		const now = referenceDate
+			? createStandardDate(referenceDate)
+			: createStandardDate(new Date());
+		const conferenceStart = createStandardDate(conference.start);
+
+		// Calculate the difference in months
+		const diffTime = conferenceStart.getTime() - now.getTime();
+		const diffDays = diffTime / (1000 * 60 * 60 * 24);
+		const diffMonths = diffDays / 30.44; // Average days in a month
+
+		return diffMonths > 1;
+	} catch (error) {
+		console.error("Error checking if conference is more than 1 month away:", error);
+		return false;
+	}
+}

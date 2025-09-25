@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TypesList } from "~/components/Type/TypesList";
 import { getAllData } from "~/server/functions/fosdem";
 import { PageHeader } from "~/components/PageHeader";
+import { ConferenceScheduleNotice } from "~/components/ConferenceScheduleNotice";
 import { constants } from "~/constants";
 
 export const Route = createFileRoute("/")({
@@ -41,6 +42,7 @@ function Home() {
 					text={`${fosdem.conference.city} / ${fosdem.conference.start} - ${fosdem.conference.end}`}
 					year={year}
 				/>
+				<ConferenceScheduleNotice conference={fosdem.conference} />
 				<div>{fosdem.types && <TypesList types={fosdem.types} />}</div>
 			</div>
 		</div>
