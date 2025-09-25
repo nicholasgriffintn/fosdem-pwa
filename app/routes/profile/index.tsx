@@ -55,7 +55,7 @@ function ProfilePage() {
 	}
 
 	if (!user) {
-		return <Navigate to="/" search={{ year }} />;
+		return <Navigate to="/" search={(prev) => ({ year: prev.year || constants.DEFAULT_YEAR })} />;
 	}
 
 	return (

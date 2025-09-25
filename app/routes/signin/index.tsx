@@ -33,9 +33,7 @@ function SignInPage() {
 		return (
 			<Navigate
 				to="/"
-				search={{
-					year: constants.DEFAULT_YEAR,
-				}}
+				search={(prev) => ({ year: prev.year || constants.DEFAULT_YEAR })}
 			/>
 		);
 	}

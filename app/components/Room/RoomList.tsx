@@ -3,6 +3,8 @@ import { Link } from "@tanstack/react-router";
 
 import type { RoomData } from "~/types/fosdem";
 import { sortRooms } from "~/lib/sorting";
+import { constants } from "../../constants";
+
 type RoomListProps = {
 	rooms: RoomData[];
 	year: number;
@@ -30,7 +32,7 @@ function RoomListItem({ year, room, index, isLast }: RoomListItemProps) {
 					<Link
 						to="/rooms/$roomId"
 						params={{ roomId: room.slug }}
-						search={{ year, day: undefined }}
+						search={(prev) => ({ year: prev.year || constants.DEFAULT_YEAR, day: undefined })}
 					>
 						<h3 className="font-semibold leading-none tracking-tight">
 							{room.name}
