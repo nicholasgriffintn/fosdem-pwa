@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/start";
 
 import { getSession } from "~/server/functions/session";
+import { constants } from "~/constants";
 
 export function useAuth() {
 	const queryClient = useQueryClient();
@@ -31,7 +32,7 @@ export function useAuth() {
 		},
 		onSuccess: () => {
 			queryClient.setQueryData(["auth"], null);
-			navigate({ to: "/", search: { year: 2025 } });
+			navigate({ to: "/", search: { year: constants.DEFAULT_YEAR } });
 		},
 	});
 
