@@ -3,12 +3,13 @@
 import { useState } from "react";
 
 import type { Event } from "~/types/fosdem";
+import type { Note } from "~/server/db/schema";
+import type { LocalNote } from "~/lib/localStorage";
 import { Button } from "~/components/ui/button";
 import { useNotes } from "~/hooks/use-notes";
 import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "~/hooks/use-toast";
 import { formatDate, formatTime, createStandardDate } from "~/lib/dateTime";
-import type { Note } from "~/server/db/schema";
 
 type EventNotesProps = {
 	year: number;
@@ -80,7 +81,7 @@ export function EventNotes({
 				)}
 				{!loading && notes && (
 					<ul className="space-y-2">
-						{notes.map((note: { isPending?: boolean } & Note) => (
+						{notes.map((note: { isPending?: boolean } & (LocalNote | Note)) => (
 							<li
 								key={note.id}
 								className={`bg-muted/30 rounded-lg p-3 transition-opacity ${note.isPending ? "opacity-50" : ""}`}

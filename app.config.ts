@@ -5,9 +5,7 @@ import { cloudflare } from 'unenv'
 export default defineConfig({
   vite: {
     plugins: [
-      tsConfigPaths({
-        projects: ["./tsconfig.json"],
-      }),
+      tsConfigPaths(),
     ],
     build: {
       rollupOptions: {
