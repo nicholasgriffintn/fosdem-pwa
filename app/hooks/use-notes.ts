@@ -2,10 +2,14 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/start";
+import { useEffect, useMemo } from "react";
 
 import type { Event } from "~/types/fosdem";
 import { createStandardDate } from "../lib/dateTime";
 import { getNotes, createNote } from "~/server/functions/notes";
+import { useAuth } from "~/hooks/use-auth";
+import { syncAllOfflineData } from "~/lib/backgroundSync";
+import { useLocalNotes } from "~/hooks/use-local-notes";
 
 export function useNotes({
 	year,
@@ -16,17 +20,52 @@ export function useNotes({
 	event: Event;
 	userId?: string;
 }) {
+	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const getNotesFromServer = useServerFn(getNotes);
 	const createNoteFromServer = useServerFn(createNote);
 
-	const { data: notes, isLoading } = useQuery({
+	const { notes: localNotes, saveNote: saveLocalNote, loading: localLoading } = useLocalNotes({
+		year,
+		slug: event.slug,
+	});
+
+	const { data: serverNotes, isLoading: serverLoading } = useQuery({
 		queryKey: ["notes", userId, year, event.slug],
 		queryFn: async () => {
+			if (!user?.id) return [];
+
 			const notes = await getNotesFromServer({ data: { year, eventId: event.id } });
 			return notes;
 		},
+		enabled: !!user?.id,
+		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
+
+	const mergedNotes = useMemo(() => {
+		if (!user?.id) {
+			return localNotes || [];
+		}
+
+		if (!serverNotes || !localNotes) {
+			return localNotes || serverNotes || [];
+		}
+
+		const serverMap = new Map(serverNotes.map(n => [n.id, n]));
+
+		return localNotes.map(local => {
+			// Try to find a matching server note by year/slug combination
+			const matchingServerNote = serverNotes.find(serverNote =>
+				serverNote.year === local.year && serverNote.slug === local.slug
+			);
+
+			return {
+				...local,
+				serverId: matchingServerNote?.id,
+				existsOnServer: !!matchingServerNote,
+			};
+		}) as any;
+	}, [user?.id, localNotes, serverNotes]);
 
 	const create = useMutation({
 		mutationKey: ["createNote"],
@@ -39,6 +78,16 @@ export function useNotes({
 			time?: number;
 			tempId: string;
 		}) => {
+			if (!user?.id) {
+				// Save locally if not authenticated
+				saveLocalNote({
+					year,
+					slug: event.slug,
+					note: note,
+				});
+				return { success: true, tempId };
+			}
+
 			const response = await createNoteFromServer({
 				data: { year, eventId: event.id, note, time },
 			});
@@ -49,6 +98,10 @@ export function useNotes({
 			await queryClient.cancelQueries({
 				queryKey: ["notes", userId, year, event.slug],
 			});
+			await queryClient.cancelQueries({
+				queryKey: ["local-notes", year, event.slug],
+			});
+
 			const previousNotes = queryClient.getQueryData([
 				"notes",
 				userId,
@@ -56,26 +109,46 @@ export function useNotes({
 				event.slug,
 			]);
 
+			const previousLocalNotes = queryClient.getQueryData([
+				"local-notes",
+				year,
+				event.slug,
+			]);
+
+			const timestamp = createStandardDate(new Date()).getTime();
+			const optimisticNote = {
+				id: newNote.tempId,
+				note: newNote.note,
+				time: newNote.time,
+				created_at: timestamp,
+				isPending: true,
+			};
+
+			// Update both server and local queries
 			queryClient.setQueryData(
 				["notes", userId, year, event.slug],
-				(old: any[] = []) => {
-					const timestamp = createStandardDate(new Date()).getTime();
-					const optimisticNote = {
-						id: newNote.tempId,
-						note: newNote.note,
-						time: newNote.time,
-						created_at: timestamp,
-						isPending: true,
-					};
-					return [...old, optimisticNote];
-				},
+				(old: any[] = []) => [...old, optimisticNote],
 			);
 
-			return { previousNotes };
+			queryClient.setQueryData(
+				["local-notes", year, event.slug],
+				(old: any[] = []) => [...old, optimisticNote],
+			);
+
+			return { previousNotes, previousLocalNotes };
 		},
 		onSuccess: (data) => {
 			queryClient.setQueryData(
 				["notes", userId, year, event.slug],
+				(old: any[] = []) => {
+					return old.map((note: any) =>
+						note.id === data.tempId ? { ...data, isPending: false } : note
+					);
+				},
+			);
+
+			queryClient.setQueryData(
+				["local-notes", year, event.slug],
 				(old: any[] = []) => {
 					return old.map((note: any) =>
 						note.id === data.tempId ? { ...data, isPending: false } : note
@@ -88,17 +161,57 @@ export function useNotes({
 				["notes", userId, year, event.slug],
 				context?.previousNotes,
 			);
+
+			queryClient.setQueryData(
+				["local-notes", year, event.slug],
+				context?.previousLocalNotes,
+			);
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({
 				queryKey: ["notes", userId, year, event.slug],
 			});
+
+			queryClient.invalidateQueries({
+				queryKey: ["local-notes", year, event.slug],
+			});
 		},
 	});
 
+	useEffect(() => {
+		if (!user?.id) return;
+
+		if (localNotes && localNotes.length > 0) {
+			syncAllOfflineData().catch(error => {
+				console.error('Background sync failed:', error);
+			});
+		}
+	}, [user?.id, localNotes]);
+
+	useEffect(() => {
+		if (!user?.id) return;
+
+		if (serverNotes && localNotes) {
+			const localYearSlugs = new Set(localNotes.map(n => `${n.year}_${n.slug}`));
+
+			const newFromServer = serverNotes.filter(n => !localYearSlugs.has(`${n.year}_${n.slug}`));
+
+			if (newFromServer.length > 0) {
+				newFromServer.forEach(serverNote => {
+					saveLocalNote({
+						year: serverNote.year,
+						slug: serverNote.slug,
+						note: serverNote.note,
+						time: serverNote.time,
+					});
+				});
+			}
+		}
+	}, [user?.id, serverNotes, localNotes, saveLocalNote]);
+
 	return {
-		notes,
-		loading: isLoading,
+		notes: mergedNotes,
+		loading: localLoading || (user?.id ? serverLoading : false),
 		create: create.mutate,
 	};
 }

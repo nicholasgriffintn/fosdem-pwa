@@ -10,7 +10,7 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
 
 	if (!user) {
 		setResponseStatus(401);
-		return;
+		return next({ context: undefined });
 	}
 
 	return next({ context: { user } });

@@ -74,7 +74,6 @@ function ProfilePage() {
 								<h2 className="text-2xl font-bold">Your Bookmarks</h2>
 								{user?.github_username && (
 									<SetBookmarksVisability
-										year={year}
 										userId={user.github_username}
 										bookmarksVisibility={user.bookmarks_visibility}
 									/>

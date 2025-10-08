@@ -1,5 +1,6 @@
 const STORAGE_KEYS = {
   BOOKMARKS: 'fosdem_bookmarks',
+  NOTES: 'fosdem_notes',
   SYNC_QUEUE: 'fosdem_sync_queue',
 } as const;
 
@@ -20,7 +21,8 @@ export interface LocalNote {
   id: string;
   year: number;
   slug: string;
-  content: string;
+  note: string;
+  time?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -128,6 +130,105 @@ export function removeLocalBookmark(id: string): boolean {
     return true;
   } catch (error) {
     console.error('Error removing local bookmark:', error);
+    return false;
+  }
+}
+
+export function getLocalNotes(year?: number): LocalNote[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.NOTES);
+    if (!stored) return [];
+
+    const notes: LocalNote[] = JSON.parse(stored);
+    return year ? notes.filter(n => n.year === year) : notes;
+  } catch (error) {
+    console.error('Error reading local notes:', error);
+    return [];
+  }
+}
+
+export function saveLocalNote(note: Omit<LocalNote, 'id' | 'created_at' | 'updated_at'>): LocalNote {
+  const now = new Date().toISOString();
+  const id = `${note.year}_${note.slug}_${Date.now()}`;
+
+  const newNote: LocalNote = {
+    id,
+    ...note,
+    created_at: now,
+    updated_at: now,
+  };
+
+  try {
+    const existing = getLocalNotes();
+    const updated = [...existing.filter(n => n.id !== id), newNote];
+    localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(updated));
+
+    addToSyncQueue({
+      id,
+      type: 'note',
+      action: 'create',
+      data: { ...newNote, content: newNote.note },
+      timestamp: now,
+    });
+
+    return newNote;
+  } catch (error) {
+    console.error('Error saving local note:', error);
+    throw error;
+  }
+}
+
+export function updateLocalNote(id: string, updates: Partial<LocalNote>): LocalNote | null {
+  try {
+    const existing = getLocalNotes();
+    const index = existing.findIndex(n => n.id === id);
+
+    if (index === -1) return null;
+
+    const updatedNote: LocalNote = {
+      ...existing[index],
+      ...updates,
+      updated_at: new Date().toISOString(),
+    };
+
+    existing[index] = updatedNote;
+    localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(existing));
+
+    addToSyncQueue({
+      id,
+      type: 'note',
+      action: 'update',
+      data: { ...updatedNote, content: updatedNote.note },
+      timestamp: new Date().toISOString(),
+    });
+
+    return updatedNote;
+  } catch (error) {
+    console.error('Error updating local note:', error);
+    return null;
+  }
+}
+
+export function removeLocalNote(id: string): boolean {
+  try {
+    const existing = getLocalNotes();
+    const filtered = existing.filter(n => n.id !== id);
+
+    if (filtered.length === existing.length) return false;
+
+    localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(filtered));
+
+    addToSyncQueue({
+      id,
+      type: 'note',
+      action: 'delete',
+      data: { id },
+      timestamp: new Date().toISOString(),
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Error removing local note:', error);
     return false;
   }
 }
