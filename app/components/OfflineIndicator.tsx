@@ -13,6 +13,7 @@ export function OfflineIndicator() {
 	const [isMounted, setIsMounted] = useState(false);
 	const [isVisible, setIsVisible] = useState(false);
 	const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
+	const [wasOffline, setWasOffline] = useState(false);
 	const isOnline = useOnlineStatus();
 	const { user } = useAuth();
 
@@ -23,26 +24,32 @@ export function OfflineIndicator() {
 		registerBackgroundSync();
 
 		const handleOnline = () => {
-			setIsVisible(true);
-			setSyncStatus('syncing');
+			if (wasOffline) {
+				setIsVisible(true);
+				setSyncStatus('syncing');
 
-			syncOfflineData();
+				syncOfflineData();
 
-			setTimeout(() => {
-				setIsVisible(false);
-				setSyncStatus('idle');
-			}, 5000);
+				setTimeout(() => {
+					setIsVisible(false);
+					setSyncStatus('idle');
+				}, 5000);
+			}
+			setWasOffline(false);
 		};
 
 		const handleOffline = () => {
 			setIsVisible(true);
 			setSyncStatus('idle');
+			setWasOffline(true);
 		};
 
-		if (isOnline) {
-			handleOnline();
-		} else {
-			handleOffline();
+		if (isMounted) {
+			if (isOnline) {
+				handleOnline();
+			} else {
+				handleOffline();
+			}
 		}
 
 		window.addEventListener("online", handleOnline);
@@ -66,7 +73,7 @@ export function OfflineIndicator() {
 				navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
 			}
 		};
-	}, [isOnline]);
+	}, [isOnline, isMounted, wasOffline]);
 
 	const syncOfflineData = async () => {
 		try {
