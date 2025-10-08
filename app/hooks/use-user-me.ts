@@ -6,12 +6,12 @@ import { useServerFn } from "@tanstack/start";
 import { getSession } from "~/server/functions/session";
 
 export function useProfile() {
-	const useGetSessionData = useServerFn(getSession);
+	const getSessionDataFromServer = useServerFn(getSession);
 
 	const { data: user, isLoading } = useQuery({
 		queryKey: ["profile", "me"],
 		queryFn: async () => {
-			const user = await useGetSessionData();
+			const user = await getSessionDataFromServer();
 
 			if (!user) {
 				return null;

@@ -7,14 +7,14 @@ import { changeBookmarksVisibility } from "~/server/functions/settings";
 
 export function useUserSettings({ userId }: { userId: string }) {
 	const queryClient = useQueryClient();
-	const useChangeBookmarksVisibility = useServerFn(changeBookmarksVisibility);
+	const changeBookmarksVisibilityFromServer = useServerFn(changeBookmarksVisibility);
 
 	const setBookmarksVisibility = useMutation({
 		mutationKey: ["changeBookmarksVisibility"],
 		mutationFn: async ({ visibility }: { visibility: string }) => {
-			const data = await useChangeBookmarksVisibility({ data: { visibility } });
+			const data = await changeBookmarksVisibilityFromServer({ data: { visibility } });
 
-			if (!data.success) {
+			if (!data?.success) {
 				throw new Error("Failed to set bookmarks visibility");
 			}
 

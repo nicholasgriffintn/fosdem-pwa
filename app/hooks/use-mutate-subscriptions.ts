@@ -10,8 +10,8 @@ import {
 
 export function useMutateSubscriptions() {
 	const queryClient = useQueryClient();
-	const useCreateSubscription = useServerFn(createSubscription);
-	const useDeleteSubscription = useServerFn(deleteSubscription);
+	const createSubscriptionFromServer = useServerFn(createSubscription);
+	const deleteSubscriptionFromServer = useServerFn(deleteSubscription);
 
 	const create = useMutation({
 		mutationKey: ["createSubscription"],
@@ -24,11 +24,11 @@ export function useMutateSubscriptions() {
 			auth: string;
 			p256dh: string;
 		}) => {
-			const data = await useCreateSubscription({
+			const data = await createSubscriptionFromServer({
 				data: { endpoint, auth, p256dh },
 			});
 
-			if (!data.success) {
+			if (!data?.success) {
 				throw new Error("Failed to create subscription");
 			}
 
@@ -44,9 +44,9 @@ export function useMutateSubscriptions() {
 	const handleDeleteSubscription = useMutation({
 		mutationKey: ["deleteSubscription"],
 		mutationFn: async ({ id }: { id: number }) => {
-			const data = await useDeleteSubscription({ data: { id } });
+			const data = await deleteSubscriptionFromServer({ data: { id } });
 
-			if (!data.success) {
+			if (!data?.success) {
 				throw new Error("Failed to delete subscription");
 			}
 

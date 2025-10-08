@@ -75,7 +75,6 @@ function TrackListItem({
 					type="track"
 					bookmarksLoading={bookmarksLoading}
 					className="pl-1 md:pl-6 pb-3 md:pb-0"
-					user={user}
 					onCreateBookmark={onCreateBookmark}
 				/>
 			</div>

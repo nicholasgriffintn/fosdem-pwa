@@ -102,7 +102,6 @@ function EventCalendarListItem({
 					bookmarksLoading={bookmarksLoading}
 					size="sm"
 					className="mt-2"
-					user={user}
 					onCreateBookmark={onCreateBookmark}
 				/>
 			</div>

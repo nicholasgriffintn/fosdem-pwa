@@ -3,13 +3,11 @@ import { Label } from "~/components/ui/label";
 import { useUserSettings } from "~/hooks/use-user-settings";
 
 type SetBookmarksVisabilityProps = {
-	year: number;
 	userId: string;
 	bookmarksVisibility: string;
 };
 
 export function SetBookmarksVisability({
-	year,
 	userId,
 	bookmarksVisibility,
 }: SetBookmarksVisabilityProps) {
@@ -27,6 +25,7 @@ export function SetBookmarksVisability({
 					Make your bookmarks visible to other users
 				</p>
 			</div>
+			{/** biome-ignore lint/correctness/useUniqueElementIds: it's wrong */}
 			<Switch
 				id="bookmarks-visibility"
 				checked={bookmarksVisibility === "public"}

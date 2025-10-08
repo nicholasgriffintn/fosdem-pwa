@@ -6,8 +6,9 @@ import { detectEventConflicts } from "~/lib/fosdem";
 import { sortEvents, sortTracks } from "~/lib/sorting";
 import type { User } from "~/server/db/schema";
 import type { Bookmark } from "~/server/db/schema";
+import type { LocalBookmark } from "~/lib/localStorage";
 
-function organizeBookmarks(bookmarks: Bookmark[]) {
+function organizeBookmarks(bookmarks: (Bookmark | LocalBookmark)[]) {
 	const byYear = bookmarks.reduce(
 		(acc, bookmark) => {
 			if (!acc[bookmark.year]) {
@@ -17,22 +18,22 @@ function organizeBookmarks(bookmarks: Bookmark[]) {
 				};
 			}
 
-			if (bookmark.type === "bookmark_event") {
+			if (bookmark.type === "bookmark_event" || bookmark.type === "event") {
 				acc[bookmark.year].events.push(bookmark);
-			} else if (bookmark.type === "bookmark_track") {
+			} else if (bookmark.type === "bookmark_track" || bookmark.type === "track") {
 				acc[bookmark.year].tracks.push(bookmark);
 			}
 
 			return acc;
 		},
-		{} as Record<number, { events: Bookmark[]; tracks: Bookmark[] }>,
+		{} as Record<number, { events: (Bookmark | LocalBookmark)[]; tracks: (Bookmark | LocalBookmark)[] }>,
 	);
 
 	return byYear;
 }
 
 type BookmarksListProps = {
-	bookmarks?: Bookmark[];
+	bookmarks?: (Bookmark | LocalBookmark)[];
 	fosdemData?: Conference;
 	year: number;
 	loading: boolean;
@@ -69,16 +70,17 @@ export function BookmarksList({
 	user,
 	onCreateBookmark,
 }: BookmarksListProps) {
-	const organizedBookmarks =
-		bookmarks && bookmarks.length > 0 ? organizeBookmarks(bookmarks) : {};
-
-	if (!bookmarks) {
+	if (!bookmarks || bookmarks.length === 0) {
 		return (
-			<div className="flex justify-center items-center">
-				<p>No bookmarks found</p>
+			<div className="flex justify-center items-center py-12">
+				<p className="text-muted-foreground">
+					No bookmarks yet. Start bookmarking events to see them here!
+				</p>
 			</div>
 		);
 	}
+
+	const organizedBookmarks = organizeBookmarks(bookmarks);
 
 	const handleSetPriority = (
 		eventId: string,
@@ -96,6 +98,7 @@ export function BookmarksList({
 
 	const getFormattedData = () => {
 		if (!bookmarks?.length || !fosdemData) {
+			console.warn("No bookmarks or fosdemData");
 			return { tracks: [], events: [], conflicts: [] };
 		}
 
@@ -108,7 +111,7 @@ export function BookmarksList({
 				if (!event) return null;
 				return {
 					...event,
-					priority: bookmark.priority,
+					priority: 'priority' in bookmark ? bookmark.priority || null : null,
 				} as Event;
 			})
 			.filter((event): event is NonNullable<typeof event> => event !== null)
@@ -139,6 +142,14 @@ export function BookmarksList({
 
 	const { tracks, events, conflicts } = getFormattedData();
 	const days = fosdemData ? Object.values(fosdemData.days) : [];
+
+	if (tracks.length === 0 && events.length === 0) {
+		return (
+			<div className="text-center py-2 mb-4">
+				<p>You haven't bookmarked anything yet!</p>
+			</div>
+		);
+	}
 
 	return (
 		<>

@@ -17,13 +17,13 @@ export function useNotes({
 	userId?: string;
 }) {
 	const queryClient = useQueryClient();
-	const useGetNotes = useServerFn(getNotes);
-	const useCreateNote = useServerFn(createNote);
+	const getNotesFromServer = useServerFn(getNotes);
+	const createNoteFromServer = useServerFn(createNote);
 
 	const { data: notes, isLoading } = useQuery({
 		queryKey: ["notes", userId, year, event.slug],
 		queryFn: async () => {
-			const notes = await useGetNotes({ data: { year, eventId: event.id } });
+			const notes = await getNotesFromServer({ data: { year, eventId: event.id } });
 			return notes;
 		},
 	});
@@ -39,11 +39,11 @@ export function useNotes({
 			time?: number;
 			tempId: string;
 		}) => {
-			const response = await useCreateNote({
+			const response = await createNoteFromServer({
 				data: { year, eventId: event.id, note, time },
 			});
 
-			return { ...response, tempId };
+			return { ...response, tempId: tempId };
 		},
 		onMutate: async (newNote) => {
 			await queryClient.cancelQueries({
@@ -78,7 +78,7 @@ export function useNotes({
 				["notes", userId, year, event.slug],
 				(old: any[] = []) => {
 					return old.map((note: any) =>
-						note.id === data.tempId ? { ...data, isPending: false } : note,
+						note.id === data.tempId ? { ...data, isPending: false } : note
 					);
 				},
 			);
