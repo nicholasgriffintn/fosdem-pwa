@@ -6,19 +6,19 @@ import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
 import { Spinner } from "~/components/Spinner";
-import type { User } from "~/server/db/schema";
 
 type FavouriteButtonProps = {
 	year: number;
 	type: string;
 	slug: string;
 	status: string;
-	user: User | null;
 	onCreateBookmark: ({
+		year,
 		type,
 		slug,
 		status,
 	}: {
+		year: number;
 		type: string;
 		slug: string;
 		status: string;
@@ -30,7 +30,6 @@ export function FavouriteButton({
 	type,
 	slug,
 	status,
-	user,
 	onCreateBookmark,
 }: FavouriteButtonProps) {
 	const [currentStatus, setCurrentStatus] = useState(status);
@@ -40,16 +39,9 @@ export function FavouriteButton({
 	}, [status]);
 
 	const handleFavourite = () => {
-		if (!user) {
-			toast({
-				title: "You must be signed in to favourite",
-				variant: "destructive",
-			});
-			return;
-		}
-
 		if (onCreateBookmark) {
 			onCreateBookmark({
+				year,
 				type,
 				slug,
 				status: currentStatus === "favourited" ? "unfavourited" : "favourited",

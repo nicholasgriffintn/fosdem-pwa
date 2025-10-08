@@ -16,7 +16,6 @@ type ItemActionsProps = {
 	bookmarksLoading: boolean;
 	size?: "default" | "sm";
 	className?: string;
-	user?: User | null;
 	onCreateBookmark?: ({
 		type,
 		slug,
@@ -35,7 +34,6 @@ export function ItemActions({
 	bookmarksLoading,
 	size = "default",
 	className = "",
-	user,
 	onCreateBookmark,
 }: ItemActionsProps) {
 	const isEvent = type === "event";
@@ -44,7 +42,7 @@ export function ItemActions({
 
 	return (
 		<div className={`flex items-center gap-2 ${className}`}>
-			{user?.id && onCreateBookmark && (
+			{onCreateBookmark && (
 				<FavouriteButton
 					year={year}
 					type={type}
@@ -56,7 +54,6 @@ export function ItemActions({
 								? "favourited"
 								: "unfavourited"
 					}
-					user={user}
 					onCreateBookmark={onCreateBookmark}
 				/>
 			)}

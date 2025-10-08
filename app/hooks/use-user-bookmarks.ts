@@ -12,12 +12,12 @@ export function useUserBookmarks({
 	year: number;
 	userId: string;
 }) {
-	const useGetUserBookmarks = useServerFn(getUserBookmarks);
+	const getUserBookmarksFromServer = useServerFn(getUserBookmarks);
 
 	const { data: bookmarks, isLoading } = useQuery({
 		queryKey: ["userBookmarks", userId, year],
 		queryFn: async () => {
-			const bookmarks = await useGetUserBookmarks({ data: { year, userId } });
+			const bookmarks = await getUserBookmarksFromServer({ data: { year, userId } });
 			return bookmarks;
 		},
 	});

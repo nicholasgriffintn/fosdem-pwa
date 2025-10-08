@@ -1,4 +1,5 @@
 import type { Bookmark } from "~/server/db/schema";
+import type { LocalBookmark } from "~/lib/localStorage";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import {
 	sortEventsWithFavorites,
@@ -22,21 +23,21 @@ export function useEventList({ items, year, sortFn }: UseEventListProps) {
 
 	const itemsWithFavourites = items?.length
 		? items.map((item) => ({
-				...item,
-				isFavourited: bookmarks?.length
-					? Boolean(
-							bookmarks.find(
-								(bookmark: Bookmark) =>
-									bookmark.slug === item.id && bookmark.status === "favourited",
-							),
-						)
-					: undefined,
-			}))
+			...item,
+			isFavourited: bookmarks?.length
+				? Boolean(
+					bookmarks.find(
+						(bookmark: Bookmark | LocalBookmark) =>
+							bookmark.slug === item.id && bookmark.status === "favourited",
+					),
+				)
+				: undefined,
+		}))
 		: [];
 
 	const favorites =
 		bookmarks?.reduce(
-			(acc: Record<string, boolean>, bookmark: Bookmark) => {
+			(acc: Record<string, boolean>, bookmark: Bookmark | LocalBookmark) => {
 				if (bookmark.status === "favourited") {
 					acc[bookmark.slug] = true;
 				}
@@ -60,21 +61,21 @@ export function useTrackList({ items, year }: UseTrackListProps) {
 
 	const itemsWithFavourites = items?.length
 		? items.map((item) => ({
-				...item,
-				isFavourited: bookmarks?.length
-					? Boolean(
-							bookmarks.find(
-								(bookmark: Bookmark) =>
-									bookmark.slug === item.id && bookmark.status === "favourited",
-							),
-						)
-					: undefined,
-			}))
+			...item,
+			isFavourited: bookmarks?.length
+				? Boolean(
+					bookmarks.find(
+						(bookmark: Bookmark | LocalBookmark) =>
+							bookmark.slug === item.id && bookmark.status === "favourited",
+					),
+				)
+				: undefined,
+		}))
 		: [];
 
 	const favorites =
 		bookmarks?.reduce(
-			(acc: Record<string, boolean>, bookmark: Bookmark) => {
+			(acc: Record<string, boolean>, bookmark: Bookmark | LocalBookmark) => {
 				if (bookmark.status === "favourited") {
 					acc[bookmark.slug] = true;
 				}

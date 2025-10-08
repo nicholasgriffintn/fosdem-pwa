@@ -6,12 +6,12 @@ import { useServerFn } from "@tanstack/start";
 import { getEventBookmark } from "~/server/functions/bookmarks";
 
 export function useBookmark({ year, slug }: { year: number; slug: string }) {
-	const useGetEventBookmark = useServerFn(getEventBookmark);
+	const getEventBookmarkFromServer = useServerFn(getEventBookmark);
 
 	const { data: bookmark, isLoading } = useQuery({
 		queryKey: ["bookmark", year, slug],
 		queryFn: async () => {
-			const data = await useGetEventBookmark({ data: { year, slug } });
+			const data = await getEventBookmarkFromServer({ data: { year, slug } });
 
 			return data;
 		},

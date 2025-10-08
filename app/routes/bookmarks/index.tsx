@@ -8,7 +8,6 @@ import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useAuth } from "~/hooks/use-auth";
 import { Spinner } from "~/components/Spinner";
-import { Button } from "~/components/ui/button";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
@@ -38,14 +37,21 @@ export const Route = createFileRoute("/bookmarks/")({
 function BookmarksHome() {
 	const { year, day } = Route.useLoaderData();
 	const { bookmarks, loading } = useBookmarks({ year });
-	const { create: createBookmark, update: updateBookmark } = useMutateBookmark({
-		year,
-	});
+	const { create, update } = useMutateBookmark({ year });
 	const { fosdemData } = useFosdemData({ year });
 	const { user, loading: authLoading } = useAuth();
 
 	const onCreateBookmark = (bookmark: any) => {
-		createBookmark(bookmark);
+		create({
+			year,
+			slug: bookmark.slug,
+			type: bookmark.type,
+			status: bookmark.status,
+		});
+	};
+
+	const onUpdateBookmark = (bookmark: any) => {
+		update(bookmark.id, { status: bookmark.status });
 	};
 
 	return (
@@ -56,36 +62,31 @@ function BookmarksHome() {
 					<div className="flex justify-center items-center">
 						<Spinner className="h-8 w-8" />
 					</div>
-				) : (
-					<>
-						{!user?.id ? (
-							<div className="flex flex-col">
-								<p>You need to sign in to view and manage your bookmarks.</p>
-								<Link to="/signin" className="mt-4">
-									<Button>Sign in</Button>
+				) : !bookmarks || bookmarks.length === 0 ? (
+					<div className="flex flex-col items-center justify-center py-12">
+						<p className="text-muted-foreground mb-4">
+							No bookmarks yet. Start bookmarking events to see them here!
+						</p>
+						{!user?.id && (
+							<div className="text-sm text-muted-foreground text-center space-y-2">
+								<p>Your bookmarks are saved locally and will sync when you sign in.</p>
+								<Link to="/signin" className="text-primary hover:underline">
+									Sign in to sync across devices
 								</Link>
 							</div>
-						) : (
-							<>
-								{!bookmarks ? (
-									<div className="flex justify-center items-center">
-										<p>No bookmarks found</p>
-									</div>
-								) : (
-									<BookmarksList
-										bookmarks={bookmarks}
-										fosdemData={fosdemData}
-										year={year}
-										loading={loading}
-										day={day}
-										onUpdateBookmark={updateBookmark}
-										user={user}
-										onCreateBookmark={onCreateBookmark}
-									/>
-								)}
-							</>
 						)}
-					</>
+					</div>
+				) : (
+					<BookmarksList
+						bookmarks={bookmarks}
+						fosdemData={fosdemData}
+						year={year}
+						loading={loading}
+						day={day}
+						onUpdateBookmark={onUpdateBookmark}
+						user={user}
+						onCreateBookmark={onCreateBookmark}
+					/>
 				)}
 			</div>
 		</div>

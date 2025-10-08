@@ -131,7 +131,6 @@ function EventPage() {
 									? "loading"
 									: (bookmark?.status ?? "unfavourited")
 							}
-							user={user}
 							onCreateBookmark={onCreateBookmark}
 						/>
 						<ShareButton

@@ -77,7 +77,6 @@ function EventScheduleListItem({
 						type="event"
 						bookmarksLoading={bookmarksLoading}
 						size="sm"
-						user={user}
 						onCreateBookmark={onCreateBookmark}
 					/>
 				</div>
