@@ -66,7 +66,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.4",
-    "@cloudflare/workers-types": "4.20251014.0",
+    "@cloudflare/workers-types": "4.20251106.1",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "autoprefixer": "10.4.21",
