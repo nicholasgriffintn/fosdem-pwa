@@ -81,7 +81,8 @@ export function useBookmarks({ year }: { year: number }) {
 						slug: serverBookmark.slug,
 						type: serverBookmark.type,
 						status: serverBookmark.status,
-					});
+						serverId: serverBookmark.id,
+					}, true);
 				});
 			}
 		}

@@ -1,7 +1,8 @@
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
   BOOKMARKS: 'fosdem_bookmarks',
   NOTES: 'fosdem_notes',
   SYNC_QUEUE: 'fosdem_sync_queue',
+  SYNC_ENABLED: 'fosdem_sync_enabled',
 } as const;
 
 function isQuotaExceededError(error: unknown): boolean {
@@ -23,6 +24,30 @@ function handleStorageError(error: unknown, operation: string): void {
   throw error;
 }
 
+export function enableSync(): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.SYNC_ENABLED, 'true');
+  } catch (error) {
+    console.error('Error enabling sync:', error);
+  }
+}
+
+export function disableSync(): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.SYNC_ENABLED, 'false');
+  } catch (error) {
+    console.error('Error disabling sync:', error);
+  }
+}
+
+export function isSyncEnabled(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.SYNC_ENABLED) === 'true';
+  } catch (error) {
+    return false;
+  }
+}
+
 export interface LocalBookmark {
   id: string;
   year: number;
@@ -34,6 +59,7 @@ export interface LocalBookmark {
   user_id?: number | null;
   priority?: number | null;
   last_notification_sent_at?: string | null;
+  serverId?: string;
 }
 
 export interface LocalNote {
@@ -44,6 +70,7 @@ export interface LocalNote {
   time?: number | null;
   created_at: string;
   updated_at: string;
+  serverId?: number;
 }
 
 export interface SyncQueueItem {
@@ -67,7 +94,7 @@ export function getLocalBookmarks(year?: number): LocalBookmark[] {
   }
 }
 
-export function saveLocalBookmark(bookmark: Omit<LocalBookmark, 'id' | 'created_at' | 'updated_at'> & { status: string }): LocalBookmark {
+export function saveLocalBookmark(bookmark: Omit<LocalBookmark, 'id' | 'created_at' | 'updated_at'> & { status: string }, skipSync?: boolean): LocalBookmark {
   const now = new Date().toISOString();
   const id = `${bookmark.year}_${bookmark.slug}_${Date.now()}`;
 
@@ -83,13 +110,15 @@ export function saveLocalBookmark(bookmark: Omit<LocalBookmark, 'id' | 'created_
     const updated = [...existing.filter(b => b.id !== id), newBookmark];
     localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(updated));
 
-    addToSyncQueue({
-      id,
-      type: 'bookmark',
-      action: 'create',
-      data: newBookmark,
-      timestamp: now,
-    });
+    if (isSyncEnabled() && !skipSync) {
+      addToSyncQueue({
+        id,
+        type: 'bookmark',
+        action: 'create',
+        data: newBookmark,
+        timestamp: now,
+      });
+    }
 
     return newBookmark;
   } catch (error) {
@@ -98,7 +127,7 @@ export function saveLocalBookmark(bookmark: Omit<LocalBookmark, 'id' | 'created_
   }
 }
 
-export function updateLocalBookmark(id: string, updates: Partial<LocalBookmark> & { status?: string }): LocalBookmark | null {
+export function updateLocalBookmark(id: string, updates: Partial<LocalBookmark> & { status?: string }, skipSync?: boolean): LocalBookmark | null {
   try {
     const existing = getLocalBookmarks();
     const index = existing.findIndex(b => b.id === id);
@@ -114,13 +143,15 @@ export function updateLocalBookmark(id: string, updates: Partial<LocalBookmark> 
     existing[index] = updatedBookmark;
     localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(existing));
 
-    addToSyncQueue({
-      id,
-      type: 'bookmark',
-      action: 'update',
-      data: updatedBookmark,
-      timestamp: new Date().toISOString(),
-    });
+    if (isSyncEnabled() && !skipSync) {
+      addToSyncQueue({
+        id,
+        type: 'bookmark',
+        action: 'update',
+        data: updatedBookmark,
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     return updatedBookmark;
   } catch (error) {
@@ -129,7 +160,7 @@ export function updateLocalBookmark(id: string, updates: Partial<LocalBookmark> 
   }
 }
 
-export function removeLocalBookmark(id: string): boolean {
+export function removeLocalBookmark(id: string, skipSync?: boolean): boolean {
   try {
     const existing = getLocalBookmarks();
     const filtered = existing.filter(b => b.id !== id);
@@ -138,13 +169,15 @@ export function removeLocalBookmark(id: string): boolean {
 
     localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(filtered));
 
-    addToSyncQueue({
-      id,
-      type: 'bookmark',
-      action: 'delete',
-      data: { id },
-      timestamp: new Date().toISOString(),
-    });
+    if (isSyncEnabled() && !skipSync) {
+      addToSyncQueue({
+        id,
+        type: 'bookmark',
+        action: 'delete',
+        data: { id },
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     return true;
   } catch (error) {
@@ -166,7 +199,7 @@ export function getLocalNotes(year?: number): LocalNote[] {
   }
 }
 
-export function saveLocalNote(note: Omit<LocalNote, 'id' | 'created_at' | 'updated_at'>): LocalNote {
+export function saveLocalNote(note: Omit<LocalNote, 'id' | 'created_at' | 'updated_at'>, skipSync?: boolean): LocalNote {
   const now = new Date().toISOString();
   const id = `${note.year}_${note.slug}_${Date.now()}`;
 
@@ -182,13 +215,15 @@ export function saveLocalNote(note: Omit<LocalNote, 'id' | 'created_at' | 'updat
     const updated = [...existing.filter(n => n.id !== id), newNote];
     localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(updated));
 
-    addToSyncQueue({
-      id,
-      type: 'note',
-      action: 'create',
-      data: { ...newNote, content: newNote.note },
-      timestamp: now,
-    });
+    if (isSyncEnabled() && !skipSync) {
+      addToSyncQueue({
+        id,
+        type: 'note',
+        action: 'create',
+        data: { ...newNote, content: newNote.note },
+        timestamp: now,
+      });
+    }
 
     return newNote;
   } catch (error) {
@@ -197,7 +232,7 @@ export function saveLocalNote(note: Omit<LocalNote, 'id' | 'created_at' | 'updat
   }
 }
 
-export function updateLocalNote(id: string, updates: Partial<LocalNote>): LocalNote | null {
+export function updateLocalNote(id: string, updates: Partial<LocalNote>, skipSync?: boolean): LocalNote | null {
   try {
     const existing = getLocalNotes();
     const index = existing.findIndex(n => n.id === id);
@@ -213,13 +248,15 @@ export function updateLocalNote(id: string, updates: Partial<LocalNote>): LocalN
     existing[index] = updatedNote;
     localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(existing));
 
-    addToSyncQueue({
-      id,
-      type: 'note',
-      action: 'update',
-      data: { ...updatedNote, content: updatedNote.note },
-      timestamp: new Date().toISOString(),
-    });
+    if (isSyncEnabled() && !skipSync) {
+      addToSyncQueue({
+        id,
+        type: 'note',
+        action: 'update',
+        data: { ...updatedNote, content: updatedNote.note },
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     return updatedNote;
   } catch (error) {
@@ -228,7 +265,7 @@ export function updateLocalNote(id: string, updates: Partial<LocalNote>): LocalN
   }
 }
 
-export function removeLocalNote(id: string): boolean {
+export function removeLocalNote(id: string, skipSync?: boolean): boolean {
   try {
     const existing = getLocalNotes();
     const filtered = existing.filter(n => n.id !== id);
@@ -237,13 +274,15 @@ export function removeLocalNote(id: string): boolean {
 
     localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(filtered));
 
-    addToSyncQueue({
-      id,
-      type: 'note',
-      action: 'delete',
-      data: { id },
-      timestamp: new Date().toISOString(),
-    });
+    if (isSyncEnabled() && !skipSync) {
+      addToSyncQueue({
+        id,
+        type: 'note',
+        action: 'delete',
+        data: { id },
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     return true;
   } catch (error) {

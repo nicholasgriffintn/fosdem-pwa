@@ -200,3 +200,39 @@ export const getUserBookmarks = createServerFn({
 
 		return bookmarks;
 	});
+
+export const deleteBookmark = createServerFn({
+	method: "POST",
+})
+	.validator((data: { id: string }) => data)
+	.handler(async (ctx: any) => {
+		const { id } = ctx.data;
+
+		const { user } = await getFullAuthSession();
+
+		if (!user) {
+			return null;
+		}
+
+		const existingBookmark = await db.query.bookmark.findFirst({
+			where: and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, user.id)),
+		});
+
+		if (!existingBookmark) {
+			throw new Error("Bookmark not found");
+		}
+
+		try {
+			await db.delete(bookmarkTable).where(eq(bookmarkTable.id, id));
+
+			return {
+				success: true,
+			};
+		} catch (error) {
+			console.error(error);
+			return {
+				success: false,
+				error: "Failed to delete bookmark",
+			};
+		}
+	});
