@@ -6,9 +6,6 @@ on:
       - main
   pull_request:
 
-env:
-  PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
-
 jobs:
   unit:
     name: Unit tests
@@ -19,8 +16,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,8 +39,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
