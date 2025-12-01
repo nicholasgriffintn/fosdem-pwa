@@ -27,11 +27,11 @@ export function useNotes({
 
 	const { notes: localNotes, saveNote: saveLocalNote, loading: localLoading } = useLocalNotes({
 		year,
-		slug: event.slug,
+		slug: event.id,
 	});
 
 	const { data: serverNotes, isLoading: serverLoading } = useQuery({
-		queryKey: ["notes", userId, year, event.slug],
+		queryKey: ["notes", userId, year, event.id],
 		queryFn: async () => {
 			if (!user?.id) return [];
 
@@ -79,10 +79,15 @@ export function useNotes({
 			tempId: string;
 		}) => {
 			if (!user?.id) {
+				if (!event.id) {
+					console.error('Cannot save note: event.id is undefined', event);
+					throw new Error('Cannot save note: event information is incomplete');
+				}
+
 				// Save locally if not authenticated
 				saveLocalNote({
 					year,
-					slug: event.slug,
+					slug: event.id,
 					note: note,
 				});
 				return { success: true, tempId };
@@ -96,23 +101,23 @@ export function useNotes({
 		},
 		onMutate: async (newNote) => {
 			await queryClient.cancelQueries({
-				queryKey: ["notes", userId, year, event.slug],
+				queryKey: ["notes", userId, year, event.id],
 			});
 			await queryClient.cancelQueries({
-				queryKey: ["local-notes", year, event.slug],
+				queryKey: ["local-notes", year, event.id],
 			});
 
 			const previousNotes = queryClient.getQueryData([
 				"notes",
 				userId,
 				year,
-				event.slug,
+				event.id,
 			]);
 
 			const previousLocalNotes = queryClient.getQueryData([
 				"local-notes",
 				year,
-				event.slug,
+				event.id,
 			]);
 
 			const timestamp = createStandardDate(new Date()).getTime();
@@ -126,12 +131,12 @@ export function useNotes({
 
 			// Update both server and local queries
 			queryClient.setQueryData(
-				["notes", userId, year, event.slug],
+				["notes", userId, year, event.id],
 				(old: any[] = []) => [...old, optimisticNote],
 			);
 
 			queryClient.setQueryData(
-				["local-notes", year, event.slug],
+				["local-notes", year, event.id],
 				(old: any[] = []) => [...old, optimisticNote],
 			);
 
@@ -139,7 +144,7 @@ export function useNotes({
 		},
 		onSuccess: (data) => {
 			queryClient.setQueryData(
-				["notes", userId, year, event.slug],
+				["notes", userId, year, event.id],
 				(old: any[] = []) => {
 					return old.map((note: any) =>
 						note.id === data.tempId ? { ...data, isPending: false } : note
@@ -148,7 +153,7 @@ export function useNotes({
 			);
 
 			queryClient.setQueryData(
-				["local-notes", year, event.slug],
+				["local-notes", year, event.id],
 				(old: any[] = []) => {
 					return old.map((note: any) =>
 						note.id === data.tempId ? { ...data, isPending: false } : note
@@ -158,22 +163,22 @@ export function useNotes({
 		},
 		onError: (err, newNote, context) => {
 			queryClient.setQueryData(
-				["notes", userId, year, event.slug],
+				["notes", userId, year, event.id],
 				context?.previousNotes,
 			);
 
 			queryClient.setQueryData(
-				["local-notes", year, event.slug],
+				["local-notes", year, event.id],
 				context?.previousLocalNotes,
 			);
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["notes", userId, year, event.slug],
+				queryKey: ["notes", userId, year, event.id],
 			});
 
 			queryClient.invalidateQueries({
-				queryKey: ["local-notes", year, event.slug],
+				queryKey: ["local-notes", year, event.id],
 			});
 		},
 	});

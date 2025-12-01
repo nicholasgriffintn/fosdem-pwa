@@ -85,7 +85,7 @@ export function useBookmarks({ year }: { year: number }) {
 				});
 			}
 		}
-	}, [user?.id, serverBookmarks, localBookmarks]);
+	}, [user?.id, serverBookmarks, localBookmarks, saveLocalBookmark]);
 
 	return {
 		bookmarks: mergedBookmarks,

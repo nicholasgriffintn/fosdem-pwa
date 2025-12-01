@@ -20,8 +20,12 @@ export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 
 	const { data: localNotes, isLoading: localLoading } = useQuery({
 		queryKey: ["local-notes", year, slug],
-		queryFn: () => getLocalNotes(year).filter(note => note.slug === slug),
+		queryFn: () => {
+			const allNotes = getLocalNotes(year);
+			return allNotes.filter(note => note.slug && note.slug === slug);
+		},
 		staleTime: 0,
+		structuralSharing: false,
 	});
 
 	const saveNote = useMutation({

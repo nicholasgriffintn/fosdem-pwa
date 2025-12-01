@@ -4,6 +4,25 @@ const STORAGE_KEYS = {
   SYNC_QUEUE: 'fosdem_sync_queue',
 } as const;
 
+function isQuotaExceededError(error: unknown): boolean {
+  return (
+    error instanceof DOMException &&
+    (error.name === 'QuotaExceededError' ||
+      error.name === 'NS_ERROR_DOM_QUOTA_REACHED')
+  );
+}
+
+function handleStorageError(error: unknown, operation: string): void {
+  if (isQuotaExceededError(error)) {
+    console.error(`Storage quota exceeded while ${operation}. Consider clearing old data.`);
+    throw new Error(
+      `Storage quota exceeded. Please clear some bookmarks or notes to free up space.`
+    );
+  }
+  console.error(`Error ${operation}:`, error);
+  throw error;
+}
+
 export interface LocalBookmark {
   id: string;
   year: number;
@@ -74,7 +93,7 @@ export function saveLocalBookmark(bookmark: Omit<LocalBookmark, 'id' | 'created_
 
     return newBookmark;
   } catch (error) {
-    console.error('Error saving local bookmark:', error);
+    handleStorageError(error, 'saving local bookmark');
     throw error;
   }
 }
@@ -173,7 +192,7 @@ export function saveLocalNote(note: Omit<LocalNote, 'id' | 'created_at' | 'updat
 
     return newNote;
   } catch (error) {
-    console.error('Error saving local note:', error);
+    handleStorageError(error, 'saving local note');
     throw error;
   }
 }
