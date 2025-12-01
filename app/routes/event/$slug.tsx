@@ -91,7 +91,7 @@ function EventPage() {
 
 	const isFavourite = {
 		status: "null",
-		slug: fosdem.event.slug,
+		slug: fosdem.event.id,
 	};
 
 	return (

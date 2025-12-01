@@ -72,7 +72,6 @@ export interface Event {
 	description: string;
 	room: string;
 	persons: string[];
-	slug: string;
 	id: string;
 	startTime: string;
 	duration: string;
