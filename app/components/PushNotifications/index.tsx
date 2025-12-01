@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
@@ -21,7 +21,23 @@ export function PushNotifications() {
 		deleteLoading: deleteSubscriptionLoading,
 	} = useMutateSubscriptions();
 
+	const pushSupported = useMemo(() => {
+		if (typeof window === "undefined" || typeof navigator === "undefined") {
+			return false;
+		}
+
+		return (
+			"serviceWorker" in navigator &&
+			typeof Notification !== "undefined" &&
+			"PushManager" in window
+		);
+	}, []);
+
 	useEffect(() => {
+		if (!pushSupported) {
+			return;
+		}
+
 		const checkCurrentSubscription = async () => {
 			const registration = await navigator.serviceWorker.ready;
 			const subscription = await registration.pushManager.getSubscription();
@@ -30,9 +46,26 @@ export function PushNotifications() {
 			}
 		};
 		checkCurrentSubscription();
-	}, []);
+	}, [pushSupported]);
 
 	const handleSubscribe = async () => {
+		if (!pushSupported) {
+			toast({
+				title: "Notifications unsupported",
+				description: "Push notifications are not available in this browser.",
+			});
+			return;
+		}
+
+		if (Notification.permission === "denied") {
+			toast({
+				title: "Notifications blocked",
+				description: "Enable notifications in your browser settings first.",
+				variant: "destructive",
+			});
+			return;
+		}
+
 		try {
 			const registration = await navigator.serviceWorker.ready;
 
@@ -97,6 +130,10 @@ export function PushNotifications() {
 		subscriptionId: number,
 		endpoint: string,
 	) => {
+		if (!pushSupported) {
+			return;
+		}
+
 		try {
 			await deleteSubscription({ id: subscriptionId });
 
@@ -126,6 +163,11 @@ export function PushNotifications() {
 	return (
 		<div className="space-y-4">
 			<h2 className="text-2xl font-bold">Push Notifications</h2>
+			{!pushSupported && (
+				<p className="text-sm text-muted-foreground">
+					This browser does not support push notifications. Try using a Chromium-based browser on desktop or Android.
+				</p>
+			)}
 			{subscriptionsLoading ? (
 				<div className="flex items-center justify-center">
 					<Spinner className="h-8 w-8" />
@@ -160,7 +202,7 @@ export function PushNotifications() {
 													subscription.endpoint,
 												)
 											}
-											disabled={deleteSubscriptionLoading}
+											disabled={deleteSubscriptionLoading || !pushSupported}
 										>
 											{deleteSubscriptionLoading ? (
 												<Spinner className="h-4 w-4" />
@@ -182,7 +224,7 @@ export function PushNotifications() {
 									<Button
 										variant="outline"
 										onClick={handleSubscribe}
-										disabled={createSubscriptionLoading}
+										disabled={createSubscriptionLoading || !pushSupported}
 									>
 										{createSubscriptionLoading ? (
 											<Spinner className="h-4 w-4" />
@@ -207,7 +249,7 @@ export function PushNotifications() {
 							<Button
 								variant="outline"
 								onClick={handleSubscribe}
-								disabled={createSubscriptionLoading}
+								disabled={createSubscriptionLoading || !pushSupported}
 							>
 								{createSubscriptionLoading ? (
 									<Spinner className="h-4 w-4" />

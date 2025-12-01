@@ -207,20 +207,43 @@ export async function syncAllOfflineData(): Promise<{
 }
 
 export function registerBackgroundSync() {
-  if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
-    navigator.serviceWorker.ready.then((registration) => {
+  if (
+    typeof window === 'undefined' ||
+    typeof navigator === 'undefined' ||
+    !('serviceWorker' in navigator)
+  ) {
+    return;
+  }
+
+  const ServiceWorkerRegistrationCtor = (window as typeof window & {
+    ServiceWorkerRegistration?: typeof window.ServiceWorkerRegistration;
+  }).ServiceWorkerRegistration;
+
+  if (
+    !ServiceWorkerRegistrationCtor ||
+    !('sync' in ServiceWorkerRegistrationCtor.prototype)
+  ) {
+    return;
+  }
+
+  navigator.serviceWorker.ready
+    .then((registration) => {
       const registrationWithSync = registration as ServiceWorkerRegistrationWithSync;
 
       registrationWithSync.sync.register('bookmark-sync').catch((error: Error) => {
         console.error('Background sync registration failed:', error);
       });
+    })
+    .catch((error) => {
+      console.warn('Service worker not ready for background sync:', error);
     });
-  } else {
-    console.warn('Background sync not supported in this browser');
-  }
 }
 
 export async function checkAndSyncOnOnline(userId?: string) {
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') {
+    return;
+  }
+
   if (navigator.onLine && userId) {
     const syncQueue = await getSyncQueue();
     if (syncQueue.length > 0) {
