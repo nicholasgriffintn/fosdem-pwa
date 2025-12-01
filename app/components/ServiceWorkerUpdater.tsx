@@ -15,16 +15,18 @@ export function ServiceWorkerUpdater() {
 			}
 		};
 
-		window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-
-		window.addEventListener("appinstalled", () => {
+		const handleAppInstalled = () => {
 			toast({
 				title: "Successfully Installed",
 				description: "FOSDEM PWA has been added to your home screen",
 				duration: 3000,
 			});
 			localStorage.removeItem("installPromptDismissed");
-		});
+		};
+
+		window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+		window.addEventListener("appinstalled", handleAppInstalled);
 
 		const handleSwUpdate = () => {
 			toast({
@@ -47,39 +49,39 @@ export function ServiceWorkerUpdater() {
 			});
 		};
 
-		const dataChannel = new BroadcastChannel("fosdem-data-updates");
-		dataChannel.onmessage = (event) => {
-			toast({
-				title: "New Data Available",
-				description: "Refresh to see the latest content.",
-				duration: 5000,
-			});
-		};
+		const supportsBroadcastChannel =
+			typeof window !== "undefined" && "BroadcastChannel" in window;
 
-		/* const syncChannel = new BroadcastChannel("user-data-sync");
-		syncChannel.onmessage = (event) => {
-			if (event.data.type === "SYNC_COMPLETE") {
-				toast({
-					title: "Sync Complete",
-					description: "Your changes have been saved.",
-					duration: 3000,
-				});
-			}
-		}; */
+		const dataChannel = supportsBroadcastChannel
+			? new BroadcastChannel("fosdem-data-updates")
+			: null;
 
-		const serverFunctionsChannel = new BroadcastChannel(
-			"server-functions-sync",
-		);
-		serverFunctionsChannel.onmessage = (event) => {
-			if (event.data.type === "SYNC_COMPLETE") {
+		if (dataChannel) {
+			dataChannel.onmessage = () => {
 				toast({
-					title: "Offline requests processed",
-					description:
-						"Requests that were queued while offline have been processed",
-					duration: 3000,
+					title: "New Data Available",
+					description: "Refresh to see the latest content.",
+					duration: 5000,
 				});
-			}
-		};
+			};
+		}
+
+		const serverFunctionsChannel = supportsBroadcastChannel
+			? new BroadcastChannel("server-functions-sync")
+			: null;
+
+		if (serverFunctionsChannel) {
+			serverFunctionsChannel.onmessage = (event) => {
+				if (event.data?.type === "SYNC_COMPLETE") {
+					toast({
+						title: "Offline requests processed",
+						description:
+							"Requests that were queued while offline have been processed",
+						duration: 3000,
+					});
+				}
+			};
+		}
 
 		window.addEventListener("swUpdated", handleSwUpdate);
 
@@ -89,10 +91,9 @@ export function ServiceWorkerUpdater() {
 				"beforeinstallprompt",
 				handleBeforeInstallPrompt,
 			);
-			window.removeEventListener("appinstalled", () => {});
-			dataChannel.close();
-			// syncChannel.close();
-			serverFunctionsChannel.close();
+			window.removeEventListener("appinstalled", handleAppInstalled);
+			dataChannel?.close();
+			serverFunctionsChannel?.close();
 		};
 	}, []);
 
