@@ -79,7 +79,7 @@ export function OfflineIndicator() {
 		try {
 			await checkAndSyncOnOnline(user?.id);
 
-			const syncQueue = getSyncQueue();
+			const syncQueue = await getSyncQueue();
 
 			if (syncQueue.length === 0) {
 				setSyncStatus('success');
