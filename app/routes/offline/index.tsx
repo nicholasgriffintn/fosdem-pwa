@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { PageHeader } from "~/components/PageHeader";
 import { TypesList } from "~/components/Type/TypesList";
@@ -31,15 +31,21 @@ export const Route = createFileRoute("/offline/")({
 
 function OfflinePage() {
 	const { year } = Route.useSearch();
-	const [isOnline, setIsOnline] = useState(navigator.onLine);
+	const [isOnline, setIsOnline] = useState(true);
 	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
 	const { user } = useAuth();
 
 	const cachedData = useFosdemData({ year });
 
 	useEffect(() => {
+		if (typeof window === "undefined") {
+			return;
+		}
+
 		const handleOnline = () => setIsOnline(true);
 		const handleOffline = () => setIsOnline(false);
+
+		setIsOnline(window.navigator.onLine);
 
 		window.addEventListener('online', handleOnline);
 		window.addEventListener('offline', handleOffline);
@@ -50,13 +56,17 @@ function OfflinePage() {
 		};
 	}, []);
 
-	const handleRetry = () => {
-		window.location.reload();
-	};
+	const handleRetry = useCallback(() => {
+		if (typeof window !== "undefined") {
+			window.location.reload();
+		}
+	}, []);
 
-	const handleGoHome = () => {
-		window.location.href = `/?year=${year}`;
-	};
+	const handleGoHome = useCallback(() => {
+		if (typeof window !== "undefined") {
+			window.location.href = `/?year=${year}`;
+		}
+	}, [year]);
 
 	return (
 		<div className="min-h-screen">

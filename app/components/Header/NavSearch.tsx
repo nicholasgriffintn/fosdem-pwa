@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useRef, useEffect } from "react";
+import { useCallback, useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
@@ -65,10 +65,25 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
 
+	const tracksIndex = useMemo(() => {
+		if (!fosdemData) return null;
+		return createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS);
+	}, [fosdemData]);
+
+	const eventsIndex = useMemo(() => {
+		if (!fosdemData) return null;
+		return createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS);
+	}, [fosdemData]);
+
+	const roomsIndex = useMemo(() => {
+		if (!fosdemData) return null;
+		return createSearchIndex(Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS);
+	}, [fosdemData]);
+
 	const handleSearch = useCallback(
 		(query: string) => {
 			setInputValue(query);
-			if (!fosdemData || !query.trim()) {
+			if (!query.trim() || !tracksIndex || !eventsIndex || !roomsIndex) {
 				setSearchResults([]);
 				return;
 			}
@@ -76,31 +91,18 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 			setIsSearching(true);
 			setFocusedIndex(-1);
 
-			const tracksFuse = createSearchIndex(
-				Object.values(fosdemData.tracks),
-				TRACK_SEARCH_KEYS,
-			);
-			const eventsFuse = createSearchIndex(
-				Object.values(fosdemData.events),
-				EVENT_SEARCH_KEYS,
-			);
-			const roomsFuse = createSearchIndex(
-				Object.values(fosdemData.rooms),
-				ROOM_SEARCH_KEYS,
-			);
-
 			const tracksResults = formatSearchResults(
-				tracksFuse.search(query),
+				tracksIndex.search(query),
 				"track",
 				3,
 			);
 			const eventsResults = formatSearchResults(
-				eventsFuse.search(query),
+				eventsIndex.search(query),
 				"event",
 				3,
 			);
 			const roomsResults = formatSearchResults(
-				roomsFuse.search(query),
+				roomsIndex.search(query),
 				"room",
 				3,
 			);
@@ -115,7 +117,7 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 			setSearchResults(combinedResults);
 			setIsSearching(false);
 		},
-		[fosdemData],
+		[tracksIndex, eventsIndex, roomsIndex],
 	);
 
 	const handleResultClick = (result: SearchResult) => {

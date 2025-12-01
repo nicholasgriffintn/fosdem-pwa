@@ -19,12 +19,19 @@ export function Image({
 	height,
 	...props
 }: ImageProps) {
+	const canUseWebP =
+		useWebP && /\.(jpe?g)$/i.test(src);
+
+	const webpSource = canUseWebP
+		? src.replace(/\.(jpe?g)$/i, ".webp")
+		: null;
+
 	return (
 		<div className={className}>
 			<picture>
-				{useWebP && (
+				{webpSource && (
 					<Source
-						src={src.replace(".jpg", ".webp")}
+						src={webpSource}
 						type="image/webp"
 						layout="fullWidth"
 					/>

@@ -9,6 +9,7 @@ import { toast } from "~/hooks/use-toast";
 import { useMutateSubscriptions } from "~/hooks/use-mutate-subscriptions";
 import { useSubscriptions } from "~/hooks/use-subscriptions";
 import { constants } from "~/constants";
+import { urlBase64ToUint8Array } from "~/lib/base64";
 
 export function PushNotifications() {
 	const { subscriptions, loading: subscriptionsLoading } = useSubscriptions();
@@ -53,7 +54,7 @@ export function PushNotifications() {
 
 			const subscription = await registration.pushManager.subscribe({
 				userVisibleOnly: true,
-				applicationServerKey: constants.VAPID_PUBLIC_KEY,
+				applicationServerKey: urlBase64ToUint8Array(constants.VAPID_PUBLIC_KEY),
 			});
 
 			const subscriptionJSON = subscription.toJSON() as {

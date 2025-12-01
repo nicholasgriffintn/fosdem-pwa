@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "~/components/ui/button";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { useAuth } from "~/hooks/use-auth";
@@ -14,68 +14,19 @@ export function OfflineIndicator() {
 	const [isVisible, setIsVisible] = useState(false);
 	const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
 	const [wasOffline, setWasOffline] = useState(false);
+	const wasOfflineRef = useRef(wasOffline);
 	const isOnline = useOnlineStatus();
 	const { user } = useAuth();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: This is intentionally set to always run
 	useEffect(() => {
 		setIsMounted(true);
+	}, []);
 
-		registerBackgroundSync();
+	useEffect(() => {
+		wasOfflineRef.current = wasOffline;
+	}, [wasOffline]);
 
-		const handleOnline = () => {
-			if (wasOffline) {
-				setIsVisible(true);
-				setSyncStatus('syncing');
-
-				syncOfflineData();
-
-				setTimeout(() => {
-					setIsVisible(false);
-					setSyncStatus('idle');
-				}, 5000);
-			}
-			setWasOffline(false);
-		};
-
-		const handleOffline = () => {
-			setIsVisible(true);
-			setSyncStatus('idle');
-			setWasOffline(true);
-		};
-
-		if (isMounted) {
-			if (isOnline) {
-				handleOnline();
-			} else {
-				handleOffline();
-			}
-		}
-
-		window.addEventListener("online", handleOnline);
-		window.addEventListener("offline", handleOffline);
-
-		const handleServiceWorkerMessage = (event: MessageEvent) => {
-			if (event.data?.type === 'TRIGGER_BACKGROUND_SYNC') {
-				syncOfflineData();
-			}
-		};
-
-		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
-		}
-
-		return () => {
-			window.removeEventListener("online", handleOnline);
-			window.removeEventListener("offline", handleOffline);
-
-			if ('serviceWorker' in navigator) {
-				navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
-			}
-		};
-	}, [isOnline, isMounted, wasOffline]);
-
-	const syncOfflineData = async () => {
+	const syncOfflineData = useCallback(async () => {
 		try {
 			await checkAndSyncOnOnline(user?.id);
 
@@ -90,7 +41,76 @@ export function OfflineIndicator() {
 			console.error('Sync failed:', error);
 			setSyncStatus('error');
 		}
-	};
+	}, [user?.id]);
+
+	useEffect(() => {
+		if (typeof window === "undefined") {
+			return;
+		}
+
+		registerBackgroundSync();
+
+		let resetTimeoutId: number | undefined;
+
+		const handleOnline = () => {
+			if (wasOfflineRef.current) {
+				setIsVisible(true);
+				setSyncStatus('syncing');
+
+				void syncOfflineData().finally(() => {
+					window.clearTimeout(resetTimeoutId);
+					resetTimeoutId = window.setTimeout(() => {
+						setIsVisible(false);
+						setSyncStatus('idle');
+					}, 5000);
+				});
+			}
+			setWasOffline(false);
+			wasOfflineRef.current = false;
+		};
+
+		const handleOffline = () => {
+			setIsVisible(true);
+			setSyncStatus('idle');
+			setWasOffline(true);
+		};
+
+		const serviceWorkerMessageHandler = (event: MessageEvent) => {
+			if (event.data?.type === 'TRIGGER_BACKGROUND_SYNC') {
+				void syncOfflineData();
+			}
+		};
+
+		window.addEventListener("online", handleOnline);
+		window.addEventListener("offline", handleOffline);
+
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.addEventListener('message', serviceWorkerMessageHandler);
+		}
+
+		if (window.navigator.onLine) {
+			handleOnline();
+		} else {
+			handleOffline();
+		}
+
+		return () => {
+			if (typeof window === "undefined") {
+				return;
+			}
+
+			if (resetTimeoutId) {
+				window.clearTimeout(resetTimeoutId);
+			}
+
+			window.removeEventListener("online", handleOnline);
+			window.removeEventListener("offline", handleOffline);
+
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.removeEventListener('message', serviceWorkerMessageHandler);
+			}
+		};
+	}, [syncOfflineData]);
 
 	const getSyncIcon = () => {
 		switch (syncStatus) {
