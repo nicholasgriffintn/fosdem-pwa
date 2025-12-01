@@ -45,8 +45,7 @@ function SignInPage() {
 				<div className="flex flex-col gap-8">
 					<div className="space-y-6">
 						<p className="text-lg text-slate-200">
-							Connect with your GitHub account to unlock personalized features
-							that enhance your experience.
+							Connect with your GitHub account to sync your notes and bookmarks across devices and more.
 						</p>
 						<div className="space-y-3">
 							<h2 className="text-lg font-semibold text-slate-100">
@@ -63,8 +62,8 @@ function SignInPage() {
 								<li className="flex items-start gap-2">
 									<span className="text-xl">📝</span>
 									<span>
-										Take notes during sessions to capture key insights and
-										ideas.
+										Sync your notes and bookmarks across multiple devices and
+										store them for multiple years.
 									</span>
 								</li>
 								<li className="flex items-start gap-2">
@@ -72,13 +71,6 @@ function SignInPage() {
 									<span>
 										Share your curated schedule and discover others through
 										profile pages.
-									</span>
-								</li>
-								<li className="flex items-start gap-2">
-									<span className="text-xl">🔍</span>
-									<span>
-										Get personalized recommendations based on your bookmarks
-										(coming soon).
 									</span>
 								</li>
 							</ul>

@@ -79,8 +79,8 @@ export function SignInForm() {
 				Continue as Guest
 			</Button>
 			<p className="text-sm text-slate-400 text-center max-w-md mx-auto mt-4">
-				(You will be able to upgrade to a GitHub account later if you'd like to
-				persist your data.)
+				(Guest accounts will not work across devices, and data may be lost if you clear
+				your browser data, these are meant to be used temporarily only.)
 			</p>
 
 			<div
