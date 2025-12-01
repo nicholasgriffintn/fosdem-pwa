@@ -16,7 +16,7 @@ import { createBookmark, updateBookmark, deleteBookmark } from "~/server/functio
 import { createNote, updateNote, deleteNote } from "~/server/functions/notes";
 
 export async function syncBookmarksToServer(): Promise<SyncResult> {
-  const syncQueue = getSyncQueue();
+  const syncQueue = await getSyncQueue();
   const bookmarkItems = syncQueue.filter(item => item.type === 'bookmark');
 
   if (bookmarkItems.length === 0) {
@@ -39,7 +39,7 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 
         if (response?.success) {
           results.push({ success: true, id: item.id });
-          removeFromSyncQueue(item.id);
+          await removeFromSyncQueue(item.id);
         } else {
           results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
         }
@@ -52,13 +52,13 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
           });
           if (response?.success) {
             results.push({ success: true, id: item.id });
-            removeFromSyncQueue(item.id);
+            await removeFromSyncQueue(item.id);
           } else {
             results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
           }
         } else {
           results.push({ success: true, id: item.id });
-          removeFromSyncQueue(item.id);
+          await removeFromSyncQueue(item.id);
         }
       }
     } catch (error) {
@@ -78,7 +78,7 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 }
 
 export async function syncNotesToServer(): Promise<SyncResult> {
-  const syncQueue = getSyncQueue();
+  const syncQueue = await getSyncQueue();
   const noteItems = syncQueue.filter(item => item.type === 'note');
 
   if (noteItems.length === 0) {
@@ -101,7 +101,7 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 
         if (response?.success) {
           results.push({ success: true, id: item.id });
-          removeFromSyncQueue(item.id);
+          await removeFromSyncQueue(item.id);
         } else {
           results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
         }
@@ -118,7 +118,7 @@ export async function syncNotesToServer(): Promise<SyncResult> {
           });
           if (response?.success) {
             results.push({ success: true, id: item.id });
-            removeFromSyncQueue(item.id);
+            await removeFromSyncQueue(item.id);
           } else {
             results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
           }
@@ -133,7 +133,7 @@ export async function syncNotesToServer(): Promise<SyncResult> {
           });
           if (response?.success) {
             results.push({ success: true, id: item.id });
-            removeFromSyncQueue(item.id);
+            await removeFromSyncQueue(item.id);
           } else {
             results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
           }
@@ -147,13 +147,13 @@ export async function syncNotesToServer(): Promise<SyncResult> {
           });
           if (response?.success) {
             results.push({ success: true, id: item.id });
-            removeFromSyncQueue(item.id);
+            await removeFromSyncQueue(item.id);
           } else {
             results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
           }
         } else {
           results.push({ success: true, id: item.id });
-          removeFromSyncQueue(item.id);
+          await removeFromSyncQueue(item.id);
         }
       }
     } catch (error) {
@@ -201,24 +201,25 @@ export function registerBackgroundSync() {
   }
 }
 
-export function checkAndSyncOnOnline(userId?: string) {
+export async function checkAndSyncOnOnline(userId?: string) {
   if (navigator.onLine && userId) {
-    const syncQueue = getSyncQueue();
+    const syncQueue = await getSyncQueue();
     if (syncQueue.length > 0) {
       console.info('Syncing offline data...');
-      syncAllOfflineData().then((results) => {
+      try {
+        const results = await syncAllOfflineData();
         console.info('Sync completed:', results);
 
         window.dispatchEvent(new CustomEvent('offline-sync-completed', {
           detail: results
         }));
-      }).catch((error) => {
+      } catch (error) {
         console.error('Sync failed:', error);
 
         window.dispatchEvent(new CustomEvent('offline-sync-failed', {
           detail: error
         }));
-      });
+      }
     }
   }
 }

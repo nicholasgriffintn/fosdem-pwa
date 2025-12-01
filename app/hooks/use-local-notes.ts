@@ -20,8 +20,8 @@ export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 
 	const { data: localNotes, isLoading: localLoading } = useQuery({
 		queryKey: ["local-notes", year, slug],
-		queryFn: () => {
-			const allNotes = getLocalNotes(year);
+		queryFn: async () => {
+			const allNotes = await getLocalNotes(year);
 			return allNotes.filter(note => note.slug && note.slug === slug);
 		},
 		staleTime: 0,
@@ -29,9 +29,21 @@ export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 	});
 
 	const saveNote = useMutation({
-		mutationFn: async (data: Omit<LocalNote, 'id' | 'created_at' | 'updated_at'> & { skipSync?: boolean }) => {
-			const { skipSync, ...noteData } = data;
-			return saveLocalNote(noteData, skipSync);
+		mutationFn: async (
+			data: Omit<LocalNote, 'id' | 'created_at' | 'updated_at'> & { skipSync?: boolean },
+		) => {
+			if (!data) {
+				throw new Error('Note data is required');
+			}
+
+			const { skipSync, ...rest } = data;
+			const payload = {
+				...rest,
+				year: rest.year ?? year,
+				slug: rest.slug ?? slug,
+			} as Omit<LocalNote, 'id' | 'created_at' | 'updated_at'>;
+
+			return saveLocalNote(payload, skipSync);
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({

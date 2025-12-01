@@ -75,15 +75,20 @@ export function useBookmarks({ year }: { year: number }) {
 			const newFromServer = serverBookmarks.filter(b => !localSlugs.has(b.slug));
 
 			if (newFromServer.length > 0) {
-				newFromServer.forEach(serverBookmark => {
-					saveLocalBookmark({
-						year: serverBookmark.year,
-						slug: serverBookmark.slug,
-						type: serverBookmark.type,
-						status: serverBookmark.status,
-						serverId: serverBookmark.id,
-					}, true);
-				});
+				void (async () => {
+					for (const serverBookmark of newFromServer) {
+						await saveLocalBookmark(
+							{
+								year: serverBookmark.year,
+								slug: serverBookmark.slug,
+								type: serverBookmark.type,
+								status: serverBookmark.status,
+								serverId: serverBookmark.id,
+							},
+							true,
+						);
+					}
+				})();
 			}
 		}
 	}, [user?.id, serverBookmarks, localBookmarks, saveLocalBookmark]);

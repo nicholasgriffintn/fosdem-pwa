@@ -42,7 +42,9 @@ export function useAuth() {
 	useEffect(() => {
 		if (user?.id) {
 			enableSync();
-			checkAndSyncOnOnline(user.id);
+			checkAndSyncOnOnline(user.id).catch(error => {
+				console.error('Initial sync failed:', error);
+			});
 		}
 	}, [user?.id]);
 

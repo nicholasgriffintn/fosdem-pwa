@@ -21,9 +21,11 @@ export function useMutateBookmark({ year }: { year: number }) {
 	const createBookmarkOnServer = useServerFn(createBookmark);
 	const updateBookmarkOnServer = useServerFn(updateBookmark);
 
-	const createLocalBookmark = (bookmarkData: Omit<LocalBookmark, 'id' | 'created_at' | 'updated_at'> & { status: string }) => {
-		const newBookmark = saveLocalBookmark(bookmarkData);
-		queryClient.invalidateQueries({ queryKey: ["local-bookmarks", bookmarkData.year] });
+	const createLocalBookmark = async (
+		bookmarkData: Omit<LocalBookmark, 'id' | 'created_at' | 'updated_at'> & { status: string },
+	) => {
+		const newBookmark = await saveLocalBookmark(bookmarkData);
+		await queryClient.invalidateQueries({ queryKey: ["local-bookmarks", bookmarkData.year] });
 
 		if (user?.id) {
 			syncAllOfflineData().catch(error => {
@@ -34,10 +36,13 @@ export function useMutateBookmark({ year }: { year: number }) {
 		return newBookmark;
 	};
 
-	const updateLocalBookmark = (id: string, updates: Partial<LocalBookmark> & { status?: string }) => {
-		const updated = updateLocalBookmarkFromStorage(id, updates);
+	const updateLocalBookmark = async (
+		id: string,
+		updates: Partial<LocalBookmark> & { status?: string },
+	) => {
+		const updated = await updateLocalBookmarkFromStorage(id, updates);
 		if (updated) {
-			queryClient.invalidateQueries({ queryKey: ["local-bookmarks", updated.year] });
+			await queryClient.invalidateQueries({ queryKey: ["local-bookmarks", updated.year] });
 
 			if (user?.id) {
 				syncAllOfflineData().catch(error => {
@@ -48,11 +53,12 @@ export function useMutateBookmark({ year }: { year: number }) {
 		return updated;
 	};
 
-	const removeLocalBookmark = (id: string) => {
-		const bookmark = getLocalBookmarks().find(b => b.id === id);
-		const success = removeLocalBookmarkFromStorage(id);
+	const removeLocalBookmark = async (id: string) => {
+		const bookmarks = await getLocalBookmarks();
+		const bookmark = bookmarks.find(b => b.id === id);
+		const success = await removeLocalBookmarkFromStorage(id);
 		if (success && bookmark) {
-			queryClient.invalidateQueries({ queryKey: ["local-bookmarks", bookmark.year] });
+			await queryClient.invalidateQueries({ queryKey: ["local-bookmarks", bookmark.year] });
 
 			if (user?.id) {
 				syncAllOfflineData().catch(error => {
@@ -142,13 +148,13 @@ export function useMutateBookmark({ year }: { year: number }) {
 		},
 	});
 
-	const create = (bookmarkData: {
+	const create = async (bookmarkData: {
 		year: number;
 		type: string;
 		slug: string;
 		status: string;
 	}) => {
-		createLocalBookmark({
+		await createLocalBookmark({
 			year: bookmarkData.year,
 			slug: bookmarkData.slug,
 			type: bookmarkData.type,
@@ -160,8 +166,8 @@ export function useMutateBookmark({ year }: { year: number }) {
 		}
 	};
 
-	const update = (id: string, updates: Partial<Bookmark | LocalBookmark>) => {
-		updateLocalBookmark(id, updates);
+	const update = async (id: string, updates: Partial<Bookmark | LocalBookmark>) => {
+		await updateLocalBookmark(id, updates);
 
 		if (user?.id) {
 			updateServerBookmark.mutate({ id, updates });
