@@ -8,7 +8,6 @@ import { getAllData } from "~/server/functions/fosdem";
 import { EventMain } from "~/components/Event/EventMain";
 import { constants } from "~/constants";
 import { calculateEndTime } from "~/lib/dateTime";
-import { useAuth } from "~/hooks/use-auth";
 import { useBookmark } from "~/hooks/use-bookmark";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
@@ -69,7 +68,6 @@ export const Route = createFileRoute("/event/$slug")({
 function EventPage() {
 	const { fosdem, year, isTest } = Route.useLoaderData();
 
-	const { user } = useAuth();
 	const { bookmark, loading: bookmarkLoading } = useBookmark({
 		year,
 		slug: fosdem.event.id,
@@ -88,11 +86,6 @@ function EventPage() {
 			</div>
 		);
 	}
-
-	const isFavourite = {
-		status: "null",
-		slug: fosdem.event.id,
-	};
 
 	return (
 		<div className="min-h-screen">
