@@ -1,6 +1,6 @@
 export const fosdemTypeDescriptions = {
 	devroom:
-		"Developer rooms are organised and managed by the open source projects themselves, or the wider community, they include talks, hacking sessions, open discussions and more.",
+		"Developer rooms are organised and managed by the projects themselves, or the wider community, check out talks, hacking sessions, open discussions and more.",
 	keynote:
 		"FOSDEM Keynotes are talks that have been selected by the FOSDEM team. They are generally less technical, but revolve around the Open Source community.",
 	lightningtalk:
