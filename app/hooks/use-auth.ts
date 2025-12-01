@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { getSession } from "~/server/functions/session";
 import { constants } from "~/constants";
 import { checkAndSyncOnOnline } from "~/lib/backgroundSync";
+import { enableSync } from "~/lib/localStorage";
 
 export function useAuth() {
 	const queryClient = useQueryClient();
@@ -40,6 +41,7 @@ export function useAuth() {
 
 	useEffect(() => {
 		if (user?.id) {
+			enableSync();
 			checkAndSyncOnOnline(user.id);
 		}
 	}, [user?.id]);

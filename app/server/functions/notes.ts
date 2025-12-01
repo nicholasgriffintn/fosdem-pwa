@@ -70,3 +70,68 @@ export const createNote = createServerFn({
 			return { error: "Failed to save note" };
 		}
 	});
+
+export const updateNote = createServerFn({
+	method: "POST",
+})
+	.validator((data: { id: number; updates: any }) => data)
+	.handler(async (ctx: any) => {
+		const { id, updates } = ctx.data;
+
+		const { user } = await getFullAuthSession();
+
+		if (!user) {
+			throw new Error("User not found");
+		}
+
+		const existingNote = await db.query.note.findFirst({
+			where: and(eq(noteTable.id, id), eq(noteTable.user_id, user.id)),
+		});
+
+		if (!existingNote) {
+			throw new Error("Note not found");
+		}
+
+		try {
+			await db
+				.update(noteTable)
+				.set({ ...updates })
+				.where(eq(noteTable.id, id));
+
+			return { success: true };
+		} catch (error) {
+			console.error(error);
+			return { error: "Failed to update note" };
+		}
+	});
+
+export const deleteNote = createServerFn({
+	method: "POST",
+})
+	.validator((data: { id: number }) => data)
+	.handler(async (ctx: any) => {
+		const { id } = ctx.data;
+
+		const { user } = await getFullAuthSession();
+
+		if (!user) {
+			throw new Error("User not found");
+		}
+
+		const existingNote = await db.query.note.findFirst({
+			where: and(eq(noteTable.id, id), eq(noteTable.user_id, user.id)),
+		});
+
+		if (!existingNote) {
+			throw new Error("Note not found");
+		}
+
+		try {
+			await db.delete(noteTable).where(eq(noteTable.id, id));
+
+			return { success: true };
+		} catch (error) {
+			console.error(error);
+			return { error: "Failed to delete note" };
+		}
+	});

@@ -12,6 +12,9 @@ export interface SyncResult {
   errors: string[];
 }
 
+import { createBookmark, updateBookmark, deleteBookmark } from "~/server/functions/bookmarks";
+import { createNote, updateNote, deleteNote } from "~/server/functions/notes";
+
 export async function syncBookmarksToServer(): Promise<SyncResult> {
   const syncQueue = getSyncQueue();
   const bookmarkItems = syncQueue.filter(item => item.type === 'bookmark');
@@ -25,29 +28,38 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
   for (const item of bookmarkItems) {
     try {
       if (item.action === 'create' || item.action === 'update') {
-        const response = await fetch('/api/bookmarks', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+        const response = await createBookmark({
+          data: {
             year: item.data.year,
             type: item.data.type,
             slug: item.data.slug,
             status: item.data.status,
-          }),
+          }
         });
 
-        if (response.ok) {
+        if (response?.success) {
           results.push({ success: true, id: item.id });
           removeFromSyncQueue(item.id);
         } else {
-          results.push({ success: false, id: item.id, error: response.statusText });
+          results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
         }
       } else if (item.action === 'delete') {
-        // TODO: Implement delete endpoint
-        removeFromSyncQueue(item.id);
-        results.push({ success: true, id: item.id });
+        if (item.data.serverId) {
+          const response = await deleteBookmark({
+            data: {
+              id: item.data.serverId
+            }
+          });
+          if (response?.success) {
+            results.push({ success: true, id: item.id });
+            removeFromSyncQueue(item.id);
+          } else {
+            results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
+          }
+        } else {
+          results.push({ success: true, id: item.id });
+          removeFromSyncQueue(item.id);
+        }
       }
     } catch (error) {
       console.error('Sync error for bookmark:', item.id, error);
@@ -77,29 +89,72 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 
   for (const item of noteItems) {
     try {
-      if (item.action === 'create' || item.action === 'update') {
-        const response = await fetch('/api/notes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+      if (item.action === 'create') {
+        const response = await createNote({
+          data: {
             year: item.data.year,
-            slug: item.data.slug,
-            content: item.data.content,
-          }),
+            eventId: item.data.slug,
+            note: item.data.content,
+            time: item.data.time,
+          }
         });
 
-        if (response.ok) {
+        if (response?.success) {
           results.push({ success: true, id: item.id });
           removeFromSyncQueue(item.id);
         } else {
-          results.push({ success: false, id: item.id, error: response.statusText });
+          results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
+        }
+      } else if (item.action === 'update') {
+        if (item.data.serverId) {
+          const response = await updateNote({
+            data: {
+              id: item.data.serverId,
+              updates: {
+                note: item.data.content,
+                time: item.data.time,
+              }
+            }
+          });
+          if (response?.success) {
+            results.push({ success: true, id: item.id });
+            removeFromSyncQueue(item.id);
+          } else {
+            results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
+          }
+        } else {
+          const response = await createNote({
+            data: {
+              year: item.data.year,
+              eventId: item.data.slug,
+              note: item.data.content,
+              time: item.data.time,
+            }
+          });
+          if (response?.success) {
+            results.push({ success: true, id: item.id });
+            removeFromSyncQueue(item.id);
+          } else {
+            results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
+          }
         }
       } else if (item.action === 'delete') {
-        // TODO: Implement delete endpoint
-        removeFromSyncQueue(item.id);
-        results.push({ success: true, id: item.id });
+        if (item.data.serverId) {
+          const response = await deleteNote({
+            data: {
+              id: item.data.serverId
+            }
+          });
+          if (response?.success) {
+            results.push({ success: true, id: item.id });
+            removeFromSyncQueue(item.id);
+          } else {
+            results.push({ success: false, id: item.id, error: response?.error || 'Unknown error' });
+          }
+        } else {
+          results.push({ success: true, id: item.id });
+          removeFromSyncQueue(item.id);
+        }
       }
     } catch (error) {
       console.error('Sync error for note:', item.id, error);

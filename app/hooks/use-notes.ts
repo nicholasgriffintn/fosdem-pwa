@@ -54,7 +54,6 @@ export function useNotes({
 		const serverMap = new Map(serverNotes.map(n => [n.id, n]));
 
 		return localNotes.map(local => {
-			// Try to find a matching server note by year/slug combination
 			const matchingServerNote = serverNotes.find(serverNote =>
 				serverNote.year === local.year && serverNote.slug === local.slug
 			);
@@ -84,7 +83,6 @@ export function useNotes({
 					throw new Error('Cannot save note: event information is incomplete');
 				}
 
-				// Save locally if not authenticated
 				saveLocalNote({
 					year,
 					slug: event.id,
@@ -129,7 +127,6 @@ export function useNotes({
 				isPending: true,
 			};
 
-			// Update both server and local queries
 			queryClient.setQueryData(
 				["notes", userId, year, event.id],
 				(old: any[] = []) => [...old, optimisticNote],
@@ -208,6 +205,8 @@ export function useNotes({
 						slug: serverNote.slug,
 						note: serverNote.note,
 						time: serverNote.time,
+						serverId: serverNote.id,
+						skipSync: true,
 					});
 				});
 			}

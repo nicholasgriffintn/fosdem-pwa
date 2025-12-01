@@ -29,8 +29,9 @@ export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 	});
 
 	const saveNote = useMutation({
-		mutationFn: async (noteData: Omit<LocalNote, 'id' | 'created_at' | 'updated_at'>) => {
-			return saveLocalNote(noteData);
+		mutationFn: async (data: Omit<LocalNote, 'id' | 'created_at' | 'updated_at'> & { skipSync?: boolean }) => {
+			const { skipSync, ...noteData } = data;
+			return saveLocalNote(noteData, skipSync);
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
