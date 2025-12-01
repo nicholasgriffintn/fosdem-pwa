@@ -14,7 +14,6 @@ import { formatDate, formatTime, createStandardDate } from "~/lib/dateTime";
 type EventNotesProps = {
 	year: number;
 	event: Event;
-	userId?: string;
 	videoRef: React.RefObject<HTMLVideoElement | null>;
 	isMobile?: boolean;
 };
@@ -22,11 +21,10 @@ type EventNotesProps = {
 export function EventNotes({
 	year,
 	event,
-	userId,
 	videoRef,
 	isMobile,
 }: EventNotesProps) {
-	const { notes, loading, create } = useNotes({ year, event, userId });
+	const { notes, loading, create } = useNotes({ year, event });
 	const [note, setNote] = useState("");
 	const [noteTime, setNoteTime] = useState<number | undefined>();
 
@@ -90,14 +88,14 @@ export function EventNotes({
 									<p className="flex-1">{note.note}</p>
 									<div className="flex items-center gap-2 text-xs text-muted-foreground">
 										<span>{formatDate(note.created_at)}</span>
-										{note.time && (
+										{note.time != null && (
 											<>
 												<span>•</span>
 												<button
 													type="button"
 													className="bg-primary/10 px-2 py-1 rounded-md cursor-pointer hover:bg-primary/20"
 													onClick={() => {
-														handleClickTime(note.time || 0);
+														handleClickTime(note.time ?? 0);
 													}}
 												>
 													@{formatTime(note.time)}

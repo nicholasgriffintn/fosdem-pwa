@@ -1,8 +1,10 @@
 import type { Event, ConferenceData } from "~/types/fosdem";
 import { constants } from "~/constants";
 
-export function formatTime(seconds?: number) {
-	if (!seconds) return null;
+export function formatTime(seconds?: number | null) {
+	if (seconds == null) {
+		return null;
+	}
 	const minutes = Math.floor(seconds / 60);
 	const remainingSeconds = Math.floor(seconds % 60);
 	return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;

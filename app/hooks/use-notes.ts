@@ -8,35 +8,36 @@ import type { Event } from "~/types/fosdem";
 import { getNotes, createNote } from "~/server/functions/notes";
 import type { Note } from "~/server/db/schema";
 import { useAuth } from "~/hooks/use-auth";
-import { syncAllOfflineData } from "~/lib/backgroundSync";
 import { useLocalNotes } from "~/hooks/use-local-notes";
 import {
 	saveLocalNote as persistLocalNote,
 	updateLocalNote as persistUpdateLocalNote,
+	addToSyncQueue,
 	type LocalNote,
 } from "~/lib/localStorage";
 
-export function useNotes({
-	year,
-	event,
-	userId,
-}: {
+type UseNotesArgs = {
 	year: number;
 	event: Event;
-	userId?: string;
-}) {
+};
+
+export function useNotes({ year, event }: UseNotesArgs) {
 	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const getNotesFromServer = useServerFn(getNotes);
 	const createNoteFromServer = useServerFn(createNote);
 
-	const { notes: localNotes, saveNote: saveLocalNoteMutation, loading: localLoading } = useLocalNotes({
+	const { notes: localNotes, loading: localLoading } = useLocalNotes({
 		year,
 		slug: event.id,
 	});
 
+	const userKey = user?.id ?? "guest";
+	const serverQueryKey = ["notes", userKey, year, event.id] as const;
+	const localQueryKey = ["local-notes", year, event.id] as const;
+
 	const { data: serverNotes, isLoading: serverLoading } = useQuery({
-		queryKey: ["notes", userId, year, event.id],
+		queryKey: serverQueryKey,
 		queryFn: async () => {
 			if (!user?.id) return [];
 
@@ -60,8 +61,7 @@ export function useNotes({
 
 		return localNotes.map(local => {
 			let matchingServerNote =
-				(local.serverId &&
-					serverMap.get(String(local.serverId))) ||
+				(local.serverId && serverMap.get(String(local.serverId))) ||
 				serverNotes.find(serverNote =>
 					serverNote.slug === local.slug &&
 					serverNote.year === local.year &&
@@ -73,6 +73,7 @@ export function useNotes({
 				...local,
 				serverId: matchingServerNote?.id,
 				existsOnServer: !!matchingServerNote,
+				isPending: !!user?.id && !matchingServerNote,
 			};
 		}) as any;
 	}, [user?.id, localNotes, serverNotes]);
@@ -88,49 +89,56 @@ export function useNotes({
 			time?: number;
 			tempId: string;
 			}) => {
-			if (!event.id) {
-				console.error('Cannot save note: event.id is undefined', event);
-				throw new Error('Cannot save note: event information is incomplete');
+			if (!event?.id) {
+				console.error("Cannot save note: event.id is undefined", event);
+				throw new Error("Cannot save note: event information is incomplete");
 			}
 
-			saveLocalNoteMutation({
-				year,
-				slug: event.id,
-				note: note,
-				time,
-				skipSync: !user?.id ? false : true,
-			});
-
-			if (!user?.id) {
-				return { success: true, tempId };
+			let localNote: LocalNote;
+			try {
+				localNote = await persistLocalNote(
+					{
+						year,
+						slug: event.id,
+						note,
+						time,
+					},
+					true,
+				);
+			} catch (error) {
+				throw new LocalNotePersistenceError(
+					error instanceof Error ? error.message : "Failed to save note locally",
+				);
 			}
 
-			const response = await createNoteFromServer({
-				data: { year, eventId: event.id, note, time },
-			});
+			const shouldDefer =
+				!!user?.id &&
+				(typeof navigator !== "undefined" ? !navigator.onLine : false);
 
-			return { ...response, tempId: tempId };
+			if (!user?.id || shouldDefer) {
+				if (shouldDefer) {
+					await queueNoteForSync(localNote);
+				}
+				return { success: true, tempId, queued: shouldDefer };
+			}
+
+			try {
+				const response = await createNoteFromServer({
+					data: { year, eventId: event.id, note, time },
+				});
+
+				return { ...response, tempId, queued: false };
+			} catch (error) {
+				await queueNoteForSync(localNote);
+				console.error("Failed to sync note immediately, queued for later:", error);
+				return { success: true, tempId, queued: true };
+			}
 		},
 		onMutate: async (newNote) => {
-			await queryClient.cancelQueries({
-				queryKey: ["notes", userId, year, event.id],
-			});
-			await queryClient.cancelQueries({
-				queryKey: ["local-notes", year, event.id],
-			});
+			await queryClient.cancelQueries({ queryKey: serverQueryKey });
+			await queryClient.cancelQueries({ queryKey: localQueryKey });
 
-			const previousNotes = queryClient.getQueryData([
-				"notes",
-				userId,
-				year,
-				event.id,
-			]);
-
-			const previousLocalNotes = queryClient.getQueryData([
-				"local-notes",
-				year,
-				event.id,
-			]);
+			const previousLocalNotes = queryClient.getQueryData(localQueryKey);
 
 			const timestamp = new Date().toISOString();
 			const optimisticNote = {
@@ -143,68 +151,34 @@ export function useNotes({
 				isPending: true,
 			};
 
-			queryClient.setQueryData(
-				["notes", userId, year, event.id],
-				(old: any[] = []) => [...old, optimisticNote],
-			);
+			queryClient.setQueryData(localQueryKey, (old: any[] = []) => [
+				...old,
+				optimisticNote,
+			]);
 
-			queryClient.setQueryData(
-				["local-notes", year, event.id],
-				(old: any[] = []) => [...old, optimisticNote],
-			);
-
-			return { previousNotes, previousLocalNotes };
+			return { previousLocalNotes };
 		},
-		onSuccess: (_data, variables) => {
-			queryClient.setQueryData(
-				["notes", userId, year, event.id],
-				(old: any[] = []) => {
-					return old.map((note: any) =>
-						note.id === variables.tempId ? { ...note, isPending: false } : note
-					);
-				},
-			);
+		onSuccess: (data, variables) => {
+			if (data?.queued) {
+				return;
+			}
 
-			queryClient.setQueryData(
-				["local-notes", year, event.id],
-				(old: any[] = []) => {
-					return old.map((note: any) =>
-						note.id === variables.tempId ? { ...note, isPending: false } : note
-					);
-				},
-			);
+			queryClient.setQueryData(localQueryKey, (old: any[] = []) => {
+				return old.map((note: any) =>
+					note.id === variables.tempId ? { ...note, isPending: false } : note,
+				);
+			});
 		},
-		onError: (err, newNote, context) => {
-			queryClient.setQueryData(
-				["notes", userId, year, event.id],
-				context?.previousNotes,
-			);
-
-			queryClient.setQueryData(
-				["local-notes", year, event.id],
-				context?.previousLocalNotes,
-			);
+		onError: (err, _newNote, context) => {
+			if (err instanceof LocalNotePersistenceError && context?.previousLocalNotes) {
+				queryClient.setQueryData(localQueryKey, context.previousLocalNotes);
+			}
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({
-				queryKey: ["notes", userId, year, event.id],
-			});
-
-			queryClient.invalidateQueries({
-				queryKey: ["local-notes", year, event.id],
-			});
+			queryClient.invalidateQueries({ queryKey: serverQueryKey });
+			queryClient.invalidateQueries({ queryKey: localQueryKey });
 		},
 	});
-
-	useEffect(() => {
-		if (!user?.id) return;
-
-		if (localNotes && localNotes.length > 0) {
-			syncAllOfflineData().catch(error => {
-				console.error('Background sync failed:', error);
-			});
-		}
-	}, [user?.id, localNotes]);
 
 	useEffect(() => {
 		if (!user?.id) return;
@@ -225,20 +199,24 @@ export function useNotes({
 
 			const localServerIdMap = new Map(
 				localNotes
-					.filter((note): note is LocalNote & { serverId: number } => typeof note.serverId === "number")
+					.filter(
+						(note): note is LocalNote & { serverId: number } =>
+							typeof note.serverId === "number",
+					)
 					.map((note) => [String(note.serverId), note]),
 			);
 
 			(async () => {
 				try {
-					for (const serverNote of validServerNotes) {
+					const operations = validServerNotes.map(async (serverNote) => {
 						const key = String(serverNote.id);
 						const existingLocalByServerId = localServerIdMap.get(key);
 
 						if (existingLocalByServerId) {
 							const needsUpdate =
 								existingLocalByServerId.note !== serverNote.note ||
-								(existingLocalByServerId.time ?? null) !== (serverNote.time ?? null);
+								(existingLocalByServerId.time ?? null) !==
+								(serverNote.time ?? null);
 
 							if (needsUpdate) {
 								await persistUpdateLocalNote(
@@ -250,15 +228,16 @@ export function useNotes({
 									true,
 								);
 							}
-							continue;
+							return;
 						}
 
-						const existingLocalMatch = localNotes.find(localNote =>
-							!localNote.serverId &&
-							localNote.slug === serverNote.slug &&
-							localNote.year === serverNote.year &&
-							localNote.note === serverNote.note &&
-							(localNote.time ?? null) === (serverNote.time ?? null)
+						const existingLocalMatch = localNotes.find(
+							(localNote) =>
+								!localNote.serverId &&
+								localNote.slug === serverNote.slug &&
+								localNote.year === serverNote.year &&
+								localNote.note === serverNote.note &&
+								(localNote.time ?? null) === (serverNote.time ?? null),
 						);
 
 						if (existingLocalMatch) {
@@ -269,7 +248,7 @@ export function useNotes({
 								},
 								true,
 							);
-							continue;
+							return;
 						}
 
 						await persistLocalNote(
@@ -282,13 +261,15 @@ export function useNotes({
 							},
 							true,
 						);
-					}
+					});
+
+					await Promise.all(operations);
 
 					await queryClient.invalidateQueries({
 						queryKey: ["local-notes", year, event.id],
 					});
 				} catch (error) {
-					console.error('Failed to persist server notes locally:', error);
+					console.error("Failed to persist server notes locally:", error);
 				}
 			})();
 		}
@@ -299,4 +280,31 @@ export function useNotes({
 		loading: localLoading || (user?.id ? serverLoading : false),
 		create: create.mutate,
 	};
+}
+
+class LocalNotePersistenceError extends Error {
+	constructor(message?: string) {
+		super(message ?? "Failed to save note locally");
+		this.name = "LocalNotePersistenceError";
+	}
+}
+
+async function queueNoteForSync(localNote: LocalNote) {
+	try {
+		await addToSyncQueue({
+			id: localNote.id,
+			type: "note",
+			action: "create",
+			data: {
+				year: localNote.year,
+				slug: localNote.slug,
+				content: localNote.note,
+				time: localNote.time,
+				serverId: localNote.serverId,
+			},
+			timestamp: new Date().toISOString(),
+		});
+	} catch (error) {
+		console.error("Failed to queue note for sync:", error);
+	}
 }

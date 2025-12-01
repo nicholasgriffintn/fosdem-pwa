@@ -6,10 +6,10 @@ import { useEffect, useMemo } from "react";
 
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { useAuth } from "~/hooks/use-auth";
-import { syncAllOfflineData } from "~/lib/backgroundSync";
 import {
 	getLocalBookmarks,
 	saveLocalBookmark,
+	updateLocalBookmark,
 } from "~/lib/localStorage";
 
 export function useBookmarks({ year }: { year: number }) {
@@ -20,7 +20,8 @@ export function useBookmarks({ year }: { year: number }) {
 	const { data: localBookmarks, isLoading: localLoading } = useQuery({
 		queryKey: ["local-bookmarks", year],
 		queryFn: () => getLocalBookmarks(year),
-		staleTime: 0,
+		staleTime: 60 * 1000,
+		gcTime: 10 * 60 * 1000,
 	});
 
 	const { data: serverBookmarks, isLoading: serverLoading } = useQuery({
@@ -59,39 +60,55 @@ export function useBookmarks({ year }: { year: number }) {
 	useEffect(() => {
 		if (!user?.id) return;
 
-		if (localBookmarks && localBookmarks.length > 0) {
-			syncAllOfflineData().catch(error => {
-				console.error('Background sync failed:', error);
-			});
-		}
-	}, [user?.id, localBookmarks]);
-
-	useEffect(() => {
-		if (!user?.id) return;
-
 		if (serverBookmarks && localBookmarks) {
-			const localSlugs = new Set(localBookmarks.map(b => b.slug));
+			const localBySlug = new Map(localBookmarks.map(b => [b.slug, b]));
 
-			const newFromServer = serverBookmarks.filter(b => !localSlugs.has(b.slug));
+			const operations = serverBookmarks.map(async (serverBookmark) => {
+				const existingLocal = localBySlug.get(serverBookmark.slug);
 
-			if (newFromServer.length > 0) {
+				if (!existingLocal) {
+					await saveLocalBookmark(
+						{
+							year: serverBookmark.year,
+							slug: serverBookmark.slug,
+							type: serverBookmark.type,
+							status: serverBookmark.status,
+							serverId: serverBookmark.id,
+						},
+						true,
+					);
+					return;
+				}
+
+				const needsUpdate =
+					existingLocal.serverId !== serverBookmark.id ||
+					existingLocal.status !== serverBookmark.status ||
+					existingLocal.type !== serverBookmark.type;
+
+				if (needsUpdate) {
+					await updateLocalBookmark(
+						existingLocal.id,
+						{
+							serverId: serverBookmark.id,
+							status: serverBookmark.status,
+							type: serverBookmark.type,
+						},
+						true,
+					);
+				}
+			});
+
+			if (operations.length > 0) {
 				void (async () => {
-					for (const serverBookmark of newFromServer) {
-						await saveLocalBookmark(
-							{
-								year: serverBookmark.year,
-								slug: serverBookmark.slug,
-								type: serverBookmark.type,
-								status: serverBookmark.status,
-								serverId: serverBookmark.id,
-							},
-							true,
-						);
+					try {
+						await Promise.all(operations);
+					} catch (error) {
+						console.error("Failed to reconcile local bookmarks:", error);
 					}
 				})();
 			}
 		}
-	}, [user?.id, serverBookmarks, localBookmarks, saveLocalBookmark]);
+	}, [user?.id, serverBookmarks, localBookmarks]);
 
 	return {
 		bookmarks: mergedBookmarks,
