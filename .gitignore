@@ -20,3 +20,6 @@ dist
 app.config.timestamp*
 count.txt
 dev-dist
+
+tests/playwright/results/
+test-results/
