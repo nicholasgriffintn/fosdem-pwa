@@ -1,5 +1,12 @@
 import { getSyncQueue, removeFromSyncQueue } from "~/lib/localStorage";
 
+let currentSyncPromise:
+  | Promise<{
+      bookmarks: SyncResult;
+      notes: SyncResult;
+    }>
+  | null = null;
+
 interface ServiceWorkerRegistrationWithSync extends ServiceWorkerRegistration {
   sync: {
     register(tag: string): Promise<void>;
@@ -176,15 +183,27 @@ export async function syncAllOfflineData(): Promise<{
   bookmarks: SyncResult;
   notes: SyncResult;
 }> {
-  const [bookmarkResult, noteResult] = await Promise.all([
-    syncBookmarksToServer(),
-    syncNotesToServer(),
-  ]);
+  if (currentSyncPromise) {
+    return currentSyncPromise;
+  }
 
-  return {
-    bookmarks: bookmarkResult,
-    notes: noteResult,
-  };
+  currentSyncPromise = (async () => {
+    const [bookmarkResult, noteResult] = await Promise.all([
+      syncBookmarksToServer(),
+      syncNotesToServer(),
+    ]);
+
+    return {
+      bookmarks: bookmarkResult,
+      notes: noteResult,
+    };
+  })();
+
+  try {
+    return await currentSyncPromise;
+  } finally {
+    currentSyncPromise = null;
+  }
 }
 
 export function registerBackgroundSync() {
@@ -205,10 +224,15 @@ export async function checkAndSyncOnOnline(userId?: string) {
   if (navigator.onLine && userId) {
     const syncQueue = await getSyncQueue();
     if (syncQueue.length > 0) {
-      console.info('Syncing offline data...');
+      const wasRunning = !!currentSyncPromise;
+      if (!wasRunning) {
+        console.info('Syncing offline data...');
+      }
       try {
         const results = await syncAllOfflineData();
-        console.info('Sync completed:', results);
+        if (!wasRunning) {
+          console.info('Sync completed:', results);
+        }
 
         window.dispatchEvent(new CustomEvent('offline-sync-completed', {
           detail: results

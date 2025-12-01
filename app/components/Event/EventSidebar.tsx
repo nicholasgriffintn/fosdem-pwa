@@ -19,7 +19,7 @@ export function EventSidebar({
 	year,
 	videoRef,
 }: EventSidebarProps) {
-	const { user, loading } = useAuth();
+	const { loading } = useAuth();
 
 	const sidebarClassName = clsx("h-full", {
 		"p-6": !isMobile,
@@ -40,7 +40,6 @@ export function EventSidebar({
 						<EventNotesMobile
 							event={event}
 							year={year}
-							userId={user.github_username}
 							videoRef={videoRef}
 						/>
 					) : (
@@ -49,7 +48,6 @@ export function EventSidebar({
 							<EventNotes
 								event={event}
 								year={year}
-								userId={user.github_username}
 								videoRef={videoRef}
 							/>
 						</>

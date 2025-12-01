@@ -15,14 +15,12 @@ import type { Event } from "~/types/fosdem";
 type EventNotesMobileProps = {
 	event: Event;
 	year: number;
-	userId?: string;
 	videoRef: React.RefObject<HTMLVideoElement | null>;
 };
 
 export function EventNotesMobile({
 	event,
 	year,
-	userId,
 	videoRef,
 }: EventNotesMobileProps) {
 	return (
@@ -41,7 +39,6 @@ export function EventNotesMobile({
 					<EventNotes
 						event={event}
 						year={year}
-						userId={userId}
 						videoRef={videoRef}
 						isMobile={true}
 					/>

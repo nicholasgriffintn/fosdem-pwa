@@ -40,12 +40,28 @@ export function useAuth() {
 	});
 
 	useEffect(() => {
-		if (user?.id) {
-			enableSync();
-			checkAndSyncOnOnline(user.id).catch(error => {
-				console.error('Initial sync failed:', error);
-			});
+		if (!user?.id) return;
+
+		enableSync();
+		checkAndSyncOnOnline(user.id).catch(error => {
+			console.error("Initial sync failed:", error);
+		});
+
+		if (typeof window === "undefined") {
+			return;
 		}
+
+		const handleOnline = () => {
+			checkAndSyncOnOnline(user.id).catch(error => {
+				console.error("Online sync failed:", error);
+			});
+		};
+
+		window.addEventListener("online", handleOnline);
+
+		return () => {
+			window.removeEventListener("online", handleOnline);
+		};
 	}, [user?.id]);
 
 	return {
