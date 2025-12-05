@@ -67,7 +67,7 @@ importers:
         version: 1.95.1(@tanstack/react-router@1.95.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(csstype@3.2.3)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tanstack/start':
         specifier: 1.95.1
-        version: 1.95.1(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(terser@5.37.0)(tsx@4.20.6)(vite@6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))(yaml@2.6.1)
+        version: 1.95.1(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(terser@5.37.0)(tsx@4.20.6)(vite@6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))(yaml@2.6.1)
       '@unpic/react':
         specifier: 1.0.1
         version: 1.0.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -88,7 +88,7 @@ importers:
         version: 2.1.1
       drizzle-orm:
         specifier: 0.44.7
-        version: 0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)
+        version: 0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)
       fuse.js:
         specifier: 7.1.0
         version: 7.1.0
@@ -121,14 +121,14 @@ importers:
         version: 1.10.0
       vinxi:
         specifier: 0.5.8
-        version: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
+        version: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.3.8
         version: 2.3.8
       '@cloudflare/workers-types':
-        specifier: 4.20251128.0
-        version: 4.20251128.0
+        specifier: 4.20251202.0
+        version: 4.20251202.0
       '@playwright/test':
         specifier: ^1.57.0
         version: 1.57.0
@@ -173,7 +173,7 @@ importers:
         version: 4.0.14(@types/node@22.10.2)(jiti@2.6.1)(jsdom@27.2.0)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
       wrangler:
         specifier: 4.51.0
-        version: 4.51.0(@cloudflare/workers-types@4.20251128.0)
+        version: 4.51.0(@cloudflare/workers-types@4.20251202.0)
 
 packages:
 
@@ -450,8 +450,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@cloudflare/workers-types@4.20251128.0':
-    resolution: {integrity: sha512-gQxQvxLRsFb+mDlaBKGoJwEHWt+ox9telZZEuRMbNUAD6v78XYqZepTI4yPDdKhkRTlqYcDqDhIdAI3HrsGk7w==}
+  '@cloudflare/workers-types@4.20251202.0':
+    resolution: {integrity: sha512-Q7m1Ivu2fbKalOPm00KLpu6GfRaq4TlrPknqugvZgp/gDH96OYKINO4x7jvCIBvCz/aK9vVoOj8tlbSQBervVA==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -4744,7 +4744,7 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20251125.0':
     optional: true
 
-  '@cloudflare/workers-types@4.20251128.0': {}
+  '@cloudflare/workers-types@4.20251202.0': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -5993,7 +5993,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/start@1.95.1(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(terser@5.37.0)(tsx@4.20.6)(vite@6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))(yaml@2.6.1)':
+  '@tanstack/start@1.95.1(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(terser@5.37.0)(tsx@4.20.6)(vite@6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))(yaml@2.6.1)':
     dependencies:
       '@tanstack/react-cross-context': 1.87.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tanstack/react-router': 1.95.1(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -6002,8 +6002,8 @@ snapshots:
       '@tanstack/start-vite-plugin': 1.91.1
       '@vinxi/react': 0.2.5
       '@vinxi/react-server-dom': 0.0.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vite@6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
-      '@vinxi/server-components': 0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
-      '@vinxi/server-functions': 0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
+      '@vinxi/server-components': 0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
+      '@vinxi/server-functions': 0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
       '@vitejs/plugin-react': 4.3.4(vite@6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
       import-meta-resolve: 4.1.0
       isbot: 5.1.17
@@ -6011,7 +6011,7 @@ snapshots:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
       tiny-invariant: 1.3.3
-      vinxi: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
+      vinxi: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
       zod: 3.24.1
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -6171,7 +6171,7 @@ snapshots:
       untun: 0.1.3
       uqr: 0.1.2
 
-  '@vinxi/plugin-directives@0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))':
+  '@vinxi/plugin-directives@0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))':
     dependencies:
       '@babel/parser': 7.28.4
       acorn: 8.15.0
@@ -6182,7 +6182,7 @@ snapshots:
       magicast: 0.2.11
       recast: 0.23.9
       tslib: 2.8.1
-      vinxi: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
+      vinxi: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
 
   '@vinxi/react-server-dom@0.0.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vite@6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))':
     dependencies:
@@ -6193,27 +6193,27 @@ snapshots:
 
   '@vinxi/react@0.2.5': {}
 
-  '@vinxi/server-components@0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))':
+  '@vinxi/server-components@0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))':
     dependencies:
-      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
+      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
       acorn: 8.14.0
       acorn-loose: 8.4.0
       acorn-typescript: 1.4.13(acorn@8.14.0)
       astring: 1.9.0
       magicast: 0.2.11
       recast: 0.23.9
-      vinxi: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
+      vinxi: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
 
-  '@vinxi/server-functions@0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))':
+  '@vinxi/server-functions@0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))':
     dependencies:
-      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
+      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))
       acorn: 8.14.0
       acorn-loose: 8.4.0
       acorn-typescript: 1.4.13(acorn@8.14.0)
       astring: 1.9.0
       magicast: 0.2.11
       recast: 0.23.9
-      vinxi: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
+      vinxi: 0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
 
   '@vitejs/plugin-react@4.3.4(vite@6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1))':
     dependencies:
@@ -6623,9 +6623,9 @@ snapshots:
       '@deno/shim-deno': 0.19.2
       undici-types: 5.28.4
 
-  db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)):
+  db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)):
     optionalDependencies:
-      drizzle-orm: 0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)
+      drizzle-orm: 0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)
 
   debug@2.6.9:
     dependencies:
@@ -6678,9 +6678,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7):
+  drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7):
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20251128.0
+      '@cloudflare/workers-types': 4.20251202.0
       '@upstash/redis': 1.35.7
 
   duplexer@0.1.2: {}
@@ -7357,7 +7357,7 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  nitropack@2.12.7(@upstash/redis@1.35.7)(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)):
+  nitropack@2.12.7(@upstash/redis@1.35.7)(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
       '@rollup/plugin-alias': 5.1.1(rollup@4.52.4)
@@ -7378,7 +7378,7 @@ snapshots:
       cookie-es: 2.0.0
       croner: 9.1.0
       crossws: 0.3.5
-      db0: 0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))
+      db0: 0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))
       defu: 6.1.4
       destr: 2.0.5
       dot-prop: 10.1.0
@@ -7424,7 +7424,7 @@ snapshots:
       unenv: 2.0.0-rc.24
       unimport: 5.4.1
       unplugin-utils: 0.3.1
-      unstorage: 1.17.1(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(ioredis@5.8.1)
+      unstorage: 1.17.1(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(ioredis@5.8.1)
       untyped: 2.0.0
       unwasm: 0.3.11
       youch: 4.1.0-beta.11
@@ -8238,7 +8238,7 @@ snapshots:
       picomatch: 4.0.3
       webpack-virtual-modules: 0.6.2
 
-  unstorage@1.17.1(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(ioredis@5.8.1):
+  unstorage@1.17.1(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(ioredis@5.8.1):
     dependencies:
       anymatch: 3.1.3
       chokidar: 4.0.3
@@ -8250,7 +8250,7 @@ snapshots:
       ufo: 1.6.1
     optionalDependencies:
       '@upstash/redis': 1.35.7
-      db0: 0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))
+      db0: 0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))
       ioredis: 5.8.1
 
   untun@0.1.3:
@@ -8309,7 +8309,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1):
+  vinxi@0.5.8(@types/node@22.10.2)(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))(ioredis@5.8.1)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1):
     dependencies:
       '@babel/core': 7.28.4
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.28.4)
@@ -8330,7 +8330,7 @@ snapshots:
       hookable: 5.5.3
       http-proxy: 1.18.1
       micromatch: 4.0.8
-      nitropack: 2.12.7(@upstash/redis@1.35.7)(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7))
+      nitropack: 2.12.7(@upstash/redis@1.35.7)(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7))
       node-fetch-native: 1.6.7
       path-to-regexp: 6.3.0
       pathe: 1.1.2
@@ -8342,7 +8342,7 @@ snapshots:
       ufo: 1.6.1
       unctx: 2.4.1
       unenv: 1.10.0
-      unstorage: 1.17.1(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251128.0)(@upstash/redis@1.35.7)))(ioredis@5.8.1)
+      unstorage: 1.17.1(@upstash/redis@1.35.7)(db0@0.3.4(drizzle-orm@0.44.7(@cloudflare/workers-types@4.20251202.0)(@upstash/redis@1.35.7)))(ioredis@5.8.1)
       vite: 6.3.6(@types/node@22.10.2)(jiti@2.6.1)(terser@5.37.0)(tsx@4.20.6)(yaml@2.6.1)
       zod: 3.25.76
     transitivePeerDependencies:
@@ -8504,7 +8504,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20251125.0
       '@cloudflare/workerd-windows-64': 1.20251125.0
 
-  wrangler@4.51.0(@cloudflare/workers-types@4.20251128.0):
+  wrangler@4.51.0(@cloudflare/workers-types@4.20251202.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.1
       '@cloudflare/unenv-preset': 2.7.11(unenv@2.0.0-rc.24)(workerd@1.20251125.0)
@@ -8515,7 +8515,7 @@ snapshots:
       unenv: 2.0.0-rc.24
       workerd: 1.20251125.0
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20251128.0
+      '@cloudflare/workers-types': 4.20251202.0
       fsevents: 2.3.3
     transitivePeerDependencies:
       - bufferutil
