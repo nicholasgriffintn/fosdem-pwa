@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fosdem-pwa-push-notifications",
   "main": "src/index.ts",
-  "compatibility_date": "2025-01-09",
+  "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "enabled": true

@@ -1,7 +1,7 @@
 name = "fosdem-pwa-build-data"
 main = "src/index.ts"
 compatibility_flags = ["nodejs_compat"]
-compatibility_date = "2024-11-13"
+compatibility_date = "2025-09-02"
 
 [[r2_buckets]]
 binding = "R2"
