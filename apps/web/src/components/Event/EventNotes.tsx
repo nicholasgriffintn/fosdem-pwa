@@ -68,13 +68,17 @@ export function EventNotes({
 	};
 
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex flex-col h-full min-h-0">
 			<div
-				className={`flex-1 overflow-y-auto mb-4 ${isMobile ? "min-h-[calc(100vh-250px)] max-h-[calc(100vh-250px)]" : "min-h-[250px] max-h-[250px]"}`}
+				className={`flex-1 overflow-y-auto mb-4 ${isMobile
+						? "min-h-[calc(100vh-250px)] max-h-[calc(100vh-250px)]"
+						: "min-h-0"
+					}`}
 			>
 				{loading && (
 					<Skeleton
-						className={`h-full ${isMobile ? "min-h-[calc(100vh-250px)]" : "min-h-[250px]"}`}
+						className={`h-full ${isMobile ? "min-h-[calc(100vh-250px)]" : ""
+							}`}
 					/>
 				)}
 				{!loading && notes && (
