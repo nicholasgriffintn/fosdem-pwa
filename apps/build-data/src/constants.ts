@@ -32,4 +32,7 @@ export const constants = {
     U: { id: 'U' },
     K: { id: 'K' },
   },
+  SCHEDULE_FETCH_MAX_RETRIES: 3,
+  SCHEDULE_FETCH_TIMEOUT_MS: 10000,
+  SCHEDULE_RETRY_BASE_DELAY_MS: 1000,
 };
