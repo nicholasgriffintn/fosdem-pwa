@@ -311,7 +311,7 @@ export default function SearchPage() {
 
 	return (
 		<div className="min-h-screen">
-			<div className="container py-6 lg:py-10 space-y-6">
+			<div className="relative py-6 lg:py-10">
 				<PageHeader
 					heading="Search"
 					subtitle={`Results for "${query || "…"}"`}
