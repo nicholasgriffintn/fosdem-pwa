@@ -1,4 +1,17 @@
 {
   "name": "fosdem-pwa",
-  "version": "0.202.1"
+  "version": "0.2025.1",
+  "private": true,
+  "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @fosdem-pwa/web dev",
+    "build": "pnpm --filter @fosdem-pwa/web build",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "format": "pnpm --filter @fosdem-pwa/web format"
+  }
 }
