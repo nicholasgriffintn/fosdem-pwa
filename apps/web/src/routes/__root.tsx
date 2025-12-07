@@ -25,10 +25,10 @@ const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
 		? () => null
 		: lazy(() =>
-			import("@tanstack/react-router-devtools").then((res) => ({
-				default: res.TanStackRouterDevtools,
-			})),
-		);
+				import("@tanstack/react-router-devtools").then((res) => ({
+					default: res.TanStackRouterDevtools,
+				})),
+			);
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 	{

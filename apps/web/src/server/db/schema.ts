@@ -178,7 +178,9 @@ export const scheduleSnapshot = sqliteTable(
 			scheduleSnapshotPk: primaryKey({
 				columns: [table.slug, table.year],
 			}),
-			scheduleSnapshotYearIdx: index("schedule_snapshot_year_idx").on(table.year),
+			scheduleSnapshotYearIdx: index("schedule_snapshot_year_idx").on(
+				table.year,
+			),
 		};
 	},
 );

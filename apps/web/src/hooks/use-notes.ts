@@ -41,7 +41,9 @@ export function useNotes({ year, event }: UseNotesArgs) {
 		queryFn: async () => {
 			if (!user?.id) return [];
 
-			const notes = await getNotesFromServer({ data: { year, eventId: event.id } });
+			const notes = await getNotesFromServer({
+				data: { year, eventId: event.id },
+			});
 			return notes;
 		},
 		enabled: !!user?.id,
@@ -57,16 +59,19 @@ export function useNotes({ year, event }: UseNotesArgs) {
 			return localNotes || serverNotes || [];
 		}
 
-		const serverMap = new Map(serverNotes.map(note => [String(note.id), note]));
+		const serverMap = new Map(
+			serverNotes.map((note) => [String(note.id), note]),
+		);
 
-		return localNotes.map(local => {
+		return localNotes.map((local) => {
 			let matchingServerNote =
 				(local.serverId && serverMap.get(String(local.serverId))) ||
-				serverNotes.find(serverNote =>
-					serverNote.slug === local.slug &&
-					serverNote.year === local.year &&
-					serverNote.note === local.note &&
-					(serverNote.time ?? null) === (local.time ?? null)
+				serverNotes.find(
+					(serverNote) =>
+						serverNote.slug === local.slug &&
+						serverNote.year === local.year &&
+						serverNote.note === local.note &&
+						(serverNote.time ?? null) === (local.time ?? null),
 				);
 
 			return {
@@ -107,7 +112,9 @@ export function useNotes({ year, event }: UseNotesArgs) {
 				);
 			} catch (error) {
 				throw new LocalNotePersistenceError(
-					error instanceof Error ? error.message : "Failed to save note locally",
+					error instanceof Error
+						? error.message
+						: "Failed to save note locally",
 				);
 			}
 
@@ -130,7 +137,10 @@ export function useNotes({ year, event }: UseNotesArgs) {
 				return { ...response, tempId, queued: false };
 			} catch (error) {
 				await queueNoteForSync(localNote);
-				console.error("Failed to sync note immediately, queued for later:", error);
+				console.error(
+					"Failed to sync note immediately, queued for later:",
+					error,
+				);
 				return { success: true, tempId, queued: true };
 			}
 		},
@@ -170,7 +180,10 @@ export function useNotes({ year, event }: UseNotesArgs) {
 			});
 		},
 		onError: (err, _newNote, context) => {
-			if (err instanceof LocalNotePersistenceError && context?.previousLocalNotes) {
+			if (
+				err instanceof LocalNotePersistenceError &&
+				context?.previousLocalNotes
+			) {
 				queryClient.setQueryData(localQueryKey, context.previousLocalNotes);
 			}
 		},
@@ -216,7 +229,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 							const needsUpdate =
 								existingLocalByServerId.note !== serverNote.note ||
 								(existingLocalByServerId.time ?? null) !==
-								(serverNote.time ?? null);
+									(serverNote.time ?? null);
 
 							if (needsUpdate) {
 								await persistUpdateLocalNote(

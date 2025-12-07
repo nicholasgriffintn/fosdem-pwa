@@ -67,12 +67,18 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 
 	const tracksIndex = useMemo(() => {
 		if (!fosdemData) return null;
-		return createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS);
+		return createSearchIndex(
+			Object.values(fosdemData.tracks),
+			TRACK_SEARCH_KEYS,
+		);
 	}, [fosdemData]);
 
 	const eventsIndex = useMemo(() => {
 		if (!fosdemData) return null;
-		return createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS);
+		return createSearchIndex(
+			Object.values(fosdemData.events),
+			EVENT_SEARCH_KEYS,
+		);
 	}, [fosdemData]);
 
 	const roomsIndex = useMemo(() => {

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
 import { createGuestSession, setSessionTokenCookie } from "~/server/auth";
 

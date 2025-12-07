@@ -175,7 +175,8 @@ export function PushNotifications() {
 			<h2 className="text-2xl font-bold text-foreground">Push Notifications</h2>
 			{!pushSupported && (
 				<p className="text-sm text-muted-foreground">
-					This browser does not support push notifications. Try using a Chromium-based browser on desktop or Android.
+					This browser does not support push notifications. Try using a
+					Chromium-based browser on desktop or Android.
 				</p>
 			)}
 			{subscriptionsLoading ? (

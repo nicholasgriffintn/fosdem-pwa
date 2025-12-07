@@ -20,15 +20,14 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 	console.error(error);
 
 	const message =
-		(error as Error)?.message || "An unexpected error occurred. Please try again.";
+		(error as Error)?.message ||
+		"An unexpected error occurred. Please try again.";
 
 	return (
 		<div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-6 p-4">
 			<EmptyStateCard
 				title="Something went wrong"
-				description={
-					<p className="text-sm text-muted-foreground">{message}</p>
-				}
+				description={<p className="text-sm text-muted-foreground">{message}</p>}
 				actions={
 					<>
 						<Button

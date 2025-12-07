@@ -35,7 +35,9 @@ const getFullData = async (year: number): Promise<Conference> => {
 	}
 
 	if (!response.ok) {
-		throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+		throw new Error(
+			`Failed to fetch data: ${response.status} ${response.statusText}`,
+		);
 	}
 
 	const json = await response.json();

@@ -126,7 +126,9 @@ function RoomPage() {
 						)}
 
 						<div>
-							<h2 className="text-xl font-semibold mb-2 text-foreground">Quick Links</h2>
+							<h2 className="text-xl font-semibold mb-2 text-foreground">
+								Quick Links
+							</h2>
 							<div className="flex flex-col space-y-2">
 								<a
 									href={constants.CHAT_LINK.replace(

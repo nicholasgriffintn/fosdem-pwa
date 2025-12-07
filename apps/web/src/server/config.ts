@@ -1,4 +1,4 @@
-import { env } from 'cloudflare:workers'
+import { env } from "cloudflare:workers";
 
 export function getCloudflareEnv() {
 	try {

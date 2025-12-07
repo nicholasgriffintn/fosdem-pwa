@@ -17,7 +17,9 @@ export function useUserBookmarks({
 	const { data: bookmarks, isLoading } = useQuery({
 		queryKey: ["userBookmarks", userId, year],
 		queryFn: async () => {
-			const bookmarks = await getUserBookmarksFromServer({ data: { year, userId } });
+			const bookmarks = await getUserBookmarksFromServer({
+				data: { year, userId },
+			});
 			return bookmarks;
 		},
 	});

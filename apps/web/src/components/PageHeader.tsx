@@ -40,11 +40,8 @@ export function PageHeader({
 				<Alert variant="destructive" className="mb-4">
 					<AlertTitle>
 						<span>
-							You are viewing the {year} edition of FOSDEM.{' '}
-							<Link
-								to="/"
-								search={{ year: constants.DEFAULT_YEAR }}
-							>
+							You are viewing the {year} edition of FOSDEM.{" "}
+							<Link to="/" search={{ year: constants.DEFAULT_YEAR }}>
 								Click here to view the {constants.DEFAULT_YEAR} edition
 							</Link>
 						</span>
@@ -87,10 +84,7 @@ export function PageHeader({
 							{metadata.map((meta, index) => (
 								<span key={meta.text}>
 									{meta.href ? (
-										<Link
-											to={meta.href}
-											search={(prev) => ({ ...prev })}
-										>
+										<Link to={meta.href} search={(prev) => ({ ...prev })}>
 											{meta.text}
 										</Link>
 									) : (

@@ -7,7 +7,13 @@ import { useBookmarks } from "~/hooks/use-bookmarks";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { useAuth } from "~/hooks/use-auth";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { constants } from "~/constants";
 
@@ -47,12 +53,12 @@ function OfflinePage() {
 
 		setIsOnline(window.navigator.onLine);
 
-		window.addEventListener('online', handleOnline);
-		window.addEventListener('offline', handleOffline);
+		window.addEventListener("online", handleOnline);
+		window.addEventListener("offline", handleOffline);
 
 		return () => {
-			window.removeEventListener('online', handleOnline);
-			window.removeEventListener('offline', handleOffline);
+			window.removeEventListener("online", handleOnline);
+			window.removeEventListener("offline", handleOffline);
 		};
 	}, []);
 
@@ -130,9 +136,7 @@ function OfflinePage() {
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
 							Your Bookmarks
-							{!user?.id && (
-								<Badge variant="outline">Local Only</Badge>
-							)}
+							{!user?.id && <Badge variant="outline">Local Only</Badge>}
 						</CardTitle>
 						<CardDescription>
 							{!user?.id
@@ -153,15 +157,16 @@ function OfflinePage() {
 										<div className="flex justify-between items-start">
 											<div>
 												<p className="font-medium">
-													{bookmark.type === 'bookmark_event' || bookmark.type === 'event' ? 'Event' : 'Track'}
+													{bookmark.type === "bookmark_event" ||
+													bookmark.type === "event"
+														? "Event"
+														: "Track"}
 												</p>
 												<p className="text-sm text-muted-foreground">
 													Slug: {bookmark.slug}
 												</p>
 											</div>
-											<Badge variant="outline">
-												{bookmark.status}
-											</Badge>
+											<Badge variant="outline">{bookmark.status}</Badge>
 										</div>
 									</div>
 								))}
@@ -181,7 +186,9 @@ function OfflinePage() {
 								{!user?.id && (
 									<Button
 										variant="outline"
-										onClick={() => { window.location.href = '/signin'; }}
+										onClick={() => {
+											window.location.href = "/signin";
+										}}
 									>
 										Sign in to sync bookmarks
 									</Button>

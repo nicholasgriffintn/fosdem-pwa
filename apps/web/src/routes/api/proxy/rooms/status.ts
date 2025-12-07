@@ -11,7 +11,10 @@ export const Route = createFileRoute("/api/proxy/rooms/status")({
 			GET: async () => {
 				try {
 					const controller = new AbortController();
-					const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+					const timeout = setTimeout(
+						() => controller.abort(),
+						FETCH_TIMEOUT_MS,
+					);
 
 					const response = await fetch(constants.ROOMS_API, {
 						signal: controller.signal,

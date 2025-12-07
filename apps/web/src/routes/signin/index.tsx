@@ -45,7 +45,8 @@ function SignInPage() {
 				<div className="flex flex-col gap-8">
 					<div className="space-y-6">
 						<p className="text-lg text-slate-200">
-							Connect with your GitHub account to sync your notes and bookmarks across devices and more.
+							Connect with your GitHub account to sync your notes and bookmarks
+							across devices and more.
 						</p>
 						<div className="space-y-3">
 							<h2 className="text-lg font-semibold text-slate-100 text-foreground">

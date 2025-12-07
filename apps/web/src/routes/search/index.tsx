@@ -179,17 +179,17 @@ export default function SearchPage() {
 
 	const filteredTracksWithScores = selectedTrack
 		? tracksWithScores.filter((result) => {
-			const matchesId = result.item.id === selectedTrack;
-			const matchesName = result.item.name === selectedTrack;
-			const selectedName = trackIdToName[selectedTrack];
-			return matchesId || matchesName || result.item.name === selectedName;
-		})
+				const matchesId = result.item.id === selectedTrack;
+				const matchesName = result.item.name === selectedTrack;
+				const selectedName = trackIdToName[selectedTrack];
+				return matchesId || matchesName || result.item.name === selectedName;
+			})
 		: tracksWithScores;
 
 	const filteredEventsWithScores = eventsWithScores.filter((result) => {
 		const matchesTrack = selectedTrack
 			? result.item.trackKey === selectedTrack ||
-			result.item.trackKey === trackIdToName[selectedTrack]
+				result.item.trackKey === trackIdToName[selectedTrack]
 			: true;
 		const matchesTime = selectedTime
 			? result.item.startTime === selectedTime

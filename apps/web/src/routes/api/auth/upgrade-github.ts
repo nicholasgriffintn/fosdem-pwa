@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 import { generateState } from "arctic";
-import { setCookie } from '@tanstack/react-start/server'
+import { setCookie } from "@tanstack/react-start/server";
 
 import { github } from "~/server/auth";
 import { getCloudflareEnv } from "~/server/config";

@@ -42,7 +42,7 @@ type EventListProps = {
 		type: string;
 		slug: string;
 		status: string;
-		}) => void;
+	}) => void;
 	displaySortByFavourites?: boolean;
 };
 
@@ -120,7 +120,10 @@ export function EventList({
 											onCheckedChange={setSortByFavourites}
 											aria-label="Toggle favourites-first sorting"
 										/>
-										<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+										<Label
+											htmlFor={sortSwitchId}
+											className="text-sm font-medium text-foreground"
+										>
 											Favourites first
 										</Label>
 									</div>
@@ -187,7 +190,7 @@ export function EventList({
 											onSetPriority={onSetPriority}
 											showTrack={showTrack}
 											user={user}
-												sortByFavourites={sortByFavourites}
+											sortByFavourites={sortByFavourites}
 											onCreateBookmark={onCreateBookmark}
 										/>
 									) : (
@@ -198,7 +201,7 @@ export function EventList({
 											onSetPriority={onSetPriority}
 											showTrack={showTrack}
 											user={user}
-													sortByFavourites={sortByFavourites}
+											sortByFavourites={sortByFavourites}
 											onCreateBookmark={onCreateBookmark}
 										/>
 									)}
@@ -214,7 +217,11 @@ export function EventList({
 	return (
 		<section>
 			<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
-				{title && <h2 className="text-xl font-semibold shrink-0 text-foreground">{title}</h2>}
+				{title && (
+					<h2 className="text-xl font-semibold shrink-0 text-foreground">
+						{title}
+					</h2>
+				)}
 				<div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
 					{displaySortByFavourites && (
 						<div className="flex items-center gap-2">
@@ -224,7 +231,10 @@ export function EventList({
 								onCheckedChange={setSortByFavourites}
 								aria-label="Toggle favourites-first sorting"
 							/>
-							<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+							<Label
+								htmlFor={sortSwitchId}
+								className="text-sm font-medium text-foreground"
+							>
 								Favourites first
 							</Label>
 						</div>
@@ -279,7 +289,7 @@ export function EventList({
 							onSetPriority={onSetPriority}
 							showTrack={showTrack}
 							user={user}
-								sortByFavourites={sortByFavourites}
+							sortByFavourites={sortByFavourites}
 							onCreateBookmark={onCreateBookmark}
 						/>
 					) : (
@@ -290,7 +300,7 @@ export function EventList({
 							onSetPriority={onSetPriority}
 							showTrack={showTrack}
 							user={user}
-									sortByFavourites={sortByFavourites}
+							sortByFavourites={sortByFavourites}
 							onCreateBookmark={onCreateBookmark}
 						/>
 					)}

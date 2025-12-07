@@ -79,15 +79,14 @@ export const updateNote = createServerFn({
 		const { id, updates } = ctx.data;
 
 		const allowedFields = ["note", "time"] as const;
-		const safeUpdates = Object.entries(updates ?? {}).reduce<Record<string, unknown>>(
-			(acc, [key, value]) => {
-				if (allowedFields.includes(key as (typeof allowedFields)[number])) {
-					acc[key] = value;
-				}
-				return acc;
-			},
-			{},
-		);
+		const safeUpdates = Object.entries(updates ?? {}).reduce<
+			Record<string, unknown>
+		>((acc, [key, value]) => {
+			if (allowedFields.includes(key as (typeof allowedFields)[number])) {
+				acc[key] = value;
+			}
+			return acc;
+		}, {});
 
 		if (Object.keys(safeUpdates).length === 0) {
 			return { error: "No valid note fields to update" };
@@ -108,10 +107,7 @@ export const updateNote = createServerFn({
 		}
 
 		try {
-			await db
-				.update(noteTable)
-				.set(safeUpdates)
-				.where(eq(noteTable.id, id));
+			await db.update(noteTable).set(safeUpdates).where(eq(noteTable.id, id));
 
 			return { success: true };
 		} catch (error) {

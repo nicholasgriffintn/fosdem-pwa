@@ -6,9 +6,7 @@ import { useState } from "react";
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
-import {
-	isEventLive,
-} from "~/lib/dateTime";
+import { isEventLive } from "~/lib/dateTime";
 import { EventPlayerNotStarted } from "./components/NotStarted";
 import { EventPlayerStarted } from "./components/Started";
 
