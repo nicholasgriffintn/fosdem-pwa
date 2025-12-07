@@ -12,7 +12,7 @@ import { getFullAuthSession } from "~/server/auth";
 export const getBookmarks = createServerFn({
 	method: "GET",
 })
-	.validator(
+	.inputValidator(
 		(data: { year: number; status: "favourited" | "unfavourited" }) => data,
 	)
 	.handler(async (ctx: any) => {
@@ -42,7 +42,7 @@ export const getBookmarks = createServerFn({
 export const getEventBookmark = createServerFn({
 	method: "GET",
 })
-	.validator((data: { year: number; slug: string }) => data)
+	.inputValidator((data: { year: number; slug: string }) => data)
 	.handler(async (ctx: any) => {
 		const { year, slug } = ctx.data;
 
@@ -66,7 +66,7 @@ export const getEventBookmark = createServerFn({
 export const createBookmark = createServerFn({
 	method: "POST",
 })
-	.validator(
+	.inputValidator(
 		(data: { year: number; type: string; slug: string; status: string }) =>
 			data,
 	)
@@ -129,7 +129,7 @@ export const createBookmark = createServerFn({
 export const updateBookmark = createServerFn({
 	method: "POST",
 })
-	.validator((data: { id: string; updates: any }) => data)
+	.inputValidator((data: { id: string; updates: any }) => data)
 	.handler(async (ctx: any) => {
 		const { id, updates } = ctx.data;
 
@@ -168,7 +168,7 @@ export const updateBookmark = createServerFn({
 export const getUserBookmarks = createServerFn({
 	method: "GET",
 })
-	.validator((data: { year: number; userId: string }) => data)
+	.inputValidator((data: { year: number; userId: string }) => data)
 	.handler(async (ctx: any) => {
 		const { year, userId } = ctx.data;
 
@@ -204,7 +204,7 @@ export const getUserBookmarks = createServerFn({
 export const deleteBookmark = createServerFn({
 	method: "POST",
 })
-	.validator((data: { id: string }) => data)
+	.inputValidator((data: { id: string }) => data)
 	.handler(async (ctx: any) => {
 		const { id } = ctx.data;
 

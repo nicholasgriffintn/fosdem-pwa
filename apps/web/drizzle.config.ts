@@ -3,7 +3,7 @@ import type { Config } from 'drizzle-kit';
 export default {
   dialect: "sqlite",
   driver: "d1-http",
-  schema: './app/server/db/schema.ts',
+  schema: './src/server/db/schema.ts',
   out: './migrations',
   dbCredentials: {
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID || "",

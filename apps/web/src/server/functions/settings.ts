@@ -8,7 +8,7 @@ import { getFullAuthSession } from "~/server/auth";
 export const changeBookmarksVisibility = createServerFn({
 	method: "POST",
 })
-	.validator((data: { visibility: string }) => {
+	.inputValidator((data: { visibility: string }) => {
 		if (!["private", "public"].includes(data.visibility)) {
 			throw new Error("Invalid value");
 		}
