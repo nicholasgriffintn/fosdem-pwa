@@ -9,6 +9,7 @@ import type {
   Stream,
   MutableDayInfo,
   MutableBuildDataResult,
+  MutableBuildingStats,
   XmlEvent,
   XmlLink,
   XmlAttachment,
@@ -163,6 +164,21 @@ async function processScheduleData(
     events: {},
   };
 
+  const getBuildingStats = (id: string | null): MutableBuildingStats | null => {
+    if (!id) return null;
+    if (!result.buildings[id]) {
+      result.buildings[id] = {
+        name: id,
+        roomCount: 0,
+        trackCount: 0,
+        eventCount: 0,
+        rooms: new Set(),
+        tracks: new Set(),
+      };
+    }
+    return result.buildings[id];
+  };
+
   // Initialize types from constants
   for (const type of Object.keys(typeData)) {
     result.types[type] = {
@@ -184,6 +200,8 @@ async function processScheduleData(
       roomCount: 0,
       trackCount: 0,
       eventCount: 0,
+      rooms: new Set(),
+      tracks: new Set(),
     };
   }
 
@@ -214,6 +232,7 @@ async function processScheduleData(
         const buildingId = buildingMatch ? buildingMatch[1] : null;
         const floorMatch = roomName.match(/^[A-Z]+\.?([0-9]+)/);
         const floor = floorMatch ? floorMatch[1] : null;
+        const buildingStats = getBuildingStats(buildingId);
 
         if (!result.rooms[roomName]) {
           result.rooms[roomName] = {
@@ -228,6 +247,8 @@ async function processScheduleData(
             eventCount: 0,
           };
         }
+
+        buildingStats?.rooms.add(roomName);
 
         // Process events in each room
         const events = Array.isArray(room.event)
@@ -247,6 +268,10 @@ async function processScheduleData(
             result.events[event.id] = event;
             result.rooms[roomName].eventCount++;
             dayInfo.eventCount++;
+            if (buildingStats) {
+              buildingStats.eventCount++;
+              buildingStats.tracks.add(event.trackKey);
+            }
 
             // Update track info
             if (!result.tracks[event.trackKey]) {
@@ -281,12 +306,6 @@ async function processScheduleData(
             }
             dayInfo.tracks.add(event.trackKey);
           }
-        }
-
-        // Update building stats
-        if (buildingId && result.buildings[buildingId]) {
-          result.buildings[buildingId].roomCount++;
-          result.buildings[buildingId].eventCount += result.rooms[roomName].eventCount;
         }
       }
     }
@@ -343,10 +362,21 @@ async function processScheduleData(
     };
   }
 
+  const serializableBuildings: BuildDataResult["buildings"] = {};
+  for (const [key, building] of Object.entries(result.buildings)) {
+    serializableBuildings[key] = {
+      name: building.name,
+      roomCount: building.rooms.size,
+      trackCount: building.tracks.size,
+      eventCount: building.eventCount,
+    };
+  }
+
   return {
     ...result,
     types: serializableTypes,
     days: serializableDays,
+    buildings: serializableBuildings,
   };
 }
 

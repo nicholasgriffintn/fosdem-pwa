@@ -169,9 +169,18 @@ export type MutableDayInfo = Omit<DayInfo, "rooms" | "buildings" | "tracks"> & {
   tracks: Set<string>;
 };
 
-export type MutableBuildDataResult = Omit<BuildDataResult, "types" | "days"> & {
+export type MutableBuildingStats = BuildingStats & {
+  rooms: Set<string>;
+  tracks: Set<string>;
+};
+
+export type MutableBuildDataResult = Omit<
+  BuildDataResult,
+  "types" | "days" | "buildings"
+> & {
   types: Record<string, MutableTypeInfo>;
   days: Record<string, MutableDayInfo>;
+  buildings: Record<string, MutableBuildingStats>;
 };
 
 export type RoomEvent = {
