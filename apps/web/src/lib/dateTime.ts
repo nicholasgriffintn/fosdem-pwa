@@ -164,7 +164,6 @@ export function isConferenceMoreThanOneMonthAway(
 			: createStandardDate(new Date());
 		const conferenceStart = createStandardDate(conference.start);
 
-		// Calculate the difference in months
 		const diffTime = conferenceStart.getTime() - now.getTime();
 		const diffDays = diffTime / (1000 * 60 * 60 * 24);
 		const diffMonths = diffDays / 30.44; // Average days in a month

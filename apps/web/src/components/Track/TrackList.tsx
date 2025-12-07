@@ -1,3 +1,4 @@
+import { useId, useState } from "react";
 import clsx from "clsx";
 import type { Track } from "~/types/fosdem";
 import { ItemActions } from "~/components/ItemActions";
@@ -6,6 +7,8 @@ import { groupTracksByDay } from "~/lib/grouping";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
 import type { User } from "~/server/db/schema";
+import { Switch } from "~/components/ui/switch";
+import { Label } from "~/components/ui/label";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -86,6 +89,7 @@ type TrackListContentProps = {
 	tracks: Track[];
 	year: number;
 	user?: User | null;
+	sortByFavourites?: boolean;
 	onCreateBookmark?: ({
 		type,
 		slug,
@@ -101,11 +105,13 @@ function TrackListContent({
 	tracks,
 	year,
 	user,
+	sortByFavourites = false,
 	onCreateBookmark,
 }: TrackListContentProps) {
 	const { items: sortedTracks, bookmarksLoading } = useTrackList({
 		items: tracks,
 		year,
+		sortByFavourites,
 	});
 
 	return (
@@ -143,6 +149,9 @@ export function TrackList({
 	user,
 	onCreateBookmark,
 }: TrackListProps) {
+	const [sortByFavourites, setSortByFavourites] = useState(false);
+	const sortSwitchId = useId();
+
 	if (groupByDay && days) {
 		const trackDataSplitByDay = groupTracksByDay(tracks);
 
@@ -152,7 +161,7 @@ export function TrackList({
 			<section>
 				<div className="flex flex-col space-y-4">
 					<Tabs defaultValue={dayId.toString()} className="w-full">
-						<div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+						<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
 							<div className="flex flex-col md:flex-row md:items-center gap-4">
 								{title && (
 									<h2 className="text-xl font-semibold shrink-0 text-foreground">{title}</h2>
@@ -177,6 +186,17 @@ export function TrackList({
 									})}
 								</TabsList>
 							</div>
+							<div className="flex items-center gap-2">
+								<Switch
+									id={sortSwitchId}
+									checked={sortByFavourites}
+									onCheckedChange={setSortByFavourites}
+									aria-label="Toggle favourites-first sorting"
+								/>
+								<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+									Favourites first
+								</Label>
+							</div>
 						</div>
 						{days.map((day) => {
 							if (!trackDataSplitByDay[day.id]) {
@@ -196,6 +216,7 @@ export function TrackList({
 										tracks={trackDataSplitByDay[day.id]}
 										year={year}
 										user={user}
+										sortByFavourites={sortByFavourites}
 										onCreateBookmark={onCreateBookmark}
 									/>
 								</TabsContent>
@@ -209,15 +230,25 @@ export function TrackList({
 
 	return (
 		<section>
-			{title && (
-				<div className="flex justify-between items-center mb-4">
-					<h2 className="text-xl font-semibold text-foreground">{title}</h2>
+			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+				{title && <h2 className="text-xl font-semibold text-foreground">{title}</h2>}
+				<div className="flex items-center gap-2">
+					<Switch
+						id={sortSwitchId}
+						checked={sortByFavourites}
+						onCheckedChange={setSortByFavourites}
+						aria-label="Toggle favourites-first sorting"
+					/>
+					<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+						Favourites first
+					</Label>
 				</div>
-			)}
+			</div>
 			<TrackListContent
 				tracks={tracks}
 				year={year}
 				user={user}
+				sortByFavourites={sortByFavourites}
 				onCreateBookmark={onCreateBookmark}
 			/>
 		</section>

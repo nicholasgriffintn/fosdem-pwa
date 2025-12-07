@@ -17,6 +17,7 @@ type EventCalendarListProps = {
 	) => void;
 	showTrack?: boolean;
 	user?: User | null;
+	sortByFavourites?: boolean;
 	onCreateBookmark?: ({
 		type,
 		slug,
@@ -117,10 +118,12 @@ export function EventCalendarList({
 	showTrack,
 	user,
 	onCreateBookmark,
+	sortByFavourites = false,
 }: EventCalendarListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({
 		items: events,
 		year,
+		sortByFavourites,
 	});
 	const timeSlots = generateTimeSlots(sortedEvents);
 

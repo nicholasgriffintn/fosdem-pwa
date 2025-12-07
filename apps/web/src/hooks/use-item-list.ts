@@ -2,7 +2,9 @@ import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import {
+	sortEvents,
 	sortEventsWithFavorites,
+	sortTracks,
 	sortTracksWithFavorites,
 } from "~/lib/sorting";
 import type { Event, Track } from "~/types/fosdem";
@@ -11,14 +13,21 @@ interface UseEventListProps {
 	items: Event[];
 	year: number;
 	sortFn?: (a: Event, b: Event) => number;
+	sortByFavourites?: boolean;
 }
 
 interface UseTrackListProps {
 	items: Track[];
 	year: number;
+	sortByFavourites?: boolean;
 }
 
-export function useEventList({ items, year, sortFn }: UseEventListProps) {
+export function useEventList({
+	items,
+	year,
+	sortFn,
+	sortByFavourites = false,
+}: UseEventListProps) {
 	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
 
 	const itemsWithFavourites = items?.length
@@ -46,9 +55,11 @@ export function useEventList({ items, year, sortFn }: UseEventListProps) {
 			{} as Record<string, boolean>,
 		) || {};
 
-	const sortedItems = [...itemsWithFavourites].sort(
-		sortFn || sortEventsWithFavorites(favorites),
-	);
+	const sorter =
+		sortFn ||
+		(sortByFavourites ? sortEventsWithFavorites(favorites) : sortEvents);
+
+	const sortedItems = [...itemsWithFavourites].sort(sorter);
 
 	return {
 		items: sortedItems,
@@ -56,7 +67,11 @@ export function useEventList({ items, year, sortFn }: UseEventListProps) {
 	};
 }
 
-export function useTrackList({ items, year }: UseTrackListProps) {
+export function useTrackList({
+	items,
+	year,
+	sortByFavourites = false,
+}: UseTrackListProps) {
 	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
 
 	const itemsWithFavourites = items?.length
@@ -84,9 +99,11 @@ export function useTrackList({ items, year }: UseTrackListProps) {
 			{} as Record<string, boolean>,
 		) || {};
 
-	const sortedItems = [...itemsWithFavourites].sort(
-		sortTracksWithFavorites(favorites),
-	);
+	const sorter = sortByFavourites
+		? sortTracksWithFavorites(favorites)
+		: sortTracks;
+
+	const sortedItems = [...itemsWithFavourites].sort(sorter);
 
 	return {
 		items: sortedItems,
