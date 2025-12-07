@@ -1,13 +1,16 @@
 name: E2E Tests
 
 on:
+  push:
+    branches:
+      - main
+  pull_request:
   workflow_dispatch:
 
 jobs:
   e2e:
     name: Playwright e2e tests
     runs-on: ubuntu-latest
-    needs: unit
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
