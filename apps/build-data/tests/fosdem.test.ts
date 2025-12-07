@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { constants } from "../src/constants";
+import { buildData } from "../src/lib/fosdem";
+
 const mockXml2json = vi.fn();
 
 vi.mock("xml-js", () => ({
 	xml2json: mockXml2json,
 }));
-
-const { constants } = await import("../src/constants");
-const { buildData } = await import("../src/lib/fosdem");
 
 const schedulePayload = {
 	schedule: {
@@ -98,6 +98,7 @@ describe("buildData", () => {
 
 		expect(fetchMock).toHaveBeenCalledWith(
 			"https://fosdem.org/2025/schedule/xml",
+			expect.objectContaining({ signal: expect.any(AbortSignal) }),
 		);
 		expect(mockXml2json).toHaveBeenCalledTimes(1);
 
@@ -198,13 +199,74 @@ describe("buildData", () => {
 	it("throws when schedule fetch fails", async () => {
 		const fetchMock = vi.fn(async () => ({
 			ok: false,
+			status: 404,
 			statusText: "Not Found",
 		}));
 		vi.stubGlobal("fetch", fetchMock);
 
 		await expect(buildData({ year: "2025" })).rejects.toThrow(
-			"Failed to fetch schedule: Not Found",
+			"Failed to fetch schedule: 404 Not Found",
 		);
 		expect(mockXml2json).not.toHaveBeenCalled();
+	});
+
+	it("retries transient failures before succeeding", async () => {
+		mockXml2json.mockReturnValue(JSON.stringify(schedulePayload));
+
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce({ ok: false, status: 502, statusText: "Bad Gateway" })
+			.mockResolvedValueOnce({
+				ok: true,
+				text: async () => "<xml />",
+			});
+
+		vi.stubGlobal("fetch", fetchMock);
+
+		const result = await buildData({ year: "2025" });
+
+		expect(result.conference.title).toBe("FOSDEM 2025");
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+	});
+
+	it("fails fast when parsed schedule is missing conference", async () => {
+		mockXml2json.mockReturnValue(
+			JSON.stringify({
+				schedule: {
+					day: [],
+				},
+			}),
+		);
+
+		const fetchMock = vi.fn(async () => ({
+			ok: true,
+			text: async () => "<xml />",
+		}));
+		vi.stubGlobal("fetch", fetchMock);
+
+		await expect(buildData({ year: "2025" })).rejects.toThrow(
+			"Invalid schedule: missing conference data",
+		);
+	});
+
+	it("fails fast when schedule has no days", async () => {
+		mockXml2json.mockReturnValue(
+			JSON.stringify({
+				schedule: {
+					conference: {},
+					day: [],
+				},
+			}),
+		);
+
+		const fetchMock = vi.fn(async () => ({
+			ok: true,
+			text: async () => "<xml />",
+		}));
+		vi.stubGlobal("fetch", fetchMock);
+
+		await expect(buildData({ year: "2025" })).rejects.toThrow(
+			"Invalid schedule: missing day entries",
+		);
 	});
 });

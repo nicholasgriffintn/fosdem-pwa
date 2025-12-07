@@ -19,6 +19,7 @@ import { Toaster } from "~/components/ui/toaster";
 import { OfflineIndicator } from "~/components/OfflineIndicator";
 import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
 import { GuestBanner } from "~/components/GuestBanner";
+import { siteMeta } from "~/constants/site";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
@@ -41,11 +42,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 					content: "width=device-width, initial-scale=1",
 				},
 				{
-					title: "FOSDEM PWA",
-					description: "A companion app for FOSDEM conference",
+					title: siteMeta.title,
+					description: siteMeta.description,
+				},
+				{
+					name: "theme-color",
+					content: siteMeta.themeColor,
+				},
+				{
+					property: "og:title",
+					content: siteMeta.title,
+				},
+				{
+					property: "og:description",
+					content: siteMeta.description,
+				},
+				{
+					property: "og:locale",
+					content: siteMeta.locale,
 				},
 			],
-			links: [{ rel: "stylesheet", href: appCss }],
+			links: [
+				{ rel: "stylesheet", href: appCss },
+				{ rel: "manifest", href: "/manifest.webmanifest" },
+			],
 		}),
 		component: RootComponent,
 	},
@@ -68,7 +88,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 		<html className="dark" lang="en">
 			<head>
 				<HeadContent />
-				<link rel="manifest" href="/manifest.webmanifest" />
 			</head>
 			<body
 				className={cn(

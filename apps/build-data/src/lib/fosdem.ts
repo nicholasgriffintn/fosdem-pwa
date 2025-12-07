@@ -1,6 +1,13 @@
-import { xml2json } from 'xml-js';
+import { xml2json } from "xml-js";
 
-import { constants } from '../constants';
+import { constants } from "../constants";
+import { createLogger } from "./logger";
+
+const typeData = Object.freeze(constants.TYPES);
+const buildings = Object.freeze(constants.BUILDINGS);
+const SCHEDULE_FETCH_TIMEOUT_MS = 8_000;
+const SCHEDULE_FETCH_MAX_RETRIES = 3;
+const SCHEDULE_RETRY_BASE_DELAY_MS = 200;
 
 // Base interfaces for XML parsing
 interface XmlAttribute {
@@ -67,7 +74,7 @@ interface BuildingStats {
 interface ProcessedEvent {
   day: number;
   isLive: boolean;
-  status: 'canceled' | 'amendment' | 'running' | 'unknown';
+  status: "canceled" | "amendment" | "running" | "unknown";
   type: string;
   track: string;
   trackKey: string;
@@ -107,7 +114,7 @@ interface Stream {
   type: string;
 }
 
-interface BuildDataResult {
+export interface BuildDataResult {
   conference: Conference;
   types: Record<string, TypeInfo>;
   buildings: Record<string, BuildingStats>;
@@ -194,27 +201,26 @@ type Day = {
   room: Room[];
 };
 
-const typeData = Object.freeze(constants.TYPES);
-const buildings = Object.freeze(constants.BUILDINGS);
-
 function flattenData<T>(element: unknown): T {
   if (Array.isArray(element)) {
     return element.map(flattenData) as T;
   }
 
-  if (typeof element === 'object' && element !== null) {
+  if (typeof element === "object" && element !== null) {
     const keys = Object.keys(element);
 
     if (keys.length === 1) {
       const key = keys[0];
-      if (key === 'value') {
+      if (key === "value") {
         return (element as Record<string, T>)[key];
       }
     }
 
     const newElement = {} as T;
     for (const e of keys) {
-      (newElement as Record<string, unknown>)[e] = flattenData((element as Record<string, unknown>)[e]);
+      (newElement as Record<string, unknown>)[e] = flattenData(
+        (element as Record<string, unknown>)[e]
+      );
     }
     return newElement;
   }
@@ -234,7 +240,7 @@ function flattenConference(conference: any): Conference {
     days: [conference.start?._text, conference.end?._text].filter(Boolean),
     day_change: conference.day_change?._text,
     timeslot_duration: conference.timeslot_duration?._text,
-    time_zone_name: conference.time_zone_name?._text
+    time_zone_name: conference.time_zone_name?._text,
   };
 
   return result;
@@ -259,7 +265,7 @@ async function parseData(text: string): Promise<{
 
   return {
     conference: flattenConference(result.conference),
-    day: result.day
+    day: result.day,
   };
 }
 
@@ -273,49 +279,49 @@ const memoize = <T, R>(fn: (arg: T) => R) => {
 };
 
 const getRoomName = memoize((name: string) =>
-  name.startsWith('D.') ? `${name} (online)` : name
+  name.startsWith("D.") ? `${name} (online)` : name
 );
 
 const getLinkType = memoize((url: string) => {
-  if (url.endsWith('.mp4')) return 'video/mp4';
-  if (url.endsWith('.webm')) return 'video/webm';
+  if (url.endsWith(".mp4")) return "video/mp4";
+  if (url.endsWith(".webm")) return "video/webm";
   return null;
 });
 
-const getStatus = memoize((title: string): ProcessedEvent['status'] => {
+const getStatus = memoize((title: string): ProcessedEvent["status"] => {
   const lowerTitle = title.toLowerCase();
-  if (lowerTitle.includes('canceled')) return 'canceled';
-  if (lowerTitle.includes('amendment')) return 'amendment';
-  return 'running';
+  if (lowerTitle.includes("canceled")) return "canceled";
+  if (lowerTitle.includes("amendment")) return "amendment";
+  return "running";
 });
 
 class EventProcessor {
   private getType(event: XmlEvent): string {
     const type = event.type._text;
-    if (type === 'lightning') {
-      return 'lightningtalk';
+    if (type === "lightning") {
+      return "lightningtalk";
     }
 
-    if (type === 'lecture') {
-      return 'keynote';
+    if (type === "lecture") {
+      return "keynote";
     }
 
-    return type in typeData ? type : 'other';
+    return type in typeData ? type : "other";
   }
 
-  private processPersons(persons: XmlEvent['persons']): string[] {
+  private processPersons(persons: XmlEvent["persons"]): string[] {
     if (!persons?.person) return [];
     return Array.isArray(persons.person)
-      ? persons.person.map(person => person._text)
+      ? persons.person.map((person) => person._text)
       : [persons.person._text];
   }
 
-  private processLinks(links: XmlEvent['links']): Link[] {
+  private processLinks(links: XmlEvent["links"]): Link[] {
     if (!links?.link) return [];
     const processLink = (link: XmlLink) => ({
       href: link._attributes.href,
-      title: link._text || '',
-      type: getLinkType(link._attributes.href)
+      title: link._text || "",
+      type: getLinkType(link._attributes.href),
     });
 
     return Array.isArray(links.link)
@@ -323,12 +329,12 @@ class EventProcessor {
       : [processLink(links.link)];
   }
 
-  private processAttachments(attachments: XmlEvent['attachments']): Attachment[] {
+  private processAttachments(attachments: XmlEvent["attachments"]): Attachment[] {
     if (!attachments?.attachment) return [];
     const processAttachment = (attachment: XmlAttachment): Attachment => ({
       type: attachment._attributes.type,
       href: attachment._attributes.href,
-      title: attachment._text || ''
+      title: attachment._text || "",
     });
 
     return Array.isArray(attachments.attachment)
@@ -337,28 +343,28 @@ class EventProcessor {
   }
 
   private buildStreamInfo(roomName: string): Stream[] {
-    const isLiveRoom = !['B.', 'I.', 'S.'].some(prefix =>
-      roomName.startsWith(prefix)
-    );
+    const isLiveRoom = !["B.", "I.", "S."].some((prefix) => roomName.startsWith(prefix));
 
     if (!isLiveRoom) return [];
 
-    const normalizedRoom = roomName.toLowerCase().replace(/\./g, '');
-    return [{
-      href: constants.STREAM_LINK.replace('${ROOM_ID}', normalizedRoom),
-      title: 'Stream',
-      type: 'application/vnd.apple.mpegurl'
-    }];
+    const normalizedRoom = roomName.toLowerCase().replace(/\./g, "");
+    return [
+      {
+        href: constants.STREAM_LINK.replace("${ROOM_ID}", normalizedRoom),
+        title: "Stream",
+        type: "application/vnd.apple.mpegurl",
+      },
+    ];
   }
 
   private buildChatInfo(roomName: string): string | null {
     return /^[A-Z]\./.test(roomName)
-      ? constants.CHAT_LINK.replace('${ROOM_ID}', roomName.substring(2))
+      ? constants.CHAT_LINK.replace("${ROOM_ID}", roomName.substring(2))
       : null;
   }
 
-  private getTitle(title: string, status: ProcessedEvent['status']): string {
-    return status === 'amendment' ? title?.substring(10) || title : title;
+  private getTitle(title: string, status: ProcessedEvent["status"]): string {
+    return status === "amendment" ? title?.substring(10) || title : title;
   }
 
   public processEvent(
@@ -372,15 +378,15 @@ class EventProcessor {
     const title = event.title._text;
     const status = getStatus(title.toLowerCase());
 
-    if (status === 'canceled') return null;
+    if (status === "canceled") return null;
 
     if (!event?.type?._text || !event?.track?._text) return null;
 
     const type = this.getType(event);
     const track = event.track._text;
-    const trackKey = track.toLowerCase().replace(/\s/g, '');
+    const trackKey = track.toLowerCase().replace(/\s/g, "");
 
-    if (type === 'other' && track === 'stand') return null;
+    if (type === "other" && track === "stand") return null;
 
     return {
       day,
@@ -404,7 +410,7 @@ class EventProcessor {
       duration: event.duration._text,
       subtitle: event.subtitle?._text,
       abstract: event.abstract?._text,
-      description: event.description?._text
+      description: event.description?._text,
     };
   }
 }
@@ -423,7 +429,7 @@ async function processScheduleData(
     days: {},
     rooms: {},
     tracks: {},
-    events: {}
+    events: {},
   };
 
   // Initialize types from constants
@@ -436,7 +442,7 @@ async function processScheduleData(
       roomCount: 0,
       buildingCount: 0,
       rooms: new Set(),
-      buildings: new Set()
+      buildings: new Set(),
     };
   }
 
@@ -446,7 +452,7 @@ async function processScheduleData(
       name: building,
       roomCount: 0,
       trackCount: 0,
-      eventCount: 0
+      eventCount: 0,
     };
   }
 
@@ -465,7 +471,7 @@ async function processScheduleData(
       buildingCount: 0,
       rooms: new Set(),
       buildings: new Set(),
-      tracks: new Set()
+      tracks: new Set(),
     };
 
     if (day.room?.length > 0) {
@@ -492,15 +498,13 @@ async function processScheduleData(
         }
 
         // Process events in each room
-        const events = Array.isArray(room.event)
-          ? room.event
-          : [room.event];
+        const events = Array.isArray(room.event) ? room.event : [room.event];
         for (const xmlEvent of events) {
           const event = processor.processEvent(
             xmlEvent as XmlEvent,
             dayIndex === 1,
             roomName,
-            dayIndex,
+            dayIndex
           );
 
           if (event) {
@@ -546,8 +550,7 @@ async function processScheduleData(
         // Update building stats
         if (buildingId && result.buildings[buildingId]) {
           result.buildings[buildingId].roomCount++;
-          result.buildings[buildingId].eventCount +=
-            result.rooms[roomName].eventCount;
+          result.buildings[buildingId].eventCount += result.rooms[roomName].eventCount;
         }
       }
     }
@@ -565,7 +568,7 @@ async function processScheduleData(
         type.buildingCount = type.buildings.size;
         if (Object.keys(result.tracks)?.length > 0) {
           type.trackCount = Object.values(result.tracks).filter(
-            (track) => track.type === type.id,
+            (track) => track.type === type.id
           ).length;
         }
       }
@@ -611,28 +614,109 @@ async function processScheduleData(
   };
 }
 
-export async function buildData({ year }: { year: string }): Promise<BuildDataResult> {
-  if (!year || !/^\d{4}$/.test(year)) {
-    throw new Error('Invalid year format. Expected YYYY');
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const fetchScheduleWithRetry = async (
+  url: string,
+  logger?: ReturnType<typeof createLogger>
+): Promise<Response> => {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < SCHEDULE_FETCH_MAX_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), SCHEDULE_FETCH_TIMEOUT_MS);
+
+    try {
+      logger?.info("Fetching schedule", { url, attempt: attempt + 1 });
+      const response = await fetch(url, { signal: controller.signal });
+
+      if (response.ok) {
+        return response;
+      }
+
+      const isRetriableStatus = response.status >= 500 && response.status < 600;
+      if (!isRetriableStatus) {
+        throw new Error(
+          `Failed to fetch schedule: ${response.status} ${response.statusText}`
+        );
+      }
+
+      lastError = new Error(
+        `Failed to fetch schedule: ${response.status} ${response.statusText}`
+      );
+      logger?.warn("Schedule fetch failed, will retry", {
+        attempt: attempt + 1,
+        status: response.status,
+      });
+    } catch (error) {
+      const isAbort = (error as Error)?.name === "AbortError";
+      lastError = isAbort ? new Error("Fetching schedule timed out") : error;
+      const isLastAttempt = attempt === SCHEDULE_FETCH_MAX_RETRIES - 1;
+
+      logger?.error("Schedule fetch error", {
+        attempt: attempt + 1,
+        error: (error as Error)?.message,
+        abort: (error as Error)?.name === "AbortError",
+      });
+
+      if (isLastAttempt) {
+        throw lastError instanceof Error
+          ? lastError
+          : new Error("Unknown schedule fetch error");
+      }
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    await delay(SCHEDULE_RETRY_BASE_DELAY_MS * (attempt + 1));
   }
 
-  try {
-    const url = constants.SCHEDULE_LINK.replace('${YEAR}', year);
-    const response = await fetch(url);
+  throw lastError instanceof Error ? lastError : new Error("Failed to fetch schedule");
+};
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch schedule: ${response.statusText}`);
+const validateParsedSchedule = (data: { conference: Conference; day: Day[] }) => {
+  if (!data?.conference) {
+    throw new Error("Invalid schedule: missing conference data");
+  }
+
+  if (!Array.isArray(data.day) || data.day.length === 0) {
+    throw new Error("Invalid schedule: missing day entries");
+  }
+
+  for (const day of data.day) {
+    if (!day?.room || !Array.isArray(day.room) || day.room.length === 0) {
+      throw new Error("Invalid schedule: missing rooms for day");
     }
+  }
+};
+
+export async function buildData({ year }: { year: string }): Promise<BuildDataResult> {
+  if (!year || !/^\d{4}$/.test(year)) {
+    throw new Error("Invalid year format. Expected YYYY");
+  }
+
+  const logger = createLogger({ scope: "buildData", year });
+
+  try {
+    const url = constants.SCHEDULE_LINK.replace("${YEAR}", year);
+    const response = await fetchScheduleWithRetry(url, logger);
 
     const text = await response.text();
     const data = await parseData(text);
 
+    validateParsedSchedule(data);
+
     const processor = new EventProcessor();
     const result = await processScheduleData(data, processor);
 
+    logger.info("Build data completed", {
+      eventCount: Object.keys(result.events ?? {}).length,
+      trackCount: Object.keys(result.tracks ?? {}).length,
+    });
+
     return result;
   } catch (error) {
-    console.error('Error building data:', error);
+    logger.error("Error building data", { error: (error as Error)?.message });
     throw error;
   }
 }

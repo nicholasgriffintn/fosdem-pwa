@@ -9,6 +9,7 @@ test.describe("Search experience", () => {
 
 		await searchPage.searchFromHeader();
 		await searchPage.expectOnSearchPage();
+		await searchPage.expectSearchParam("q", "keynote");
 		await searchPage.waitForAnyResult();
 		await searchPage.expectFiltersReady();
 		await searchPage.expectResultSections();
@@ -29,5 +30,21 @@ test.describe("Search experience", () => {
 		const selectedTime = await searchPage.selectFirstTimeOption();
 		await searchPage.expectSearchParam("time", selectedTime);
 		await searchPage.waitForResultsOrEmpty();
+	});
+
+	test("shows empty state when no results match", async ({ page }) => {
+		const searchPage = new SearchPage(page);
+
+		await searchPage.goto("zzzznotfound");
+		await searchPage.expectOnSearchPage("zzzznotfound");
+		await searchPage.waitForResultsOrEmpty();
+		await searchPage.expectEmptyState();
+	});
+
+	test("applies default year when none provided", async ({ page }) => {
+		await page.goto("/search?q=keynote");
+
+		const searchPage = new SearchPage(page);
+		await searchPage.expectSearchParam("year", "2026");
 	});
 });

@@ -28,6 +28,7 @@ import {
 	Play,
 	Clock,
 	AlertCircle,
+	Download,
 } from "lucide-react";
 
 export const Icons = {
@@ -101,4 +102,5 @@ export const Icons = {
 		</svg>
 	),
 	clock: Clock,
+	download: Download,
 };

@@ -76,13 +76,13 @@ export function Header() {
 											)}
 											asChild
 										>
-											<Link
-												to="/signin"
-												search={(prev) => ({
-													...prev,
-													year: prev.year || constants.DEFAULT_YEAR,
-												})}
-											>
+													<Link
+														to="/signin"
+														search={(prev: Record<string, unknown>) => ({
+															...prev,
+															year: (prev.year as number) || constants.DEFAULT_YEAR,
+														})}
+													>
 												<Icons.login className="h-7 w-7" width="7" height="7" />
 												<span>Sign In</span>
 											</Link>
