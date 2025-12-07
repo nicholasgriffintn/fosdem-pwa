@@ -24,6 +24,8 @@ import { generateTimeSlots } from "~/lib/fosdem";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { Label } from "~/components/ui/label";
+import { Icons } from "~/components/Icons";
+import { Button } from "~/components/ui/button";
 import {
 	Select,
 	SelectContent,
@@ -31,6 +33,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "~/components/ui/select";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -90,6 +93,7 @@ export default function SearchPage() {
 	const query = q || "";
 	const selectedTrack = track || "";
 	const selectedTime = time || "";
+	const hasActiveFilters = Boolean(query || selectedTrack || selectedTime);
 
 	const getSearchResults = (): SearchResults & {
 		tracksWithScores: SearchResult[];
@@ -267,6 +271,14 @@ export default function SearchPage() {
 		updateFilters({ nextTrack: selectedTrack, nextTime: normalized });
 	};
 
+	const handleClearSearch = () => {
+		navigate({
+			to: "/search",
+			search: { year, q: "", track: undefined, time: undefined },
+			replace: true,
+		});
+	};
+
 	const sections = [
 		{
 			type: "tracks",
@@ -359,6 +371,19 @@ export default function SearchPage() {
 								</SelectContent>
 							</Select>
 						</div>
+						{hasActiveFilters && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="h-10 px-3 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
+								onClick={handleClearSearch}
+								aria-label="Clear search and filters"
+							>
+								<Icons.close className="h-4 w-4" />
+								Clear
+							</Button>
+						)}
 					</div>
 				</PageHeader>
 
@@ -367,13 +392,17 @@ export default function SearchPage() {
 						<Spinner className="h-8 w-8" />
 					</div>
 				) : !query ? (
-					<p className="text-muted-foreground">
-						Enter a search term to see results.
-					</p>
+						<EmptyStateCard
+							title="Search the schedule"
+							description="Enter a search term to see results. You can also filter by track or time."
+							className="max-w-2xl"
+						/>
 				) : !hasResults ? (
-					<p className="text-muted-foreground">
-						No results match this search with the selected filters.
-					</p>
+							<EmptyStateCard
+								title="No results found"
+								description="Try adjusting your search or clearing filters."
+								className="max-w-2xl"
+							/>
 				) : (
 					<div className="space-y-8">
 						{sections.map((section) => section.component())}

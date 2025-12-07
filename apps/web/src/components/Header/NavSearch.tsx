@@ -212,6 +212,8 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					handleResultClick(searchResults[focusedIndex]);
 				} else if (inputValue.trim()) {
 					e.preventDefault();
+					setSearchResults([]);
+					setFocusedIndex(-1);
 					navigate({
 						to: "/search",
 						search: { year, q: inputValue.trim() },
