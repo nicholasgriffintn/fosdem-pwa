@@ -33,7 +33,7 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const { width } = useWindowSize();
-	const isMobile = typeof window !== "undefined" ? width < 768 : false;
+	const isMobile = width > 0 ? width < 768 : false;
 
 	if (specialRoom) {
 		return (

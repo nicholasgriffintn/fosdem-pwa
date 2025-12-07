@@ -7,26 +7,28 @@ import { isBrowser, off, on } from "~/lib/utils";
 
 export const useWindowSize = (initialWidth = 0, initialHeight = 0) => {
 	const [state, setState] = useRefState<{ width: number; height: number }>({
-		width: isBrowser ? window.innerWidth : initialWidth,
-		height: isBrowser ? window.innerHeight : initialHeight,
+		width: initialWidth,
+		height: initialHeight,
 	});
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: CBA
 	useEffect((): (() => void) | undefined => {
-		if (isBrowser) {
-			const handler = () => {
-				setState({
-					width: window.innerWidth,
-					height: window.innerHeight,
-				});
-			};
-
-			on(window, "resize", handler);
-
-			return () => {
-				off(window, "resize", handler);
-			};
+		if (!isBrowser) {
+			return;
 		}
+
+		const handler = () => {
+			setState({
+				width: window.innerWidth,
+				height: window.innerHeight,
+			});
+		};
+
+		handler();
+		on(window, "resize", handler);
+
+		return () => {
+			off(window, "resize", handler);
+		};
 	}, []);
 
 	return { ...state };

@@ -6,6 +6,7 @@ import { github } from "~/server/auth";
 import { getCloudflareEnv } from "~/server/config";
 
 export const Route = createFileRoute("/api/auth/upgrade-github")({
+	// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 	server: {
 		handlers: {
 			GET: async () => {

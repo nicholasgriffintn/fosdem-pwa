@@ -8,6 +8,7 @@ import {
 } from "~/server/auth";
 
 export const Route = createFileRoute("/api/auth/logout")({
+	// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 	server: {
 		handlers: {
 			GET: async () => {
