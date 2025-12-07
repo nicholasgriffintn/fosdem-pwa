@@ -18,13 +18,14 @@ export const Route = createFileRoute("/track/$slug")({
 	}),
 	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
 	loader: async ({ params, deps: { year, day } }) => {
+		const slug = decodeURIComponent(params.slug);
 		const data = (await getAllData({ data: { year } })) as Conference;
 		const days = Object.values(data.days);
-		const track = data.tracks[params.slug];
+		const track = data.tracks[slug];
 		const type = data.types[track?.type];
 
 		const eventData = Object.values(data.events).filter(
-			(event: Event): event is Event => event.trackKey === params.slug,
+			(event: Event): event is Event => event.trackKey === slug,
 		);
 
 		return { fosdem: { days, track, type, eventData }, year, day };
