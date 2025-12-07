@@ -7,8 +7,14 @@ import Hls from "hls.js";
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
-import { isEventLive, isEventFinished } from "~/lib/dateTime";
+import {
+	createStandardDate,
+	getEventDateTime,
+	isEventFinished,
+	isEventLive,
+} from "~/lib/dateTime";
 import { Icons } from "~/components/Icons";
+import { constants } from "~/constants";
 
 type EventPlayerProps = {
 	event: Event;
@@ -48,6 +54,42 @@ export function EventPlayer({
 		);
 
 	const eventIsInPast = isEventFinished(event, conference, testTime);
+	const eventStart = getEventDateTime(event, conference);
+	const now = testTime ? createStandardDate(testTime) : createStandardDate(new Date());
+	const timeUntilStartMs =
+		eventStart != null
+			? Math.max(0, eventStart.getTime() - now.getTime())
+			: null;
+
+	const timeUntilStartLabel =
+		timeUntilStartMs == null
+			? null
+			: (() => {
+				const totalMinutes = Math.round(timeUntilStartMs / (1000 * 60));
+				const minutesPerDay = 60 * 24;
+				if (totalMinutes >= minutesPerDay) {
+					const days = Math.floor(totalMinutes / minutesPerDay);
+					const remainingHours = Math.round(
+						(totalMinutes % minutesPerDay) / 60,
+					);
+					return remainingHours > 0
+						? `${days} ${days === 1 ? "day" : "days"} ${remainingHours} ${remainingHours === 1 ? "hour" : "hours"
+						}`
+						: `${days} ${days === 1 ? "day" : "days"}`;
+				}
+				if (totalMinutes >= 60) {
+					const hours = Math.floor(totalMinutes / 60);
+					const minutes = totalMinutes % 60;
+					return minutes > 0
+						? `${hours} ${hours === 1 ? "hour" : "hours"} ${minutes} ${minutes === 1 ? "minute" : "minutes"
+						}`
+						: `${hours} ${hours === 1 ? "hour" : "hours"}`;
+				}
+				return `${totalMinutes} ${totalMinutes === 1 ? "minute" : "minutes"}`;
+			})();
+	const startTimeLabel =
+		eventStart?.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) ??
+		event.startTime;
 
 	useEffect(() => {
 		if (!videoRef.current || !isPlaying) return;
@@ -172,12 +214,27 @@ export function EventPlayer({
 					</>
 				) : (
 					<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 transition-colors">
-						<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md">
-							<span className="text-sm md:text-base">
-								{eventIsInPast
-									? "This event has ended and no recording is available yet, it may be available in the future."
-									: `The stream isn't available yet! Check back at ${event.startTime}.`}
-							</span>
+							<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md shadow">
+								{eventIsInPast ? (
+									<span className="text-sm md:text-base">
+										This event has ended and no recording is available yet. A
+										recording may appear here if/once it is published.
+									</span>
+								) : (
+										<div className="flex items-start gap-3 max-w-sm">
+										<Icons.clock className="h-5 w-5 text-muted-foreground mt-0.5" />
+										<div className="space-y-1">
+											<p className="text-sm md:text-base font-medium text-foreground">
+												Stream opens at {startTimeLabel} ({constants.TIME_ZONE})
+											</p>
+											{timeUntilStartLabel && (
+												<p className="text-xs md:text-sm text-muted-foreground">
+														Starts in about {timeUntilStartLabel}. Come back later to watch the stream.
+												</p>
+											)}
+										</div>
+									</div>
+								)}
 						</div>
 					</div>
 				)}
