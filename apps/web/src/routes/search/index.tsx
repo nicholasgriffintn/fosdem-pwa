@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
+import { PageHeader } from "~/components/PageHeader";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { EventList } from "~/components/Event/EventList";
 import { TrackList } from "~/components/Track/TrackList";
@@ -18,8 +20,17 @@ import {
 	type SearchResults,
 	type SearchResult,
 } from "~/lib/search";
+import { generateTimeSlots } from "~/lib/fosdem";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
+import { Label } from "~/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "~/components/ui/select";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -31,23 +42,43 @@ export const Route = createFileRoute("/search/")({
 			},
 		],
 	}),
-	validateSearch: ({ year, q }: { year: number; q: string }) => ({
+	validateSearch: ({
+		year,
+		q,
+		track,
+		time,
+	}: {
+		year: number;
+		q: string;
+		track?: string;
+		time?: string;
+	}) => ({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
 			constants.DEFAULT_YEAR,
 		q: q || "",
+		track: track || undefined,
+		time: time || undefined,
 	}),
-	loaderDeps: ({ search: { year, q } }) => ({ year, q }),
-	loader: async ({ deps: { year, q } }) => {
+	loaderDeps: ({ search: { year, q, track, time } }) => ({
+		year,
+		q,
+		track,
+		time,
+	}),
+	loader: async ({ deps: { year, q, track, time } }) => {
 		return {
 			year,
 			q,
+			track,
+			time,
 		};
 	},
 });
 
 export default function SearchPage() {
-	const { year, q } = Route.useLoaderData();
+	const { year, q, track, time } = Route.useLoaderData();
+	const navigate = useNavigate();
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -57,6 +88,8 @@ export default function SearchPage() {
 
 	const { fosdemData, loading } = useFosdemData({ year });
 	const query = q || "";
+	const selectedTrack = track || "";
+	const selectedTime = time || "";
 
 	const getSearchResults = (): SearchResults & {
 		tracksWithScores: SearchResult[];
@@ -133,10 +166,44 @@ export default function SearchPage() {
 		roomsWithScores,
 	} = getSearchResults();
 
-	const formattedTracks = rawTracks.map((track) =>
-		formatTrack(track, fosdemData?.events || {}),
+	const trackIdToName = useMemo(() => {
+		if (!fosdemData) return {};
+		return Object.values(fosdemData.tracks).reduce<Record<string, string>>(
+			(acc, t) => {
+				acc[t.id] = t.name;
+				return acc;
+			},
+			{},
+		);
+	}, [fosdemData]);
+
+	const filteredTracksWithScores = selectedTrack
+		? tracksWithScores.filter((result) => {
+			const matchesId = result.item.id === selectedTrack;
+			const matchesName = result.item.name === selectedTrack;
+			const selectedName = trackIdToName[selectedTrack];
+			return matchesId || matchesName || result.item.name === selectedName;
+		})
+		: tracksWithScores;
+
+	const filteredEventsWithScores = eventsWithScores.filter((result) => {
+		const matchesTrack = selectedTrack
+			? result.item.trackKey === selectedTrack ||
+			result.item.trackKey === trackIdToName[selectedTrack]
+			: true;
+		const matchesTime = selectedTime
+			? result.item.startTime === selectedTime
+			: true;
+
+		return matchesTrack && matchesTime;
+	});
+
+	const formattedTracks = filteredTracksWithScores.map((result) =>
+		formatTrack(result.item, fosdemData?.events || {}),
 	) as Track[];
-	const formattedEvents = rawEvents.map(formatEvent) as Event[];
+	const formattedEvents = filteredEventsWithScores.map((result) =>
+		formatEvent(result.item),
+	) as Event[];
 	const formattedRooms = rawRooms.map(formatRoom) as RoomData[];
 
 	const getBestScore = (items: Array<{ score?: number }>) => {
@@ -144,13 +211,69 @@ export default function SearchPage() {
 		return Math.min(...items.map((item) => item.score ?? 1));
 	};
 
+	const hasResults =
+		formattedTracks.length > 0 ||
+		formattedEvents.length > 0 ||
+		formattedRooms.length > 0;
+
+	const trackOptions = useMemo(() => {
+		if (!fosdemData) return [];
+
+		return Object.values(fosdemData.tracks)
+			.map((t) => ({ label: t.name, value: t.id }))
+			.sort((a, b) => a.label.localeCompare(b.label));
+	}, [fosdemData]);
+
+	const timeSlotOptions = useMemo(() => {
+		if (!fosdemData) return [];
+
+		const slots = generateTimeSlots(Object.values(fosdemData.events)).map(
+			(slot) => slot.time,
+		);
+
+		return Array.from(new Set(slots)).sort((a, b) => {
+			const [aHours, aMinutes] = a.split(":").map(Number);
+			const [bHours, bMinutes] = b.split(":").map(Number);
+			return aHours * 60 + aMinutes - (bHours * 60 + bMinutes);
+		});
+	}, [fosdemData]);
+
+	const updateFilters = ({
+		nextTrack,
+		nextTime,
+	}: {
+		nextTrack?: string;
+		nextTime?: string;
+	}) => {
+		navigate({
+			to: "/search",
+			search: {
+				year,
+				q: query,
+				track: nextTrack || undefined,
+				time: nextTime || undefined,
+			},
+			replace: true,
+		});
+	};
+
+	const handleTrackChange = (value: string) => {
+		const normalized = value === "all" ? "" : value;
+		updateFilters({ nextTrack: normalized, nextTime: selectedTime });
+	};
+
+	const handleTimeChange = (value: string) => {
+		const normalized = value === "all" ? "" : value;
+		updateFilters({ nextTrack: selectedTrack, nextTime: normalized });
+	};
+
 	const sections = [
 		{
 			type: "tracks",
 			items: formattedTracks,
-			score: getBestScore(tracksWithScores),
+			score: getBestScore(filteredTracksWithScores),
 			component: () =>
-				rawTracks.length > 0 && (
+				formattedTracks.length > 0 && (
 					<TrackList
 						tracks={formattedTracks}
 						year={year}
@@ -163,9 +286,9 @@ export default function SearchPage() {
 		{
 			type: "events",
 			items: formattedEvents,
-			score: getBestScore(eventsWithScores),
+			score: getBestScore(filteredEventsWithScores),
 			component: () =>
-				rawEvents.length > 0 && (
+				formattedEvents.length > 0 && (
 					<EventList
 						events={formattedEvents}
 						year={year}
@@ -180,28 +303,83 @@ export default function SearchPage() {
 			items: formattedRooms,
 			score: getBestScore(roomsWithScores),
 			component: () =>
-				rawRooms.length > 0 && (
+				formattedRooms.length > 0 && (
 					<RoomList rooms={formattedRooms} year={year} title="Room Results" />
 				),
 		},
 	].sort((a, b) => a.score - b.score);
 
 	return (
-		<div className="container py-8">
-			<h1 className="text-2xl font-bold mb-4">Search Results for "{query}"</h1>
-			{loading ? (
-				<div className="flex justify-center items-center h-screen">
-					<Spinner className="h-8 w-8" />
-				</div>
-			) : rawTracks.length === 0 &&
-				rawEvents.length === 0 &&
-				rawRooms.length === 0 ? (
-				<p className="text-muted-foreground">No results found.</p>
-			) : (
-				<div className="space-y-8">
-					{sections.map((section) => section.component())}
-				</div>
-			)}
+		<div className="min-h-screen">
+			<div className="container py-6 lg:py-10 space-y-6">
+				<PageHeader
+					heading="Search"
+					subtitle={`Results for "${query || "…"}"`}
+					year={year}
+				>
+					<div className="flex flex-wrap gap-3 items-end">
+						<div className="flex flex-col gap-1 min-w-[180px]">
+							<Label htmlFor="track-filter">Track</Label>
+							<Select
+								value={selectedTrack || "all"}
+								onValueChange={handleTrackChange}
+								disabled={!fosdemData}
+							>
+								<SelectTrigger id="track-filter" className="min-w-[180px]">
+									<SelectValue placeholder="All tracks" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="all">All tracks</SelectItem>
+									{trackOptions.map((option) => (
+										<SelectItem key={option.value} value={option.value}>
+											{option.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+
+						<div className="flex flex-col gap-1 min-w-[160px]">
+							<Label htmlFor="time-filter">Time slot</Label>
+							<Select
+								value={selectedTime || "all"}
+								onValueChange={handleTimeChange}
+								disabled={!fosdemData}
+							>
+								<SelectTrigger id="time-filter" className="min-w-[160px]">
+									<SelectValue placeholder="Any time" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="all">Any time</SelectItem>
+									{timeSlotOptions.map((option) => (
+										<SelectItem key={option} value={option}>
+											{option}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+					</div>
+				</PageHeader>
+
+				{loading ? (
+					<div className="flex justify-center items-center py-16">
+						<Spinner className="h-8 w-8" />
+					</div>
+				) : !query ? (
+					<p className="text-muted-foreground">
+						Enter a search term to see results.
+					</p>
+				) : !hasResults ? (
+					<p className="text-muted-foreground">
+						No results match this search with the selected filters.
+					</p>
+				) : (
+					<div className="space-y-8">
+						{sections.map((section) => section.component())}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }
