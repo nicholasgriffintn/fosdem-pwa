@@ -163,7 +163,7 @@ export type Subscription = typeof subscription.$inferSelect;
 export const scheduleSnapshot = sqliteTable(
 	"schedule_snapshot",
 	{
-		slug: text().primaryKey(),
+		slug: text().notNull(),
 		start_time: text(),
 		duration: text(),
 		room: text(),
@@ -172,6 +172,9 @@ export const scheduleSnapshot = sqliteTable(
 	},
 	(table) => {
 		return {
+			scheduleSnapshotPk: primaryKey({
+				columns: [table.slug, table.year],
+			}),
 			scheduleSnapshotYearIdx: index("schedule_snapshot_year_idx").on(table.year),
 		};
 	},

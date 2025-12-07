@@ -1,7 +1,7 @@
 import type { Env } from "../types";
 
 function parseBooleanFlag(value: string | boolean | undefined): boolean {
-	if (value === undefined) return true;
+	if (value === undefined) return false;
 	if (typeof value === "boolean") return value;
 	return value.toString().toLowerCase() === "true";
 }

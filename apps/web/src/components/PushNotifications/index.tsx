@@ -67,6 +67,16 @@ export function PushNotifications() {
 		}
 
 		try {
+			const permission = await Notification.requestPermission();
+			if (permission !== "granted") {
+				toast({
+					title: "Permission required",
+					description: "Please allow notifications to subscribe this device.",
+					variant: "destructive",
+				});
+				return;
+			}
+
 			const registration = await navigator.serviceWorker.ready;
 
 			const existingSubscription =

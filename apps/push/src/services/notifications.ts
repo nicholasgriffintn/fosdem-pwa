@@ -23,9 +23,10 @@ export function createNotificationPayload(bookmark: EnrichedBookmark): Notificat
 	
 	const brusselsNow = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Brussels' }));
 	
-	const minutesUntilStart = Math.ceil(
-		(startTime.getTime() - brusselsNow.getTime()) / (1000 * 60)
-	);
+	const minutesUntilStartRaw = (startTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
+	const minutesUntilStart = Number.isFinite(minutesUntilStartRaw)
+		? Math.max(0, Math.ceil(minutesUntilStartRaw))
+		: 0;
 
 	return {
 		title: "Event Starting Soon",
@@ -35,6 +36,14 @@ export function createNotificationPayload(bookmark: EnrichedBookmark): Notificat
 }
 
 export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: string, isEvening = false): NotificationPayload {
+	if (!bookmarks.length) {
+		return {
+			title: `FOSDEM Day ${day} Summary`,
+			body: "No events in your schedule today.",
+			url: `https://fosdempwa.com/bookmarks?day=${day}&year=${constants.YEAR}`,
+		};
+	}
+
 	const totalEvents = bookmarks.length;
 	const firstEvent = bookmarks[0];
 	const lastEvent = bookmarks[bookmarks.length - 1];

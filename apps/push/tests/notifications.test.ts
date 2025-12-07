@@ -123,7 +123,7 @@ describe("notification feature flags", () => {
 		const envFalse = { BOOKMARK_NOTIFICATIONS_ENABLED: "false" } as Env;
 		const envTrue = { BOOKMARK_NOTIFICATIONS_ENABLED: "true" } as Env;
 
-		expect(bookmarkNotificationsEnabled(envDefault)).toBe(true);
+		expect(bookmarkNotificationsEnabled(envDefault)).toBe(false);
 		expect(bookmarkNotificationsEnabled(envFalse)).toBe(false);
 		expect(bookmarkNotificationsEnabled(envTrue)).toBe(true);
 	});

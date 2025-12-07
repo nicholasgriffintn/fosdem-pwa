@@ -146,8 +146,8 @@ interface DayInfo {
 interface RoomInfo {
   name: string;
   slug: string;
-  buildingId: string;
-  building: typeof buildings[keyof typeof buildings] | null;
+  buildingId: string | null;
+  building: (typeof buildings)[keyof typeof buildings] | null;
   floor: string | null;
   eventCount: number;
 }
@@ -457,7 +457,7 @@ async function processScheduleData(
       for (const room of day.room) {
         const roomName = getRoomName(room._attributes.name);
         const buildingMatch = roomName.match(/^(AW|[A-Z])/);
-        const buildingId = buildingMatch ? buildingMatch[1] : "";
+        const buildingId = buildingMatch ? buildingMatch[1] : null;
         const floorMatch = roomName.match(/^[A-Z]+\.?([0-9]+)/);
         const floor = floorMatch ? floorMatch[1] : null;
 
@@ -467,7 +467,7 @@ async function processScheduleData(
             slug: room._attributes.slug,
             buildingId,
             building:
-              buildingId in buildings
+              buildingId && buildingId in buildings
                 ? buildings[buildingId as keyof typeof buildings]
                 : null,
             floor,
@@ -513,18 +513,22 @@ async function processScheduleData(
             if (result.types[event.type]) {
               result.types[event.type].eventCount++;
               result.types[event.type].rooms.add(roomName);
-              result.types[event.type].buildings.add(buildingId);
+              if (buildingId) {
+                result.types[event.type].buildings.add(buildingId);
+              }
             }
 
             // Update day stats
             dayInfo.rooms.add(roomName);
-            dayInfo.buildings.add(buildingId);
+            if (buildingId) {
+              dayInfo.buildings.add(buildingId);
+            }
             dayInfo.tracks.add(event.trackKey);
           }
         }
 
         // Update building stats
-        if (result.buildings[buildingId]) {
+        if (buildingId && result.buildings[buildingId]) {
           result.buildings[buildingId].roomCount++;
           result.buildings[buildingId].eventCount +=
             result.rooms[roomName].eventCount;

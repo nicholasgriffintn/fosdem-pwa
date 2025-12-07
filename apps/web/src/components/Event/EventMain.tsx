@@ -29,6 +29,7 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 	const specialRoom =
 		roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
 	const testTime = isTest ? new Date(conference.start) : undefined;
+	const imageDetails = fosdemImageDetails[event.type as TypeIds];
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const { width } = useWindowSize();
@@ -101,20 +102,18 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 					)}
 					<span className="text-sm block mb-2">
 						Notice: The placeholder video image is licensed under{" "}
-						{fosdemImageDetails[event.type as TypeIds].license}.{" "}
-						<a
-							href={fosdemImageDetails[event.type as TypeIds].original}
-							target="_blank"
-							rel="noreferrer"
-						>
-							The original image can be found here
-						</a>
-						.
+						{imageDetails?.license ?? "the stated license by the content owner"}.{" "}
+						{imageDetails?.original ? (
+							<a href={imageDetails.original} target="_blank" rel="noreferrer">
+								The original image can be found here
+							</a>
+						) : (
+							<span>The original image link is unavailable.</span>
+						)}
 					</span>
-					{fosdemImageDetails[event.type as TypeIds].changes && (
+					{imageDetails?.changes && (
 						<span className="text-xs block mt-1">
-							Changes made to the image are:{" "}
-							{fosdemImageDetails[event.type as TypeIds].changes}
+							Changes made to the image are: {imageDetails.changes}
 						</span>
 					)}
 				</div>
