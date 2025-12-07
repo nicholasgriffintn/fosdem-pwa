@@ -263,6 +263,10 @@ async function parseData(text: string): Promise<{
   const parsed = JSON.parse(data);
   const result = flattenData<{ conference: any; day: Day[] }>(parsed.schedule);
 
+  if (!result?.conference) {
+    throw new Error("Invalid schedule: missing conference data");
+  }
+
   return {
     conference: flattenConference(result.conference),
     day: result.day,
