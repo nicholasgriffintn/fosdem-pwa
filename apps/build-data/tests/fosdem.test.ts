@@ -115,7 +115,7 @@ describe("buildData", () => {
 			title: "Keynote",
 			type: "keynote",
 			track: "Main Track",
-			trackKey: "maintrack",
+			trackKey: "main-track",
 			persons: ["Alice"],
 			room: "H.1301",
 			status: "running",
@@ -169,8 +169,8 @@ describe("buildData", () => {
 			buildingId: "H",
 			eventCount: 1,
 		});
-		expect(result.tracks["maintrack"]).toMatchObject({
-			id: "maintrack",
+		expect(result.tracks["main-track"]).toMatchObject({
+			id: "main-track",
 			name: "Main Track",
 			type: "keynote",
 			room: "H.1301",

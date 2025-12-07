@@ -15,6 +15,7 @@ import type {
   BuildDataResult,
 } from "../types";
 import { parseData, getRoomName, getLinkType, getStatus } from "./data";
+import { slugify } from "../utils/slugs";
 
 const typeData = Object.freeze(constants.TYPES);
 const buildings = Object.freeze(constants.BUILDINGS);
@@ -91,6 +92,12 @@ class EventProcessor {
     return status === "amendment" ? title?.substring(10) || title : title;
   }
 
+  private getTrackKey(event: XmlEvent): string {
+    const trackSlug = event.track._attributes?.slug;
+    const trackName = event.track._text || "";
+    return slugify(trackSlug ?? trackName);
+  }
+
   public processEvent(
     event: XmlEvent,
     isLive: boolean,
@@ -108,7 +115,7 @@ class EventProcessor {
 
     const type = this.getType(event);
     const track = event.track._text;
-    const trackKey = track.toLowerCase().replace(/\s/g, "");
+    const trackKey = this.getTrackKey(event);
 
     if (type === "other" && track === "stand") return null;
 
@@ -198,9 +205,10 @@ async function processScheduleData(
       tracks: new Set(),
     };
 
-    if (day.room?.length > 0) {
+    const rooms = Array.isArray(day.room) ? day.room : day.room ? [day.room] : [];
+    if (rooms.length > 0) {
       // Process rooms in each day
-      for (const room of day.room) {
+      for (const room of rooms) {
         const roomName = getRoomName(room._attributes.name);
         const buildingMatch = roomName.match(/^(AW|[A-Z])/);
         const buildingId = buildingMatch ? buildingMatch[1] : null;
@@ -222,7 +230,11 @@ async function processScheduleData(
         }
 
         // Process events in each room
-        const events = Array.isArray(room.event) ? room.event : [room.event];
+        const events = Array.isArray(room.event)
+          ? room.event
+          : room.event
+            ? [room.event]
+            : [];
         for (const xmlEvent of events) {
           const event = processor.processEvent(
             xmlEvent as XmlEvent,
@@ -408,7 +420,8 @@ const validateParsedSchedule = (data: { conference: Conference; day: Day[] }) =>
   }
 
   for (const day of data.day) {
-    if (!day?.room || !Array.isArray(day.room) || day.room.length === 0) {
+    const rooms = Array.isArray(day.room) ? day.room : day.room ? [day.room] : [];
+    if (rooms.length === 0) {
       throw new Error("Invalid schedule: missing rooms for day");
     }
   }
