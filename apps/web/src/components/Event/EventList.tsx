@@ -42,7 +42,8 @@ type EventListProps = {
 		type: string;
 		slug: string;
 		status: string;
-	}) => void;
+		}) => void;
+	displaySortByFavourites?: boolean;
 };
 
 export function EventList({
@@ -59,6 +60,7 @@ export function EventList({
 	showTrack = false,
 	user = null,
 	onCreateBookmark,
+	displaySortByFavourites = false,
 }: EventListProps) {
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 	const [sortByFavourites, setSortByFavourites] = useState(false);
@@ -110,17 +112,19 @@ export function EventList({
 								</TabsList>
 							</div>
 							<div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
-								<div className="flex items-center gap-2">
-									<Switch
-										id={sortSwitchId}
-										checked={sortByFavourites}
-										onCheckedChange={setSortByFavourites}
-										aria-label="Toggle favourites-first sorting"
-									/>
-									<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
-										Favourites first
-									</Label>
-								</div>
+								{displaySortByFavourites && (
+									<div className="flex items-center gap-2">
+										<Switch
+											id={sortSwitchId}
+											checked={sortByFavourites}
+											onCheckedChange={setSortByFavourites}
+											aria-label="Toggle favourites-first sorting"
+										/>
+										<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+											Favourites first
+										</Label>
+									</div>
+								)}
 								{displayViewMode && (
 									<div className="flex gap-2">
 										<Button
@@ -212,17 +216,19 @@ export function EventList({
 			<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
 				{title && <h2 className="text-xl font-semibold shrink-0 text-foreground">{title}</h2>}
 				<div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
-					<div className="flex items-center gap-2">
-						<Switch
-							id={sortSwitchId}
-							checked={sortByFavourites}
-							onCheckedChange={setSortByFavourites}
-							aria-label="Toggle favourites-first sorting"
-						/>
-						<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
-							Favourites first
-						</Label>
-					</div>
+					{displaySortByFavourites && (
+						<div className="flex items-center gap-2">
+							<Switch
+								id={sortSwitchId}
+								checked={sortByFavourites}
+								onCheckedChange={setSortByFavourites}
+								aria-label="Toggle favourites-first sorting"
+							/>
+							<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+								Favourites first
+							</Label>
+						</div>
+					)}
 					{displayViewMode && (
 						<div className="flex gap-2">
 							<Button

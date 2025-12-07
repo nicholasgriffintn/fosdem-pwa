@@ -26,7 +26,8 @@ type TrackListProps = {
 		type: string;
 		slug: string;
 		status: string;
-	}) => void;
+		}) => void;
+	displaySortByFavourites?: boolean;
 };
 
 type TrackListItemProps = {
@@ -98,7 +99,7 @@ type TrackListContentProps = {
 		type: string;
 		slug: string;
 		status: string;
-	}) => void;
+		}) => void;
 };
 
 function TrackListContent({
@@ -148,6 +149,7 @@ export function TrackList({
 	day,
 	user,
 	onCreateBookmark,
+	displaySortByFavourites = false,
 }: TrackListProps) {
 	const [sortByFavourites, setSortByFavourites] = useState(false);
 	const sortSwitchId = useId();
@@ -186,17 +188,19 @@ export function TrackList({
 									})}
 								</TabsList>
 							</div>
-							<div className="flex items-center gap-2">
-								<Switch
-									id={sortSwitchId}
-									checked={sortByFavourites}
-									onCheckedChange={setSortByFavourites}
-									aria-label="Toggle favourites-first sorting"
-								/>
-								<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
-									Favourites first
-								</Label>
-							</div>
+							{displaySortByFavourites && (
+								<div className="flex items-center gap-2">
+									<Switch
+										id={sortSwitchId}
+										checked={sortByFavourites}
+										onCheckedChange={setSortByFavourites}
+										aria-label="Toggle favourites-first sorting"
+									/>
+									<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+										Favourites first
+									</Label>
+								</div>
+							)}
 						</div>
 						{days.map((day) => {
 							if (!trackDataSplitByDay[day.id]) {
@@ -232,17 +236,19 @@ export function TrackList({
 		<section>
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
 				{title && <h2 className="text-xl font-semibold text-foreground">{title}</h2>}
-				<div className="flex items-center gap-2">
-					<Switch
-						id={sortSwitchId}
-						checked={sortByFavourites}
-						onCheckedChange={setSortByFavourites}
-						aria-label="Toggle favourites-first sorting"
-					/>
-					<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
-						Favourites first
-					</Label>
-				</div>
+				{displaySortByFavourites && (
+					<div className="flex items-center gap-2">
+						<Switch
+							id={sortSwitchId}
+							checked={sortByFavourites}
+							onCheckedChange={setSortByFavourites}
+							aria-label="Toggle favourites-first sorting"
+						/>
+						<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+							Favourites first
+						</Label>
+					</div>
+				)}
 			</div>
 			<TrackListContent
 				tracks={tracks}

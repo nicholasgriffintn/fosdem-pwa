@@ -8,6 +8,7 @@ import { constants } from "~/constants";
 import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -56,7 +57,10 @@ function TypePage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Type not found" year={year} />
+					<EmptyStateCard
+						title="Type not found"
+						description="We couldn't find this type of content. Please check the link and try again."
+					/>
 				</div>
 			</div>
 		);
@@ -87,6 +91,7 @@ function TypePage() {
 					day={day}
 					user={user}
 					onCreateBookmark={onCreateBookmark}
+					displaySortByFavourites={true}
 				/>
 			</div>
 		</div>

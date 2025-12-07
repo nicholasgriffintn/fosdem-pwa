@@ -7,6 +7,7 @@ import type { Conference, Event } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/track/$slug")({
 	component: TrackPage,
@@ -54,7 +55,10 @@ function TrackPage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Track not found" year={year} />
+					<EmptyStateCard
+						title="Track not found"
+						description="We couldn't find this track. It may have moved or the link might be outdated."
+					/>
 				</div>
 			</div>
 		);
@@ -94,6 +98,7 @@ function TrackPage() {
 					day={day}
 					user={user}
 					onCreateBookmark={onCreateBookmark}
+					displaySortByFavourites={true}
 				/>
 			</div>
 		</div>
