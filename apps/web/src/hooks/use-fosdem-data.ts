@@ -8,7 +8,7 @@ import { getAllData } from "~/server/functions/fosdem";
 export function useFosdemData({ year }: { year: number }) {
 	const getData = useServerFn(getAllData);
 
-	const { data: fosdemData, isLoading } = useQuery({
+	const { data: fosdemData, isLoading, error } = useQuery({
 		queryKey: ["fosdem", "full", year],
 		queryFn: async () => {
 			const data = await getData({
@@ -19,10 +19,16 @@ export function useFosdemData({ year }: { year: number }) {
 
 			return data;
 		},
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+		retry: 1,
+		refetchOnWindowFocus: false,
+		enabled: Number.isFinite(year),
 	});
 
 	return {
 		fosdemData,
 		loading: isLoading,
+		error,
 	};
 }

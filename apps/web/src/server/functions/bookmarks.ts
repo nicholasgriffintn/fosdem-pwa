@@ -133,6 +133,24 @@ export const updateBookmark = createServerFn({
 	.handler(async (ctx: any) => {
 		const { id, updates } = ctx.data;
 
+		const allowedFields = ["status", "priority", "last_notification_sent_at"] as const;
+		const safeUpdates = Object.entries(updates ?? {}).reduce<Record<string, unknown>>(
+			(acc, [key, value]) => {
+				if (allowedFields.includes(key as (typeof allowedFields)[number])) {
+					acc[key] = value;
+				}
+				return acc;
+			},
+			{},
+		);
+
+		if (Object.keys(safeUpdates).length === 0) {
+			return {
+				success: false,
+				error: "No valid bookmark fields to update",
+			};
+		}
+
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
@@ -150,7 +168,7 @@ export const updateBookmark = createServerFn({
 		try {
 			await db
 				.update(bookmarkTable)
-				.set({ ...updates })
+				.set(safeUpdates)
 				.where(eq(bookmarkTable.id, id));
 
 			return {
