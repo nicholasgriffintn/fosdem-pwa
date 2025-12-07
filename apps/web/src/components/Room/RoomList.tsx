@@ -20,32 +20,26 @@ type RoomListItemProps = {
 };
 
 function RoomListItem({ year, room, index, isLast }: RoomListItemProps) {
-	const className = clsx("flex justify-between", {
-		"border-t-2 border-solid border-muted": index % 2 === 1,
-		"border-b-2": index % 2 === 1 && !isLast,
-	});
-
 	return (
-		<div className={className}>
-			<div className="flex flex-col md:flex-row md:justify-between w-full">
-				<div className="flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1">
-					<Link
-						to="/rooms/$roomId"
-						params={{ roomId: room.slug }}
-						search={(prev) => ({
-							year: prev.year || constants.DEFAULT_YEAR,
-							day: undefined,
-						})}
-					>
-						<h3 className="font-semibold leading-none tracking-tight">
-							{room.name}
-						</h3>
-					</Link>
-					<p className="text-gray-500">
-						Building {room.buildingId || room.building?.id} | {room.eventCount}{" "}
-						events
-					</p>
-				</div>
+		<div className="flex flex-col md:flex-row md:justify-between w-full py-3 px-2 sm:px-3">
+			<div className="flex flex-col space-y-1.5">
+				<Link
+					to="/rooms/$roomId"
+					params={{ roomId: room.slug }}
+					search={(prev: Record<string, unknown>) => ({
+						year: prev.year || constants.DEFAULT_YEAR,
+						day: undefined,
+					})}
+					className="no-underline"
+				>
+					<h3 className="font-semibold leading-none tracking-tight">
+						{room.name}
+					</h3>
+				</Link>
+				<p className="text-muted-foreground">
+					Building {room.buildingId || room.building?.id} | {room.eventCount}{" "}
+					events
+				</p>
 			</div>
 		</div>
 	);
@@ -97,7 +91,7 @@ export function RoomList({
 										({buildingRooms.length} rooms)
 									</span>
 								</h3>
-								<ul className="room-list w-full">
+								<ul className="room-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
 									{buildingRooms.map((room, index) => (
 										<li key={room.slug}>
 											<RoomListItem
@@ -127,7 +121,7 @@ export function RoomList({
 				</div>
 			)}
 			{sortedRooms?.length > 0 ? (
-				<ul className="room-list w-full">
+				<ul className="room-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
 					{sortedRooms.map((room, index) => (
 						<li key={room.slug}>
 							<RoomListItem
