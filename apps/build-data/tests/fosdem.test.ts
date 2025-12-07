@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { constants } from "../src/constants";
 import { buildData } from "../src/lib/fosdem";
 
-const mockXml2json = vi.fn();
+const mockXml2json = vi.hoisted(() => vi.fn());
 
 vi.mock("xml-js", () => ({
 	xml2json: mockXml2json,
