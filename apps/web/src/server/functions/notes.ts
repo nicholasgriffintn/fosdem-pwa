@@ -9,7 +9,7 @@ import { getFullAuthSession } from "~/server/auth";
 export const getNotes = createServerFn({
 	method: "GET",
 })
-	.validator((data: { year: number; eventId: string }) => data)
+	.inputValidator((data: { year: number; eventId: string }) => data)
 	.handler(async (ctx: any) => {
 		const { year, eventId } = ctx.data;
 
@@ -37,7 +37,7 @@ export const getNotes = createServerFn({
 export const createNote = createServerFn({
 	method: "POST",
 })
-	.validator(
+	.inputValidator(
 		(data: { year: number; eventId: string; note: string; time?: number }) =>
 			data,
 	)
@@ -74,7 +74,7 @@ export const createNote = createServerFn({
 export const updateNote = createServerFn({
 	method: "POST",
 })
-	.validator((data: { id: number; updates: any }) => data)
+	.inputValidator((data: { id: number; updates: any }) => data)
 	.handler(async (ctx: any) => {
 		const { id, updates } = ctx.data;
 
@@ -108,7 +108,7 @@ export const updateNote = createServerFn({
 export const deleteNote = createServerFn({
 	method: "POST",
 })
-	.validator((data: { id: number }) => data)
+	.inputValidator((data: { id: number }) => data)
 	.handler(async (ctx: any) => {
 		const { id } = ctx.data;
 

@@ -7,7 +7,7 @@ import { user as userTable } from "~/server/db/schema";
 export const getUserDetails = createServerFn({
 	method: "GET",
 })
-	.validator((data: { userId: string }) => data)
+	.inputValidator((data: { userId: string }) => data)
 	.handler(async (ctx: any) => {
 		const user = await db.query.user.findFirst({
 			where: eq(userTable.github_username, ctx.data.userId),

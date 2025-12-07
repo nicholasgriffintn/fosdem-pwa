@@ -8,7 +8,7 @@ import { getFullAuthSession } from "~/server/auth";
 export const createSubscription = createServerFn({
 	method: "POST",
 })
-	.validator((data: { endpoint: string; auth: string; p256dh: string }) => data)
+	.inputValidator((data: { endpoint: string; auth: string; p256dh: string }) => data)
 	.handler(async (ctx: any) => {
 		const { endpoint, auth, p256dh } = ctx.data;
 
@@ -46,7 +46,7 @@ export const createSubscription = createServerFn({
 export const deleteSubscription = createServerFn({
 	method: "POST",
 })
-	.validator((data: { id: number }) => data)
+	.inputValidator((data: { id: number }) => data)
 	.handler(async (ctx: any) => {
 		const { id } = ctx.data;
 
