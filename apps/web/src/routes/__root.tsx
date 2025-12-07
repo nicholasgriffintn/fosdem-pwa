@@ -4,9 +4,9 @@ import {
 	createRootRouteWithContext,
 	Outlet,
 	ScriptOnce,
-	ScrollRestoration,
+	HeadContent,
+	Scripts,
 } from "@tanstack/react-router";
-import { Meta, Scripts } from "@tanstack/react-start";
 import { lazy, Suspense } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
@@ -66,7 +66,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 	return (
 		<html className="dark" lang="en">
 			<head>
-				<Meta />
+				<HeadContent />
 				<link rel="manifest" href="/manifest.webmanifest" />
 			</head>
 			<body
@@ -91,7 +91,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					<OfflineIndicator />
 					<ServiceWorkerUpdater />
 				</main>
-				<ScrollRestoration />
 
 				<ScriptOnce>
 					{`document.documentElement.classList.toggle(
