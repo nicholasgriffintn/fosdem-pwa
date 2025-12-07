@@ -72,7 +72,6 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 								event={event}
 								conference={conference}
 								videoRef={videoRef}
-								isMobile={isMobile}
 								testTime={testTime}
 							/>
 						</div>
