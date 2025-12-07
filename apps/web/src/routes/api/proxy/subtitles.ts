@@ -99,6 +99,8 @@ export const Route = createFileRoute("/api/proxy/subtitles")({
 					const responseHeaders: Record<string, string> = {
 						"Content-Type": "text/vtt",
 						"Cache-Control": "public, max-age=300",
+						Vary: "Origin, Accept-Encoding, If-None-Match, If-Modified-Since",
+						"Access-Control-Allow-Origin": "*",
 					};
 
 					const etag = response.headers.get("etag");

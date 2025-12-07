@@ -14,6 +14,42 @@ import {
 import { createBookmark, updateBookmark } from "~/server/functions/bookmarks";
 import type { Bookmark } from "~/server/db/schema";
 
+export type CreateBookmarkInput = {
+	year: number;
+	type: string;
+	slug: string;
+	status: string;
+};
+
+export type OptimisticCreateDeps = {
+	createLocal: (
+		bookmarkData: Omit<LocalBookmark, "id" | "created_at" | "updated_at"> & {
+			status: string;
+		},
+	) => Promise<LocalBookmark>;
+	removeLocal: (id: string) => Promise<boolean>;
+	createServer?: (bookmarkData: CreateBookmarkInput) => Promise<unknown>;
+	userId?: string;
+};
+
+export async function createBookmarkOptimistic(
+	deps: OptimisticCreateDeps,
+	bookmarkData: CreateBookmarkInput,
+) {
+	const created = await deps.createLocal(bookmarkData);
+
+	if (deps.userId && deps.createServer) {
+		try {
+			await deps.createServer(bookmarkData);
+		} catch (error) {
+			await deps.removeLocal(created.id);
+			throw error;
+		}
+	}
+
+	return created;
+}
+
 export function useMutateBookmark({ year }: { year: number }) {
 	const queryClient = useQueryClient();
 	const { user } = useAuth();
@@ -154,16 +190,15 @@ export function useMutateBookmark({ year }: { year: number }) {
 		slug: string;
 		status: string;
 	}) => {
-		await createLocalBookmark({
-			year: bookmarkData.year,
-			slug: bookmarkData.slug,
-			type: bookmarkData.type,
-			status: bookmarkData.status,
-		});
-
-		if (user?.id) {
-			createServerBookmark.mutate(bookmarkData);
-		}
+		await createBookmarkOptimistic(
+			{
+				createLocal: createLocalBookmark,
+				removeLocal: removeLocalBookmark,
+				createServer: async (data) => createServerBookmark.mutateAsync(data),
+				userId: user?.id,
+			},
+			bookmarkData,
+		);
 	};
 
 	const update = async (id: string, updates: Partial<Bookmark | LocalBookmark>) => {

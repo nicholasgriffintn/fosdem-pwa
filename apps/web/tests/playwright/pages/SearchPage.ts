@@ -124,6 +124,12 @@ export class SearchPage extends BasePage {
 		}
 	}
 
+	async expectEmptyState() {
+		await expect(
+			this.page.getByText("No results match this search with the selected filters."),
+		).toBeVisible();
+	}
+
 	async selectFirstTrackOption() {
 		const trigger = this.trackFilter();
 		await expect(trigger).toBeEnabled();

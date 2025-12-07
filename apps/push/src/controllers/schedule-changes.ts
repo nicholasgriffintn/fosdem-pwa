@@ -16,6 +16,9 @@ import type { Env, Subscription, ScheduleSnapshot } from "../types";
 
 type SnapshotRow = ScheduleSnapshot;
 
+const hashEvent = (start: string, duration: string, room: string) =>
+	`${start}|${duration}|${room}`;
+
 async function loadSnapshots(env: Env): Promise<SnapshotRow[]> {
 	const snapshots = await env.DB.prepare(
 		"SELECT slug, start_time, duration, room FROM schedule_snapshot WHERE year = ?",
@@ -23,7 +26,7 @@ async function loadSnapshots(env: Env): Promise<SnapshotRow[]> {
 		.bind(constants.YEAR)
 		.run();
 
-	return (snapshots.results ?? []) as SnapshotRow[];
+	return (snapshots.results ?? []) as unknown as SnapshotRow[];
 }
 
 async function upsertSnapshots(
@@ -74,11 +77,11 @@ export async function triggerScheduleChangeNotifications(
 
 	for (const [slug, event] of Object.entries(fosdemData.events)) {
 		const previous = snapshotMap.get(slug);
-		const hasChanged =
-			!previous ||
-			previous.start_time !== event.startTime ||
-			previous.duration !== event.duration ||
-			previous.room !== event.room;
+		const previousHash = previous
+			? hashEvent(previous.start_time, previous.duration, previous.room)
+			: undefined;
+		const currentHash = hashEvent(event.startTime, event.duration, event.room);
+		const hasChanged = !previous || previousHash !== currentHash;
 
 		if (hasChanged) {
 			changedEvents.set(slug, previous);
