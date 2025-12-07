@@ -1,15 +1,28 @@
 import { constants } from "../constants";
 import type { FosdemEvent, Bookmark, EnrichedBookmark, Env } from "../types";
 
-export async function getUserBookmarks(userId: string, env: Env): Promise<Bookmark[]> {
-	const bookmarks = await env.DB.prepare(
-		"SELECT id, user_id, type, status, year, slug, priority FROM bookmark WHERE user_id = ? AND type = 'bookmark_event' AND status = 'favourited' AND year = ? AND last_notification_sent_at IS NULL",
-	)
+interface GetUserBookmarksOptions {
+	includeSent?: boolean;
+}
+
+export async function getUserBookmarks(
+	userId: string,
+	env: Env,
+	{ includeSent = false }: GetUserBookmarksOptions = {},
+): Promise<Bookmark[]> {
+	const baseQuery =
+		"SELECT id, user_id, type, status, year, slug, priority FROM bookmark WHERE user_id = ? AND type = 'bookmark_event' AND status = 'favourited' AND year = ?";
+
+	const query = includeSent
+		? baseQuery
+		: `${baseQuery} AND last_notification_sent_at IS NULL`;
+
+	const bookmarks = await env.DB.prepare(query)
 		.bind(userId, constants.YEAR)
 		.run();
 
 	if (!bookmarks.success || !bookmarks.results?.length) {
-		throw new Error("No bookmarks found for user");
+		return [];
 	}
 
 	return bookmarks.results as unknown as Bookmark[];

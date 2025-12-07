@@ -55,7 +55,9 @@ export async function triggerDailySummary(
 					p256dh: subscription.p256dh as string,
 				};
 
-				const bookmarks = await getUserBookmarks(typedSubscription.user_id, env);
+				const bookmarks = await getUserBookmarks(typedSubscription.user_id, env, {
+					includeSent: true,
+				});
 				const enrichedBookmarks = enrichBookmarks(bookmarks, fosdemData.events);
 				const bookmarksToday = getBookmarksForDay(enrichedBookmarks, whichDay);
 
@@ -70,7 +72,8 @@ export async function triggerDailySummary(
 					await env.NOTIFICATION_QUEUE.send({
 						subscription: typedSubscription,
 						notification,
-						bookmarkId: isEvening ? 'evening-summary' : 'morning-summary'
+						bookmarkId: isEvening ? 'evening-summary' : 'morning-summary',
+						shouldMarkSent: false,
 					});
 				} else {
 					await sendNotification(typedSubscription, notification, keys, env);

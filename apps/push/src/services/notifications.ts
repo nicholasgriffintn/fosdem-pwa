@@ -5,7 +5,13 @@ import {
 } from "webpush-webcrypto";
 
 import { constants } from "../constants";
-import type { NotificationPayload, Subscription, EnrichedBookmark, Env } from "../types";
+import type {
+	NotificationPayload,
+	Subscription,
+	EnrichedBookmark,
+	Env,
+	ScheduleSnapshot,
+} from "../types";
 import { trackPushNotificationSuccess, trackPushNotificationFailure } from "./analytics";
 
 export function createNotificationPayload(bookmark: EnrichedBookmark): NotificationPayload {
@@ -45,6 +51,20 @@ export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: st
 		title: `Your FOSDEM Day ${day} Summary`,
 		body: `You have ${totalEvents} events today, starting from ${firstEvent.startTime} (${firstEvent.title}) until ${lastEvent.startTime} (${lastEvent.title})`,
 		url: `https://fosdempwa.com/bookmarks?day=${day}&year=${constants.YEAR}`,
+	};
+}
+
+export function createScheduleChangePayload(
+	bookmark: EnrichedBookmark,
+	previous: ScheduleSnapshot | undefined,
+): NotificationPayload {
+	const previousTime = previous?.start_time ?? "an earlier time";
+	const previousRoom = previous?.room ?? "a different room";
+
+	return {
+		title: "Schedule updated",
+		body: `${bookmark.title} now starts at ${bookmark.startTime} in ${bookmark.room} (was ${previousTime} in ${previousRoom})`,
+		url: `https://fosdempwa.com/event/${bookmark.slug}?year=${constants.YEAR}`,
 	};
 }
 

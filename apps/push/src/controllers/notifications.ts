@@ -9,6 +9,7 @@ import {
 	markNotificationSent,
 } from "../services/bookmarks";
 import { getApplicationKeys, sendNotification, createNotificationPayload } from "../services/notifications";
+import { bookmarkNotificationsEnabled } from "../services/config";
 import type { Subscription, EnrichedBookmark, Env } from "../types";
 
 async function processUserNotifications(
@@ -25,7 +26,8 @@ async function processUserNotifications(
 				await env.NOTIFICATION_QUEUE.send({
 					subscription,
 					notification,
-					bookmarkId: bookmark.id
+					bookmarkId: bookmark.id,
+					shouldMarkSent: true,
 				});
 			} else {
 				await sendNotification(subscription, notification, keys, env);
@@ -42,6 +44,11 @@ async function processUserNotifications(
 }
 
 export async function triggerTestNotification(env: Env, ctx: ExecutionContext) {
+	if (!bookmarkNotificationsEnabled(env)) {
+		console.log("Bookmark notifications disabled; skipping test send");
+		return;
+	}
+
 	const keys = await getApplicationKeys(env);
 
 	const testSubscriptions = await env.DB.prepare(
@@ -62,7 +69,9 @@ export async function triggerTestNotification(env: Env, ctx: ExecutionContext) {
 	}));
 
 	const fosdemData = await getFosdemData();
-	const bookmarks = await getUserBookmarks(subscriptions[0].user_id, env);
+	const bookmarks = await getUserBookmarks(subscriptions[0].user_id, env, {
+		includeSent: true,
+	});
 	const enrichedBookmarks = enrichBookmarks(bookmarks, fosdemData.events);
 	const dayOneBookmarks = getBookmarksForDay(enrichedBookmarks, "1");
 
@@ -83,6 +92,11 @@ export async function triggerNotifications(
 	ctx: ExecutionContext,
 	queueMode = false
 ) {
+	if (!bookmarkNotificationsEnabled(env)) {
+		console.log("Bookmark notifications disabled; skipping processing");
+		return;
+	}
+
 	const whichDay = getCurrentDay();
 
 	if (!whichDay) {
