@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/cloudflare";
 
-import { buildData, type BuildDataResult } from "./lib/fosdem";
+import type { BuildDataResult } from "./types.js";
+import { buildData } from "./lib/fosdem";
 import { createLogger } from "./lib/logger";
 
 const DEFAULT_YEAR = 2026;

@@ -12,7 +12,7 @@ export interface XmlEvent extends XmlAttribute {
   };
   title: { _text: string };
   type: { _text: string };
-  track: { _text: string };
+  track: { _text: string; _attributes?: { slug?: string } };
   persons?: { person: Array<{ _text: string }> | { _text: string } };
   links?: { link: Array<XmlLink> | XmlLink };
   attachments?: { attachment: Array<XmlAttachment> | XmlAttachment };
@@ -188,5 +188,5 @@ export type Room = {
 
 export type Day = {
   _attributes: { index: number; date: string; start: string; end: string };
-  room: Room[];
+  room: Room[] | Room;
 };
