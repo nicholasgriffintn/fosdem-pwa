@@ -44,15 +44,15 @@ function SignInPage() {
 				<PageHeader heading="Sign in" className="mb-4" />
 				<div className="flex flex-col gap-8">
 					<div className="space-y-6">
-						<p className="text-lg text-slate-200">
+						<p className="text-lg text-muted-foreground">
 							Connect with your GitHub account to sync your notes and bookmarks
 							across devices and more.
 						</p>
 						<div className="space-y-3">
-							<h2 className="text-lg font-semibold text-slate-100 text-foreground">
+							<h2 className="text-lg font-semibold text-foreground">
 								What you'll be able to do:
 							</h2>
-							<ul className="space-y-2 text-slate-200">
+							<ul className="space-y-2 text-muted-foreground">
 								<li className="flex items-start gap-2">
 									<span className="text-xl">🔖</span>
 									<span>

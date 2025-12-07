@@ -8,485 +8,485 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as SigninIndexRouteImport } from "./routes/signin/index";
-import { Route as SearchIndexRouteImport } from "./routes/search/index";
-import { Route as RoomsIndexRouteImport } from "./routes/rooms/index";
-import { Route as ProfileIndexRouteImport } from "./routes/profile/index";
-import { Route as OfflineIndexRouteImport } from "./routes/offline/index";
-import { Route as MapIndexRouteImport } from "./routes/map/index";
-import { Route as LiveIndexRouteImport } from "./routes/live/index";
-import { Route as BookmarksIndexRouteImport } from "./routes/bookmarks/index";
-import { Route as TypeSlugRouteImport } from "./routes/type/$slug";
-import { Route as TrackSlugRouteImport } from "./routes/track/$slug";
-import { Route as RoomsRoomIdRouteImport } from "./routes/rooms/$roomId";
-import { Route as EventSlugRouteImport } from "./routes/event/$slug";
-import { Route as ProfileUserIdIndexRouteImport } from "./routes/profile/$userId/index";
-import { Route as ApiProxySubtitlesRouteImport } from "./routes/api/proxy/subtitles";
-import { Route as ApiAuthUpgradeGithubRouteImport } from "./routes/api/auth/upgrade-github";
-import { Route as ApiAuthLogoutRouteImport } from "./routes/api/auth/logout";
-import { Route as ApiAuthGuestRouteImport } from "./routes/api/auth/guest";
-import { Route as ApiAuthGithubRouteImport } from "./routes/api/auth/github";
-import { Route as ApiProxyRoomsStatusRouteImport } from "./routes/api/proxy/rooms/status";
-import { Route as ApiAuthCallbackGithubRouteImport } from "./routes/api/auth/callback.github";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as SigninIndexRouteImport } from './routes/signin/index'
+import { Route as SearchIndexRouteImport } from './routes/search/index'
+import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
+import { Route as OfflineIndexRouteImport } from './routes/offline/index'
+import { Route as MapIndexRouteImport } from './routes/map/index'
+import { Route as LiveIndexRouteImport } from './routes/live/index'
+import { Route as BookmarksIndexRouteImport } from './routes/bookmarks/index'
+import { Route as TypeSlugRouteImport } from './routes/type/$slug'
+import { Route as TrackSlugRouteImport } from './routes/track/$slug'
+import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
+import { Route as EventSlugRouteImport } from './routes/event/$slug'
+import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
+import { Route as ApiProxySubtitlesRouteImport } from './routes/api/proxy/subtitles'
+import { Route as ApiAuthUpgradeGithubRouteImport } from './routes/api/auth/upgrade-github'
+import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
+import { Route as ApiAuthGuestRouteImport } from './routes/api/auth/guest'
+import { Route as ApiAuthGithubRouteImport } from './routes/api/auth/github'
+import { Route as ApiProxyRoomsStatusRouteImport } from './routes/api/proxy/rooms/status'
+import { Route as ApiAuthCallbackGithubRouteImport } from './routes/api/auth/callback.github'
 
 const IndexRoute = IndexRouteImport.update({
-	id: "/",
-	path: "/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SigninIndexRoute = SigninIndexRouteImport.update({
-	id: "/signin/",
-	path: "/signin/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/signin/',
+  path: '/signin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchIndexRoute = SearchIndexRouteImport.update({
-	id: "/search/",
-	path: "/search/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/search/',
+  path: '/search/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoomsIndexRoute = RoomsIndexRouteImport.update({
-	id: "/rooms/",
-	path: "/rooms/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/rooms/',
+  path: '/rooms/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
-	id: "/profile/",
-	path: "/profile/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/profile/',
+  path: '/profile/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OfflineIndexRoute = OfflineIndexRouteImport.update({
-	id: "/offline/",
-	path: "/offline/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/offline/',
+  path: '/offline/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MapIndexRoute = MapIndexRouteImport.update({
-	id: "/map/",
-	path: "/map/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/map/',
+  path: '/map/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LiveIndexRoute = LiveIndexRouteImport.update({
-	id: "/live/",
-	path: "/live/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/live/',
+  path: '/live/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookmarksIndexRoute = BookmarksIndexRouteImport.update({
-	id: "/bookmarks/",
-	path: "/bookmarks/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/bookmarks/',
+  path: '/bookmarks/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TypeSlugRoute = TypeSlugRouteImport.update({
-	id: "/type/$slug",
-	path: "/type/$slug",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/type/$slug',
+  path: '/type/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackSlugRoute = TrackSlugRouteImport.update({
-	id: "/track/$slug",
-	path: "/track/$slug",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/track/$slug',
+  path: '/track/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
-	id: "/rooms/$roomId",
-	path: "/rooms/$roomId",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/rooms/$roomId',
+  path: '/rooms/$roomId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventSlugRoute = EventSlugRouteImport.update({
-	id: "/event/$slug",
-	path: "/event/$slug",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/event/$slug',
+  path: '/event/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileUserIdIndexRoute = ProfileUserIdIndexRouteImport.update({
-	id: "/profile/$userId/",
-	path: "/profile/$userId/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/profile/$userId/',
+  path: '/profile/$userId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProxySubtitlesRoute = ApiProxySubtitlesRouteImport.update({
-	id: "/api/proxy/subtitles",
-	path: "/api/proxy/subtitles",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/api/proxy/subtitles',
+  path: '/api/proxy/subtitles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthUpgradeGithubRoute = ApiAuthUpgradeGithubRouteImport.update({
-	id: "/api/auth/upgrade-github",
-	path: "/api/auth/upgrade-github",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/api/auth/upgrade-github',
+  path: '/api/auth/upgrade-github',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
-	id: "/api/auth/logout",
-	path: "/api/auth/logout",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/api/auth/logout',
+  path: '/api/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthGuestRoute = ApiAuthGuestRouteImport.update({
-	id: "/api/auth/guest",
-	path: "/api/auth/guest",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/api/auth/guest',
+  path: '/api/auth/guest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthGithubRoute = ApiAuthGithubRouteImport.update({
-	id: "/api/auth/github",
-	path: "/api/auth/github",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/api/auth/github',
+  path: '/api/auth/github',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProxyRoomsStatusRoute = ApiProxyRoomsStatusRouteImport.update({
-	id: "/api/proxy/rooms/status",
-	path: "/api/proxy/rooms/status",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/api/proxy/rooms/status',
+  path: '/api/proxy/rooms/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthCallbackGithubRoute = ApiAuthCallbackGithubRouteImport.update({
-	id: "/api/auth/callback/github",
-	path: "/api/auth/callback/github",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/api/auth/callback/github',
+  path: '/api/auth/callback/github',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-	"/": typeof IndexRoute;
-	"/event/$slug": typeof EventSlugRoute;
-	"/rooms/$roomId": typeof RoomsRoomIdRoute;
-	"/track/$slug": typeof TrackSlugRoute;
-	"/type/$slug": typeof TypeSlugRoute;
-	"/bookmarks": typeof BookmarksIndexRoute;
-	"/live": typeof LiveIndexRoute;
-	"/map": typeof MapIndexRoute;
-	"/offline": typeof OfflineIndexRoute;
-	"/profile": typeof ProfileIndexRoute;
-	"/rooms": typeof RoomsIndexRoute;
-	"/search": typeof SearchIndexRoute;
-	"/signin": typeof SigninIndexRoute;
-	"/api/auth/github": typeof ApiAuthGithubRoute;
-	"/api/auth/guest": typeof ApiAuthGuestRoute;
-	"/api/auth/logout": typeof ApiAuthLogoutRoute;
-	"/api/auth/upgrade-github": typeof ApiAuthUpgradeGithubRoute;
-	"/api/proxy/subtitles": typeof ApiProxySubtitlesRoute;
-	"/profile/$userId": typeof ProfileUserIdIndexRoute;
-	"/api/auth/callback/github": typeof ApiAuthCallbackGithubRoute;
-	"/api/proxy/rooms/status": typeof ApiProxyRoomsStatusRoute;
+  '/': typeof IndexRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/rooms/$roomId': typeof RoomsRoomIdRoute
+  '/track/$slug': typeof TrackSlugRoute
+  '/type/$slug': typeof TypeSlugRoute
+  '/bookmarks': typeof BookmarksIndexRoute
+  '/live': typeof LiveIndexRoute
+  '/map': typeof MapIndexRoute
+  '/offline': typeof OfflineIndexRoute
+  '/profile': typeof ProfileIndexRoute
+  '/rooms': typeof RoomsIndexRoute
+  '/search': typeof SearchIndexRoute
+  '/signin': typeof SigninIndexRoute
+  '/api/auth/github': typeof ApiAuthGithubRoute
+  '/api/auth/guest': typeof ApiAuthGuestRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
+  '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
+  '/profile/$userId': typeof ProfileUserIdIndexRoute
+  '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
+  '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
 export interface FileRoutesByTo {
-	"/": typeof IndexRoute;
-	"/event/$slug": typeof EventSlugRoute;
-	"/rooms/$roomId": typeof RoomsRoomIdRoute;
-	"/track/$slug": typeof TrackSlugRoute;
-	"/type/$slug": typeof TypeSlugRoute;
-	"/bookmarks": typeof BookmarksIndexRoute;
-	"/live": typeof LiveIndexRoute;
-	"/map": typeof MapIndexRoute;
-	"/offline": typeof OfflineIndexRoute;
-	"/profile": typeof ProfileIndexRoute;
-	"/rooms": typeof RoomsIndexRoute;
-	"/search": typeof SearchIndexRoute;
-	"/signin": typeof SigninIndexRoute;
-	"/api/auth/github": typeof ApiAuthGithubRoute;
-	"/api/auth/guest": typeof ApiAuthGuestRoute;
-	"/api/auth/logout": typeof ApiAuthLogoutRoute;
-	"/api/auth/upgrade-github": typeof ApiAuthUpgradeGithubRoute;
-	"/api/proxy/subtitles": typeof ApiProxySubtitlesRoute;
-	"/profile/$userId": typeof ProfileUserIdIndexRoute;
-	"/api/auth/callback/github": typeof ApiAuthCallbackGithubRoute;
-	"/api/proxy/rooms/status": typeof ApiProxyRoomsStatusRoute;
+  '/': typeof IndexRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/rooms/$roomId': typeof RoomsRoomIdRoute
+  '/track/$slug': typeof TrackSlugRoute
+  '/type/$slug': typeof TypeSlugRoute
+  '/bookmarks': typeof BookmarksIndexRoute
+  '/live': typeof LiveIndexRoute
+  '/map': typeof MapIndexRoute
+  '/offline': typeof OfflineIndexRoute
+  '/profile': typeof ProfileIndexRoute
+  '/rooms': typeof RoomsIndexRoute
+  '/search': typeof SearchIndexRoute
+  '/signin': typeof SigninIndexRoute
+  '/api/auth/github': typeof ApiAuthGithubRoute
+  '/api/auth/guest': typeof ApiAuthGuestRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
+  '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
+  '/profile/$userId': typeof ProfileUserIdIndexRoute
+  '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
+  '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
 export interface FileRoutesById {
-	__root__: typeof rootRouteImport;
-	"/": typeof IndexRoute;
-	"/event/$slug": typeof EventSlugRoute;
-	"/rooms/$roomId": typeof RoomsRoomIdRoute;
-	"/track/$slug": typeof TrackSlugRoute;
-	"/type/$slug": typeof TypeSlugRoute;
-	"/bookmarks/": typeof BookmarksIndexRoute;
-	"/live/": typeof LiveIndexRoute;
-	"/map/": typeof MapIndexRoute;
-	"/offline/": typeof OfflineIndexRoute;
-	"/profile/": typeof ProfileIndexRoute;
-	"/rooms/": typeof RoomsIndexRoute;
-	"/search/": typeof SearchIndexRoute;
-	"/signin/": typeof SigninIndexRoute;
-	"/api/auth/github": typeof ApiAuthGithubRoute;
-	"/api/auth/guest": typeof ApiAuthGuestRoute;
-	"/api/auth/logout": typeof ApiAuthLogoutRoute;
-	"/api/auth/upgrade-github": typeof ApiAuthUpgradeGithubRoute;
-	"/api/proxy/subtitles": typeof ApiProxySubtitlesRoute;
-	"/profile/$userId/": typeof ProfileUserIdIndexRoute;
-	"/api/auth/callback/github": typeof ApiAuthCallbackGithubRoute;
-	"/api/proxy/rooms/status": typeof ApiProxyRoomsStatusRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/rooms/$roomId': typeof RoomsRoomIdRoute
+  '/track/$slug': typeof TrackSlugRoute
+  '/type/$slug': typeof TypeSlugRoute
+  '/bookmarks/': typeof BookmarksIndexRoute
+  '/live/': typeof LiveIndexRoute
+  '/map/': typeof MapIndexRoute
+  '/offline/': typeof OfflineIndexRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/rooms/': typeof RoomsIndexRoute
+  '/search/': typeof SearchIndexRoute
+  '/signin/': typeof SigninIndexRoute
+  '/api/auth/github': typeof ApiAuthGithubRoute
+  '/api/auth/guest': typeof ApiAuthGuestRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
+  '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
+  '/profile/$userId/': typeof ProfileUserIdIndexRoute
+  '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
+  '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
 export interface FileRouteTypes {
-	fileRoutesByFullPath: FileRoutesByFullPath;
-	fullPaths:
-		| "/"
-		| "/event/$slug"
-		| "/rooms/$roomId"
-		| "/track/$slug"
-		| "/type/$slug"
-		| "/bookmarks"
-		| "/live"
-		| "/map"
-		| "/offline"
-		| "/profile"
-		| "/rooms"
-		| "/search"
-		| "/signin"
-		| "/api/auth/github"
-		| "/api/auth/guest"
-		| "/api/auth/logout"
-		| "/api/auth/upgrade-github"
-		| "/api/proxy/subtitles"
-		| "/profile/$userId"
-		| "/api/auth/callback/github"
-		| "/api/proxy/rooms/status";
-	fileRoutesByTo: FileRoutesByTo;
-	to:
-		| "/"
-		| "/event/$slug"
-		| "/rooms/$roomId"
-		| "/track/$slug"
-		| "/type/$slug"
-		| "/bookmarks"
-		| "/live"
-		| "/map"
-		| "/offline"
-		| "/profile"
-		| "/rooms"
-		| "/search"
-		| "/signin"
-		| "/api/auth/github"
-		| "/api/auth/guest"
-		| "/api/auth/logout"
-		| "/api/auth/upgrade-github"
-		| "/api/proxy/subtitles"
-		| "/profile/$userId"
-		| "/api/auth/callback/github"
-		| "/api/proxy/rooms/status";
-	id:
-		| "__root__"
-		| "/"
-		| "/event/$slug"
-		| "/rooms/$roomId"
-		| "/track/$slug"
-		| "/type/$slug"
-		| "/bookmarks/"
-		| "/live/"
-		| "/map/"
-		| "/offline/"
-		| "/profile/"
-		| "/rooms/"
-		| "/search/"
-		| "/signin/"
-		| "/api/auth/github"
-		| "/api/auth/guest"
-		| "/api/auth/logout"
-		| "/api/auth/upgrade-github"
-		| "/api/proxy/subtitles"
-		| "/profile/$userId/"
-		| "/api/auth/callback/github"
-		| "/api/proxy/rooms/status";
-	fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/event/$slug'
+    | '/rooms/$roomId'
+    | '/track/$slug'
+    | '/type/$slug'
+    | '/bookmarks'
+    | '/live'
+    | '/map'
+    | '/offline'
+    | '/profile'
+    | '/rooms'
+    | '/search'
+    | '/signin'
+    | '/api/auth/github'
+    | '/api/auth/guest'
+    | '/api/auth/logout'
+    | '/api/auth/upgrade-github'
+    | '/api/proxy/subtitles'
+    | '/profile/$userId'
+    | '/api/auth/callback/github'
+    | '/api/proxy/rooms/status'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/event/$slug'
+    | '/rooms/$roomId'
+    | '/track/$slug'
+    | '/type/$slug'
+    | '/bookmarks'
+    | '/live'
+    | '/map'
+    | '/offline'
+    | '/profile'
+    | '/rooms'
+    | '/search'
+    | '/signin'
+    | '/api/auth/github'
+    | '/api/auth/guest'
+    | '/api/auth/logout'
+    | '/api/auth/upgrade-github'
+    | '/api/proxy/subtitles'
+    | '/profile/$userId'
+    | '/api/auth/callback/github'
+    | '/api/proxy/rooms/status'
+  id:
+    | '__root__'
+    | '/'
+    | '/event/$slug'
+    | '/rooms/$roomId'
+    | '/track/$slug'
+    | '/type/$slug'
+    | '/bookmarks/'
+    | '/live/'
+    | '/map/'
+    | '/offline/'
+    | '/profile/'
+    | '/rooms/'
+    | '/search/'
+    | '/signin/'
+    | '/api/auth/github'
+    | '/api/auth/guest'
+    | '/api/auth/logout'
+    | '/api/auth/upgrade-github'
+    | '/api/proxy/subtitles'
+    | '/profile/$userId/'
+    | '/api/auth/callback/github'
+    | '/api/proxy/rooms/status'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-	IndexRoute: typeof IndexRoute;
-	EventSlugRoute: typeof EventSlugRoute;
-	RoomsRoomIdRoute: typeof RoomsRoomIdRoute;
-	TrackSlugRoute: typeof TrackSlugRoute;
-	TypeSlugRoute: typeof TypeSlugRoute;
-	BookmarksIndexRoute: typeof BookmarksIndexRoute;
-	LiveIndexRoute: typeof LiveIndexRoute;
-	MapIndexRoute: typeof MapIndexRoute;
-	OfflineIndexRoute: typeof OfflineIndexRoute;
-	ProfileIndexRoute: typeof ProfileIndexRoute;
-	RoomsIndexRoute: typeof RoomsIndexRoute;
-	SearchIndexRoute: typeof SearchIndexRoute;
-	SigninIndexRoute: typeof SigninIndexRoute;
-	ApiAuthGithubRoute: typeof ApiAuthGithubRoute;
-	ApiAuthGuestRoute: typeof ApiAuthGuestRoute;
-	ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute;
-	ApiAuthUpgradeGithubRoute: typeof ApiAuthUpgradeGithubRoute;
-	ApiProxySubtitlesRoute: typeof ApiProxySubtitlesRoute;
-	ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute;
-	ApiAuthCallbackGithubRoute: typeof ApiAuthCallbackGithubRoute;
-	ApiProxyRoomsStatusRoute: typeof ApiProxyRoomsStatusRoute;
+  IndexRoute: typeof IndexRoute
+  EventSlugRoute: typeof EventSlugRoute
+  RoomsRoomIdRoute: typeof RoomsRoomIdRoute
+  TrackSlugRoute: typeof TrackSlugRoute
+  TypeSlugRoute: typeof TypeSlugRoute
+  BookmarksIndexRoute: typeof BookmarksIndexRoute
+  LiveIndexRoute: typeof LiveIndexRoute
+  MapIndexRoute: typeof MapIndexRoute
+  OfflineIndexRoute: typeof OfflineIndexRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
+  RoomsIndexRoute: typeof RoomsIndexRoute
+  SearchIndexRoute: typeof SearchIndexRoute
+  SigninIndexRoute: typeof SigninIndexRoute
+  ApiAuthGithubRoute: typeof ApiAuthGithubRoute
+  ApiAuthGuestRoute: typeof ApiAuthGuestRoute
+  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthUpgradeGithubRoute: typeof ApiAuthUpgradeGithubRoute
+  ApiProxySubtitlesRoute: typeof ApiProxySubtitlesRoute
+  ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
+  ApiAuthCallbackGithubRoute: typeof ApiAuthCallbackGithubRoute
+  ApiProxyRoomsStatusRoute: typeof ApiProxyRoomsStatusRoute
 }
 
-declare module "@tanstack/react-router" {
-	interface FileRoutesByPath {
-		"/": {
-			id: "/";
-			path: "/";
-			fullPath: "/";
-			preLoaderRoute: typeof IndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/signin/": {
-			id: "/signin/";
-			path: "/signin";
-			fullPath: "/signin";
-			preLoaderRoute: typeof SigninIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/search/": {
-			id: "/search/";
-			path: "/search";
-			fullPath: "/search";
-			preLoaderRoute: typeof SearchIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/rooms/": {
-			id: "/rooms/";
-			path: "/rooms";
-			fullPath: "/rooms";
-			preLoaderRoute: typeof RoomsIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/profile/": {
-			id: "/profile/";
-			path: "/profile";
-			fullPath: "/profile";
-			preLoaderRoute: typeof ProfileIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/offline/": {
-			id: "/offline/";
-			path: "/offline";
-			fullPath: "/offline";
-			preLoaderRoute: typeof OfflineIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/map/": {
-			id: "/map/";
-			path: "/map";
-			fullPath: "/map";
-			preLoaderRoute: typeof MapIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/live/": {
-			id: "/live/";
-			path: "/live";
-			fullPath: "/live";
-			preLoaderRoute: typeof LiveIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/bookmarks/": {
-			id: "/bookmarks/";
-			path: "/bookmarks";
-			fullPath: "/bookmarks";
-			preLoaderRoute: typeof BookmarksIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/type/$slug": {
-			id: "/type/$slug";
-			path: "/type/$slug";
-			fullPath: "/type/$slug";
-			preLoaderRoute: typeof TypeSlugRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/track/$slug": {
-			id: "/track/$slug";
-			path: "/track/$slug";
-			fullPath: "/track/$slug";
-			preLoaderRoute: typeof TrackSlugRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/rooms/$roomId": {
-			id: "/rooms/$roomId";
-			path: "/rooms/$roomId";
-			fullPath: "/rooms/$roomId";
-			preLoaderRoute: typeof RoomsRoomIdRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/event/$slug": {
-			id: "/event/$slug";
-			path: "/event/$slug";
-			fullPath: "/event/$slug";
-			preLoaderRoute: typeof EventSlugRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/profile/$userId/": {
-			id: "/profile/$userId/";
-			path: "/profile/$userId";
-			fullPath: "/profile/$userId";
-			preLoaderRoute: typeof ProfileUserIdIndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/api/proxy/subtitles": {
-			id: "/api/proxy/subtitles";
-			path: "/api/proxy/subtitles";
-			fullPath: "/api/proxy/subtitles";
-			preLoaderRoute: typeof ApiProxySubtitlesRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/api/auth/upgrade-github": {
-			id: "/api/auth/upgrade-github";
-			path: "/api/auth/upgrade-github";
-			fullPath: "/api/auth/upgrade-github";
-			preLoaderRoute: typeof ApiAuthUpgradeGithubRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/api/auth/logout": {
-			id: "/api/auth/logout";
-			path: "/api/auth/logout";
-			fullPath: "/api/auth/logout";
-			preLoaderRoute: typeof ApiAuthLogoutRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/api/auth/guest": {
-			id: "/api/auth/guest";
-			path: "/api/auth/guest";
-			fullPath: "/api/auth/guest";
-			preLoaderRoute: typeof ApiAuthGuestRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/api/auth/github": {
-			id: "/api/auth/github";
-			path: "/api/auth/github";
-			fullPath: "/api/auth/github";
-			preLoaderRoute: typeof ApiAuthGithubRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/api/proxy/rooms/status": {
-			id: "/api/proxy/rooms/status";
-			path: "/api/proxy/rooms/status";
-			fullPath: "/api/proxy/rooms/status";
-			preLoaderRoute: typeof ApiProxyRoomsStatusRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/api/auth/callback/github": {
-			id: "/api/auth/callback/github";
-			path: "/api/auth/callback/github";
-			fullPath: "/api/auth/callback/github";
-			preLoaderRoute: typeof ApiAuthCallbackGithubRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-	}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin/': {
+      id: '/signin/'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search/': {
+      id: '/search/'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rooms/': {
+      id: '/rooms/'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof RoomsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offline/': {
+      id: '/offline/'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map/': {
+      id: '/map/'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/': {
+      id: '/live/'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bookmarks/': {
+      id: '/bookmarks/'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof BookmarksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/type/$slug': {
+      id: '/type/$slug'
+      path: '/type/$slug'
+      fullPath: '/type/$slug'
+      preLoaderRoute: typeof TypeSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track/$slug': {
+      id: '/track/$slug'
+      path: '/track/$slug'
+      fullPath: '/track/$slug'
+      preLoaderRoute: typeof TrackSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rooms/$roomId': {
+      id: '/rooms/$roomId'
+      path: '/rooms/$roomId'
+      fullPath: '/rooms/$roomId'
+      preLoaderRoute: typeof RoomsRoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/event/$slug': {
+      id: '/event/$slug'
+      path: '/event/$slug'
+      fullPath: '/event/$slug'
+      preLoaderRoute: typeof EventSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/$userId/': {
+      id: '/profile/$userId/'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof ProfileUserIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/proxy/subtitles': {
+      id: '/api/proxy/subtitles'
+      path: '/api/proxy/subtitles'
+      fullPath: '/api/proxy/subtitles'
+      preLoaderRoute: typeof ApiProxySubtitlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/upgrade-github': {
+      id: '/api/auth/upgrade-github'
+      path: '/api/auth/upgrade-github'
+      fullPath: '/api/auth/upgrade-github'
+      preLoaderRoute: typeof ApiAuthUpgradeGithubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/logout': {
+      id: '/api/auth/logout'
+      path: '/api/auth/logout'
+      fullPath: '/api/auth/logout'
+      preLoaderRoute: typeof ApiAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/guest': {
+      id: '/api/auth/guest'
+      path: '/api/auth/guest'
+      fullPath: '/api/auth/guest'
+      preLoaderRoute: typeof ApiAuthGuestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/github': {
+      id: '/api/auth/github'
+      path: '/api/auth/github'
+      fullPath: '/api/auth/github'
+      preLoaderRoute: typeof ApiAuthGithubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/proxy/rooms/status': {
+      id: '/api/proxy/rooms/status'
+      path: '/api/proxy/rooms/status'
+      fullPath: '/api/proxy/rooms/status'
+      preLoaderRoute: typeof ApiProxyRoomsStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/callback/github': {
+      id: '/api/auth/callback/github'
+      path: '/api/auth/callback/github'
+      fullPath: '/api/auth/callback/github'
+      preLoaderRoute: typeof ApiAuthCallbackGithubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-	IndexRoute: IndexRoute,
-	EventSlugRoute: EventSlugRoute,
-	RoomsRoomIdRoute: RoomsRoomIdRoute,
-	TrackSlugRoute: TrackSlugRoute,
-	TypeSlugRoute: TypeSlugRoute,
-	BookmarksIndexRoute: BookmarksIndexRoute,
-	LiveIndexRoute: LiveIndexRoute,
-	MapIndexRoute: MapIndexRoute,
-	OfflineIndexRoute: OfflineIndexRoute,
-	ProfileIndexRoute: ProfileIndexRoute,
-	RoomsIndexRoute: RoomsIndexRoute,
-	SearchIndexRoute: SearchIndexRoute,
-	SigninIndexRoute: SigninIndexRoute,
-	ApiAuthGithubRoute: ApiAuthGithubRoute,
-	ApiAuthGuestRoute: ApiAuthGuestRoute,
-	ApiAuthLogoutRoute: ApiAuthLogoutRoute,
-	ApiAuthUpgradeGithubRoute: ApiAuthUpgradeGithubRoute,
-	ApiProxySubtitlesRoute: ApiProxySubtitlesRoute,
-	ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
-	ApiAuthCallbackGithubRoute: ApiAuthCallbackGithubRoute,
-	ApiProxyRoomsStatusRoute: ApiProxyRoomsStatusRoute,
-};
+  IndexRoute: IndexRoute,
+  EventSlugRoute: EventSlugRoute,
+  RoomsRoomIdRoute: RoomsRoomIdRoute,
+  TrackSlugRoute: TrackSlugRoute,
+  TypeSlugRoute: TypeSlugRoute,
+  BookmarksIndexRoute: BookmarksIndexRoute,
+  LiveIndexRoute: LiveIndexRoute,
+  MapIndexRoute: MapIndexRoute,
+  OfflineIndexRoute: OfflineIndexRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
+  RoomsIndexRoute: RoomsIndexRoute,
+  SearchIndexRoute: SearchIndexRoute,
+  SigninIndexRoute: SigninIndexRoute,
+  ApiAuthGithubRoute: ApiAuthGithubRoute,
+  ApiAuthGuestRoute: ApiAuthGuestRoute,
+  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthUpgradeGithubRoute: ApiAuthUpgradeGithubRoute,
+  ApiProxySubtitlesRoute: ApiProxySubtitlesRoute,
+  ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
+  ApiAuthCallbackGithubRoute: ApiAuthCallbackGithubRoute,
+  ApiProxyRoomsStatusRoute: ApiProxyRoomsStatusRoute,
+}
 export const routeTree = rootRouteImport
-	._addFileChildren(rootRouteChildren)
-	._addFileTypes<FileRouteTypes>();
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/react-start";
-declare module "@tanstack/react-start" {
-	interface Register {
-		ssr: true;
-		router: Awaited<ReturnType<typeof getRouter>>;
-	}
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
 }

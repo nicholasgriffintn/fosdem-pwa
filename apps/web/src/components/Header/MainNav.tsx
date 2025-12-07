@@ -58,6 +58,9 @@ export function MainNav({ title, items }: MainNavProps) {
 				type="button"
 				className="flex items-center space-x-2 lg:hidden"
 				onClick={() => setShowMobileMenu(!showMobileMenu)}
+				aria-expanded={showMobileMenu}
+				aria-controls="mobile-nav"
+				aria-label={showMobileMenu ? "Close menu" : "Open menu"}
 			>
 				{showMobileMenu && <Icons.close width="28" height="28" />}
 				<span className="font-bold">Menu</span>

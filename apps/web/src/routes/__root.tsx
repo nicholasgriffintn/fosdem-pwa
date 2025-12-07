@@ -85,9 +85,18 @@ function RootComponent() {
 
 function RootDocument({ children }: { readonly children: React.ReactNode }) {
 	return (
-		<html className="dark" lang="en">
+		<html lang="en">
 			<head>
 				<HeadContent />
+				<ScriptOnce>
+					{`(() => {
+            const root = document.documentElement;
+            const stored = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const shouldUseDark = stored === 'dark' || (!stored && prefersDark);
+            root.classList.toggle('dark', shouldUseDark);
+          })();`}
+				</ScriptOnce>
 			</head>
 			<body
 				className={cn(
