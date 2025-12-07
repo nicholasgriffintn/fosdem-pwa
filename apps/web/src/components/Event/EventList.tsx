@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
@@ -13,6 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
 import { EventScheduleList } from "~/components/Event/EventScheduleList";
 import type { User } from "~/server/db/schema";
+import { Switch } from "~/components/ui/switch";
+import { Label } from "~/components/ui/label";
 
 type EventListViewModes = "list" | "calendar" | "schedule";
 
@@ -59,8 +61,9 @@ export function EventList({
 	onCreateBookmark,
 }: EventListProps) {
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
+	const [sortByFavourites, setSortByFavourites] = useState(false);
+	const sortSwitchId = useId();
 
-	// Filter events for schedule view (priority 1 or no conflicts)
 	const scheduleEvents = events.filter((event) => {
 		const hasConflict = conflicts?.some(
 			(conflict) =>
@@ -106,34 +109,47 @@ export function EventList({
 									})}
 								</TabsList>
 							</div>
-							{displayViewMode && (
-								<div className="flex gap-2 shrink-0">
-									<Button
-										variant={viewMode === "list" ? "default" : "outline"}
-										size="sm"
-										onClick={() => setViewMode("list")}
-									>
-										<Icons.list className="h-4 w-4 mr-1" />
-										List
-									</Button>
-									<Button
-										variant={viewMode === "calendar" ? "default" : "outline"}
-										size="sm"
-										onClick={() => setViewMode("calendar")}
-									>
-										<Icons.calendar className="h-4 w-4 mr-1" />
-										Calendar
-									</Button>
-									<Button
-										variant={viewMode === "schedule" ? "default" : "outline"}
-										size="sm"
-										onClick={() => setViewMode("schedule")}
-									>
-										<Icons.clock className="h-4 w-4 mr-1" />
-										Schedule
-									</Button>
+							<div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+								<div className="flex items-center gap-2">
+									<Switch
+										id={sortSwitchId}
+										checked={sortByFavourites}
+										onCheckedChange={setSortByFavourites}
+										aria-label="Toggle favourites-first sorting"
+									/>
+									<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+										Favourites first
+									</Label>
 								</div>
-							)}
+								{displayViewMode && (
+									<div className="flex gap-2">
+										<Button
+											variant={viewMode === "list" ? "default" : "outline"}
+											size="sm"
+											onClick={() => setViewMode("list")}
+										>
+											<Icons.list className="h-4 w-4 mr-1" />
+											List
+										</Button>
+										<Button
+											variant={viewMode === "calendar" ? "default" : "outline"}
+											size="sm"
+											onClick={() => setViewMode("calendar")}
+										>
+											<Icons.calendar className="h-4 w-4 mr-1" />
+											Calendar
+										</Button>
+										<Button
+											variant={viewMode === "schedule" ? "default" : "outline"}
+											size="sm"
+											onClick={() => setViewMode("schedule")}
+										>
+											<Icons.clock className="h-4 w-4 mr-1" />
+											Schedule
+										</Button>
+									</div>
+								)}
+							</div>
 						</div>
 						{days.map((day) => {
 							if (!eventDataSplitByDay[day.id]) {
@@ -167,6 +183,7 @@ export function EventList({
 											onSetPriority={onSetPriority}
 											showTrack={showTrack}
 											user={user}
+												sortByFavourites={sortByFavourites}
 											onCreateBookmark={onCreateBookmark}
 										/>
 									) : (
@@ -177,6 +194,7 @@ export function EventList({
 											onSetPriority={onSetPriority}
 											showTrack={showTrack}
 											user={user}
+													sortByFavourites={sortByFavourites}
 											onCreateBookmark={onCreateBookmark}
 										/>
 									)}
@@ -191,11 +209,22 @@ export function EventList({
 
 	return (
 		<section>
-			{(title || displayViewMode) && (
-				<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
-					{title && <h2 className="text-xl font-semibold shrink-0 text-foreground">{title}</h2>}
+			<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
+				{title && <h2 className="text-xl font-semibold shrink-0 text-foreground">{title}</h2>}
+				<div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+					<div className="flex items-center gap-2">
+						<Switch
+							id={sortSwitchId}
+							checked={sortByFavourites}
+							onCheckedChange={setSortByFavourites}
+							aria-label="Toggle favourites-first sorting"
+						/>
+						<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+							Favourites first
+						</Label>
+					</div>
 					{displayViewMode && (
-						<div className="flex gap-2 shrink-0">
+						<div className="flex gap-2">
 							<Button
 								variant={viewMode === "list" ? "default" : "outline"}
 								size="sm"
@@ -223,7 +252,7 @@ export function EventList({
 						</div>
 					)}
 				</div>
-			)}
+			</div>
 			{events.length > 0 ? (
 				<>
 					{viewMode === "schedule" ? (
@@ -244,6 +273,7 @@ export function EventList({
 							onSetPriority={onSetPriority}
 							showTrack={showTrack}
 							user={user}
+								sortByFavourites={sortByFavourites}
 							onCreateBookmark={onCreateBookmark}
 						/>
 					) : (
@@ -254,6 +284,7 @@ export function EventList({
 							onSetPriority={onSetPriority}
 							showTrack={showTrack}
 							user={user}
+									sortByFavourites={sortByFavourites}
 							onCreateBookmark={onCreateBookmark}
 						/>
 					)}

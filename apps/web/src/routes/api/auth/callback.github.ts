@@ -70,7 +70,6 @@ export const Route = createFileRoute("/api/auth/callback/github")({
 						throw new Error("GitHub Callback: No user ID found in GitHub response");
 					}
 
-					// Check if this is a guest user trying to upgrade
 					const { user: currentUser } = await getAuthSession();
 					if (currentUser?.is_guest) {
 						await upgradeGuestToGithub(currentUser.id, providerUser);
