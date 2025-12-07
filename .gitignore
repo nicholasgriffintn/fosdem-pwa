@@ -20,5 +20,5 @@ app.config.timestamp*
 count.txt
 dev-dist
 
-tests/playwright/results/
+apps/web/tests/playwright/results/
 test-results/
