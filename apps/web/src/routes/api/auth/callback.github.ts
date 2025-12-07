@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { OAuth2RequestError } from "arctic";
 import { and, eq } from "drizzle-orm";
-import { parseCookies } from '@tanstack/react-start/server'
+import { getCookies } from '@tanstack/react-start/server'
 
 import {
 	createSession,
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/auth/callback/github")({
 				const code = url.searchParams.get("code");
 				const state = url.searchParams.get("state");
 
-				const cookies = parseCookies();
+				const cookies = getCookies();
 				const storedState = cookies.github_oauth_state;
 
 				if (!code || !state || !storedState || state !== storedState) {
