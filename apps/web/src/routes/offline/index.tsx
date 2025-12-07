@@ -87,23 +87,24 @@ function OfflinePage() {
 					year={year}
 				/>
 
-				<div className="flex flex-col sm:flex-row gap-4 mb-8">
-					<Button onClick={handleRetry} className="flex-1">
-						{isOnline ? "Refresh Page" : "Try Again"}
-					</Button>
-					<Button variant="outline" onClick={handleGoHome} className="flex-1">
-						Go to Homepage
-					</Button>
-				</div>
-
 				<Card className="mb-6">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							Connection Status
-							<Badge variant={isOnline ? "default" : "secondary"}>
-								{isOnline ? "Online" : "Offline"}
-							</Badge>
-						</CardTitle>
+						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<CardTitle className="flex items-center gap-2">
+								Connection Status
+								<Badge variant={isOnline ? "default" : "secondary"}>
+									{isOnline ? "Online" : "Offline"}
+								</Badge>
+							</CardTitle>
+							<div className="flex flex-col sm:flex-row gap-2">
+								<Button size="sm" onClick={handleRetry}>
+									{isOnline ? "Refresh Page" : "Try Again"}
+								</Button>
+								<Button variant="outline" size="sm" onClick={handleGoHome}>
+									Go to Homepage
+								</Button>
+							</div>
+						</div>
 					</CardHeader>
 					<CardContent>
 						<p className="text-muted-foreground">

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
@@ -18,11 +19,31 @@ type MobileNavProps = {
 	}[];
 	onCloseMenu: () => void;
 	children?: ReactNode;
+	returnFocusRef?: React.RefObject<HTMLElement | null>;
 };
 
-export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
+export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps) {
 	useLockBody();
 	const { user, logout } = useAuth();
+
+	const firstLinkRef = useRef<HTMLAnchorElement | null>(null);
+
+	useEffect(() => {
+		firstLinkRef.current?.focus();
+
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				event.preventDefault();
+				onCloseMenu();
+				returnFocusRef?.current?.focus?.();
+			}
+		};
+
+		window.addEventListener("keydown", handleKeyDown);
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [onCloseMenu, returnFocusRef]);
 
 	return (
 		<div
@@ -45,10 +66,11 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 								item.disabled && "cursor-not-allowed opacity-60",
 							)}
 							onClick={onCloseMenu}
-							search={(prev) => ({
+							search={(prev: Record<string, unknown>) => ({
 								...prev,
 								year: prev.year || constants.DEFAULT_YEAR,
 							})}
+							ref={index === 0 ? firstLinkRef : undefined}
 						>
 							{item.icon}
 							{item.title}
@@ -80,7 +102,7 @@ export function MobileNav({ items, onCloseMenu }: MobileNavProps) {
 									asChild
 								>
 									<Link
-										search={(prev) => ({
+										search={(prev: Record<string, unknown>) => ({
 											...prev,
 											year: prev.year || constants.DEFAULT_YEAR,
 										})}

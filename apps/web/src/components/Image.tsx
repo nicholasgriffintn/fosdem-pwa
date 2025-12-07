@@ -15,6 +15,7 @@ export function Image({
 	alt,
 	className,
 	useWebP = true,
+	loading = "lazy",
 	width,
 	height,
 	...props
@@ -29,7 +30,13 @@ export function Image({
 				{webpSource && (
 					<Source src={webpSource} type="image/webp" layout="fullWidth" />
 				)}
-				<UnpicImage src={src} alt={alt} layout="fullWidth" {...props} />
+				<UnpicImage
+					src={src}
+					alt={alt}
+					layout="fullWidth"
+					loading={loading}
+					{...props}
+				/>
 			</picture>
 		</div>
 	);

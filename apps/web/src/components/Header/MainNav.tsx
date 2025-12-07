@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
@@ -18,6 +18,7 @@ type MainNavProps = {
 
 export function MainNav({ title, items }: MainNavProps) {
 	const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
+	const menuButtonRef = useRef<HTMLButtonElement>(null);
 
 	return (
 		<div className="flex gap-6 md:gap-10">
@@ -56,6 +57,7 @@ export function MainNav({ title, items }: MainNavProps) {
 			) : null}
 			<button
 				type="button"
+				ref={menuButtonRef}
 				className="flex items-center space-x-2 lg:hidden"
 				onClick={() => setShowMobileMenu(!showMobileMenu)}
 				aria-expanded={showMobileMenu}
@@ -66,7 +68,14 @@ export function MainNav({ title, items }: MainNavProps) {
 				<span className="font-bold">Menu</span>
 			</button>
 			{showMobileMenu && items && (
-				<MobileNav items={items} onCloseMenu={() => setShowMobileMenu(false)} />
+				<MobileNav
+					items={items}
+					onCloseMenu={() => {
+						setShowMobileMenu(false);
+						menuButtonRef.current?.focus();
+					}}
+					returnFocusRef={menuButtonRef}
+				/>
 			)}
 		</div>
 	);

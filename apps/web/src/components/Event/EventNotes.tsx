@@ -53,6 +53,11 @@ export function EventNotes({
 		});
 		setNote("");
 		setNoteTime(undefined);
+
+		toast({
+			title: "Note saved",
+			description: noteTime != null ? "Time link captured with your note." : undefined,
+		});
 	};
 
 	const handleClickTime = (time: number) => {
