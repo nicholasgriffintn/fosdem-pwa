@@ -44,14 +44,9 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 ## TODO
 
-- [ ] Allow users to search within specific tracks or time slots
 - [ ] Maybe a calendar export? Is that too hard?
 - [ ] Create a new service for sending the push notifications out on schedule changes
 - [ ] Send notifications for bookmarked events (should be configurable)
-- [ ] Add a track progress feature? https://capture.dropbox.com/tmn4M77IN4F7IJUl
-- [ ] Maybe a visual indicator for progress?: https://capture.dropbox.com/YiTleZxrLM539GKc
-- [ ] Add personalised recommendations based on bookmarks? Maybe could give users the ability to st their interests? https://capture.dropbox.com/2UZpDyZp0R2YcKDn
-- [ ] Maybe we could put the events in Vectorize and then have a RAG AI suggest events? This would also include notes, would need to be personalised to the user, maybe with namespaces?
 
 ## Contributing
 
