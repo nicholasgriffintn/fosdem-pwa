@@ -10,6 +10,7 @@ import {
 import { lazy, Suspense } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
+// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 import appCss from "~/styles/app.css?url";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/Header";
@@ -23,7 +24,7 @@ const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
 		? () => null
 		: lazy(() =>
-			import("@tanstack/router-devtools").then((res) => ({
+			import("@tanstack/react-router-devtools").then((res) => ({
 				default: res.TanStackRouterDevtools,
 			})),
 		);

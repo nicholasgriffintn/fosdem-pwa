@@ -123,9 +123,6 @@ importers:
       '@tanstack/react-start':
         specifier: 1.139.14
         version: 1.139.14(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0))
-      '@tanstack/router-devtools':
-        specifier: 1.139.15
-        version: 1.139.15(@tanstack/react-router@1.139.16(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@tanstack/router-core@1.139.16)(csstype@3.2.3)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(solid-js@1.9.10)
       '@unpic/react':
         specifier: 1.0.1
         version: 1.0.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -2172,18 +2169,6 @@ packages:
       '@tanstack/router-core': ^1.139.14
       csstype: ^3.0.10
       solid-js: '>=1.9.5'
-    peerDependenciesMeta:
-      csstype:
-        optional: true
-
-  '@tanstack/router-devtools@1.139.15':
-    resolution: {integrity: sha512-Fi8xArH88MOshtneWJw9Jc/7bXL+/2BWei81yRx2gaF1F2RjOu5RLXiSw4CG4jsbbgOoM8D1R4/zLaIFFGDQgQ==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      '@tanstack/react-router': ^1.139.14
-      csstype: ^3.0.10
-      react: '>=18.0.0 || >=19.0.0'
-      react-dom: '>=18.0.0 || >=19.0.0'
     peerDependenciesMeta:
       csstype:
         optional: true
@@ -5225,20 +5210,6 @@ snapshots:
       tiny-invariant: 1.3.3
     optionalDependencies:
       csstype: 3.2.3
-
-  '@tanstack/router-devtools@1.139.15(@tanstack/react-router@1.139.16(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@tanstack/router-core@1.139.16)(csstype@3.2.3)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(solid-js@1.9.10)':
-    dependencies:
-      '@tanstack/react-router': 1.139.16(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      '@tanstack/react-router-devtools': 1.139.15(@tanstack/react-router@1.139.16(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(@tanstack/router-core@1.139.16)(csstype@3.2.3)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(solid-js@1.9.10)
-      clsx: 2.1.1
-      goober: 2.1.18(csstype@3.2.3)
-      react: 19.2.1
-      react-dom: 19.2.1(react@19.2.1)
-    optionalDependencies:
-      csstype: 3.2.3
-    transitivePeerDependencies:
-      - '@tanstack/router-core'
-      - solid-js
 
   '@tanstack/router-generator@1.139.14':
     dependencies:
