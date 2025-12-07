@@ -33,6 +33,13 @@ export interface NotificationPayload {
 	url: string;
 }
 
+export interface ScheduleSnapshot {
+	slug: string;
+	start_time: string;
+	duration: string;
+	room: string;
+}
+
 export interface Subscription {
 	user_id: string;
 	endpoint: string;
@@ -44,6 +51,7 @@ export interface QueueMessage {
 	subscription: Subscription;
 	notification: NotificationPayload;
 	bookmarkId: string;
+	shouldMarkSent?: boolean;
 }
 
 export interface Env {
@@ -54,4 +62,6 @@ export interface Env {
 	VAPID_EMAIL: string;
 	VAPID_PUBLIC_KEY: string;
 	VAPID_PRIVATE_KEY: string;
+	BOOKMARK_NOTIFICATIONS_ENABLED?: string | boolean;
+	SCHEDULE_CHANGE_NOTIFICATIONS_ENABLED?: string | boolean;
 }

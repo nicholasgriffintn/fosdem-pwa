@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "cf-typegen": "wrangler types",
-    "postinstall": "npm run cf-typegen",
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "start": "node .output/server/index.mjs",

@@ -42,12 +42,6 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 *Data sync service deployed separately: [Build Data Repository](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)*
 
-## TODO
-
-- [ ] Maybe a calendar export? Is that too hard?
-- [ ] Create a new service for sending the push notifications out on schedule changes
-- [ ] Send notifications for bookmarked events (should be configurable)
-
 ## Contributing
 
 If you want to contribute to this project, please read the [CONTRIBUTING.md](CONTRIBUTING.md) file.

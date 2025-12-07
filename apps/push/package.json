@@ -7,10 +7,13 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev --test-scheduled",
     "start": "wrangler dev --test-scheduled",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20251205.0",
+    "vitest": "4.0.15",
     "typescript": "5.9.3",
     "wrangler": "4.53.0"
   },
