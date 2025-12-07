@@ -71,7 +71,7 @@ function ProfilePage() {
 						<div className="w-full lg:flex-1 space-y-8">
 							<PushNotifications />
 							<div className="space-y-4">
-								<h2 className="text-2xl font-bold">Your Bookmarks</h2>
+								<h2 className="text-2xl font-bold text-foreground">Your Bookmarks</h2>
 								{user?.github_username && (
 									<SetBookmarksVisability
 										userId={user.github_username}

@@ -10,8 +10,8 @@ export function EventContent({ event }: { event: Event }) {
 				</div>
 			)}
 			{event.abstract && (
-				<div className="prose prose-lg prose-indigo overflow-scroll mt-4">
-					<h2 className="text-xl font-medium">Abstract</h2>
+				<div className="prose prose-lg prose-indigo overflow-scroll mt-4 text-foreground">
+					<h2 className="text-xl font-medium text-foreground">Abstract</h2>
 					<div
 						className="mt-2"
 						// biome-ignore lint/security/noDangerouslySetInnerHtml: We're using the abstract as HTML
@@ -20,8 +20,8 @@ export function EventContent({ event }: { event: Event }) {
 				</div>
 			)}
 			{event.description && (
-				<div className="prose prose-lg prose-indigo overflow-scroll mt-4">
-					<h2 className="text-xl font-medium">Description</h2>
+				<div className="prose prose-lg prose-indigo overflow-scroll mt-4 text-foreground">
+					<h2 className="text-xl font-medium text-foreground">Description</h2>
 					<div
 						className="mt-2"
 						// biome-ignore lint/security/noDangerouslySetInnerHtml: We're using the description as HTML
@@ -31,7 +31,7 @@ export function EventContent({ event }: { event: Event }) {
 			)}
 			{event.attachments?.length > 0 && (
 				<div className="mt-2">
-					<h2 className="text-xl font-medium">Attachments</h2>
+					<h2 className="text-xl font-medium text-foreground">Attachments</h2>
 					<ul className="mt-2 space-y-2 list-disc list-inside">
 						{event.attachments.map((attachment) => (
 							<li key={attachment.href}>
@@ -45,7 +45,7 @@ export function EventContent({ event }: { event: Event }) {
 			)}
 			{event.links?.length > 0 && (
 				<div className="mt-2">
-					<h2 className="text-xl font-medium">Links</h2>
+					<h2 className="text-xl font-medium text-foreground">Links</h2>
 					<ul className="mt-2 space-y-2 list-disc list-inside">
 						{event.links.map((link) => (
 							<li key={link.href}>
@@ -59,7 +59,7 @@ export function EventContent({ event }: { event: Event }) {
 			)}
 			{(event.url || event.feedbackUrl) && (
 				<div className="mt-2">
-					<h2 className="text-xl font-medium">External Links</h2>
+					<h2 className="text-xl font-medium text-foreground">External Links</h2>
 					<ul className="mt-2 space-y-2 list-disc list-inside">
 						{event.url && (
 							<li>

@@ -77,7 +77,7 @@ export function RoomList({
 			<section>
 				{title && (
 					<div className="flex justify-between items-center mb-4">
-						<h2 className="text-xl font-semibold">{title}</h2>
+						<h2 className="text-xl font-semibold text-foreground">{title}</h2>
 					</div>
 				)}
 				<div className="space-y-8">
@@ -88,7 +88,7 @@ export function RoomList({
 
 						return (
 							<div key={buildingId} className="space-y-2">
-								<h3 className="text-2xl font-bold">
+								<h3 className="text-2xl font-bold text-foreground">
 									Building {buildingId}
 									<span className="text-sm font-normal text-muted-foreground ml-2">
 										({buildingRooms.length} rooms)
@@ -120,7 +120,7 @@ export function RoomList({
 		<section>
 			{title && (
 				<div className="flex justify-between items-center mb-4">
-					<h2 className="text-xl font-semibold">{title}</h2>
+					<h2 className="text-xl font-semibold text-foreground">{title}</h2>
 				</div>
 			)}
 			{sortedRooms?.length > 0 ? (

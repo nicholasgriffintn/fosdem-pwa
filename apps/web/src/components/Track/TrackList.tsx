@@ -155,7 +155,7 @@ export function TrackList({
 						<div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
 							<div className="flex flex-col md:flex-row md:items-center gap-4">
 								{title && (
-									<h2 className="text-xl font-semibold shrink-0">{title}</h2>
+									<h2 className="text-xl font-semibold shrink-0 text-foreground">{title}</h2>
 								)}
 								<TabsList className="bg-transparent p-0 h-auto justify-start gap-2">
 									{days.map((day) => {
@@ -211,7 +211,7 @@ export function TrackList({
 		<section>
 			{title && (
 				<div className="flex justify-between items-center mb-4">
-					<h2 className="text-xl font-semibold">{title}</h2>
+					<h2 className="text-xl font-semibold text-foreground">{title}</h2>
 				</div>
 			)}
 			<TrackListContent

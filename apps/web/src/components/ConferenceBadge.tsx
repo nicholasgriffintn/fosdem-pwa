@@ -47,7 +47,7 @@ export function ConferenceBadge({
 						</Avatar>
 					)}
 					<div className="flex-1">
-						<h2 className="text-2xl font-bold">{user.name}</h2>
+						<h2 className="text-2xl font-bold text-foreground">{user.name}</h2>
 						<p className="text-muted-foreground">{user.email}</p>
 						{user.bio && (
 							<p className="mt-2 text-sm text-muted-foreground line-clamp-2">

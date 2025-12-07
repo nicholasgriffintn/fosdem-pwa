@@ -48,7 +48,7 @@ function SignInPage() {
 							Connect with your GitHub account to sync your notes and bookmarks across devices and more.
 						</p>
 						<div className="space-y-3">
-							<h2 className="text-lg font-semibold text-slate-100">
+							<h2 className="text-lg font-semibold text-slate-100 text-foreground">
 								What you'll be able to do:
 							</h2>
 							<ul className="space-y-2 text-slate-200">

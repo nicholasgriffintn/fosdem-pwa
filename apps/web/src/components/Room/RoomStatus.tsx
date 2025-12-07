@@ -27,7 +27,7 @@ export function RoomStatus({ roomId, className }: RoomStatusProps) {
 
 	return (
 		<div>
-			<h2 className="text-xl font-semibold mb-2">Room Status</h2>
+			<h2 className="text-xl font-semibold mb-2 text-foreground">Room Status</h2>
 			<div className={statusClassName}>
 				<span className="capitalize">
 					{isLoading ? "Loading..." : status?.state || "Unknown"}
