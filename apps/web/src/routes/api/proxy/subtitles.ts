@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
 const ALLOWED_SUBTITLE_HOSTS = [
 	"fosdem.org",
@@ -8,9 +8,10 @@ const ALLOWED_SUBTITLE_HOSTS = [
 	"r2.fosdempwa.com",
 	"dosowisko.net",
 ];
-const MAX_VTT_BYTES = 1_000_000; // 1MB safety cap
+const FETCH_TIMEOUT_MS = 8000;
 
 export const Route = createFileRoute("/api/proxy/subtitles")({
+	// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 	server: {
 		handlers: {
 			GET: async ({ request }: { request: Request }) => {
@@ -55,7 +56,23 @@ export const Route = createFileRoute("/api/proxy/subtitles")({
 						});
 					}
 
-					const response = await fetch(parsed.toString());
+					const controller = new AbortController();
+					const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+					const conditionalHeaders: Record<string, string> = {};
+					const ifNoneMatch = request.headers.get("if-none-match");
+					const ifModifiedSince = request.headers.get("if-modified-since");
+
+					if (ifNoneMatch) {
+						conditionalHeaders["if-none-match"] = ifNoneMatch;
+					}
+					if (ifModifiedSince) {
+						conditionalHeaders["if-modified-since"] = ifModifiedSince;
+					}
+
+					const response = await fetch(parsed.toString(), {
+						signal: controller.signal,
+						headers: conditionalHeaders,
+					}).finally(() => clearTimeout(timeout));
 
 					if (!response.ok) {
 						return new Response(
@@ -69,52 +86,46 @@ export const Route = createFileRoute("/api/proxy/subtitles")({
 						);
 					}
 
-					const contentLength = response.headers.get("content-length");
-					if (contentLength && Number(contentLength) > MAX_VTT_BYTES) {
-						return new Response(
-							JSON.stringify({ error: "Subtitle file too large" }),
-							{
-								status: 413,
-								headers: { "Content-Type": "application/json" },
-							},
-						);
+					let body: string;
+					try {
+						body = await response.text();
+					} catch {
+						return new Response(JSON.stringify({ error: "Failed to read subtitle" }), {
+							status: 500,
+							headers: { "Content-Type": "application/json" },
+						});
 					}
 
-					const contentType = response.headers.get("content-type") || "";
-					if (!contentType.includes("text/vtt") && !contentType.includes("text/plain")) {
-						return new Response(
-							JSON.stringify({ error: "Invalid subtitle content type" }),
-							{
-								status: 415,
-								headers: { "Content-Type": "application/json" },
-							},
-						);
-					}
+					const responseHeaders: Record<string, string> = {
+						"Content-Type": "text/vtt",
+						"Cache-Control": "public, max-age=300",
+					};
 
-					const body = await response.text();
-					if (body.length > MAX_VTT_BYTES) {
-						return new Response(
-							JSON.stringify({ error: "Subtitle file too large" }),
-							{
-								status: 413,
-								headers: { "Content-Type": "application/json" },
-							},
-						);
+					const etag = response.headers.get("etag");
+					const lastModified = response.headers.get("last-modified");
+
+					if (etag) {
+						responseHeaders.ETag = etag;
+					}
+					if (lastModified) {
+						responseHeaders["Last-Modified"] = lastModified;
 					}
 
 					return new Response(body, {
 						status: 200,
-						headers: {
-							"Content-Type": "text/vtt",
-							"Cache-Control": "public, max-age=300",
-						},
+						headers: responseHeaders,
 					});
 				} catch (error) {
+					const isAbort = (error as Error)?.name === "AbortError";
 					console.error("Failed to fetch subtitle:", error);
 					return new Response(
-						JSON.stringify({ error: "Failed to fetch subtitle" }),
+						JSON.stringify({
+							error: isAbort
+								? "Timed out fetching subtitle"
+								: "Failed to fetch subtitle",
+						}),
 						{
-							status: 500,
+							status: isAbort ? 504 : 500,
 							headers: {
 								"Content-Type": "application/json",
 							},

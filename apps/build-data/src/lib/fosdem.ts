@@ -124,8 +124,8 @@ interface TypeInfo {
   eventCount: number;
   roomCount: number;
   buildingCount: number;
-  rooms: Set<string>;
-  buildings: Set<string>;
+  rooms: string[];
+  buildings: string[];
 }
 
 interface DayInfo {
@@ -138,9 +138,9 @@ interface DayInfo {
   trackCount: number;
   roomCount: number;
   buildingCount: number;
-  rooms: Set<string>;
-  buildings: Set<string>;
-  tracks: Set<string>;
+  rooms: string[];
+  buildings: string[];
+  tracks: string[];
 }
 
 interface RoomInfo {
@@ -160,6 +160,22 @@ interface TrackInfo {
   day: number[];
   eventCount: number;
 }
+
+type MutableTypeInfo = Omit<TypeInfo, "rooms" | "buildings"> & {
+  rooms: Set<string>;
+  buildings: Set<string>;
+};
+
+type MutableDayInfo = Omit<DayInfo, "rooms" | "buildings" | "tracks"> & {
+  rooms: Set<string>;
+  buildings: Set<string>;
+  tracks: Set<string>;
+};
+
+type MutableBuildDataResult = Omit<BuildDataResult, "types" | "days"> & {
+  types: Record<string, MutableTypeInfo>;
+  days: Record<string, MutableDayInfo>;
+};
 
 type RoomEvent = {
   _attributes: {
@@ -400,7 +416,7 @@ async function processScheduleData(
   },
   processor: EventProcessor
 ): Promise<BuildDataResult> {
-  const result: BuildDataResult = {
+  const result: MutableBuildDataResult = {
     conference: data.conference,
     types: {},
     buildings: {},
@@ -437,7 +453,7 @@ async function processScheduleData(
   // Process each day
   for (const day of data.day) {
     const dayIndex = day._attributes.index;
-    const dayInfo: DayInfo = {
+    const dayInfo: MutableDayInfo = {
       date: day._attributes.date,
       start: day._attributes.start,
       end: day._attributes.end,
@@ -556,28 +572,43 @@ async function processScheduleData(
     }
   }
 
-  if (Object.keys(result.types).length > 0) {
-    // Clean up before returning
-    for (const type of Object.values(result.types)) {
-      // biome-ignore lint/performance/noDelete: <explanation>
-      delete (type as any).rooms;
-      // biome-ignore lint/performance/noDelete: <explanation>
-      delete (type as any).buildings;
-    }
+  const serializableTypes: BuildDataResult["types"] = {};
+  for (const [key, type] of Object.entries(result.types)) {
+    serializableTypes[key] = {
+      id: type.id,
+      name: type.name,
+      trackCount: type.trackCount,
+      eventCount: type.eventCount,
+      roomCount: type.roomCount,
+      buildingCount: type.buildingCount,
+      rooms: Array.from(type.rooms),
+      buildings: Array.from(type.buildings),
+    };
   }
 
-  if (Object.keys(result.days).length > 0) {
-    for (const day of Object.values(result.days)) {
-      // biome-ignore lint/performance/noDelete: <explanation>
-      delete (day as any).rooms;
-      // biome-ignore lint/performance/noDelete: <explanation>
-      delete (day as any).buildings;
-      // biome-ignore lint/performance/noDelete: <explanation>
-      delete (day as any).tracks;
-    }
+  const serializableDays: BuildDataResult["days"] = {};
+  for (const [key, day] of Object.entries(result.days)) {
+    serializableDays[key] = {
+      date: day.date,
+      start: day.start,
+      end: day.end,
+      id: day.id,
+      name: day.name,
+      eventCount: day.eventCount,
+      trackCount: day.trackCount,
+      roomCount: day.roomCount,
+      buildingCount: day.buildingCount,
+      rooms: Array.from(day.rooms),
+      buildings: Array.from(day.buildings),
+      tracks: Array.from(day.tracks),
+    };
   }
 
-  return result;
+  return {
+    ...result,
+    types: serializableTypes,
+    days: serializableDays,
+  };
 }
 
 export async function buildData({ year }: { year: string }): Promise<BuildDataResult> {

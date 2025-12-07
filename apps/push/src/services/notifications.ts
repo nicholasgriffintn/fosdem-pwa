@@ -14,23 +14,32 @@ import type {
 } from "../types";
 import { trackPushNotificationSuccess, trackPushNotificationFailure } from "./analytics";
 
-export function createNotificationPayload(bookmark: EnrichedBookmark): NotificationPayload {
-	const [hours, minutes] = bookmark.startTime.split(":").map(Number);
-	const now = new Date();
-	
-	const startTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Brussels' }));
+const PUSH_TTL_SECONDS = 60;
+const FETCH_TIMEOUT_MS = 8000;
+
+function minutesUntilStart(start: string, now = new Date()): number {
+	const [hours, minutes] = start.split(":").map(Number);
+	if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return 0;
+
+	const brusselsNow = new Date(
+		now.toLocaleString("en-US", { timeZone: "Europe/Brussels" }),
+	);
+	const startTime = new Date(brusselsNow);
 	startTime.setHours(hours, minutes, 0, 0);
-	
-	const brusselsNow = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Brussels' }));
-	
-	const minutesUntilStartRaw = (startTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
-	const minutesUntilStart = Number.isFinite(minutesUntilStartRaw)
-		? Math.max(0, Math.ceil(minutesUntilStartRaw))
-		: 0;
+
+	const diffMinutes =
+		(startTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
+	if (!Number.isFinite(diffMinutes)) return 0;
+
+	return Math.max(0, Math.ceil(diffMinutes));
+}
+
+export function createNotificationPayload(bookmark: EnrichedBookmark): NotificationPayload {
+	const minutesUntil = minutesUntilStart(bookmark.startTime);
 
 	return {
 		title: "Event Starting Soon",
-		body: `${bookmark.title} starts in ${minutesUntilStart} minutes in ${bookmark.room}`,
+		body: `${bookmark.title} starts in ${minutesUntil} minutes in ${bookmark.room}`,
 		url: `https://fosdempwa.com/event/${bookmark.slug}?year=${constants.YEAR}`,
 	};
 }
@@ -96,24 +105,33 @@ export async function sendNotification(
 		payload: JSON.stringify(notification),
 		target,
 		adminContact: constants.VAPID_EMAIL,
-		ttl: 60,
+		ttl: PUSH_TTL_SECONDS,
 		urgency: "normal",
 	});
 
-	const result = await fetch(endpoint, {
-		method: "POST",
-		headers,
-		body,
-	});
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+	let result: Response;
+
+	try {
+		result = await fetch(endpoint, {
+			method: "POST",
+			headers,
+			body,
+			signal: controller.signal,
+		});
+	} finally {
+		clearTimeout(timeout);
+	}
 
 	if (!result.ok) {
 		const clonedResponse = result.clone();
 		let errorDetails = "";
 		try {
 			const content = await result.json();
-			errorDetails = JSON.stringify(content);
+			errorDetails = JSON.stringify(content).slice(0, 500);
 		} catch {
-			errorDetails = await clonedResponse.text();
+			errorDetails = (await clonedResponse.text()).slice(0, 500);
 		}
 		const error = `HTTP error! status: ${result.status}, content: ${errorDetails}`;
 		trackPushNotificationFailure(subscription, error, env);

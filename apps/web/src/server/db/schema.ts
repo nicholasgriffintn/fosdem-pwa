@@ -52,7 +52,7 @@ export const oauthAccount = sqliteTable(
 		provider_user_id: text(),
 		user_id: integer()
 			.notNull()
-			.references(() => user.id),
+			.references(() => user.id, { onDelete: "cascade" }),
 	},
 	(table) => [
 		primaryKey({ columns: [table.provider_id, table.provider_user_id] }),
@@ -65,7 +65,7 @@ export const session = sqliteTable(
 		id: text().primaryKey(),
 		user_id: integer()
 			.notNull()
-			.references(() => user.id),
+			.references(() => user.id, { onDelete: "cascade" }),
 		expires_at: text().notNull(),
 		last_extended_at: text("last_extended_at")
 			.default(sql`(CURRENT_TIMESTAMP)`)
@@ -88,7 +88,7 @@ export const bookmark = sqliteTable(
 		slug: text().notNull(),
 		user_id: integer()
 			.notNull()
-			.references(() => user.id),
+			.references(() => user.id, { onDelete: "cascade" }),
 		type: text().notNull(),
 		status: text().notNull(),
 		year: integer().notNull(),
@@ -116,7 +116,7 @@ export const note = sqliteTable(
 		id: integer().primaryKey({ autoIncrement: true }),
 		user_id: integer()
 			.notNull()
-			.references(() => user.id),
+			.references(() => user.id, { onDelete: "cascade" }),
 		note: text().notNull(),
 		time: integer(),
 		year: integer().notNull(),
@@ -142,7 +142,7 @@ export const subscription = sqliteTable(
 		id: integer().primaryKey({ autoIncrement: true }),
 		user_id: integer()
 			.notNull()
-			.references(() => user.id),
+			.references(() => user.id, { onDelete: "cascade" }),
 		endpoint: text().notNull(),
 		auth: text().notNull(),
 		p256dh: text().notNull(),
@@ -154,6 +154,9 @@ export const subscription = sqliteTable(
 	(table) => {
 		return {
 			userIdIdx: index("subscription_user_id_idx").on(table.user_id),
+			subscriptionUserEndpointIdx: uniqueIndex(
+				"subscription_user_endpoint_idx",
+			).on(table.user_id, table.endpoint),
 		};
 	},
 );
