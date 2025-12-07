@@ -400,7 +400,7 @@ export default function SearchPage() {
 				) : !hasResults ? (
 							<EmptyStateCard
 								title="No results found"
-								description="Try adjusting your search or clearing filters."
+								description="No results match this search with the selected filters. Try adjusting your search or clearing filters."
 								className="max-w-2xl"
 							/>
 				) : (
