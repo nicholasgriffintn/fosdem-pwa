@@ -95,7 +95,12 @@ function EventPage() {
 					year={year}
 					breadcrumbs={[
 						{ title: fosdem.type?.name, href: `/type/${fosdem.type?.id}` },
-						{ title: fosdem.track?.name, href: `/track/${fosdem.track?.id}` },
+						{
+							title: fosdem.track?.name,
+							href: fosdem.track?.id
+								? `/track/${encodeURIComponent(fosdem.track.id)}`
+								: "#",
+						},
 					]}
 					subtitle={fosdem.event.subtitle}
 					metadata={[
