@@ -44,7 +44,7 @@ export function EventSidebar({
 						/>
 					) : (
 						<>
-							<h2 className="text-xl font-medium mb-4">Notes</h2>
+									<h2 className="text-xl font-medium mb-4 text-foreground">Notes</h2>
 							<EventNotes
 								event={event}
 								year={year}

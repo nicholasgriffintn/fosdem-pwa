@@ -37,7 +37,7 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 	if (specialRoom) {
 		return (
 			<div className="space-y-4">
-				<div className="prose prose-lg prose-indigo">
+				<div className="prose prose-lg prose-indigo text-foreground">
 					{specialRoom.description(year)}
 				</div>
 				{event.chat && (

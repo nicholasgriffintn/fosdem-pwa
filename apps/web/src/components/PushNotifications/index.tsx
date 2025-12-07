@@ -162,7 +162,7 @@ export function PushNotifications() {
 
 	return (
 		<div className="space-y-4">
-			<h2 className="text-2xl font-bold">Push Notifications</h2>
+			<h2 className="text-2xl font-bold text-foreground">Push Notifications</h2>
 			{!pushSupported && (
 				<p className="text-sm text-muted-foreground">
 					This browser does not support push notifications. Try using a Chromium-based browser on desktop or Android.

@@ -193,7 +193,7 @@ export function EventList({
 		<section>
 			{(title || displayViewMode) && (
 				<div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
-					{title && <h2 className="text-xl font-semibold shrink-0">{title}</h2>}
+					{title && <h2 className="text-xl font-semibold shrink-0 text-foreground">{title}</h2>}
 					{displayViewMode && (
 						<div className="flex gap-2 shrink-0">
 							<Button
