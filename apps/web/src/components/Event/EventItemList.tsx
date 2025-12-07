@@ -66,11 +66,6 @@ function EventListItem({
 	user,
 	onCreateBookmark,
 }: EventListItemProps) {
-	const className = clsx("flex justify-between relative", {
-		"border-t-2 border-solid border-muted": index % 2 === 1,
-		"border-b-2": index % 2 === 1 && !isLast,
-	});
-
 	const hasConflicts = conflicts?.some(
 		(conflict) =>
 			conflict.event1.id === event.id || conflict.event2.id === event.id,
@@ -79,8 +74,7 @@ function EventListItem({
 	return (
 		<div
 			className={clsx(
-				"flex items-center",
-				className,
+				"flex items-center justify-between relative py-3 px-1 sm:px-2",
 				hasConflicts && !event.priority && "border-l-4 border-l-destructive",
 			)}
 		>
@@ -94,14 +88,14 @@ function EventListItem({
 			<div className="flex flex-col md:flex-row md:justify-between w-full">
 				<div
 					className={clsx(
-						"flex flex-col space-y-1.5 pt-3 pb-3 pl-1 pr-1",
+						"flex flex-col space-y-1.5 pl-1 pr-1",
 						hasConflicts && "pl-2",
 					)}
 				>
 					<h3 className="font-semibold leading-none tracking-tight">
 						{event.title}
 					</h3>
-					<p className="text-gray-500">
+					<p className="text-muted-foreground">
 						{event.room} | {event.startTime} -{" "}
 						{calculateEndTime(event.startTime, event.duration)}
 						{event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
@@ -138,7 +132,7 @@ export function EventItemList({
 	});
 
 	return (
-		<ul className="event-list w-full">
+		<ul className="event-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
 			{sortedEvents?.length > 0 ? (
 				sortedEvents.map((event, index) => (
 					<li key={event.id}>
@@ -158,11 +152,14 @@ export function EventItemList({
 				))
 			) : (
 				<li>
-					<div className="flex justify-between">
-						<div className="flex flex-col space-y-1.5 pt-6 pb-6">
+						<div className="flex justify-between px-3 py-4">
+							<div className="flex flex-col space-y-1.5">
 							<h3 className="font-semibold leading-none tracking-tight">
 								No events found
 							</h3>
+								<p className="text-muted-foreground text-sm">
+									Try adjusting filters or search terms.
+								</p>
 						</div>
 					</div>
 				</li>

@@ -298,6 +298,8 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					type="search"
 					value={inputValue}
 					placeholder="Search events..."
+					aria-label="Search events"
+					aria-expanded={searchResults.length > 0}
 					className="h-8 w-full sm:w-64 sm:pr-12"
 					onChange={(e) => handleSearch(e.target.value)}
 					onKeyDown={handleKeyDown}

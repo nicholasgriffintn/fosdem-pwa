@@ -118,6 +118,7 @@ export function EventNotes({
 				<textarea
 					className="w-full h-24 mb-2 p-2 rounded-md bg-background border placeholder:text-muted-foreground focus:ring-1 focus:ring-ring"
 					placeholder="Start writing your new note here..."
+					aria-label="Add a note for this event"
 					value={note}
 					onChange={handleNoteChange}
 				/>
