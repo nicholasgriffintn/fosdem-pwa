@@ -1,5 +1,5 @@
 import { createMiddleware } from "@tanstack/react-start";
-import { setResponseStatus } from '@tanstack/react-start/server'
+import { setResponseStatus } from "@tanstack/react-start/server";
 
 import { getAuthSession } from "~/server/auth";
 

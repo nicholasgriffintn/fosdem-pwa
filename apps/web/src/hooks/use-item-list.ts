@@ -32,16 +32,16 @@ export function useEventList({
 
 	const itemsWithFavourites = items?.length
 		? items.map((item) => ({
-			...item,
-			isFavourited: bookmarks?.length
-				? Boolean(
-					bookmarks.find(
-						(bookmark: Bookmark | LocalBookmark) =>
-							bookmark.slug === item.id && bookmark.status === "favourited",
-					),
-				)
-				: undefined,
-		}))
+				...item,
+				isFavourited: bookmarks?.length
+					? Boolean(
+							bookmarks.find(
+								(bookmark: Bookmark | LocalBookmark) =>
+									bookmark.slug === item.id && bookmark.status === "favourited",
+							),
+						)
+					: undefined,
+			}))
 		: [];
 
 	const favorites =
@@ -76,16 +76,16 @@ export function useTrackList({
 
 	const itemsWithFavourites = items?.length
 		? items.map((item) => ({
-			...item,
-			isFavourited: bookmarks?.length
-				? Boolean(
-					bookmarks.find(
-						(bookmark: Bookmark | LocalBookmark) =>
-							bookmark.slug === item.id && bookmark.status === "favourited",
-					),
-				)
-				: undefined,
-		}))
+				...item,
+				isFavourited: bookmarks?.length
+					? Boolean(
+							bookmarks.find(
+								(bookmark: Bookmark | LocalBookmark) =>
+									bookmark.slug === item.id && bookmark.status === "favourited",
+							),
+						)
+					: undefined,
+			}))
 		: [];
 
 	const favorites =

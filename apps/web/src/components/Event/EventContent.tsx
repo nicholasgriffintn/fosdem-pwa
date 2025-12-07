@@ -59,7 +59,9 @@ export function EventContent({ event }: { event: Event }) {
 			)}
 			{(event.url || event.feedbackUrl) && (
 				<div className="mt-2">
-					<h2 className="text-xl font-medium text-foreground">External Links</h2>
+					<h2 className="text-xl font-medium text-foreground">
+						External Links
+					</h2>
 					<ul className="mt-2 space-y-2 list-disc list-inside">
 						{event.url && (
 							<li>

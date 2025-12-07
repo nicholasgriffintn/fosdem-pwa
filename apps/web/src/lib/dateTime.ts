@@ -170,7 +170,10 @@ export function isConferenceMoreThanOneMonthAway(
 
 		return diffMonths > 1;
 	} catch (error) {
-		console.error("Error checking if conference is more than 1 month away:", error);
+		console.error(
+			"Error checking if conference is more than 1 month away:",
+			error,
+		);
 		return false;
 	}
 }

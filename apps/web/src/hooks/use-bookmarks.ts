@@ -48,9 +48,9 @@ export function useBookmarks({ year }: { year: number }) {
 			return localBookmarks || serverBookmarks || [];
 		}
 
-		const serverMap = new Map(serverBookmarks.map(b => [b.slug, b]));
+		const serverMap = new Map(serverBookmarks.map((b) => [b.slug, b]));
 
-		return localBookmarks.map(local => ({
+		return localBookmarks.map((local) => ({
 			...local,
 			serverId: serverMap.get(local.slug)?.id,
 			existsOnServer: serverMap.has(local.slug),
@@ -61,7 +61,7 @@ export function useBookmarks({ year }: { year: number }) {
 		if (!user?.id) return;
 
 		if (serverBookmarks && localBookmarks) {
-			const localBySlug = new Map(localBookmarks.map(b => [b.slug, b]));
+			const localBySlug = new Map(localBookmarks.map((b) => [b.slug, b]));
 
 			const operations = serverBookmarks.map(async (serverBookmark) => {
 				const existingLocal = localBySlug.get(serverBookmark.slug);

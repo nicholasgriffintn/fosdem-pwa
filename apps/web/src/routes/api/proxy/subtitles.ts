@@ -20,33 +20,43 @@ export const Route = createFileRoute("/api/proxy/subtitles")({
 					const subtitleUrl = url.searchParams.get("url");
 
 					if (!subtitleUrl) {
-						return new Response(JSON.stringify({ error: "Missing subtitle URL" }), {
-							status: 400,
-							headers: {
-								"Content-Type": "application/json",
+						return new Response(
+							JSON.stringify({ error: "Missing subtitle URL" }),
+							{
+								status: 400,
+								headers: {
+									"Content-Type": "application/json",
+								},
 							},
-						});
+						);
 					}
 
 					let parsed: URL;
 					try {
 						parsed = new URL(subtitleUrl);
 					} catch {
-						return new Response(JSON.stringify({ error: "Invalid subtitle URL" }), {
-							status: 400,
-							headers: { "Content-Type": "application/json" },
-						});
+						return new Response(
+							JSON.stringify({ error: "Invalid subtitle URL" }),
+							{
+								status: 400,
+								headers: { "Content-Type": "application/json" },
+							},
+						);
 					}
 
 					if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-						return new Response(JSON.stringify({ error: "Unsupported protocol" }), {
-							status: 400,
-							headers: { "Content-Type": "application/json" },
-						});
+						return new Response(
+							JSON.stringify({ error: "Unsupported protocol" }),
+							{
+								status: 400,
+								headers: { "Content-Type": "application/json" },
+							},
+						);
 					}
 
-					const hostAllowed = ALLOWED_SUBTITLE_HOSTS.some((host) =>
-						parsed.hostname === host || parsed.hostname.endsWith(`.${host}`),
+					const hostAllowed = ALLOWED_SUBTITLE_HOSTS.some(
+						(host) =>
+							parsed.hostname === host || parsed.hostname.endsWith(`.${host}`),
 					);
 
 					if (!hostAllowed) {
@@ -57,7 +67,10 @@ export const Route = createFileRoute("/api/proxy/subtitles")({
 					}
 
 					const controller = new AbortController();
-					const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+					const timeout = setTimeout(
+						() => controller.abort(),
+						FETCH_TIMEOUT_MS,
+					);
 					const conditionalHeaders: Record<string, string> = {};
 					const ifNoneMatch = request.headers.get("if-none-match");
 					const ifModifiedSince = request.headers.get("if-modified-since");
@@ -90,10 +103,13 @@ export const Route = createFileRoute("/api/proxy/subtitles")({
 					try {
 						body = await response.text();
 					} catch {
-						return new Response(JSON.stringify({ error: "Failed to read subtitle" }), {
-							status: 500,
-							headers: { "Content-Type": "application/json" },
-						});
+						return new Response(
+							JSON.stringify({ error: "Failed to read subtitle" }),
+							{
+								status: 500,
+								headers: { "Content-Type": "application/json" },
+							},
+						);
 					}
 
 					const responseHeaders: Record<string, string> = {

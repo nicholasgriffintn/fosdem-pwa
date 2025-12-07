@@ -26,7 +26,7 @@ type TrackListProps = {
 		type: string;
 		slug: string;
 		status: string;
-		}) => void;
+	}) => void;
 	displaySortByFavourites?: boolean;
 };
 
@@ -99,7 +99,7 @@ type TrackListContentProps = {
 		type: string;
 		slug: string;
 		status: string;
-		}) => void;
+	}) => void;
 };
 
 function TrackListContent({
@@ -166,7 +166,9 @@ export function TrackList({
 						<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
 							<div className="flex flex-col md:flex-row md:items-center gap-4">
 								{title && (
-									<h2 className="text-xl font-semibold shrink-0 text-foreground">{title}</h2>
+									<h2 className="text-xl font-semibold shrink-0 text-foreground">
+										{title}
+									</h2>
 								)}
 								<TabsList className="bg-transparent p-0 h-auto justify-start gap-2">
 									{days.map((day) => {
@@ -196,7 +198,10 @@ export function TrackList({
 										onCheckedChange={setSortByFavourites}
 										aria-label="Toggle favourites-first sorting"
 									/>
-									<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+									<Label
+										htmlFor={sortSwitchId}
+										className="text-sm font-medium text-foreground"
+									>
 										Favourites first
 									</Label>
 								</div>
@@ -235,7 +240,9 @@ export function TrackList({
 	return (
 		<section>
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-				{title && <h2 className="text-xl font-semibold text-foreground">{title}</h2>}
+				{title && (
+					<h2 className="text-xl font-semibold text-foreground">{title}</h2>
+				)}
 				{displaySortByFavourites && (
 					<div className="flex items-center gap-2">
 						<Switch
@@ -244,7 +251,10 @@ export function TrackList({
 							onCheckedChange={setSortByFavourites}
 							aria-label="Toggle favourites-first sorting"
 						/>
-						<Label htmlFor={sortSwitchId} className="text-sm font-medium text-foreground">
+						<Label
+							htmlFor={sortSwitchId}
+							className="text-sm font-medium text-foreground"
+						>
 							Favourites first
 						</Label>
 					</div>

@@ -8,7 +8,9 @@ import { getFullAuthSession } from "~/server/auth";
 export const createSubscription = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { endpoint: string; auth: string; p256dh: string }) => data)
+	.inputValidator(
+		(data: { endpoint: string; auth: string; p256dh: string }) => data,
+	)
 	.handler(async (ctx: any) => {
 		const { endpoint, auth, p256dh } = ctx.data;
 

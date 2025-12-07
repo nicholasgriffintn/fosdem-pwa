@@ -35,23 +35,15 @@ export function EventSidebar({
 					})}
 				/>
 			) : (
-					<div className="flex-1 flex flex-col min-h-0">
+				<div className="flex-1 flex flex-col min-h-0">
 					{isMobile ? (
-						<EventNotesMobile
-							event={event}
-							year={year}
-							videoRef={videoRef}
-						/>
+						<EventNotesMobile event={event} year={year} videoRef={videoRef} />
 					) : (
 						<>
-									<h2 className="text-xl font-medium mb-4 text-foreground">
-										Notes
-									</h2>
-							<EventNotes
-								event={event}
-								year={year}
-								videoRef={videoRef}
-							/>
+							<h2 className="text-xl font-medium mb-4 text-foreground">
+								Notes
+							</h2>
+							<EventNotes event={event} year={year} videoRef={videoRef} />
 						</>
 					)}
 				</div>

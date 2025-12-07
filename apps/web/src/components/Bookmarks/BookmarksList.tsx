@@ -20,13 +20,22 @@ function organizeBookmarks(bookmarks: (Bookmark | LocalBookmark)[]) {
 
 			if (bookmark.type === "bookmark_event" || bookmark.type === "event") {
 				acc[bookmark.year].events.push(bookmark);
-			} else if (bookmark.type === "bookmark_track" || bookmark.type === "track") {
+			} else if (
+				bookmark.type === "bookmark_track" ||
+				bookmark.type === "track"
+			) {
 				acc[bookmark.year].tracks.push(bookmark);
 			}
 
 			return acc;
 		},
-		{} as Record<number, { events: (Bookmark | LocalBookmark)[]; tracks: (Bookmark | LocalBookmark)[] }>,
+		{} as Record<
+			number,
+			{
+				events: (Bookmark | LocalBookmark)[];
+				tracks: (Bookmark | LocalBookmark)[];
+			}
+		>,
 	);
 
 	return byYear;
@@ -111,7 +120,7 @@ export function BookmarksList({
 				if (!event) return null;
 				return {
 					...event,
-					priority: 'priority' in bookmark ? bookmark.priority || null : null,
+					priority: "priority" in bookmark ? bookmark.priority || null : null,
 				} as Event;
 			})
 			.filter((event): event is NonNullable<typeof event> => event !== null)

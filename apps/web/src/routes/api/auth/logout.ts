@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { deleteCookie } from '@tanstack/react-start/server'
+import { createFileRoute } from "@tanstack/react-router";
+import { deleteCookie } from "@tanstack/react-start/server";
 
 import {
 	getAuthSession,

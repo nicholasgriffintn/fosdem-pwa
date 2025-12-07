@@ -58,14 +58,18 @@ export function useMutateBookmark({ year }: { year: number }) {
 	const updateBookmarkOnServer = useServerFn(updateBookmark);
 
 	const createLocalBookmark = async (
-		bookmarkData: Omit<LocalBookmark, 'id' | 'created_at' | 'updated_at'> & { status: string },
+		bookmarkData: Omit<LocalBookmark, "id" | "created_at" | "updated_at"> & {
+			status: string;
+		},
 	) => {
 		const newBookmark = await saveLocalBookmark(bookmarkData);
-		await queryClient.invalidateQueries({ queryKey: ["local-bookmarks", bookmarkData.year] });
+		await queryClient.invalidateQueries({
+			queryKey: ["local-bookmarks", bookmarkData.year],
+		});
 
 		if (user?.id) {
-			syncAllOfflineData().catch(error => {
-				console.error('Background sync failed:', error);
+			syncAllOfflineData().catch((error) => {
+				console.error("Background sync failed:", error);
 			});
 		}
 
@@ -78,11 +82,13 @@ export function useMutateBookmark({ year }: { year: number }) {
 	) => {
 		const updated = await updateLocalBookmarkFromStorage(id, updates);
 		if (updated) {
-			await queryClient.invalidateQueries({ queryKey: ["local-bookmarks", updated.year] });
+			await queryClient.invalidateQueries({
+				queryKey: ["local-bookmarks", updated.year],
+			});
 
 			if (user?.id) {
-				syncAllOfflineData().catch(error => {
-					console.error('Background sync failed:', error);
+				syncAllOfflineData().catch((error) => {
+					console.error("Background sync failed:", error);
 				});
 			}
 		}
@@ -91,14 +97,16 @@ export function useMutateBookmark({ year }: { year: number }) {
 
 	const removeLocalBookmark = async (id: string) => {
 		const bookmarks = await getLocalBookmarks();
-		const bookmark = bookmarks.find(b => b.id === id);
+		const bookmark = bookmarks.find((b) => b.id === id);
 		const success = await removeLocalBookmarkFromStorage(id);
 		if (success && bookmark) {
-			await queryClient.invalidateQueries({ queryKey: ["local-bookmarks", bookmark.year] });
+			await queryClient.invalidateQueries({
+				queryKey: ["local-bookmarks", bookmark.year],
+			});
 
 			if (user?.id) {
-				syncAllOfflineData().catch(error => {
-					console.error('Background sync failed:', error);
+				syncAllOfflineData().catch((error) => {
+					console.error("Background sync failed:", error);
 				});
 			}
 		}
@@ -201,7 +209,10 @@ export function useMutateBookmark({ year }: { year: number }) {
 		);
 	};
 
-	const update = async (id: string, updates: Partial<Bookmark | LocalBookmark>) => {
+	const update = async (
+		id: string,
+		updates: Partial<Bookmark | LocalBookmark>,
+	) => {
 		await updateLocalBookmark(id, updates);
 
 		if (user?.id) {

@@ -55,7 +55,12 @@ function ProfilePage() {
 	}
 
 	if (!user) {
-		return <Navigate to="/" search={(prev) => ({ year: prev.year || constants.DEFAULT_YEAR })} />;
+		return (
+			<Navigate
+				to="/"
+				search={(prev) => ({ year: prev.year || constants.DEFAULT_YEAR })}
+			/>
+		);
 	}
 
 	return (
@@ -71,7 +76,9 @@ function ProfilePage() {
 						{user.bookmarks_visibility === "public" ? (
 							<div className="w-full lg:flex-1 space-y-8">
 								<div className="space-y-4">
-									<h2 className="text-2xl font-bold text-foreground">Shared Bookmarks</h2>
+									<h2 className="text-2xl font-bold text-foreground">
+										Shared Bookmarks
+									</h2>
 									<BookmarksList
 										bookmarks={bookmarks}
 										fosdemData={fosdemData}
@@ -86,7 +93,9 @@ function ProfilePage() {
 						) : (
 							<div className="flex-1 space-y-8">
 								<div className="space-y-4">
-										<h2 className="text-2xl font-bold text-foreground">Shared Bookmarks</h2>
+									<h2 className="text-2xl font-bold text-foreground">
+										Shared Bookmarks
+									</h2>
 									<p className="text-sm text-muted-foreground">
 										This user has not shared their bookmarks with you.
 									</p>

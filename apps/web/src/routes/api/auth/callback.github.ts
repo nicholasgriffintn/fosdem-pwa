@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 import { OAuth2RequestError } from "arctic";
 import { and, eq } from "drizzle-orm";
-import { getCookies } from '@tanstack/react-start/server'
+import { getCookies } from "@tanstack/react-start/server";
 
 import {
 	createSession,
@@ -42,13 +42,16 @@ export const Route = createFileRoute("/api/auth/callback/github")({
 						throw new Error("GitHub Callback: No access token found");
 					}
 
-					const githubUserResponse = await fetch("https://api.github.com/user", {
-						headers: {
-							Authorization: `Bearer ${tokens.accessToken()}`,
-							Accept: "application/json",
-							"User-Agent": "Fosdem PWA",
+					const githubUserResponse = await fetch(
+						"https://api.github.com/user",
+						{
+							headers: {
+								Authorization: `Bearer ${tokens.accessToken()}`,
+								Accept: "application/json",
+								"User-Agent": "Fosdem PWA",
+							},
 						},
-					});
+					);
 
 					if (!githubUserResponse.ok) {
 						const errorText = await githubUserResponse.text();
@@ -67,7 +70,9 @@ export const Route = createFileRoute("/api/auth/callback/github")({
 					const providerUser: GitHubUser = await githubUserResponse.json();
 
 					if (!providerUser.id) {
-						throw new Error("GitHub Callback: No user ID found in GitHub response");
+						throw new Error(
+							"GitHub Callback: No user ID found in GitHub response",
+						);
 					}
 
 					const { user: currentUser } = await getAuthSession();

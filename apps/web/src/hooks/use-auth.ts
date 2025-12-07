@@ -43,7 +43,7 @@ export function useAuth() {
 		if (!user?.id) return;
 
 		enableSync();
-		checkAndSyncOnOnline(user.id).catch(error => {
+		checkAndSyncOnOnline(user.id).catch((error) => {
 			console.error("Initial sync failed:", error);
 		});
 
@@ -52,7 +52,7 @@ export function useAuth() {
 		}
 
 		const handleOnline = () => {
-			checkAndSyncOnOnline(user.id).catch(error => {
+			checkAndSyncOnOnline(user.id).catch((error) => {
 				console.error("Online sync failed:", error);
 			});
 		};

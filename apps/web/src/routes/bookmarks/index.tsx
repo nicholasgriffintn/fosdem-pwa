@@ -64,26 +64,27 @@ function BookmarksHome() {
 						<Spinner className="h-8 w-8" />
 					</div>
 				) : !bookmarks || bookmarks.length === 0 ? (
-						<EmptyStateCard
-							title="No bookmarks yet"
-							description={
-								<div className="space-y-2">
-									<p>Start bookmarking events to see them here.</p>
-									{!user?.id && (
-										<p className="text-sm">
-											Your bookmarks are saved locally and will sync when you sign in.
-										</p>
-									)}
-								</div>
-							}
-							actions={
-								!user?.id ? (
+					<EmptyStateCard
+						title="No bookmarks yet"
+						description={
+							<div className="space-y-2">
+								<p>Start bookmarking events to see them here.</p>
+								{!user?.id && (
+									<p className="text-sm">
+										Your bookmarks are saved locally and will sync when you sign
+										in.
+									</p>
+								)}
+							</div>
+						}
+						actions={
+							!user?.id ? (
 								<Link to="/signin" className="text-primary hover:underline">
 									Sign in to sync across devices
 								</Link>
-								) : undefined
-							}
-						/>
+							) : undefined
+						}
+					/>
 				) : (
 					<BookmarksList
 						bookmarks={bookmarks}

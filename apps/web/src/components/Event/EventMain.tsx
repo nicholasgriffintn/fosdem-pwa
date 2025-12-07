@@ -101,7 +101,8 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 					)}
 					<span className="text-sm block mb-2">
 						Notice: The placeholder video image is licensed under{" "}
-						{imageDetails?.license ?? "the stated license by the content owner"}.{" "}
+						{imageDetails?.license ?? "the stated license by the content owner"}
+						.{" "}
 						{imageDetails?.original ? (
 							<a href={imageDetails.original} target="_blank" rel="noreferrer">
 								The original image can be found here

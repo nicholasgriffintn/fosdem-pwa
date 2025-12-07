@@ -182,7 +182,9 @@ function validateNoteInput(
 	}
 }
 
-function isValidStoredNote(note: LocalNote | undefined | null): note is LocalNote {
+function isValidStoredNote(
+	note: LocalNote | undefined | null,
+): note is LocalNote {
 	return (
 		note !== null &&
 		note !== undefined &&
@@ -251,9 +253,13 @@ export interface SyncQueueItem {
 	timestamp: string;
 }
 
-export async function getLocalBookmarks(year?: number): Promise<LocalBookmark[]> {
+export async function getLocalBookmarks(
+	year?: number,
+): Promise<LocalBookmark[]> {
 	try {
-		const bookmarks = await getAllFromStore<LocalBookmark>(STORE_NAMES.BOOKMARKS);
+		const bookmarks = await getAllFromStore<LocalBookmark>(
+			STORE_NAMES.BOOKMARKS,
+		);
 		return year ? bookmarks.filter((b) => b.year === year) : bookmarks;
 	} catch (error) {
 		console.error("Error reading local bookmarks:", error);
@@ -328,12 +334,15 @@ export async function updateLocalBookmark(
 
 		return updatedBookmark;
 	} catch (error) {
-		console.error('Error updating local bookmark:', error);
+		console.error("Error updating local bookmark:", error);
 		return null;
 	}
 }
 
-export async function removeLocalBookmark(id: string, skipSync?: boolean): Promise<boolean> {
+export async function removeLocalBookmark(
+	id: string,
+	skipSync?: boolean,
+): Promise<boolean> {
 	try {
 		const existing = await getFromStore<LocalBookmark>(
 			STORE_NAMES.BOOKMARKS,
@@ -355,7 +364,7 @@ export async function removeLocalBookmark(id: string, skipSync?: boolean): Promi
 
 		return true;
 	} catch (error) {
-		console.error('Error removing local bookmark:', error);
+		console.error("Error removing local bookmark:", error);
 		return false;
 	}
 }
@@ -386,7 +395,7 @@ export async function getLocalNotes(year?: number): Promise<LocalNote[]> {
 
 		return year ? validNotes.filter((n) => n.year === year) : validNotes;
 	} catch (error) {
-		console.error('Error reading local notes:', error);
+		console.error("Error reading local notes:", error);
 		return [];
 	}
 }
@@ -421,7 +430,7 @@ export async function saveLocalNote(
 
 		return newNote;
 	} catch (error) {
-		handleStorageError(error, 'saving local note');
+		handleStorageError(error, "saving local note");
 	}
 }
 
@@ -456,12 +465,15 @@ export async function updateLocalNote(
 
 		return updatedNote;
 	} catch (error) {
-		console.error('Error updating local note:', error);
+		console.error("Error updating local note:", error);
 		return null;
 	}
 }
 
-export async function removeLocalNote(id: string, skipSync?: boolean): Promise<boolean> {
+export async function removeLocalNote(
+	id: string,
+	skipSync?: boolean,
+): Promise<boolean> {
 	try {
 		const existing = await getFromStore<LocalNote>(STORE_NAMES.NOTES, id);
 		if (!existing) return false;
@@ -480,7 +492,7 @@ export async function removeLocalNote(id: string, skipSync?: boolean): Promise<b
 
 		return true;
 	} catch (error) {
-		console.error('Error removing local note:', error);
+		console.error("Error removing local note:", error);
 		return false;
 	}
 }
@@ -489,7 +501,7 @@ export async function getSyncQueue(): Promise<SyncQueueItem[]> {
 	try {
 		return await getAllFromStore<SyncQueueItem>(STORE_NAMES.SYNC_QUEUE);
 	} catch (error) {
-		console.error('Error reading sync queue:', error);
+		console.error("Error reading sync queue:", error);
 		return [];
 	}
 }
@@ -498,7 +510,7 @@ export async function addToSyncQueue(item: SyncQueueItem): Promise<void> {
 	try {
 		await putInStore(STORE_NAMES.SYNC_QUEUE, item);
 	} catch (error) {
-		console.error('Error adding to sync queue:', error);
+		console.error("Error adding to sync queue:", error);
 	}
 }
 
@@ -506,6 +518,6 @@ export async function removeFromSyncQueue(id: string): Promise<void> {
 	try {
 		await deleteFromStore(STORE_NAMES.SYNC_QUEUE, id);
 	} catch (error) {
-		console.error('Error removing from sync queue:', error);
+		console.error("Error removing from sync queue:", error);
 	}
 }

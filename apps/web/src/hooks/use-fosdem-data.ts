@@ -8,7 +8,11 @@ import { getAllData } from "~/server/functions/fosdem";
 export function useFosdemData({ year }: { year: number }) {
 	const getData = useServerFn(getAllData);
 
-	const { data: fosdemData, isLoading, error } = useQuery({
+	const {
+		data: fosdemData,
+		isLoading,
+		error,
+	} = useQuery({
 		queryKey: ["fosdem", "full", year],
 		queryFn: async () => {
 			const data = await getData({
