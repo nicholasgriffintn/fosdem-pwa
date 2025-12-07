@@ -1,303 +1,23 @@
-import { xml2json } from "xml-js";
-
 import { constants } from "../constants";
 import { createLogger } from "./logger";
+import type {
+  Conference,
+  Day,
+  ProcessedEvent,
+  Link,
+  Attachment,
+  Stream,
+  MutableDayInfo,
+  MutableBuildDataResult,
+  XmlEvent,
+  XmlLink,
+  XmlAttachment,
+  BuildDataResult,
+} from "../types";
+import { parseData, getRoomName, getLinkType, getStatus } from "./data";
 
 const typeData = Object.freeze(constants.TYPES);
 const buildings = Object.freeze(constants.BUILDINGS);
-const SCHEDULE_FETCH_TIMEOUT_MS = 8_000;
-const SCHEDULE_FETCH_MAX_RETRIES = 3;
-const SCHEDULE_RETRY_BASE_DELAY_MS = 200;
-
-// Base interfaces for XML parsing
-interface XmlAttribute {
-  _attributes: Record<string, string>;
-  _text?: string;
-}
-
-interface XmlEvent extends XmlAttribute {
-  _attributes: {
-    guid: string;
-    id: string;
-  };
-  title: { _text: string };
-  type: { _text: string };
-  track: { _text: string };
-  persons?: { person: Array<{ _text: string }> | { _text: string } };
-  links?: { link: Array<XmlLink> | XmlLink };
-  attachments?: { attachment: Array<XmlAttachment> | XmlAttachment };
-  url?: { _text: string };
-  language?: { _text: string };
-  feedback_url?: { _text: string };
-  start: { _text: string };
-  duration: { _text: string };
-  subtitle?: { _text: string };
-  abstract?: { _text: string };
-  description?: { _text: string };
-}
-
-interface XmlLink extends XmlAttribute {
-  _attributes: {
-    href: string;
-  };
-}
-
-interface XmlAttachment extends XmlLink {
-  _attributes: {
-    href: string;
-    type: string;
-  };
-}
-
-// Processed data interfaces
-interface Conference {
-  acronym?: string;
-  title?: string;
-  subtitle?: string;
-  venue?: string;
-  city?: string;
-  start?: string;
-  end?: string;
-  days: string[];
-  day_change?: string;
-  timeslot_duration?: string;
-  time_zone_name?: string;
-}
-
-interface BuildingStats {
-  name: string;
-  roomCount: number;
-  trackCount: number;
-  eventCount: number;
-}
-
-interface ProcessedEvent {
-  day: number;
-  isLive: boolean;
-  status: "canceled" | "amendment" | "running" | "unknown";
-  type: string;
-  track: string;
-  trackKey: string;
-  title: string;
-  persons: string[];
-  links: Link[];
-  attachments: Attachment[];
-  streams: Stream[];
-  chat: string | null;
-  room: string;
-  url?: string;
-  language?: string;
-  feedbackUrl?: string;
-  id: string;
-  startTime: string;
-  duration: string;
-  subtitle?: string;
-  abstract?: string;
-  description?: string;
-}
-
-interface Link {
-  href: string;
-  title: string;
-  type: string | null;
-}
-
-interface Attachment {
-  type: string;
-  href: string;
-  title: string;
-}
-
-interface Stream {
-  href: string;
-  title: string;
-  type: string;
-}
-
-export interface BuildDataResult {
-  conference: Conference;
-  types: Record<string, TypeInfo>;
-  buildings: Record<string, BuildingStats>;
-  days: Record<string, DayInfo>;
-  rooms: Record<string, RoomInfo>;
-  tracks: Record<string, TrackInfo>;
-  events: Record<string, ProcessedEvent>;
-}
-
-interface TypeInfo {
-  id: string;
-  name: string;
-  trackCount: number;
-  eventCount: number;
-  roomCount: number;
-  buildingCount: number;
-  rooms: string[];
-  buildings: string[];
-}
-
-interface DayInfo {
-  date: string;
-  start: string;
-  end: string;
-  id: number;
-  name: string;
-  eventCount: number;
-  trackCount: number;
-  roomCount: number;
-  buildingCount: number;
-  rooms: string[];
-  buildings: string[];
-  tracks: string[];
-}
-
-interface RoomInfo {
-  name: string;
-  slug: string;
-  buildingId: string | null;
-  building: (typeof buildings)[keyof typeof buildings] | null;
-  floor: string | null;
-  eventCount: number;
-}
-
-interface TrackInfo {
-  id: string;
-  name: string;
-  type: string;
-  room: string;
-  day: number[];
-  eventCount: number;
-}
-
-type MutableTypeInfo = Omit<TypeInfo, "rooms" | "buildings"> & {
-  rooms: Set<string>;
-  buildings: Set<string>;
-};
-
-type MutableDayInfo = Omit<DayInfo, "rooms" | "buildings" | "tracks"> & {
-  rooms: Set<string>;
-  buildings: Set<string>;
-  tracks: Set<string>;
-};
-
-type MutableBuildDataResult = Omit<BuildDataResult, "types" | "days"> & {
-  types: Record<string, MutableTypeInfo>;
-  days: Record<string, MutableDayInfo>;
-};
-
-type RoomEvent = {
-  _attributes: {
-    guid: string;
-    id: string;
-  };
-};
-
-type Room = {
-  _attributes: { name: string; slug: string };
-  event: RoomEvent | RoomEvent[];
-};
-
-type Day = {
-  _attributes: { index: number; date: string; start: string; end: string };
-  room: Room[];
-};
-
-function flattenData<T>(element: unknown): T {
-  if (Array.isArray(element)) {
-    return element.map(flattenData) as T;
-  }
-
-  if (typeof element === "object" && element !== null) {
-    const keys = Object.keys(element);
-
-    if (keys.length === 1) {
-      const key = keys[0];
-      if (key === "value") {
-        return (element as Record<string, T>)[key];
-      }
-    }
-
-    const newElement = {} as T;
-    for (const e of keys) {
-      (newElement as Record<string, unknown>)[e] = flattenData(
-        (element as Record<string, unknown>)[e]
-      );
-    }
-    return newElement;
-  }
-
-  return element as T;
-}
-
-function flattenConference(conference: any): Conference {
-  const result: Conference = {
-    acronym: conference.acronym?._text,
-    title: conference.title?._text,
-    subtitle: conference.subtitle?._text,
-    venue: conference.venue?._text,
-    city: conference.city?._text,
-    start: conference.start?._text,
-    end: conference.end?._text,
-    days: [conference.start?._text, conference.end?._text].filter(Boolean),
-    day_change: conference.day_change?._text,
-    timeslot_duration: conference.timeslot_duration?._text,
-    time_zone_name: conference.time_zone_name?._text,
-  };
-
-  return result;
-}
-
-async function parseData(text: string): Promise<{
-  conference: Conference;
-  day: Day[];
-}> {
-  const data = await xml2json(text, {
-    compact: true,
-    ignoreDeclaration: true,
-    ignoreInstruction: true,
-    ignoreComment: true,
-    ignoreDoctype: true,
-    ignoreCdata: true,
-    textFn: (value) => value.trim(),
-  });
-
-  const parsed = JSON.parse(data);
-  const result = flattenData<{ conference: any; day: Day[] }>(parsed.schedule);
-
-  if (!result?.conference) {
-    throw new Error("Invalid schedule: missing conference data");
-  }
-
-  return {
-    conference: flattenConference(result.conference),
-    day: result.day,
-  };
-}
-
-const memoize = <T, R>(fn: (arg: T) => R) => {
-  const cache = new Map<T, R>();
-  return (arg: T): R => {
-    const value = cache.get(arg) ?? fn(arg);
-    cache.set(arg, value);
-    return value;
-  };
-};
-
-const getRoomName = memoize((name: string) =>
-  name.startsWith("D.") ? `${name} (online)` : name
-);
-
-const getLinkType = memoize((url: string) => {
-  if (url.endsWith(".mp4")) return "video/mp4";
-  if (url.endsWith(".webm")) return "video/webm";
-  return null;
-});
-
-const getStatus = memoize((title: string): ProcessedEvent["status"] => {
-  const lowerTitle = title.toLowerCase();
-  if (lowerTitle.includes("canceled")) return "canceled";
-  if (lowerTitle.includes("amendment")) return "amendment";
-  return "running";
-});
 
 class EventProcessor {
   private getType(event: XmlEvent): string {
@@ -626,9 +346,9 @@ const fetchScheduleWithRetry = async (
 ): Promise<Response> => {
   let lastError: unknown;
 
-  for (let attempt = 0; attempt < SCHEDULE_FETCH_MAX_RETRIES; attempt++) {
+  for (let attempt = 0; attempt < constants.SCHEDULE_FETCH_MAX_RETRIES; attempt++) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), SCHEDULE_FETCH_TIMEOUT_MS);
+    const timeout = setTimeout(() => controller.abort(), constants.SCHEDULE_FETCH_TIMEOUT_MS);
 
     try {
       logger?.info("Fetching schedule", { url, attempt: attempt + 1 });
@@ -655,7 +375,7 @@ const fetchScheduleWithRetry = async (
     } catch (error) {
       const isAbort = (error as Error)?.name === "AbortError";
       lastError = isAbort ? new Error("Fetching schedule timed out") : error;
-      const isLastAttempt = attempt === SCHEDULE_FETCH_MAX_RETRIES - 1;
+      const isLastAttempt = attempt === constants.SCHEDULE_FETCH_MAX_RETRIES - 1;
 
       logger?.error("Schedule fetch error", {
         attempt: attempt + 1,
@@ -672,7 +392,7 @@ const fetchScheduleWithRetry = async (
       clearTimeout(timeout);
     }
 
-    await delay(SCHEDULE_RETRY_BASE_DELAY_MS * (attempt + 1));
+    await delay(constants.SCHEDULE_RETRY_BASE_DELAY_MS * (attempt + 1));
   }
 
   throw lastError instanceof Error ? lastError : new Error("Failed to fetch schedule");
