@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+
 import { getCloudflareEnv } from "~/server/config";
 
 export class CacheManager {
