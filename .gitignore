@@ -8,7 +8,6 @@ yarn.lock
 
 .vercel
 .output
-.vinxi
 .wrangler
 .netlify
 dist

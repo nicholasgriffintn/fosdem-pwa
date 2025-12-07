@@ -1,0 +1,35 @@
+name = "fosdem-pwa"
+pages_build_output_dir = "./dist"
+compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2025-09-02"
+main = "@tanstack/react-start/server-entry"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "fosdem"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fosdem"
+database_id = "a9e2ef23-b95b-49e4-b1aa-5abc2bd26152"
+
+[[d1_databases]]
+binding = "DB_PREVIEW"
+database_name = "fosdem-preview"
+database_id = "2ec973b1-6e46-49a8-825b-1928ec34cd22"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "eaa0ebf8ad2e4c9da021aeffc43f74b4"
+
+# The following are secrets that should be set using `wrangler secret put`
+# NODE_ENV = "production"
+# REDIS_ENABLED = "true"
+# CLOUDFLARE_ACCOUNT_ID
+# CLOUDFLARE_DATABASE_ID
+# CLOUDFLARE_D1_TOKEN
+# UPSTASH_REDIS_URL
+# UPSTASH_REDIS_TOKEN
+# GITHUB_CLIENT_ID
+# GITHUB_CLIENT_SECRET
+# GITHUB_REDIRECT_URI
