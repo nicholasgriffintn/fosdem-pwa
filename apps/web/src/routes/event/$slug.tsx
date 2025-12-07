@@ -10,6 +10,7 @@ import { constants } from "~/constants";
 import { calculateEndTime } from "~/lib/dateTime";
 import { useBookmark } from "~/hooks/use-bookmark";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/event/$slug")({
 	component: EventPage,
@@ -81,7 +82,10 @@ function EventPage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Event not found" year={year} />
+					<EmptyStateCard
+						title="Event not found"
+						description="We couldn't find this event. It may have been removed or the link is incorrect."
+					/>
 				</div>
 			</div>
 		);

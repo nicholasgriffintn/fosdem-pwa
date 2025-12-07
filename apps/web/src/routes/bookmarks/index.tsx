@@ -8,6 +8,7 @@ import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useAuth } from "~/hooks/use-auth";
 import { Spinner } from "~/components/Spinner";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
@@ -63,19 +64,26 @@ function BookmarksHome() {
 						<Spinner className="h-8 w-8" />
 					</div>
 				) : !bookmarks || bookmarks.length === 0 ? (
-					<div className="flex flex-col items-center justify-center py-12">
-						<p className="text-muted-foreground mb-4">
-							No bookmarks yet. Start bookmarking events to see them here!
-						</p>
-						{!user?.id && (
-							<div className="text-sm text-muted-foreground text-center space-y-2">
-								<p>Your bookmarks are saved locally and will sync when you sign in.</p>
+						<EmptyStateCard
+							title="No bookmarks yet"
+							description={
+								<div className="space-y-2">
+									<p>Start bookmarking events to see them here.</p>
+									{!user?.id && (
+										<p className="text-sm">
+											Your bookmarks are saved locally and will sync when you sign in.
+										</p>
+									)}
+								</div>
+							}
+							actions={
+								!user?.id ? (
 								<Link to="/signin" className="text-primary hover:underline">
 									Sign in to sync across devices
 								</Link>
-							</div>
-						)}
-					</div>
+								) : undefined
+							}
+						/>
 				) : (
 					<BookmarksList
 						bookmarks={bookmarks}

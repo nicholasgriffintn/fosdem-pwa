@@ -11,6 +11,7 @@ import { PageHeader } from "~/components/PageHeader";
 import { createStandardDate } from "~/lib/dateTime";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/rooms/$roomId")({
 	component: RoomPage,
@@ -86,10 +87,9 @@ function RoomPage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
-					<PageHeader
-						heading="Room not found"
-						breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
-						year={year}
+					<EmptyStateCard
+						title="Room not found"
+						description="We couldn't find this room. It may have changed or the link is incorrect."
 					/>
 				</div>
 			</div>
@@ -165,6 +165,7 @@ function RoomPage() {
 						day={day}
 						user={user}
 						onCreateBookmark={onCreateBookmark}
+						displaySortByFavourites={true}
 					/>
 				</div>
 			</div>
