@@ -7,6 +7,7 @@ import { sortEvents, sortTracks } from "~/lib/sorting";
 import type { User } from "~/server/db/schema";
 import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
+import { EmptyStateCard } from "../EmptyStateCard";
 
 function organizeBookmarks(bookmarks: (Bookmark | LocalBookmark)[]) {
 	const byYear = bookmarks.reduce(
@@ -81,11 +82,11 @@ export function BookmarksList({
 }: BookmarksListProps) {
 	if (!bookmarks || bookmarks.length === 0) {
 		return (
-			<div className="flex justify-center items-center py-12">
-				<p className="text-muted-foreground">
-					No bookmarks yet. Start bookmarking events to see them here!
-				</p>
-			</div>
+			<EmptyStateCard
+				title="No bookmarks yet"
+				description="Start bookmarking events to see them here."
+				className="my-6"
+			/>
 		);
 	}
 
@@ -154,9 +155,11 @@ export function BookmarksList({
 
 	if (tracks.length === 0 && events.length === 0) {
 		return (
-			<div className="text-center py-2 mb-4">
-				<p>You haven't bookmarked anything yet!</p>
-			</div>
+			<EmptyStateCard
+				title="No bookmarks yet"
+				description="Start bookmarking events to see them here."
+				className="my-6"
+			/>
 		);
 	}
 
