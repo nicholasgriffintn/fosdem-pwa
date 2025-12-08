@@ -81,6 +81,8 @@ function LivePage() {
 							title="Live Now"
 							user={user}
 							onCreateBookmark={onCreateBookmark}
+							emptyStateTitle="No live events found"
+							emptyStateMessage="Come back later to see live events"
 						/>
 					</section>
 
@@ -92,6 +94,8 @@ function LivePage() {
 							title="Starting Soon"
 							user={user}
 							onCreateBookmark={onCreateBookmark}
+							emptyStateTitle="No upcoming events found"
+							emptyStateMessage="Come back later to see upcoming events"
 						/>
 					</section>
 				</div>
