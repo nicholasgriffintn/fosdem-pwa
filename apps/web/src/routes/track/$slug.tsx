@@ -88,18 +88,25 @@ function TrackPage() {
 						},
 					]}
 				/>
-				<EventList
-					events={fosdem.eventData}
-					year={year}
-					groupByDay={true}
-					days={fosdem.days}
-					defaultViewMode="list"
-					displayViewMode={false}
-					day={day}
-					user={user}
-					onCreateBookmark={onCreateBookmark}
-					displaySortByFavourites={true}
-				/>
+				{fosdem.eventData?.length > 0 ? (
+					<EventList
+						events={fosdem.eventData}
+						year={year}
+						groupByDay={true}
+						days={fosdem.days}
+						defaultViewMode="list"
+						displayViewMode={false}
+						day={day}
+						user={user}
+						onCreateBookmark={onCreateBookmark}
+						displaySortByFavourites={true}
+					/>
+				) : (
+					<EmptyStateCard
+						title="No sessions in this track"
+						description="There are no events scheduled here yet. Try another day or browse a different track."
+					/>
+				)}
 			</div>
 		</div>
 	);

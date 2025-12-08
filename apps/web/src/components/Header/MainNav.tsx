@@ -21,10 +21,10 @@ export function MainNav({ title, items }: MainNavProps) {
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
 
 	return (
-		<div className="flex gap-6 md:gap-10">
+		<div className="flex items-center gap-4 md:gap-6 lg:gap-10 min-w-0">
 			<Link
 				to="/"
-				search={(prev) => ({
+				search={(prev: Record<string, unknown>) => ({
 					...prev,
 					year: prev.year || constants.DEFAULT_YEAR,
 				})}
@@ -34,20 +34,27 @@ export function MainNav({ title, items }: MainNavProps) {
 				<span className="hidden font-bold sm:inline-block">{title}</span>
 			</Link>
 			{items?.length ? (
-				<nav className="hidden gap-6 lg:flex">
+				<nav className="hidden gap-2 lg:flex" aria-label="Primary">
 					{items?.map((item) => (
 						<Link
 							key={item.href}
 							to={item.disabled ? "#" : item.href}
 							className={cn(
-								"nav-link flex items-center gap-2 text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm",
-								"text-foreground/60",
+								"nav-link flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-foreground/70 hover:text-foreground hover:bg-muted/60",
 								item.disabled && "cursor-not-allowed opacity-80",
 							)}
-							search={(prev) => ({
+							activeProps={{
+								className: cn(
+									"nav-link flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+									"bg-muted text-foreground",
+									item.disabled && "cursor-not-allowed opacity-80",
+								),
+							}}
+							search={(prev: Record<string, unknown>) => ({
 								...prev,
 								year: prev.year || constants.DEFAULT_YEAR,
 							})}
+							activeOptions={{ exact: item.href === "/" }}
 						>
 							{item.icon}
 							{item.title}
@@ -58,14 +65,18 @@ export function MainNav({ title, items }: MainNavProps) {
 			<button
 				type="button"
 				ref={menuButtonRef}
-				className="flex items-center space-x-2 lg:hidden"
+				className="flex items-center gap-1 rounded-md border px-2 py-1 text-sm font-medium lg:hidden"
 				onClick={() => setShowMobileMenu(!showMobileMenu)}
 				aria-expanded={showMobileMenu}
 				aria-controls="mobile-nav"
 				aria-label={showMobileMenu ? "Close menu" : "Open menu"}
 			>
-				{showMobileMenu && <Icons.close width="28" height="28" />}
-				<span className="font-bold">Menu</span>
+				{showMobileMenu ? (
+					<Icons.close width="18" height="18" />
+				) : (
+					<Icons.list width="18" height="18" />
+				)}
+				<span>Menu</span>
 			</button>
 			{showMobileMenu && items && (
 				<MobileNav

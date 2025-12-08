@@ -62,14 +62,21 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 							key={item.href}
 							to={item.disabled ? "#" : item.href}
 							className={cn(
-								"flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium hover:underline",
+								"flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium transition-colors text-foreground/80 hover:text-foreground hover:bg-muted no-underline",
 								item.disabled && "cursor-not-allowed opacity-60",
 							)}
+							activeProps={{
+								className: cn(
+									"flex w-full items-center gap-2 rounded-md p-2 text-sm font-medium transition-colors bg-muted text-foreground",
+									item.disabled && "cursor-not-allowed opacity-60",
+								),
+							}}
 							onClick={onCloseMenu}
 							search={(prev: Record<string, unknown>) => ({
 								...prev,
 								year: prev.year || constants.DEFAULT_YEAR,
 							})}
+							activeOptions={{ exact: item.href === "/" }}
 							ref={index === 0 ? firstLinkRef : undefined}
 						>
 							{item.icon}
@@ -108,6 +115,7 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 										})}
 										to="/profile"
 										onClick={onCloseMenu}
+										className="no-underline"
 									>
 										View Profile
 									</Link>
@@ -143,7 +151,7 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 							className="flex items-center justify-start gap-2 w-full"
 							asChild
 						>
-							<Link to="/signin" onClick={onCloseMenu}>
+								<Link to="/signin" onClick={onCloseMenu} className="no-underline">
 								<Icons.login className="h-5 w-5" />
 								Sign In
 							</Link>
@@ -159,6 +167,7 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 							href="https://github.com/nicholasgriffintn/fosdem-pwa"
 							target="_blank"
 							rel="noreferrer"
+							className="no-underline"
 							onClick={onCloseMenu}
 						>
 							<Icons.gitHub className="h-5 w-5" />

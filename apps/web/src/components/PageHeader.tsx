@@ -54,7 +54,7 @@ export function PageHeader({
 						<li key={breadcrumb.href}>
 							<Link
 								to={breadcrumb.href}
-								search={(prev) => ({ ...prev, ...breadcrumb.search })}
+								search={(prev: Record<string, unknown>) => ({ ...prev, ...breadcrumb.search })}
 								className="no-underline"
 							>
 								{breadcrumb.title}
@@ -84,7 +84,7 @@ export function PageHeader({
 							{metadata.map((meta, index) => (
 								<span key={meta.text}>
 									{meta.href ? (
-										<Link to={meta.href} search={(prev) => ({ ...prev })}>
+										<Link to={meta.href} search={(prev: Record<string, unknown>) => ({ ...prev })}>
 											{meta.text}
 										</Link>
 									) : (

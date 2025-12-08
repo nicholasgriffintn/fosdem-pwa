@@ -5,6 +5,8 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
 import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { Spinner } from "~/components/Spinner";
 import { ScrollArea } from "~/components/ui/scroll-area";
@@ -155,15 +157,24 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 		setFocusedIndex(-1);
 	};
 
+	const goToSearchPage = useCallback(
+		(query: string) => {
+			const trimmed = query.trim();
+			if (!trimmed) return;
+			navigate({
+				to: "/search",
+				search: { year, q: trimmed },
+			});
+		},
+		[navigate, year],
+	);
+
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (!searchResults.length) {
 			if (e.key === "Enter" && inputValue.trim()) {
 				e.preventDefault();
 				setFocusedIndex(-1);
-				navigate({
-					to: "/search",
-					search: { year, q: inputValue.trim() },
-				});
+				goToSearchPage(inputValue);
 				return;
 			}
 			return;
@@ -214,10 +225,7 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					e.preventDefault();
 					setSearchResults([]);
 					setFocusedIndex(-1);
-					navigate({
-						to: "/search",
-						search: { year, q: inputValue.trim() },
-					});
+					goToSearchPage(inputValue);
 				}
 				break;
 		}
@@ -234,6 +242,8 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					<button
 						ref={setRef}
 						type="button"
+						role="option"
+						aria-selected={focusedIndex === index}
 						className={cn(
 							"w-full text-left p-2 hover:bg-accent cursor-pointer focus:outline-none focus:bg-accent",
 							focusedIndex === index && "bg-accent",
@@ -241,9 +251,16 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 						onClick={() => handleResultClick(result)}
 						onKeyDown={handleKeyDown}
 					>
-						<div className="font-medium">{result.item.name}</div>
-						<div className="text-sm text-muted-foreground">
-							Track • {result.item.type}
+						<div className="flex items-start justify-between gap-2">
+							<div className="font-medium">{result.item.name}</div>
+							<Badge variant="outline" className="text-[10px] uppercase">
+								Track
+							</Badge>
+						</div>
+						<div className="text-xs text-muted-foreground">
+							{[result.item.type, result.item.room]
+								.filter(Boolean)
+								.join(" • ")}
 						</div>
 					</button>
 				);
@@ -252,6 +269,8 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					<button
 						ref={setRef}
 						type="button"
+						role="option"
+						aria-selected={focusedIndex === index}
 						className={cn(
 							"w-full text-left p-2 hover:bg-accent cursor-pointer focus:outline-none focus:bg-accent",
 							focusedIndex === index && "bg-accent",
@@ -259,10 +278,26 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 						onClick={() => handleResultClick(result)}
 						onKeyDown={handleKeyDown}
 					>
-						<div className="font-medium">{result.item.title}</div>
-						<div className="text-sm text-muted-foreground">
-							Event • {result.item.track} • {result.item.persons?.join(", ")}
+						<div className="flex items-start justify-between gap-2">
+							<div className="font-medium">{result.item.title}</div>
+							<Badge variant="outline" className="text-[10px] uppercase">
+								Event
+							</Badge>
 						</div>
+						<div className="text-xs text-muted-foreground">
+							{[
+								result.item.track || result.item.trackKey,
+								result.item.startTime,
+								result.item.room,
+							]
+								.filter(Boolean)
+								.join(" • ")}
+						</div>
+						{result.item.persons?.length ? (
+							<div className="text-[11px] text-muted-foreground line-clamp-1">
+								{result.item.persons.join(", ")}
+							</div>
+						) : null}
 					</button>
 				);
 			case "room":
@@ -270,6 +305,8 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					<button
 						ref={setRef}
 						type="button"
+						role="option"
+						aria-selected={focusedIndex === index}
 						className={cn(
 							"w-full text-left p-2 hover:bg-accent cursor-pointer focus:outline-none focus:bg-accent",
 							focusedIndex === index && "bg-accent",
@@ -277,10 +314,19 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 						onClick={() => handleResultClick(result)}
 						onKeyDown={handleKeyDown}
 					>
-						<div className="font-medium">{result.item.name}</div>
-						<div className="text-sm text-muted-foreground">
-							Room • Building{" "}
-							{result.item.buildingId || result.item.building?.id}
+						<div className="flex items-start justify-between gap-2">
+							<div className="font-medium">{result.item.name}</div>
+							<Badge variant="outline" className="text-[10px] uppercase">
+								Room
+							</Badge>
+						</div>
+						<div className="text-xs text-muted-foreground">
+							{[
+								"Building",
+								result.item.buildingId || result.item.building?.id,
+							]
+								.filter(Boolean)
+								.join(" ")}
 						</div>
 					</button>
 				);
@@ -313,7 +359,11 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 			</form>
 
 			{searchResults.length > 0 && (
-				<Card className="absolute top-full mt-2 right-0 w-full sm:w-96 z-50">
+				<Card
+					className="absolute top-full mt-2 right-0 w-full sm:w-96 z-50 overflow-hidden"
+					role="listbox"
+					aria-label="Search suggestions"
+				>
 					<ScrollArea className="h-[300px]">
 						<div className="p-2">
 							{searchResults.map((result, index) => (
@@ -326,6 +376,22 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 							))}
 						</div>
 					</ScrollArea>
+					{inputValue.trim() && (
+						<div className="flex items-center justify-between gap-3 border-t bg-muted/40 px-3 py-2">
+							{focusedIndex === -1 && (
+								<p className="text-xs text-muted-foreground">
+									Press Enter to search all results
+								</p>
+							)}
+							<Button
+								size="sm"
+								variant="ghost"
+								onClick={() => goToSearchPage(inputValue)}
+							>
+								View all
+							</Button>
+						</div>
+					)}
 				</Card>
 			)}
 		</div>

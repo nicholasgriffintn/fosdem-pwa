@@ -7,6 +7,7 @@ import Hls from "hls.js";
 import { Icons } from "~/components/Icons";
 import { constants } from "~/constants";
 import { Image } from "~/components/Image";
+import { useOnlineStatus } from "~/hooks/use-online-status";
 
 type RoomPlayerProps = {
 	roomId: string;
@@ -26,6 +27,7 @@ export function RoomPlayer({
 	const hlsRef = useRef<Hls | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [streamError, setStreamError] = useState(false);
+	const isOnline = useOnlineStatus();
 
 	useEffect(() => {
 		if (!videoRef.current || !isPlaying) return;
@@ -73,7 +75,7 @@ export function RoomPlayer({
 
 	return (
 		<div className={containerClassName}>
-			{!isPlaying && (
+			{(!isPlaying || !isOnline) && (
 				<Image
 					src="/images/fosdem/full/fallback.png"
 					alt="The FOSDEM logo"
@@ -82,7 +84,7 @@ export function RoomPlayer({
 			)}
 
 			<div className={videoWrapperClassName}>
-				{!isPlaying && (
+				{!isPlaying && isOnline && (
 					<button
 						type="button"
 						onClick={handlePlay}
@@ -117,6 +119,22 @@ export function RoomPlayer({
 								The stream is currently unavailable. The room might not be
 								streaming at the moment.
 							</span>
+						</div>
+					</div>
+				)}
+				{!isOnline && (
+					<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
+						<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
+							<p className="text-sm md:text-base font-medium">
+								You are offline. Live streams are unavailable.
+							</p>
+							<a
+								className="text-sm text-primary underline"
+								href="/offline"
+								rel="noreferrer"
+							>
+								View offline schedule
+							</a>
 						</div>
 					</div>
 				)}

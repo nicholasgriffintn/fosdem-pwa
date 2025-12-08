@@ -1,4 +1,5 @@
 import type { Event } from "~/types/fosdem";
+import { Badge } from "~/components/ui/badge";
 
 export function EventContent({ event }: { event: Event }) {
 	return (
@@ -10,7 +11,7 @@ export function EventContent({ event }: { event: Event }) {
 				</div>
 			)}
 			{event.abstract && (
-				<div className="prose prose-lg prose-indigo overflow-scroll mt-4 text-foreground">
+				<div className="prose prose-lg prose-indigo mt-4 text-foreground">
 					<h2 className="text-xl font-medium text-foreground">Abstract</h2>
 					<div
 						className="mt-2"
@@ -20,7 +21,7 @@ export function EventContent({ event }: { event: Event }) {
 				</div>
 			)}
 			{event.description && (
-				<div className="prose prose-lg prose-indigo overflow-scroll mt-4 text-foreground">
+				<div className="prose prose-lg prose-indigo mt-4 text-foreground">
 					<h2 className="text-xl font-medium text-foreground">Description</h2>
 					<div
 						className="mt-2"

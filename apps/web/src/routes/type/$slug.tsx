@@ -83,16 +83,23 @@ function TypePage() {
 						},
 					]}
 				/>
-				<TrackList
-					tracks={fosdem.trackData}
-					year={year}
-					groupByDay={true}
-					days={fosdem.days}
-					day={day}
-					user={user}
-					onCreateBookmark={onCreateBookmark}
-					displaySortByFavourites={true}
-				/>
+				{fosdem.trackData?.length > 0 ? (
+					<TrackList
+						tracks={fosdem.trackData}
+						year={year}
+						groupByDay={true}
+						days={fosdem.days}
+						day={day}
+						user={user}
+						onCreateBookmark={onCreateBookmark}
+						displaySortByFavourites={true}
+					/>
+				) : (
+					<EmptyStateCard
+						title="No tracks for this type"
+						description="We don’t have tracks for this content type yet. Check another type or return later."
+					/>
+				)}
 			</div>
 		</div>
 	);

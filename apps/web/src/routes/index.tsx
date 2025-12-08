@@ -5,6 +5,7 @@ import { getAllData } from "~/server/functions/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { ConferenceScheduleNotice } from "~/components/ConferenceScheduleNotice";
 import { constants } from "~/constants";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/")({
 	component: Home,
@@ -42,8 +43,19 @@ function Home() {
 					text={`${fosdem.conference.city} / ${fosdem.conference.start} - ${fosdem.conference.end}`}
 					year={year}
 				/>
-				<ConferenceScheduleNotice conference={fosdem.conference} year={year} />
-				<div>{fosdem.types && <TypesList types={fosdem.types} />}</div>
+
+				{!fosdem.types || Object.keys(fosdem.types).length === 0 ? (
+					<EmptyStateCard
+						title="No schedule data yet"
+						description="We couldn't load tracks and types for this year. Please check back shortly."
+					/>
+				) : (
+					<>
+							<ConferenceScheduleNotice conference={fosdem.conference} year={year} />
+
+							<div>{fosdem.types && <TypesList types={fosdem.types} />}</div>
+					</>
+				)}
 			</div>
 		</div>
 	);

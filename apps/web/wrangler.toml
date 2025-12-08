@@ -20,15 +20,3 @@ database_id = "2ec973b1-6e46-49a8-825b-1928ec34cd22"
 [[kv_namespaces]]
 binding = "KV"
 id = "eaa0ebf8ad2e4c9da021aeffc43f74b4"
-
-# The following are secrets that should be set using `wrangler secret put`
-# NODE_ENV = "production"
-# REDIS_ENABLED = "true"
-# CLOUDFLARE_ACCOUNT_ID
-# CLOUDFLARE_DATABASE_ID
-# CLOUDFLARE_D1_TOKEN
-# UPSTASH_REDIS_URL
-# UPSTASH_REDIS_TOKEN
-# GITHUB_CLIENT_ID
-# GITHUB_CLIENT_SECRET
-# GITHUB_REDIRECT_URI

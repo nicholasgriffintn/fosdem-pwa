@@ -15,6 +15,7 @@ import { EventScheduleList } from "~/components/Event/EventScheduleList";
 import type { User } from "~/server/db/schema";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 type EventListViewModes = "list" | "calendar" | "schedule";
 
@@ -73,6 +74,21 @@ export function EventList({
 		);
 		return event.priority === 1 || !hasConflict;
 	});
+
+	if (!events.length) {
+		return (
+			<div className="my-6">
+				{title && (
+					<h2 className="text-xl font-semibold shrink-0">{title}</h2>
+				)}
+				<EmptyStateCard
+					title="No events to show"
+					description="Adjust filters or pick another day to see more sessions."
+					className="my-6"
+				/>
+			</div>
+		);
+	}
 
 	if (groupByDay && days && days.length > 0) {
 		const eventDataSplitByDay = groupEventsByDay(
@@ -162,10 +178,11 @@ export function EventList({
 							if (!eventDataSplitByDay[day.id]) {
 								return (
 									<TabsContent key={day.id} value={day.id}>
-										<p>
-											No events are currently scheduled for this day, check the
-											next day instead. Or check back later for updates.
-										</p>
+										<EmptyStateCard
+											title="No events for this day"
+											description="Try switching to another day or come back later for updates."
+											className="my-4"
+										/>
 									</TabsContent>
 								);
 							}
