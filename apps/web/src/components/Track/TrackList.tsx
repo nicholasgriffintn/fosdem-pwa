@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+
 import type { Track } from "~/types/fosdem";
 import { ItemActions } from "~/components/ItemActions";
 import { useTrackList } from "~/hooks/use-item-list";
@@ -8,6 +9,8 @@ import { cn } from "~/lib/utils";
 import type { User } from "~/server/db/schema";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { Icons } from "~/components/Icons";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -52,26 +55,52 @@ function TrackListItem({
 	user,
 	onCreateBookmark,
 }: TrackListItemProps) {
+	const metaBadges = [
+		track.room
+			? {
+				key: "room",
+				label: track.room,
+				icon: <Icons.mapPin className="h-3.5 w-3.5" />,
+			}
+			: null,
+		{
+			key: "events",
+			label: `${track.eventCount} events`,
+			icon: <Icons.list className="h-3.5 w-3.5" />,
+		},
+		track.type
+			? {
+				key: "type",
+				label: track.type,
+				icon: <Icons.calendar className="h-3.5 w-3.5" />,
+			}
+			: null,
+	].filter(Boolean) as { key: string; label: string; icon?: React.ReactNode }[];
+
 	return (
-		<div className="flex items-center justify-between relative py-3 px-2 sm:px-3">
-			<div className="flex flex-col md:flex-row md:justify-between w-full">
-				<div className="flex flex-col space-y-1.5">
-					<h3 className="font-semibold leading-none tracking-tight">
-						{track.name}
-					</h3>
-					<p className="text-muted-foreground">
-						{track.room} | {track.eventCount} events
-					</p>
+		<div className="flex items-start justify-between gap-3 relative py-4 px-3 sm:px-4 hover:bg-muted/40 transition-colors">
+			<div className="flex flex-1 flex-col gap-2 min-w-0">
+				<h3 className="font-semibold leading-tight text-base">{track.name}</h3>
+				<div className="flex flex-wrap gap-2">
+					{metaBadges.map((meta) => (
+						<div
+							key={meta.key}
+							className="flex items-center gap-1 text-xs"
+						>
+							{meta.icon}
+							<span className="truncate">{meta.label}</span>
+						</div>
+					))}
 				</div>
-				<ItemActions
-					item={track}
-					year={year}
-					type="track"
-					bookmarksLoading={bookmarksLoading}
-					className="pl-1 md:pl-6 pt-3 md:pt-0"
-					onCreateBookmark={onCreateBookmark}
-				/>
 			</div>
+			<ItemActions
+				item={track}
+				year={year}
+				type="track"
+				bookmarksLoading={bookmarksLoading}
+				className="pl-1 lg:pl-6"
+				onCreateBookmark={onCreateBookmark}
+			/>
 		</div>
 	);
 }
@@ -122,7 +151,11 @@ function TrackListContent({
 					))}
 				</ul>
 			) : (
-				<div className="text-muted-foreground">No tracks found</div>
+					<EmptyStateCard
+						title="No tracks to show"
+						description="Try another day or browse all tracks from the home page."
+						className="my-4"
+					/>
 			)}
 		</>
 	);
@@ -199,10 +232,11 @@ export function TrackList({
 							if (!trackDataSplitByDay[day.id]) {
 								return (
 									<TabsContent key={day.id} value={day.id}>
-										<p>
-											No tracks are currently scheduled for this day, check the
-											next day instead. Or check back later for updates.
-										</p>
+										<EmptyStateCard
+											title="No tracks for this day"
+											description="Switch to another day to find available tracks."
+											className="my-4"
+										/>
 									</TabsContent>
 								);
 							}

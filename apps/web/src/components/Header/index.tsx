@@ -24,19 +24,23 @@ export function Header() {
 
 	const navItems = [
 		{
-			title: "Home",
+			title: "Schedule",
 			href: "/",
-			icon: <Icons.home className="h-4 w-4" />,
+			icon: <Icons.calendar className="h-4 w-4" />,
 		},
 		{
 			title: "Live",
 			href: "/live",
-			// biome-ignore lint/a11y/useMediaCaption: <explanation>
 			icon: <Icons.video className="h-4 w-4" />,
 		},
 		{
+			title: "Rooms",
+			href: "/rooms",
+			icon: <Icons.building className="h-4 w-4" />,
+		},
+		{
 			title: "Bookmarks",
-			href: "/bookmarks/",
+			href: "/bookmarks",
 			icon: <Icons.bookmark className="h-4 w-4" />,
 		},
 		{
@@ -47,16 +51,16 @@ export function Header() {
 	];
 
 	return (
-		<header className="sticky top-0 z-40 w-full border-b bg-background">
-			<div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+		<header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+			<div className="container flex h-16 items-center gap-4 sm:justify-between">
 				<MainNav title="FOSDEM PWA" items={navItems} />
 				<div
 					className={cn(
-						"flex flex-1 items-center space-x-4 sm:justify-end",
-						user?.id || loading ? "" : "gap-4",
+						"flex flex-1 items-center gap-3 sm:justify-end",
+						user?.id || loading ? "" : "sm:gap-4",
 					)}
 				>
-					<nav className="hidden md:flex space-x-4">
+					<nav className="hidden md:flex items-center gap-2">
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
@@ -69,10 +73,9 @@ export function Header() {
 									) : (
 										<Button
 											variant="link"
-											size="icon"
+													size="sm"
 											className={cn(
-												"h-7 text-muted-foreground no-underline",
-												user?.id || loading ? "w-7" : "",
+												"h-8 gap-2 px-3 text-muted-foreground no-underline",
 											)}
 											asChild
 										>
@@ -83,7 +86,7 @@ export function Header() {
 													year: (prev.year as number) || constants.DEFAULT_YEAR,
 												})}
 											>
-												<Icons.login className="h-7 w-7" width="7" height="7" />
+														<Icons.login className="h-4 w-4" />
 												<span>Sign In</span>
 											</Link>
 										</Button>
@@ -101,7 +104,7 @@ export function Header() {
 							</Tooltip>
 						</TooltipProvider>
 					</nav>
-					<div className="flex-1 sm:grow-0">
+					<div className="flex-1 sm:grow-0 max-w-md">
 						<NavSearch year={selectedYear} />
 					</div>
 				</div>

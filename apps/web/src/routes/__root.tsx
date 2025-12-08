@@ -105,7 +105,13 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					"--font-heading",
 				)}
 			>
-				<main className="flex min-h-screen flex-col">
+				<a
+					href="#main-content"
+					className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
+				>
+					Skip to main content
+				</a>
+				<main id="main-content" className="flex min-h-screen flex-col">
 					<Header />
 					<GuestBanner />
 					<div className="container flex-1">

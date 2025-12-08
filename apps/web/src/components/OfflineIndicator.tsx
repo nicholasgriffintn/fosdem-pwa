@@ -164,6 +164,8 @@ export function OfflineIndicator() {
 				"fixed bottom-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300",
 				"bg-background border rounded-lg shadow-lg p-3 flex items-center gap-3",
 			)}
+			role="status"
+			aria-live="polite"
 		>
 			<div className="flex items-center gap-2">
 				{isOnline ? (
@@ -175,6 +177,12 @@ export function OfflineIndicator() {
 					{isOnline ? "Back Online" : "Offline Mode"}
 				</span>
 			</div>
+
+			{!isOnline && (
+				<span className="text-xs text-muted-foreground">
+					Using cached data when available.
+				</span>
+			)}
 
 			{!isOnline && (
 				<Button

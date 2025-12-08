@@ -133,6 +133,27 @@ function OfflinePage() {
 					</Card>
 				)}
 
+				{!cachedData.fosdemData && (
+					<Card className="mb-6">
+						<CardHeader>
+							<CardTitle>No cached schedule yet</CardTitle>
+							<CardDescription>
+								Open the schedule while online to keep it available offline.
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<p className="text-sm text-muted-foreground">
+								We couldn't find locally cached conference data for this year.
+								Once you're online, visit the schedule to save it for offline
+								use.
+							</p>
+							<Button variant="outline" size="sm" onClick={handleRetry}>
+								Retry now
+							</Button>
+						</CardContent>
+					</Card>
+				)}
+
 				<Card className="mb-6">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+import type React from "react";
 import clsx from "clsx";
 
 import type { Event } from "~/types/fosdem";
@@ -7,6 +8,8 @@ import { ItemActions } from "~/components/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime } from "~/lib/dateTime";
 import type { User } from "~/server/db/schema";
+import { Badge } from "~/components/ui/badge";
+import { Icons } from "~/components/Icons";
 
 type EventListProps = {
 	events: Event[];
@@ -33,8 +36,6 @@ type EventListProps = {
 type EventListItemProps = {
 	year: number;
 	event: Event;
-	index: number;
-	isLast: boolean;
 	bookmarksLoading: boolean;
 	conflicts?: EventConflict[];
 	onSetPriority?: (
@@ -52,64 +53,136 @@ type EventListItemProps = {
 		slug: string;
 		status: string;
 	}) => void;
+	variant?: "list" | "card";
+	className?: string;
+	style?: React.CSSProperties;
+	actionSize?: "default" | "sm";
 };
 
-function EventListItem({
+export function EventListItem({
 	year,
 	event,
-	index,
-	isLast,
 	bookmarksLoading,
 	conflicts,
 	onSetPriority,
 	showTrack,
 	user,
 	onCreateBookmark,
+	variant = "list",
+	className,
+	style,
+	actionSize,
 }: EventListItemProps) {
 	const hasConflicts = conflicts?.some(
 		(conflict) =>
 			conflict.event1.id === event.id || conflict.event2.id === event.id,
 	);
+	const endTime = calculateEndTime(event.startTime, event.duration);
+	const layoutClass =
+		variant === "card"
+			? "flex flex-col gap-3 h-full"
+			: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3";
+	const metaBadges = [
+		{
+			key: "time",
+			label: `${event.startTime} – ${endTime}`,
+			icon: <Icons.clock className="h-3.5 w-3.5" />,
+		},
+		event.room
+			? {
+				key: "room",
+				label: event.room,
+				icon: <Icons.mapPin className="h-3.5 w-3.5" />,
+			}
+			: null,
+		showTrack && event.trackKey
+			? {
+				key: "track",
+				label: event.trackKey,
+				icon: <Icons.list className="h-3.5 w-3.5" />,
+			}
+			: null,
+		event.persons?.length > 0
+			? {
+				key: "persons",
+				label: event.persons.join(", "),
+				icon: <Icons.users className="h-3.5 w-3.5" />,
+			}
+			: null,
+	]
+		.filter(Boolean)
+		.map((meta) => meta as { key: string; label: string; icon?: React.ReactNode });
 
 	return (
 		<div
 			className={clsx(
-				"flex items-center justify-between relative py-3 px-1 sm:px-2",
-				hasConflicts && !event.priority && "border-l-4 border-l-destructive",
+				variant === "card"
+					? "bg-card border rounded-lg p-3 hover:shadow-md transition-shadow relative flex flex-col"
+					: "flex items-start justify-between gap-3 relative py-4 px-3 sm:px-4 hover:bg-muted/40 transition-colors",
+				hasConflicts &&
+				!event.priority &&
+				(variant === "card"
+					? "border-destructive/70"
+					: "border-l-4 border-l-destructive/70"),
+				className,
 			)}
+			style={style}
 		>
-			<ConflictTooltip
-				event={event}
-				conflicts={conflicts}
-				className="pl-2 py-3"
-				onSetPriority={onSetPriority}
-				priority={event.priority}
-			/>
-			<div className="flex flex-col md:flex-row md:justify-between w-full">
-				<div
-					className={clsx(
-						"flex flex-col space-y-1.5 pl-1 pr-1",
-						hasConflicts && "pl-2",
+			<div className="flex flex-1 flex-col gap-2 min-w-0">
+				<div className="flex flex-wrap items-start gap-2">
+					{event.isLive && (
+						<Badge variant="default" className="bg-red-500 hover:bg-red-500">
+							Live
+						</Badge>
 					)}
-				>
-					<h3 className="font-semibold leading-none tracking-tight">
-						{event.title}
-					</h3>
-					<p className="text-muted-foreground">
-						{event.room} | {event.startTime} -{" "}
-						{calculateEndTime(event.startTime, event.duration)}
-						{event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
-						{showTrack && event.trackKey && ` | ${event.trackKey}`}
-					</p>
+					{hasConflicts && <Badge variant="destructive">Conflict</Badge>}
+					{event.priority === 1 && <Badge variant="secondary">Pinned</Badge>}
 				</div>
-				<ItemActions
-					item={event}
-					year={year}
-					type="event"
-					bookmarksLoading={bookmarksLoading}
-					className="pl-1 md:pl-6 pb-3 md:pb-0"
-					onCreateBookmark={onCreateBookmark}
-				/>
+				<div className={layoutClass}>
+					<div className="flex-1 space-y-2 min-w-0">
+						<h3 className="font-semibold leading-tight text-base">
+							{event.title}
+						</h3>
+						<div
+							className={clsx(
+								"flex flex-wrap gap-2",
+								variant === "card" ? "text-xs" : "",
+							)}
+						>
+							{metaBadges.map((meta) => (
+								<div
+									key={meta.key}
+									className="flex items-center gap-1 text-xs"
+								>
+									{meta.icon}
+									<span className="truncate">{meta.label}</span>
+								</div>
+							))}
+						</div>
+						{hasConflicts && (
+							<ConflictTooltip
+								event={event}
+								conflicts={conflicts}
+								className="inline-flex"
+								onSetPriority={onSetPriority}
+								priority={event.priority}
+							/>
+						)}
+					</div>
+					<ItemActions
+						item={event}
+						year={year}
+						type="event"
+						bookmarksLoading={bookmarksLoading}
+						size={actionSize ?? (variant === "card" ? "sm" : "default")}
+						className={
+							variant === "card"
+								? "pt-2 mt-auto"
+								: "pl-1 lg:pl-6"
+						}
+						onCreateBookmark={onCreateBookmark}
+					/>
+				</div>
 			</div>
 		</div>
 	);
@@ -139,8 +212,6 @@ export function EventItemList({
 						<EventListItem
 							year={year}
 							event={event}
-							index={index}
-							isLast={events.length === index + 1}
 							bookmarksLoading={bookmarksLoading}
 							conflicts={conflicts}
 							onSetPriority={onSetPriority}
