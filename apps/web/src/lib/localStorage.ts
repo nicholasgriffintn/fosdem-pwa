@@ -274,12 +274,15 @@ export async function saveLocalBookmark(
 	skipSync?: boolean,
 ): Promise<LocalBookmark> {
 	const now = new Date().toISOString();
-	const id = `${bookmark.year}_${bookmark.slug}_${Date.now()}`;
+	const id = `${bookmark.year}_${bookmark.slug}`;
+
+	const existing = await getFromStore<LocalBookmark>(STORE_NAMES.BOOKMARKS, id);
+	const createdAt = existing?.created_at ?? now;
 
 	const newBookmark: LocalBookmark = {
 		id,
 		...bookmark,
-		created_at: now,
+		created_at: createdAt,
 		updated_at: now,
 	};
 
@@ -290,7 +293,7 @@ export async function saveLocalBookmark(
 			await addToSyncQueue({
 				id,
 				type: "bookmark",
-				action: "create",
+				action: existing ? "update" : "create",
 				data: newBookmark,
 				timestamp: now,
 			});
