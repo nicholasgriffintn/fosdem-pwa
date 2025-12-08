@@ -45,6 +45,8 @@ type EventListProps = {
 		status: string;
 	}) => void;
 	displaySortByFavourites?: boolean;
+	emptyStateTitle?: string;
+	emptyStateMessage?: string;
 };
 
 export function EventList({
@@ -62,6 +64,8 @@ export function EventList({
 	user = null,
 	onCreateBookmark,
 	displaySortByFavourites = false,
+	emptyStateTitle = "No events to show",
+	emptyStateMessage = "Adjust filters or pick another day to see more sessions.",
 }: EventListProps) {
 	const [viewMode, setViewMode] = useState<EventListViewModes>(defaultViewMode);
 	const [sortByFavourites, setSortByFavourites] = useState(false);
@@ -82,8 +86,8 @@ export function EventList({
 					<h2 className="text-xl font-semibold shrink-0">{title}</h2>
 				)}
 				<EmptyStateCard
-					title="No events to show"
-					description="Adjust filters or pick another day to see more sessions."
+					title={emptyStateTitle}
+					description={emptyStateMessage}
 					className="my-6"
 				/>
 			</div>
