@@ -39,7 +39,7 @@ export function TypesList({ types }: TypesListProps) {
 							<CardHeader>
 								<CardTitle>
 									<Link
-										search={(prev) => ({
+										search={(prev: any) => ({
 											...prev,
 											year: prev.year || constants.DEFAULT_YEAR,
 											day: prev.day || undefined,
@@ -88,7 +88,7 @@ export function TypesList({ types }: TypesListProps) {
 									className="w-full no-underline"
 								>
 									<Link
-										search={(prev) => ({
+										search={(prev: any) => ({
 											...prev,
 											year: prev.year || constants.DEFAULT_YEAR,
 											day: prev.day || undefined,
@@ -96,7 +96,7 @@ export function TypesList({ types }: TypesListProps) {
 										to="/type/$slug"
 										params={{ slug: types[typeKey].id }}
 									>
-										View Tracks
+										View {types[typeKey].name ?? "Tracks"}
 									</Link>
 								</Button>
 							</CardFooter>
