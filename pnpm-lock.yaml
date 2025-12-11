@@ -124,8 +124,8 @@ importers:
         specifier: 1.139.14
         version: 1.139.14(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(vite@7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0))
       '@unpic/react':
-        specifier: 1.0.1
-        version: 1.0.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+        specifier: 1.0.2
+        version: 1.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@upstash/redis':
         specifier: 1.35.7
         version: 1.35.7
@@ -2267,13 +2267,13 @@ packages:
   '@types/react@19.2.7':
     resolution: {integrity: sha512-MWtvHrGZLFttgeEj28VXHxpmwYbor/ATPYbBfSFZEIRK0ecCFLl2Qo55z52Hss+UV9CRN7trSeq1zbgx7YDWWg==}
 
-  '@unpic/core@1.0.2':
-    resolution: {integrity: sha512-wZFg5K///uWutEKXS2PJeZZ1jpVj1Ao75pxBcDXbp5QVg7l347gUX/Q2w+cQdBBghHbJE+ndRaaVvnt8ACmiVQ==}
+  '@unpic/core@1.0.3':
+    resolution: {integrity: sha512-aum9YNVUGso7MjGLD0Rp/08kywCGLqZ03/q6VQBFFakDBOXWEc8D4kPGcZ8v5wEnGRex3lE+++bOuucBp3KJ/w==}
 
-  '@unpic/react@1.0.1':
-    resolution: {integrity: sha512-JmKVmf7ZhKDlVFK8yfbgiWp9K4rXXovE8mWrbkqjDJHKhDqbF5uUp7754Tk7oNSYJcvIXfH8P/nYRCfG2ca0/w==}
+  '@unpic/react@1.0.2':
+    resolution: {integrity: sha512-5RmRfELwTF8w+4zjtQGqjpvX+RU2VLvis3xDCS1O2uWk0PZN2cvatL+3/KAR3mshAuRrkFGTX1XwyAezSXaoCA==}
     peerDependencies:
-      next: ^13.0.0 || ^14.0.0 || ^15.0.0
+      next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
@@ -5417,13 +5417,13 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
-  '@unpic/core@1.0.2':
+  '@unpic/core@1.0.3':
     dependencies:
       unpic: 4.2.2
 
-  '@unpic/react@1.0.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1)':
+  '@unpic/react@1.0.2(react-dom@19.2.1(react@19.2.1))(react@19.2.1)':
     dependencies:
-      '@unpic/core': 1.0.2
+      '@unpic/core': 1.0.3
       react: 19.2.1
       react-dom: 19.2.1(react@19.2.1)
 
