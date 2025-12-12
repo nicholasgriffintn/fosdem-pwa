@@ -12,7 +12,7 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20251205.0",
+    "@cloudflare/workers-types": "4.20251209.0",
     "vitest": "4.0.15",
     "typescript": "5.9.3",
     "wrangler": "4.53.0"
