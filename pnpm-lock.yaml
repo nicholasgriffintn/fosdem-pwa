@@ -139,8 +139,8 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       drizzle-orm:
-        specifier: 0.45.0
-        version: 0.45.0(@cloudflare/workers-types@4.20251209.0)(@opentelemetry/api@1.9.0)(@upstash/redis@1.35.7)
+        specifier: 0.45.1
+        version: 0.45.1(@cloudflare/workers-types@4.20251209.0)(@opentelemetry/api@1.9.0)(@upstash/redis@1.35.7)
       fuse.js:
         specifier: 7.1.0
         version: 7.1.0
@@ -2538,8 +2538,8 @@ packages:
     resolution: {integrity: sha512-O9EC/miwdnRDY10qRxM8P3Pg8hXe3LyU4ZipReKOgTwn4OqANmftj8XJz1UPUAS6NMHf0E2htjsbQujUTkncCg==}
     hasBin: true
 
-  drizzle-orm@0.45.0:
-    resolution: {integrity: sha512-lyd9VRk3SXKRjV/gQckQzmJgkoYMvVG3A2JAV0vh3L+Lwk+v9+rK5Gj0H22y+ZBmxsrRBgJ5/RbQCN7DWd1dtQ==}
+  drizzle-orm@0.45.1:
+    resolution: {integrity: sha512-Te0FOdKIistGNPMq2jscdqngBRfBpC8uMFVwqjf6gtTVJHIQ/dosgV/CLBU2N4ZJBsXL5savCba9b0YJskKdcA==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -5715,7 +5715,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.45.0(@cloudflare/workers-types@4.20251209.0)(@opentelemetry/api@1.9.0)(@upstash/redis@1.35.7):
+  drizzle-orm@0.45.1(@cloudflare/workers-types@4.20251209.0)(@opentelemetry/api@1.9.0)(@upstash/redis@1.35.7):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20251209.0
       '@opentelemetry/api': 1.9.0
