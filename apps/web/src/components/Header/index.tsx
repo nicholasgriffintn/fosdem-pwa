@@ -52,15 +52,10 @@ export function Header() {
 
 	return (
 		<header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-			<div className="container flex h-16 items-center gap-4 sm:justify-between">
+			<div className="container flex h-16 items-center justify-between gap-4">
 				<MainNav title="FOSDEM PWA" items={navItems} />
-				<div
-					className={cn(
-						"flex flex-1 items-center gap-3 sm:justify-end",
-						user?.id || loading ? "" : "sm:gap-4",
-					)}
-				>
-					<nav className="hidden md:flex items-center gap-2">
+				<div className="flex items-center justify-end gap-3">
+					<nav className="hidden md:flex items-center gap-2 shrink-0">
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
@@ -75,7 +70,7 @@ export function Header() {
 											variant="link"
 													size="sm"
 											className={cn(
-												"h-8 gap-2 px-3 text-muted-foreground no-underline",
+												"h-8 gap-2 px-3 text-muted-foreground no-underline whitespace-nowrap",
 											)}
 											asChild
 										>
@@ -104,9 +99,7 @@ export function Header() {
 							</Tooltip>
 						</TooltipProvider>
 					</nav>
-					<div className="flex-1 sm:grow-0 max-w-md">
-						<NavSearch year={selectedYear} />
-					</div>
+					<NavSearch year={selectedYear} />
 				</div>
 			</div>
 		</header>
