@@ -211,15 +211,31 @@ export function useMutateBookmark({ year }: { year: number }) {
 		slug: string;
 		status: string;
 	}) => {
-		await createBookmarkOptimistic(
-			{
-				createLocal: createLocalBookmark,
-				removeLocal: removeLocalBookmark,
-				createServer: async (data) => createServerBookmark.mutateAsync(data),
-				userId: user?.id,
-			},
-			bookmarkData,
-		);
+		const bookmarkId = `${bookmarkData.year}_${bookmarkData.slug}`;
+		const bookmarks = await getLocalBookmarks(bookmarkData.year);
+		const existingBookmark = bookmarks.find((b) => b.id === bookmarkId);
+
+		if (bookmarkData.status === "unfavourited") {
+			if (existingBookmark) {
+				await removeLocalBookmark(bookmarkId);
+			}
+			if (user?.id) {
+				await createServerBookmark.mutateAsync(bookmarkData);
+			}
+			queryClient.invalidateQueries({
+				queryKey: ["bookmark", bookmarkData.year, bookmarkData.slug],
+			});
+		} else {
+			await createBookmarkOptimistic(
+				{
+					createLocal: createLocalBookmark,
+					removeLocal: removeLocalBookmark,
+					createServer: async (data) => createServerBookmark.mutateAsync(data),
+					userId: user?.id,
+				},
+				bookmarkData,
+			);
+		}
 	};
 
 	const update = async (
