@@ -41,7 +41,7 @@ export function useBookmark({ year, slug }: { year: number; slug: string }) {
 
 		if (serverBookmark) {
 			return {
-				...localBookmark,
+				...(localBookmark ?? {}),
 				...serverBookmark,
 				serverId: serverBookmark.id,
 				existsOnServer: true,

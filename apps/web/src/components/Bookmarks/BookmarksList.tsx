@@ -9,7 +9,9 @@ import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
 import { EmptyStateCard } from "../EmptyStateCard";
 
-function organizeBookmarks(bookmarks: (Bookmark | LocalBookmark)[]) {
+type BookmarkListItem = (Bookmark | LocalBookmark) & { serverId?: string };
+
+function organizeBookmarks(bookmarks: BookmarkListItem[]) {
 	const byYear = bookmarks.reduce(
 		(acc, bookmark) => {
 			if (!acc[bookmark.year]) {
@@ -43,14 +45,15 @@ function organizeBookmarks(bookmarks: (Bookmark | LocalBookmark)[]) {
 }
 
 type BookmarksListProps = {
-	bookmarks?: (Bookmark | LocalBookmark)[];
+	bookmarks?: BookmarkListItem[];
 	fosdemData?: Conference;
 	year: number;
 	loading: boolean;
 	day?: string;
 	onUpdateBookmark?: (params: {
 		id: string;
-		updates: Partial<Bookmark>;
+		serverId?: string;
+		updates: Partial<Bookmark | LocalBookmark>;
 	}) => void;
 	showConflicts?: boolean;
 	defaultViewMode?: "list" | "schedule" | "calendar";
@@ -102,7 +105,11 @@ export function BookmarksList({
 		});
 
 		if (bookmark && onUpdateBookmark) {
-			onUpdateBookmark({ id: bookmark.id, updates });
+			onUpdateBookmark({
+				id: bookmark.id,
+				serverId: bookmark.serverId,
+				updates,
+			});
 		}
 	};
 

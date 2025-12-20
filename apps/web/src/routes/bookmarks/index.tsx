@@ -52,7 +52,7 @@ function BookmarksHome() {
 	};
 
 	const onUpdateBookmark = (bookmark: any) => {
-		update(bookmark.id, { status: bookmark.status });
+		update(bookmark.id, { status: bookmark.status }, bookmark.serverId);
 	};
 
 	return (
