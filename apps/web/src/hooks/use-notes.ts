@@ -227,10 +227,10 @@ export function useNotes({ year, event }: UseNotesArgs) {
 		if (!serverNotes || !localNotes) return;
 		if (reconciliationInProgress.current) return;
 
+		reconciliationInProgress.current = true;
 		let cancelled = false;
 
 		const reconcile = async () => {
-			reconciliationInProgress.current = true;
 
 			try {
 				const validServerNotes = serverNotes.filter(

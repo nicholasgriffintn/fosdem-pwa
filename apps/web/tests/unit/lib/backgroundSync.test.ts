@@ -228,4 +228,122 @@ describe("background sync helpers", () => {
 		expect(dispatchSpy).toHaveBeenCalled();
 		expect(dispatchSpy.mock.calls.at(-1)?.[0].type).toBe("offline-sync-failed");
 	});
+
+	it("retries bookmark sync on failure with exponential backoff", async () => {
+		vi.useFakeTimers();
+
+		getSyncQueue.mockResolvedValue([
+			{
+				id: "1",
+				type: "bookmark",
+				action: "create",
+				data: { year: 2024, type: "event", slug: "talk", status: "favourited" },
+			},
+		]);
+
+		createBookmark
+			.mockRejectedValueOnce(new Error("Network error"))
+			.mockRejectedValueOnce(new Error("Network error"))
+			.mockResolvedValueOnce({ success: true });
+
+		const syncPromise = backgroundSync.syncBookmarksToServer();
+
+		await vi.runAllTimersAsync();
+
+		const result = await syncPromise;
+
+		expect(createBookmark).toHaveBeenCalledTimes(3);
+		expect(result.success).toBe(true);
+		expect(removeFromSyncQueue).toHaveBeenCalledWith("1");
+
+		vi.useRealTimers();
+	});
+
+	it("stops retrying after max retries and reports error", async () => {
+		vi.useFakeTimers();
+
+		getSyncQueue.mockResolvedValue([
+			{
+				id: "1",
+				type: "bookmark",
+				action: "create",
+				data: { year: 2024, type: "event", slug: "talk", status: "favourited" },
+			},
+		]);
+
+		createBookmark.mockRejectedValue(new Error("Persistent error"));
+
+		const syncPromise = backgroundSync.syncBookmarksToServer();
+
+		await vi.runAllTimersAsync();
+
+		const result = await syncPromise;
+
+		expect(createBookmark).toHaveBeenCalledTimes(3);
+		expect(result.success).toBe(false);
+		expect(result.errors[0]).toContain("Persistent error");
+		expect(removeFromSyncQueue).not.toHaveBeenCalled();
+
+		vi.useRealTimers();
+	});
+
+	it("handles timeout errors in retry logic", async () => {
+		vi.useFakeTimers();
+
+		getSyncQueue.mockResolvedValue([
+			{
+				id: "1",
+				type: "bookmark",
+				action: "create",
+				data: { year: 2024, type: "event", slug: "talk", status: "favourited" },
+			},
+		]);
+
+		const abortError = new Error("AbortError");
+		abortError.name = "AbortError";
+
+		createBookmark
+			.mockRejectedValueOnce(abortError)
+			.mockResolvedValueOnce({ success: true });
+
+		const syncPromise = backgroundSync.syncBookmarksToServer();
+
+		await vi.runAllTimersAsync();
+
+		const result = await syncPromise;
+
+		expect(createBookmark).toHaveBeenCalledTimes(2);
+		expect(result.success).toBe(true);
+
+		vi.useRealTimers();
+	});
+
+	it("retries note sync operations with retry logic", async () => {
+		vi.useFakeTimers();
+
+		getSyncQueue.mockResolvedValue([
+			{
+				id: "note1",
+				type: "note",
+				action: "create",
+				data: { year: 2024, slug: "event", content: "test", time: 1 },
+			},
+		]);
+
+		createNote
+			.mockRejectedValueOnce(new Error("Network error"))
+			.mockResolvedValueOnce({ success: true });
+
+		const syncPromise = backgroundSync.syncNotesToServer();
+
+		await vi.runAllTimersAsync();
+
+		const result = await syncPromise;
+
+		expect(createNote).toHaveBeenCalledTimes(2);
+		expect(result.success).toBe(true);
+		expect(removeFromSyncQueue).toHaveBeenCalledWith("note1");
+
+		vi.useRealTimers();
+	});
 });

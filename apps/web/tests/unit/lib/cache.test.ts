@@ -76,4 +76,99 @@ describe("CacheManager", () => {
 		await manager.invalidate("rooms");
 		expect(redisFns.del).toHaveBeenCalledWith("fosdem:rooms");
 	});
+
+	it("handles redis get() network errors gracefully", async () => {
+		mockEnv.REDIS_ENABLED = "true";
+		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
+		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+
+		const manager = new CacheManager();
+		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		redisFns.get.mockRejectedValueOnce(new Error("Network error"));
+
+		const result = await manager.get("test-key");
+
+		expect(result).toBeNull();
+		expect(consoleErrorSpy).toHaveBeenCalledWith(
+			"Redis get error for key test-key:",
+			expect.any(Error)
+		);
+
+		consoleErrorSpy.mockRestore();
+	});
+
+	it("handles redis set() network errors gracefully", async () => {
+		mockEnv.REDIS_ENABLED = "true";
+		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
+		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+
+		const manager = new CacheManager();
+		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		redisFns.set.mockRejectedValueOnce(new Error("Network error"));
+
+		await manager.set("test-key", { data: "test" });
+
+		expect(consoleErrorSpy).toHaveBeenCalledWith(
+			"Redis set error for key test-key:",
+			expect.any(Error)
+		);
+
+		consoleErrorSpy.mockRestore();
+	});
+
+	it("handles redis invalidate() network errors gracefully", async () => {
+		mockEnv.REDIS_ENABLED = "true";
+		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
+		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+
+		const manager = new CacheManager();
+		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		redisFns.del.mockRejectedValueOnce(new Error("Network error"));
+
+		await manager.invalidate("test-key");
+
+		expect(consoleErrorSpy).toHaveBeenCalledWith(
+			"Redis invalidate error for key test-key:",
+			expect.any(Error)
+		);
+
+		consoleErrorSpy.mockRestore();
+	});
+
+	it("handles JSON parse errors when getting cached data", async () => {
+		mockEnv.REDIS_ENABLED = "true";
+		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
+		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+
+		const manager = new CacheManager();
+
+		redisFns.get.mockResolvedValueOnce("invalid json{");
+
+		const result = await manager.get("test-key");
+
+		expect(result).toBe("invalid json{");
+	});
+
+	it("handles connection timeouts without crashing", async () => {
+		mockEnv.REDIS_ENABLED = "true";
+		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
+		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+
+		const manager = new CacheManager();
+		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		const timeoutError = new Error("Request timeout");
+		timeoutError.name = "TimeoutError";
+		redisFns.get.mockRejectedValueOnce(timeoutError);
+
+		const result = await manager.get("test-key");
+
+		expect(result).toBeNull();
+		expect(consoleErrorSpy).toHaveBeenCalled();
+
+		consoleErrorSpy.mockRestore();
+	});
 });

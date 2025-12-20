@@ -389,11 +389,13 @@ export async function getLocalNotes(year?: number): Promise<LocalNote[]> {
 		const { valid: validNotes, invalid: invalidNotes } = partitioned;
 
 		if (invalidNotes.length > 0) {
-			Promise.all(
-				invalidNotes.map((note) => deleteFromStore(STORE_NAMES.NOTES, note.id)),
-			).catch((error) => {
+			try {
+				await Promise.allSettled(
+					invalidNotes.map((note) => deleteFromStore(STORE_NAMES.NOTES, note.id)),
+				);
+			} catch (error) {
 				console.warn("Failed to clean invalid local notes:", error);
-			});
+			}
 		}
 
 		return year ? validNotes.filter((n) => n.year === year) : validNotes;

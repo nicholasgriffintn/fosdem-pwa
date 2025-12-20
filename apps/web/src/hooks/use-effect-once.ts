@@ -1,9 +1,16 @@
 "use client";
 
-import { type EffectCallback, useEffect } from "react";
+import { type EffectCallback, useEffect, useRef } from "react";
 
 const useEffectOnce = (effect: EffectCallback) => {
-	useEffect(effect, []);
+	const hasRun = useRef(false);
+
+	useEffect(() => {
+		if (!hasRun.current) {
+			hasRun.current = true;
+			return effect();
+		}
+	}, [effect]);
 };
 
 export default useEffectOnce;

@@ -228,4 +228,65 @@ describe("local storage helpers", () => {
 		const afterRemoval = await getSyncQueue();
 		expect(afterRemoval.some((item) => item.id === "queue-item")).toBe(false);
 	});
+
+	it("filters out invalid notes when retrieving", async () => {
+		const validNote = await saveLocalNote({
+			year: 2024,
+			slug: "valid-event",
+			note: "Valid note",
+			time: 100,
+		});
+
+		const invalidNote = {
+			id: "invalid-note",
+			year: null as any,
+			slug: "",
+			note: "",
+			created_at: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+		};
+
+		context.stores.notes.set(invalidNote.id, invalidNote);
+
+		const notes = await getLocalNotes();
+
+		expect(notes.some((n) => n.id === validNote.id)).toBe(true);
+		expect(notes.some((n) => n.id === invalidNote.id)).toBe(false);
+	});
+
+	it("handles errors during invalid note cleanup gracefully", async () => {
+		const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+		const validNote = await saveLocalNote({
+			year: 2024,
+			slug: "valid-event",
+			note: "Valid note",
+			time: 100,
+		});
+
+		const invalidNote = {
+			id: "invalid-note",
+			year: null as any,
+			slug: "",
+			note: "",
+			created_at: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+		};
+
+		context.stores.notes.set(invalidNote.id, invalidNote);
+
+		const originalDelete = context.stores.notes.delete.bind(context.stores.notes);
+		context.stores.notes.delete = vi.fn(() => {
+			throw new Error("Storage quota exceeded");
+		});
+
+		const notes = await getLocalNotes();
+
+		expect(notes.some((n) => n.id === validNote.id)).toBe(true);
+
+		await vi.runAllTimersAsync();
+
+		context.stores.notes.delete = originalDelete;
+		consoleWarnSpy.mockRestore();
+	});
 });

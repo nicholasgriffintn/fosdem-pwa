@@ -22,7 +22,7 @@ type FavouriteButtonProps = {
 		type: string;
 		slug: string;
 		status: string;
-	}) => void;
+	}) => Promise<void> | void;
 };
 
 export function FavouriteButton({
@@ -33,28 +33,44 @@ export function FavouriteButton({
 	onCreateBookmark,
 }: FavouriteButtonProps) {
 	const [currentStatus, setCurrentStatus] = useState(status);
+	const [isProcessing, setIsProcessing] = useState(false);
 
 	useEffect(() => {
-		setCurrentStatus(status);
-	}, [status]);
+		if (!isProcessing) {
+			setCurrentStatus(status);
+		}
+	}, [status, isProcessing]);
 
-	const handleFavourite = () => {
-		if (onCreateBookmark) {
-			onCreateBookmark({
-				year,
-				type,
-				slug,
-				status: currentStatus === "favourited" ? "unfavourited" : "favourited",
-			});
+	const handleFavourite = async () => {
+		if (onCreateBookmark && !isProcessing) {
+			const newStatus = currentStatus === "favourited" ? "unfavourited" : "favourited";
+			const previousStatus = currentStatus;
 
-			setCurrentStatus(
-				currentStatus === "favourited" ? "unfavourited" : "favourited",
-			);
+			setIsProcessing(true);
+			setCurrentStatus(newStatus);
 
 			toast({
-				title: currentStatus === "favourited" ? "Unfavourited" : "Favourited",
+				title: newStatus === "favourited" ? "Favourited" : "Unfavourited",
 				description: "You can undo this action by clicking the button again",
 			});
+
+			try {
+				await onCreateBookmark({
+					year,
+					type,
+					slug,
+					status: newStatus,
+				});
+			} catch (error) {
+				setCurrentStatus(previousStatus);
+				toast({
+					title: "Error",
+					description: "Failed to update bookmark. Please try again.",
+					variant: "destructive",
+				});
+			} finally {
+				setIsProcessing(false);
+			}
 		}
 	};
 
@@ -62,9 +78,9 @@ export function FavouriteButton({
 		<Button
 			variant="outline"
 			onClick={handleFavourite}
-			disabled={currentStatus === "loading"}
+			disabled={currentStatus === "loading" || isProcessing}
 		>
-			{currentStatus === "loading" ? (
+			{currentStatus === "loading" || isProcessing ? (
 				<Spinner />
 			) : (
 				<Icons.star

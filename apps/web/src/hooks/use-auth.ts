@@ -42,9 +42,13 @@ export function useAuth() {
 	useEffect(() => {
 		if (!user?.id) return;
 
+		let isMounted = true;
+
 		enableSync();
 		checkAndSyncOnOnline(user.id).catch((error) => {
-			console.error("Initial sync failed:", error);
+			if (isMounted) {
+				console.error("Initial sync failed:", error);
+			}
 		});
 
 		if (typeof window === "undefined") {
@@ -52,14 +56,17 @@ export function useAuth() {
 		}
 
 		const handleOnline = () => {
-			checkAndSyncOnOnline(user.id).catch((error) => {
-				console.error("Online sync failed:", error);
-			});
+			if (isMounted) {
+				checkAndSyncOnOnline(user.id).catch((error) => {
+					console.error("Online sync failed:", error);
+				});
+			}
 		};
 
 		window.addEventListener("online", handleOnline);
 
 		return () => {
+			isMounted = false;
 			window.removeEventListener("online", handleOnline);
 		};
 	}, [user?.id]);

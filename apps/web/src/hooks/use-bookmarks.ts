@@ -86,10 +86,10 @@ export function useBookmarks({ year }: { year: number }) {
 		if (!serverBookmarks || !localBookmarks) return;
 		if (reconciliationInProgress.current) return;
 
+		reconciliationInProgress.current = true;
 		let cancelled = false;
 
 		const reconcile = async () => {
-			reconciliationInProgress.current = true;
 
 			try {
 				const localBySlug = new Map(localBookmarks.map((b) => [b.slug, b]));
