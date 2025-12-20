@@ -23,15 +23,9 @@ const typeData = Object.freeze(constants.TYPES);
 const buildings = Object.freeze(constants.BUILDINGS);
 
 class EventProcessor {
-  private getType(event: XmlEvent, year: string): string {
+  private getType(event: XmlEvent): string {
     const type = event.type._text;
     const trackSlug = event.track._attributes?.slug;
-    const eventId = event._attributes.id;
-
-    const keynotesForYear = constants.KEYNOTES_BY_YEAR[year];
-    if (keynotesForYear && keynotesForYear.includes(eventId)) {
-      return "keynote";
-    }
 
     if (trackSlug === "dev-random") {
       return "lightningtalk";
@@ -41,19 +35,32 @@ class EventProcessor {
       return "lightningtalk";
     }
 
+    if (type === "maintrack") {
+      return "maintrack";
+    }
+
     if (type === "lecture") {
       return "keynote";
+    }
+
+    if (type === "devroom") {
+      return "devroom";
+    }
+
+    if (type === "workshop" || type === "bof") {
+      return "other";
     }
 
     return type in typeData ? type : "other";
   }
 
-  private processPersons(persons: XmlEvent["persons"]): { names: string[]; ids: string[] } {
+  private processPersons(persons: XmlEvent["persons"]): {
+    names: string[];
+    ids: string[];
+  } {
     if (!persons?.person) return { names: [], ids: [] };
 
-    const personArray = Array.isArray(persons.person)
-      ? persons.person
-      : [persons.person];
+    const personArray = Array.isArray(persons.person) ? persons.person : [persons.person];
 
     const names: string[] = [];
     const ids: string[] = [];
@@ -146,7 +153,10 @@ class EventProcessor {
 
     if (!event?.type?._text || !event?.track?._text) return null;
 
-    const type = this.getType(event, year);
+    const featuredEventIds = constants.KEYNOTES_BY_YEAR[year];
+    const isFeatured = featuredEventIds?.includes(event._attributes.id);
+
+    const type = this.getType(event);
     const track = event.track._text;
     const trackKey = this.getTrackKey(event);
 
@@ -178,6 +188,7 @@ class EventProcessor {
       subtitle: event.subtitle?._text,
       abstract: event.abstract?._text,
       description: event.description?._text,
+      isFeatured
     };
   }
 }
@@ -436,7 +447,10 @@ const fetchScheduleWithRetry = async (
 
   for (let attempt = 0; attempt < constants.SCHEDULE_FETCH_MAX_RETRIES; attempt++) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), constants.SCHEDULE_FETCH_TIMEOUT_MS);
+    const timeout = setTimeout(
+      () => controller.abort(),
+      constants.SCHEDULE_FETCH_TIMEOUT_MS
+    );
 
     try {
       logger?.info("Fetching schedule", { url, attempt: attempt + 1 });

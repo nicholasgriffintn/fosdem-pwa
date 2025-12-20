@@ -106,6 +106,7 @@ export interface ProcessedEvent {
   subtitle?: string;
   abstract?: string;
   description?: string;
+  isFeatured?: boolean;
 }
 
 export interface Link {
