@@ -111,4 +111,21 @@ describe("ItemActions", () => {
 			expect.objectContaining({ title: "Unfavourited" }),
 		);
 	});
+
+	it("keeps favourite button interactive during bookmark refetches", () => {
+		const onCreateBookmark = vi.fn().mockResolvedValue(undefined);
+
+		render(
+			<ItemActions
+				item={createEvent({ isFavourited: true })}
+				year={2024}
+				type="event"
+				bookmarksLoading={true}
+				onCreateBookmark={onCreateBookmark}
+			/>,
+		);
+
+		const [favouriteButton] = screen.getAllByRole("button");
+		expect(favouriteButton).not.toBeDisabled();
+	});
 });

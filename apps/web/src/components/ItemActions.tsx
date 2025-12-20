@@ -39,6 +39,9 @@ export function ItemActions({
 	const isEvent = type === "event";
 	const title = isEvent ? (item as Event).title : (item as Track).name;
 	const slug = item.id;
+	const hasFavouriteState = typeof item.isFavourited !== "undefined";
+	const shouldShowLoadingState = bookmarksLoading && !hasFavouriteState;
+	const favouriteStatus = item.isFavourited ? "favourited" : "unfavourited";
 
 	return (
 		<div className={`flex items-center gap-2 ${className}`}>
@@ -48,11 +51,7 @@ export function ItemActions({
 					type={type}
 					slug={slug}
 					status={
-						bookmarksLoading
-							? "loading"
-							: item.isFavourited
-								? "favourited"
-								: "unfavourited"
+						shouldShowLoadingState ? "loading" : favouriteStatus
 					}
 					onCreateBookmark={onCreateBookmark}
 				/>
