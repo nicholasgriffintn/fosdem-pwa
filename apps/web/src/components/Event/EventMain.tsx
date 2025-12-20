@@ -12,7 +12,7 @@ import {
 	ResizablePanelGroup,
 } from "~/components/ui/resizable";
 import { useWindowSize } from "~/hooks/use-window-size";
-import type { Event, ConferenceData, TypeIds } from "~/types/fosdem";
+import type { Event, ConferenceData, TypeIds, Person } from "~/types/fosdem";
 import { fosdemImageDetails } from "~/data/fosdem-image-details";
 import { fosdemSpecialRooms } from "~/data/fosdem-special-rooms";
 import { EventContent } from "~/components/Event/EventContent";
@@ -22,9 +22,16 @@ type EventMainProps = {
 	conference: ConferenceData;
 	year: number;
 	isTest?: boolean;
+	persons?: Record<string, Person>;
 };
 
-export function EventMain({ event, conference, year, isTest }: EventMainProps) {
+export function EventMain({
+	event,
+	conference,
+	year,
+	isTest,
+	persons,
+}: EventMainProps) {
 	const roomType = event.room?.[0];
 	const specialRoom =
 		roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
@@ -46,7 +53,7 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 						<ChatAlert chatUrl={event.chat} />
 					</div>
 				)}
-				<EventContent event={event} />
+				<EventContent event={event} persons={persons} />
 			</div>
 		);
 	}
@@ -94,7 +101,7 @@ export function EventMain({ event, conference, year, isTest }: EventMainProps) {
 				</ResizablePanel>
 			</ResizablePanelGroup>
 			<div className="w-full">
-				<EventContent event={event} />
+				<EventContent event={event} persons={persons} />
 				<div className="mt-4">
 					{(event.abstract || event.links?.length > 0) && (
 						<hr className="my-4" />

@@ -1,7 +1,13 @@
-import type { Event } from "~/types/fosdem";
+import type { Event, Person } from "~/types/fosdem";
 import { Badge } from "~/components/ui/badge";
+import { EventSpeakers } from "~/components/Event/EventSpeakers";
 
-export function EventContent({ event }: { event: Event }) {
+type EventContentProps = {
+	event: Event;
+	persons?: Record<string, Person>;
+};
+
+export function EventContent({ event, persons }: EventContentProps) {
 	return (
 		<>
 			{event.language && event.language !== "en" && (
@@ -44,6 +50,7 @@ export function EventContent({ event }: { event: Event }) {
 					</ul>
 				</div>
 			)}
+			<EventSpeakers event={event} persons={persons} />
 			{event.links?.length > 0 && (
 				<div className="mt-2">
 					<h2 className="text-xl font-medium text-foreground">Links</h2>
@@ -67,7 +74,7 @@ export function EventContent({ event }: { event: Event }) {
 						{event.url && (
 							<li>
 								<a href={event.url} target="_blank" rel="noreferrer">
-									View on FOSDEM website
+									View on the FOSDEM website
 								</a>
 							</li>
 						)}

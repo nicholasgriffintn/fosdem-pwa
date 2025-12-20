@@ -14,6 +14,7 @@ import type {
   XmlLink,
   XmlAttachment,
   BuildDataResult,
+  Person,
 } from "../types";
 import { parseData, getRoomName, getLinkType, getStatus } from "./data";
 import { slugify } from "../utils/slugs";
@@ -22,8 +23,20 @@ const typeData = Object.freeze(constants.TYPES);
 const buildings = Object.freeze(constants.BUILDINGS);
 
 class EventProcessor {
-  private getType(event: XmlEvent): string {
+  private getType(event: XmlEvent, year: string): string {
     const type = event.type._text;
+    const trackSlug = event.track._attributes?.slug;
+    const eventId = event._attributes.id;
+
+    const keynotesForYear = constants.KEYNOTES_BY_YEAR[year];
+    if (keynotesForYear && keynotesForYear.includes(eventId)) {
+      return "keynote";
+    }
+
+    if (trackSlug === "dev-random") {
+      return "lightningtalk";
+    }
+
     if (type === "lightning") {
       return "lightningtalk";
     }
@@ -35,11 +48,29 @@ class EventProcessor {
     return type in typeData ? type : "other";
   }
 
-  private processPersons(persons: XmlEvent["persons"]): string[] {
-    if (!persons?.person) return [];
-    return Array.isArray(persons.person)
-      ? persons.person.map((person) => person._text)
-      : [persons.person._text];
+  private processPersons(persons: XmlEvent["persons"]): { names: string[]; ids: string[] } {
+    if (!persons?.person) return { names: [], ids: [] };
+
+    const personArray = Array.isArray(persons.person)
+      ? persons.person
+      : [persons.person];
+
+    const names: string[] = [];
+    const ids: string[] = [];
+
+    for (const person of personArray) {
+      const name = person._text || "";
+      const id = person._attributes?.id;
+
+      if (name) {
+        names.push(name);
+      }
+      if (id) {
+        ids.push(id);
+      }
+    }
+
+    return { names, ids };
   }
 
   private processLinks(links: XmlEvent["links"]): Link[] {
@@ -103,7 +134,8 @@ class EventProcessor {
     event: XmlEvent,
     isLive: boolean,
     roomName: string,
-    day: number
+    day: number,
+    year: string
   ): ProcessedEvent | null {
     if (!event?.title?._text) return null;
 
@@ -114,11 +146,13 @@ class EventProcessor {
 
     if (!event?.type?._text || !event?.track?._text) return null;
 
-    const type = this.getType(event);
+    const type = this.getType(event, year);
     const track = event.track._text;
     const trackKey = this.getTrackKey(event);
 
     if (type === "other" && track === "stand") return null;
+
+    const { names, ids } = this.processPersons(event.persons);
 
     return {
       day,
@@ -128,7 +162,8 @@ class EventProcessor {
       track,
       trackKey,
       title: this.getTitle(title, status),
-      persons: this.processPersons(event.persons),
+      persons: names,
+      personIds: ids.length > 0 ? ids : undefined,
       links: this.processLinks(event.links),
       attachments: this.processAttachments(event.attachments),
       streams: this.buildStreamInfo(roomName),
@@ -151,8 +186,10 @@ async function processScheduleData(
   data: {
     conference: Conference;
     day: Day[];
+    persons?: Person[];
   },
-  processor: EventProcessor
+  processor: EventProcessor,
+  year: string
 ): Promise<BuildDataResult> {
   const result: MutableBuildDataResult = {
     conference: data.conference,
@@ -163,6 +200,13 @@ async function processScheduleData(
     tracks: {},
     events: {},
   };
+
+  const persons: Record<string, Person> = {};
+  if (data.persons) {
+    for (const person of data.persons) {
+      persons[person.id] = person;
+    }
+  }
 
   const getBuildingStats = (id: string | null): MutableBuildingStats | null => {
     if (!id) return null;
@@ -261,7 +305,8 @@ async function processScheduleData(
             xmlEvent as XmlEvent,
             dayIndex === 1,
             roomName,
-            dayIndex
+            dayIndex,
+            year
           );
 
           if (event) {
@@ -377,6 +422,7 @@ async function processScheduleData(
     types: serializableTypes,
     days: serializableDays,
     buildings: serializableBuildings,
+    persons: Object.keys(persons).length > 0 ? persons : undefined,
   };
 }
 
@@ -474,7 +520,7 @@ export async function buildData({ year }: { year: string }): Promise<BuildDataRe
     validateParsedSchedule(data);
 
     const processor = new EventProcessor();
-    const result = await processScheduleData(data, processor);
+    const result = await processScheduleData(data, processor, year);
 
     logger.info("Build data completed", {
       eventCount: Object.keys(result.events ?? {}).length,

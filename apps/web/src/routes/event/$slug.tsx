@@ -70,6 +70,7 @@ export const Route = createFileRoute("/event/$slug")({
 				type: fosdem.types[
 					fosdem.tracks[fosdem.events[params.slug]?.trackKey]?.type
 				],
+				persons: fosdem.persons,
 			},
 			year,
 			isTest: false,
@@ -168,6 +169,7 @@ function EventPage() {
 						conference={fosdem.conference}
 						year={year}
 						isTest={isTest}
+						persons={fosdem.persons}
 					/>
 				</div>
 			</div>

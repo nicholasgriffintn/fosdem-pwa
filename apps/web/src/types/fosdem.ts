@@ -67,12 +67,21 @@ export interface Track {
 	isFavourited?: boolean;
 }
 
+export interface Person {
+	id: string;
+	name: string;
+	slug: string;
+	biography?: string;
+	extended_biography?: string;
+}
+
 export interface Event {
 	title: string;
 	subtitle?: string;
 	description: string;
 	room: string;
 	persons: string[];
+	personIds?: string[];
 	id: string;
 	startTime: string;
 	duration: string;
@@ -113,6 +122,7 @@ export interface Conference {
 	days: Record<string, DayData>;
 	tracks: Record<string, Track>;
 	events: Record<string, Event>;
+	persons?: Record<string, Person>;
 }
 
 export interface DayGroupedData {
