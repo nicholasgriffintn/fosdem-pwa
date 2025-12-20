@@ -110,7 +110,6 @@ export const createBookmark = createServerFn({
 						status,
 						user_id: user.id,
 					})
-					.returning();
 			}
 
 			return {
