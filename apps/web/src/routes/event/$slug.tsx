@@ -12,6 +12,26 @@ import { useBookmark } from "~/hooks/use-bookmark";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 
+type BookmarkLike = {
+	status?: string;
+} | null;
+
+export function resolveFavouriteStatus({
+	bookmark,
+	bookmarkLoading,
+}: {
+	bookmark: BookmarkLike;
+	bookmarkLoading: boolean;
+}) {
+	const hasResolvedStatus = Boolean(bookmark?.status);
+
+	if (bookmarkLoading && !hasResolvedStatus) {
+		return "loading";
+	}
+
+	return bookmark?.status ?? "unfavourited";
+}
+
 export const Route = createFileRoute("/event/$slug")({
 	component: EventPage,
 	validateSearch: ({ test, year }: { test: boolean; year: string }) => ({
@@ -73,10 +93,14 @@ function EventPage() {
 		year,
 		slug: fosdem.event.id,
 	});
-	const { create: createBookmark, createLoading } = useMutateBookmark({ year });
+	const { create: createBookmark } = useMutateBookmark({ year });
 	const onCreateBookmark = async (bookmark: any) => {
 		await createBookmark(bookmark);
 	};
+	const favouriteStatus = resolveFavouriteStatus({
+		bookmark,
+		bookmarkLoading,
+	});
 
 	if (!fosdem.event?.title || !fosdem.conference) {
 		return (
@@ -128,11 +152,7 @@ function EventPage() {
 							year={year}
 							type="event"
 							slug={fosdem.event.id}
-							status={
-								bookmarkLoading || createLoading
-									? "loading"
-									: (bookmark?.status ?? "unfavourited")
-							}
+							status={favouriteStatus}
 							onCreateBookmark={onCreateBookmark}
 						/>
 						<ShareButton
