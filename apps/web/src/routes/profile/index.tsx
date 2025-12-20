@@ -42,8 +42,8 @@ function ProfilePage() {
 	const { create: createBookmark } = useMutateBookmark({ year });
 	const { fosdemData } = useFosdemData({ year });
 
-	const onCreateBookmark = (bookmark: any) => {
-		createBookmark(bookmark);
+	const onCreateBookmark = async (bookmark: any) => {
+		await createBookmark(bookmark);
 	};
 
 	if (loading) {

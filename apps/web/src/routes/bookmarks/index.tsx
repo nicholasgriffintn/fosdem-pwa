@@ -42,8 +42,8 @@ function BookmarksHome() {
 	const { fosdemData } = useFosdemData({ year });
 	const { user, loading: authLoading } = useAuth();
 
-	const onCreateBookmark = (bookmark: any) => {
-		create({
+	const onCreateBookmark = async (bookmark: any) => {
+		await create({
 			year,
 			slug: bookmark.slug,
 			type: bookmark.type,

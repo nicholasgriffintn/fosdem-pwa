@@ -68,8 +68,8 @@ function RoomPage() {
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
-	const onCreateBookmark = (bookmark: any) => {
-		createBookmark(bookmark);
+	const onCreateBookmark = async (bookmark: any) => {
+		await createBookmark(bookmark);
 	};
 
 	const videoRef = useRef<HTMLVideoElement>(null);
