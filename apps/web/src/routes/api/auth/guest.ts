@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createGuestSession, setSessionTokenCookie } from "~/server/auth";
 
 export const Route = createFileRoute("/api/auth/guest")({
-	// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 	server: {
 		handlers: {
 			POST: async () => {

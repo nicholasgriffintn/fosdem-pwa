@@ -27,7 +27,7 @@ function RoomListItem({ year, room, index, isLast }: RoomListItemProps) {
 					to="/rooms/$roomId"
 					params={{ roomId: room.slug }}
 					search={(prev: Record<string, unknown>) => ({
-						year: prev.year || constants.DEFAULT_YEAR,
+						year: typeof prev.year === 'number' ? prev.year : constants.DEFAULT_YEAR,
 						day: undefined,
 					})}
 					className="no-underline"

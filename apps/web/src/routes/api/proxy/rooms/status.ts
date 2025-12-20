@@ -5,7 +5,6 @@ import { constants } from "~/constants";
 const FETCH_TIMEOUT_MS = 8000;
 
 export const Route = createFileRoute("/api/proxy/rooms/status")({
-	// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 	server: {
 		handlers: {
 			GET: async () => {

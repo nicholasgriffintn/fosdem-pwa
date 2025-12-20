@@ -6,9 +6,17 @@ import { useMemo } from "react";
 
 import { getEventBookmark } from "~/server/functions/bookmarks";
 import { useAuth } from "~/hooks/use-auth";
-import { getLocalBookmarks } from "~/lib/localStorage";
+import { getLocalBookmarks, type LocalBookmark } from "~/lib/localStorage";
 
-export function useBookmark({ year, slug }: { year: number; slug: string }) {
+type MergedBookmark = LocalBookmark & {
+	existsOnServer?: boolean;
+	serverId?: string;
+};
+
+export function useBookmark({ year, slug }: { year: number; slug: string }): {
+	bookmark: MergedBookmark | null;
+	loading: boolean;
+} {
 	const { user } = useAuth();
 	const getEventBookmarkFromServer = useServerFn(getEventBookmark);
 
@@ -34,9 +42,9 @@ export function useBookmark({ year, slug }: { year: number; slug: string }) {
 		return localBookmarks?.find((b) => b.slug === slug);
 	}, [localBookmarks, slug]);
 
-	const mergedBookmark = useMemo(() => {
+	const mergedBookmark = useMemo((): MergedBookmark | null => {
 		if (!user?.id) {
-			return localBookmark;
+			return localBookmark ?? null;
 		}
 
 		if (serverBookmark) {

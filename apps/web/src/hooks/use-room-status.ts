@@ -15,6 +15,11 @@ function convertState(state: string): RoomStatus["state"] {
 	return "available";
 }
 
+interface RoomStatusResponse {
+	roomname: string;
+	state: string;
+}
+
 async function fetchRoomStatus(roomId: string): Promise<RoomStatus> {
 	try {
 		const response = await fetch("/api/proxy/rooms/status");
@@ -23,9 +28,9 @@ async function fetchRoomStatus(roomId: string): Promise<RoomStatus> {
 			throw new Error("Failed to fetch room status");
 		}
 
-		const data = await response.json();
+		const data: RoomStatusResponse[] = await response.json();
 
-		const status = data.find((room: any) => room.roomname === roomId);
+		const status = data.find((room) => room.roomname === roomId);
 		return {
 			room: roomId,
 			state: status?.state ? convertState(status.state) : "unknown",

@@ -11,7 +11,6 @@ const ALLOWED_SUBTITLE_HOSTS = [
 const FETCH_TIMEOUT_MS = 8000;
 
 export const Route = createFileRoute("/api/proxy/subtitles")({
-	// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 	server: {
 		handlers: {
 			GET: async ({ request }: { request: Request }) => {

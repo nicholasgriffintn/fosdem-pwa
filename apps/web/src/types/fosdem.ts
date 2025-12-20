@@ -53,6 +53,7 @@ export interface RoomData {
 	buildingId?: string;
 	building?: BuildingData;
 	eventCount: number;
+	trackCount: number;
 }
 
 export interface Track {

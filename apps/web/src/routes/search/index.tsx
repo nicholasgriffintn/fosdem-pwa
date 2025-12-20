@@ -266,8 +266,10 @@ export default function SearchPage() {
 			nextType?: string;
 	}) => {
 		const normalizedQuery = (nextQuery ?? "").trim();
-		const normalizedType =
-			nextType && nextType !== "all" ? nextType : undefined;
+		const normalizedType: "events" | "tracks" | "rooms" | "all" =
+			nextType === "events" || nextType === "tracks" || nextType === "rooms"
+				? nextType
+				: "all";
 
 		navigate({
 			to: "/search",
