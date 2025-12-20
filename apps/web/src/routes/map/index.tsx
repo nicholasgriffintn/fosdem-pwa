@@ -25,7 +25,10 @@ export const Route = createFileRoute("/map/")({
 
 function MapPage() {
 	const { year } = Route.useSearch();
+	return <MapPageView year={year} />;
+}
 
+export function MapPageView({ year }: { year: number }) {
 	return (
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
@@ -38,8 +41,9 @@ function MapPage() {
 				/>
 				<div className="w-full">
 					<Image
-						src="images/map.png"
+						src="/images/map.png"
 						alt="Map of the ULB Solbosch Campus, the location of the FOSDEM event"
+						loading="eager"
 					/>
 					<p className="text-sm text-muted-foreground mt-4">
 						Get directions in{" "}

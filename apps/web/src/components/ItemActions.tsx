@@ -42,6 +42,9 @@ export function ItemActions({
 	const hasFavouriteState = typeof item.isFavourited !== "undefined";
 	const shouldShowLoadingState = bookmarksLoading && !hasFavouriteState;
 	const favouriteStatus = item.isFavourited ? "favourited" : "unfavourited";
+	const encodedSlug = encodeURIComponent(slug);
+	const resolvedYear = Number.isFinite(year) ? year : constants.DEFAULT_YEAR;
+	const shareUrl = `https://fosdempwa.com/${type}/${encodedSlug}?year=${resolvedYear}`;
 
 	return (
 		<div className={`flex items-center gap-2 ${className}`}>
@@ -59,7 +62,7 @@ export function ItemActions({
 			<ShareButton
 				title={title}
 				text={`Check out ${title} at FOSDEM`}
-				url={`https://fosdempwa.com/${type}/${slug}`}
+				url={shareUrl}
 			/>
 			<Button
 				variant="secondary"
@@ -70,7 +73,10 @@ export function ItemActions({
 				<Link
 					to={`/${type}/$slug`}
 					params={{ slug }}
-					search={{ year: year || constants.DEFAULT_YEAR, day: undefined }}
+					search={{
+						year: Number.isFinite(year) ? year : constants.DEFAULT_YEAR,
+						day: undefined,
+					}}
 				>
 					View {isEvent ? "Event" : "Track"}
 				</Link>
