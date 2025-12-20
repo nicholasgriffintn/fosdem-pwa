@@ -49,8 +49,22 @@ describe("search helpers", () => {
 			room: "A",
 		} as Track;
 		const events = {
-			a: { trackKey: "Track" },
+			a: { trackKey: "t" },
 			b: { trackKey: "Other" },
+		} as unknown as Record<string, Event>;
+
+		const formatted = formatTrack(track, events);
+		expect(formatted.eventCount).toBe(1);
+	});
+
+	it("falls back to the track name when matching legacy data", () => {
+		const track = {
+			id: "t",
+			name: "Track",
+			room: "A",
+		} as Track;
+		const events = {
+			a: { trackKey: "Track" },
 		} as unknown as Record<string, Event>;
 
 		const formatted = formatTrack(track, events);

@@ -8,6 +8,7 @@ import type { User } from "~/server/db/schema";
 import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
 import { EmptyStateCard } from "../EmptyStateCard";
+import { doesEventMatchTrack } from "~/lib/tracks";
 
 type BookmarkListItem = (Bookmark | LocalBookmark) & { serverId?: string };
 
@@ -146,8 +147,8 @@ export function BookmarksList({
 					id: track.id,
 					name: track.name,
 					room: track.room,
-					eventCount: Object.values(fosdemData.events).filter(
-						(event) => event.trackKey === track.name,
+					eventCount: Object.values(fosdemData.events).filter((event) =>
+						doesEventMatchTrack(event, track),
 					).length,
 				} as Track;
 			})
