@@ -79,6 +79,32 @@ describe("FavouriteButton", () => {
 		});
 	});
 
+	it("keeps optimistic state until parent status changes", async () => {
+		const onCreateBookmark = vi.fn().mockResolvedValue(undefined);
+		const user = userEvent.setup();
+
+		render(
+			<FavouriteButton
+				year={2024}
+				type="event"
+				slug="test-event"
+				status="favourited"
+				onCreateBookmark={onCreateBookmark}
+			/>,
+		);
+
+		const button = screen.getByRole("button");
+		await user.click(button);
+
+		await waitFor(() => {
+			expect(button).not.toBeDisabled();
+		});
+
+		const starIcon = button.querySelector("svg");
+		expect(starIcon).not.toBeNull();
+		expect(starIcon?.classList.contains("icon--filled")).toBe(false);
+	});
+
 	it("rolls back optimistic update on error", async () => {
 		const onCreateBookmark = vi
 			.fn()

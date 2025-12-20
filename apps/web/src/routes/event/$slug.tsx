@@ -74,8 +74,8 @@ function EventPage() {
 		slug: fosdem.event.id,
 	});
 	const { create: createBookmark, createLoading } = useMutateBookmark({ year });
-	const onCreateBookmark = (bookmark: any) => {
-		createBookmark(bookmark);
+	const onCreateBookmark = async (bookmark: any) => {
+		await createBookmark(bookmark);
 	};
 
 	if (!fosdem.event?.title || !fosdem.conference) {

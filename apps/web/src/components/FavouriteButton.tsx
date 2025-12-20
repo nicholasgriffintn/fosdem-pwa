@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
@@ -34,9 +34,15 @@ export function FavouriteButton({
 }: FavouriteButtonProps) {
 	const [currentStatus, setCurrentStatus] = useState(status);
 	const [isProcessing, setIsProcessing] = useState(false);
+	const lastSyncedStatusRef = useRef(status);
 
 	useEffect(() => {
-		if (!isProcessing) {
+		if (isProcessing) {
+			return;
+		}
+
+		if (lastSyncedStatusRef.current !== status) {
+			lastSyncedStatusRef.current = status;
 			setCurrentStatus(status);
 		}
 	}, [status, isProcessing]);
