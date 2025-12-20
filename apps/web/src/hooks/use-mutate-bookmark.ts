@@ -3,13 +3,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "~/hooks/use-auth";
-import { syncAllOfflineData } from "~/lib/backgroundSync";
 import {
 	getLocalBookmarks,
 	saveLocalBookmark,
 	removeLocalBookmark as removeLocalBookmarkFromStorage,
 	updateLocalBookmark as updateLocalBookmarkFromStorage,
 	type LocalBookmark,
+	removeFromSyncQueue,
 } from "~/lib/localStorage";
 import { createBookmark, updateBookmark } from "~/server/functions/bookmarks";
 import type { Bookmark } from "~/server/db/schema";
@@ -31,6 +31,17 @@ export type OptimisticCreateDeps = {
 	createServer?: (bookmarkData: CreateBookmarkInput) => Promise<unknown>;
 	userId?: string;
 };
+
+async function clearBookmarkSyncQueue(bookmarkId: string) {
+	try {
+		await removeFromSyncQueue(bookmarkId);
+	} catch (error) {
+		console.error(
+			`Failed to remove bookmark ${bookmarkId} from the sync queue:`,
+			error,
+		);
+	}
+}
 
 export async function createBookmarkOptimistic(
 	deps: OptimisticCreateDeps,
@@ -67,12 +78,6 @@ export function useMutateBookmark({ year }: { year: number }) {
 			queryKey: ["local-bookmarks", bookmarkData.year],
 		});
 
-		if (user?.id) {
-			syncAllOfflineData().catch((error) => {
-				console.error("Background sync failed:", error);
-			});
-		}
-
 		return newBookmark;
 	};
 
@@ -85,12 +90,6 @@ export function useMutateBookmark({ year }: { year: number }) {
 			await queryClient.invalidateQueries({
 				queryKey: ["local-bookmarks", updated.year],
 			});
-
-			if (user?.id) {
-				syncAllOfflineData().catch((error) => {
-					console.error("Background sync failed:", error);
-				});
-			}
 		}
 		return updated;
 	};
@@ -103,12 +102,6 @@ export function useMutateBookmark({ year }: { year: number }) {
 			await queryClient.invalidateQueries({
 				queryKey: ["local-bookmarks", bookmark.year],
 			});
-
-			if (user?.id) {
-				syncAllOfflineData().catch((error) => {
-					console.error("Background sync failed:", error);
-				});
-			}
 		}
 		return success;
 	};
@@ -136,6 +129,9 @@ export function useMutateBookmark({ year }: { year: number }) {
 			return data;
 		},
 		onSuccess: (_data, variables) => {
+			const bookmarkId = `${variables.year}_${variables.slug}`;
+			void clearBookmarkSyncQueue(bookmarkId);
+
 			queryClient.invalidateQueries({
 				queryKey: ["bookmarks", year, user?.id],
 			});
@@ -161,6 +157,9 @@ export function useMutateBookmark({ year }: { year: number }) {
 			}
 
 			return data;
+		},
+		onSuccess: (_data, variables) => {
+			void clearBookmarkSyncQueue(variables.id);
 		},
 		onMutate: async ({ id, updates }) => {
 			const serverQueryKey = ["bookmarks", year, user?.id];
