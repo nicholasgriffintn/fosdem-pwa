@@ -74,7 +74,7 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 							onClick={onCloseMenu}
 							search={(prev: Record<string, unknown>) => ({
 								...prev,
-								year: prev.year || constants.DEFAULT_YEAR,
+								year: typeof prev.year === 'number' ? prev.year : constants.DEFAULT_YEAR,
 							})}
 							activeOptions={{ exact: item.href === "/" }}
 							ref={index === 0 ? firstLinkRef : undefined}
@@ -111,7 +111,7 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 									<Link
 										search={(prev: Record<string, unknown>) => ({
 											...prev,
-											year: prev.year || constants.DEFAULT_YEAR,
+											year: typeof prev.year === 'number' ? prev.year : constants.DEFAULT_YEAR,
 										})}
 										to="/profile"
 										onClick={onCloseMenu}

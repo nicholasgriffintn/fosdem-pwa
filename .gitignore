@@ -22,3 +22,5 @@ dev-dist
 
 apps/web/tests/playwright/results/
 test-results/
+
+coverage

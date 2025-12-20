@@ -90,7 +90,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 			return {
 				...local,
-				serverId: matchingServerNote?.id,
+				serverId: matchingServerNote && typeof matchingServerNote === 'object' ? matchingServerNote.id : undefined,
 				existsOnServer: !!matchingServerNote,
 				isPending: !!user?.id && !matchingServerNote,
 			};

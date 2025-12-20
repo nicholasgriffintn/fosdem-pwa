@@ -26,7 +26,7 @@ export function MainNav({ title, items }: MainNavProps) {
 				to="/"
 				search={(prev: Record<string, unknown>) => ({
 					...prev,
-					year: prev.year || constants.DEFAULT_YEAR,
+					year: typeof prev.year === 'number' ? prev.year : constants.DEFAULT_YEAR,
 				})}
 				className="items-center space-x-2 flex logo-link shrink-0"
 			>
@@ -52,7 +52,7 @@ export function MainNav({ title, items }: MainNavProps) {
 							}}
 							search={(prev: Record<string, unknown>) => ({
 								...prev,
-								year: prev.year || constants.DEFAULT_YEAR,
+								year: typeof prev.year === 'number' ? prev.year : constants.DEFAULT_YEAR,
 							})}
 							activeOptions={{ exact: item.href === "/" }}
 						>

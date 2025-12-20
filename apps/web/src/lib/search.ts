@@ -101,5 +101,6 @@ export function formatRoom(room: RoomData): RoomData {
 		slug: room.slug,
 		buildingId: room.buildingId || room.building?.id,
 		eventCount: room.eventCount,
+		trackCount: room.trackCount,
 	};
 }

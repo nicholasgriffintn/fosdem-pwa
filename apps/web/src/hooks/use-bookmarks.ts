@@ -10,9 +10,18 @@ import {
 	getLocalBookmarks,
 	saveLocalBookmark,
 	updateLocalBookmark,
+	type LocalBookmark,
 } from "~/lib/localStorage";
 
-export function useBookmarks({ year }: { year: number }) {
+type MergedBookmark = LocalBookmark & {
+	existsOnServer?: boolean;
+	serverId?: string;
+};
+
+export function useBookmarks({ year }: { year: number }): {
+	bookmarks: MergedBookmark[];
+	loading: boolean;
+} {
 	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const reconciliationInProgress = useRef(false);

@@ -16,7 +16,6 @@ import { oauthAccount, user } from "~/server/db/schema";
 import type { GitHubUser } from "~/types/user";
 
 export const Route = createFileRoute("/api/auth/callback/github")({
-	// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 	server: {
 		handlers: {
 			GET: async ({ request }: { request: Request }) => {

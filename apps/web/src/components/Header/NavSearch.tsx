@@ -163,7 +163,7 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 			if (!trimmed) return;
 			navigate({
 				to: "/search",
-				search: { year, q: trimmed },
+				search: { year, q: trimmed, track: undefined, time: undefined, type: "all" },
 			});
 		},
 		[navigate, year],
