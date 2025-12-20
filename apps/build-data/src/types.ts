@@ -5,6 +5,19 @@ export interface XmlAttribute {
   _text?: string;
 }
 
+export interface XmlPerson {
+  _attributes: { id: string };
+  _text: string;
+}
+
+export interface XmlPersonFull {
+  _attributes: { id: string };
+  name: { _text: string };
+  slug: { _text: string };
+  biography?: { _text: string };
+  extended_biography?: { _text: string };
+}
+
 export interface XmlEvent extends XmlAttribute {
   _attributes: {
     guid: string;
@@ -13,7 +26,7 @@ export interface XmlEvent extends XmlAttribute {
   title: { _text: string };
   type: { _text: string };
   track: { _text: string; _attributes?: { slug?: string } };
-  persons?: { person: Array<{ _text: string }> | { _text: string } };
+  persons?: { person: Array<XmlPerson> | XmlPerson };
   links?: { link: Array<XmlLink> | XmlLink };
   attachments?: { attachment: Array<XmlAttachment> | XmlAttachment };
   url?: { _text: string };
@@ -61,6 +74,14 @@ export interface BuildingStats {
   eventCount: number;
 }
 
+export interface Person {
+  id: string;
+  name: string;
+  slug: string;
+  biography?: string;
+  extended_biography?: string;
+}
+
 export interface ProcessedEvent {
   day: number;
   isLive: boolean;
@@ -70,6 +91,7 @@ export interface ProcessedEvent {
   trackKey: string;
   title: string;
   persons: string[];
+  personIds?: string[];
   links: Link[];
   attachments: Attachment[];
   streams: Stream[];
@@ -112,6 +134,7 @@ export interface BuildDataResult {
   rooms: Record<string, RoomInfo>;
   tracks: Record<string, TrackInfo>;
   events: Record<string, ProcessedEvent>;
+  persons?: Record<string, Person>;
 }
 
 export interface TypeInfo {
