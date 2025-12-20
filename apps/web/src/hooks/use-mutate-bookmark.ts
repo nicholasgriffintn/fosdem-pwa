@@ -149,6 +149,7 @@ export function useMutateBookmark({ year }: { year: number }) {
 		}: {
 			id: string;
 			updates: Partial<Bookmark | LocalBookmark>;
+			localId?: string;
 		}) => {
 			const data = await updateBookmarkOnServer({ data: { id, updates } });
 
@@ -159,7 +160,7 @@ export function useMutateBookmark({ year }: { year: number }) {
 			return data;
 		},
 		onSuccess: (_data, variables) => {
-			void clearBookmarkSyncQueue(variables.id);
+			void clearBookmarkSyncQueue(variables.localId ?? variables.id);
 		},
 		onMutate: async ({ id, updates }) => {
 			const serverQueryKey = ["bookmarks", year, user?.id];
@@ -194,7 +195,12 @@ export function useMutateBookmark({ year }: { year: number }) {
 				queryKey: ["bookmarks", year, user?.id],
 			});
 
-			const bookmarks = queryClient.getQueryData<(Bookmark | LocalBookmark)[]>(["bookmarks", year, user?.id]);
+			const bookmarks =
+				queryClient.getQueryData<(Bookmark | LocalBookmark)[]>([
+					"bookmarks",
+					year,
+					user?.id,
+				]);
 			const bookmark = bookmarks?.find((b) => b.id === variables.id);
 			if (bookmark && "slug" in bookmark) {
 				queryClient.invalidateQueries({
@@ -240,11 +246,27 @@ export function useMutateBookmark({ year }: { year: number }) {
 	const update = async (
 		id: string,
 		updates: Partial<Bookmark | LocalBookmark>,
+		serverId?: string,
 	) => {
-		await updateLocalBookmark(id, updates);
+		const localBookmark = await updateLocalBookmark(id, updates);
 
-		if (user?.id) {
-			updateServerBookmark.mutate({ id, updates });
+		if (!user?.id) {
+			return;
+		}
+
+		const resolvedServerId =
+			serverId ??
+			localBookmark?.serverId ??
+			(localBookmark
+				? `${user.id}_${localBookmark.year}_${localBookmark.slug}`
+				: undefined);
+
+		if (resolvedServerId) {
+			updateServerBookmark.mutate({
+				id: resolvedServerId,
+				updates,
+				localId: id,
+			});
 		}
 	};
 
