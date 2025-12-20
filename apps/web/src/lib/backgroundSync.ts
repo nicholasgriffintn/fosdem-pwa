@@ -1,4 +1,5 @@
 import { getSyncQueue, removeFromSyncQueue } from "~/lib/localStorage";
+import { withRetry } from "~/lib/withRetry";
 
 let currentSyncPromise: Promise<{
 	bookmarks: SyncResult;
@@ -19,7 +20,6 @@ export interface SyncResult {
 
 import {
 	createBookmark,
-	updateBookmark,
 	deleteBookmark,
 } from "~/server/functions/bookmarks";
 import { createNote, updateNote, deleteNote } from "~/server/functions/notes";
@@ -37,14 +37,16 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 	for (const item of bookmarkItems) {
 		try {
 			if (item.action === "create" || item.action === "update") {
-				const response = await createBookmark({
-					data: {
-						year: item.data.year,
-						type: item.data.type,
-						slug: item.data.slug,
-						status: item.data.status,
-					},
-				});
+				const response = await withRetry(() =>
+					createBookmark({
+						data: {
+							year: item.data.year,
+							type: item.data.type,
+							slug: item.data.slug,
+							status: item.data.status,
+						},
+					}),
+				);
 
 				if (response?.success) {
 					results.push({ success: true, id: item.id });
@@ -58,11 +60,13 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 				}
 			} else if (item.action === "delete") {
 				if (item.data.serverId) {
-					const response = await deleteBookmark({
-						data: {
-							id: item.data.serverId,
-						},
-					});
+					const response = await withRetry(() =>
+						deleteBookmark({
+							data: {
+								id: item.data.serverId,
+							},
+						}),
+					);
 					if (response?.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
@@ -109,14 +113,16 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 	for (const item of noteItems) {
 		try {
 			if (item.action === "create") {
-				const response = await createNote({
-					data: {
-						year: item.data.year,
-						eventId: item.data.slug,
-						note: item.data.content,
-						time: item.data.time,
-					},
-				});
+				const response = await withRetry(() =>
+					createNote({
+						data: {
+							year: item.data.year,
+							eventId: item.data.slug,
+							note: item.data.content,
+							time: item.data.time,
+						},
+					}),
+				);
 
 				if (response?.success) {
 					results.push({ success: true, id: item.id });
@@ -130,15 +136,17 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 				}
 			} else if (item.action === "update") {
 				if (item.data.serverId) {
-					const response = await updateNote({
-						data: {
-							id: item.data.serverId,
-							updates: {
-								note: item.data.content,
-								time: item.data.time,
+					const response = await withRetry(() =>
+						updateNote({
+							data: {
+								id: item.data.serverId,
+								updates: {
+									note: item.data.content,
+									time: item.data.time,
+								},
 							},
-						},
-					});
+						}),
+					);
 					if (response?.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
@@ -150,14 +158,16 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 						});
 					}
 				} else {
-					const response = await createNote({
-						data: {
-							year: item.data.year,
-							eventId: item.data.slug,
-							note: item.data.content,
-							time: item.data.time,
-						},
-					});
+					const response = await withRetry(() =>
+						createNote({
+							data: {
+								year: item.data.year,
+								eventId: item.data.slug,
+								note: item.data.content,
+								time: item.data.time,
+							},
+						}),
+					);
 					if (response?.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
@@ -171,11 +181,13 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 				}
 			} else if (item.action === "delete") {
 				if (item.data.serverId) {
-					const response = await deleteNote({
-						data: {
-							id: item.data.serverId,
-						},
-					});
+					const response = await withRetry(() =>
+						deleteNote({
+							data: {
+								id: item.data.serverId,
+							},
+						}),
+					);
 					if (response?.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);

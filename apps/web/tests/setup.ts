@@ -1,4 +1,5 @@
 import { afterEach, beforeAll, vi } from "vitest";
+import "@testing-library/jest-dom/vitest";
 
 const localStorageStore = new Map<string, string>();
 

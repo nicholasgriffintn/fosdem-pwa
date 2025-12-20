@@ -18,6 +18,11 @@ export const getBookmarks = createServerFn({
 	.handler(async (ctx: any) => {
 		const { year, status } = ctx.data;
 
+		const yearNum = Number.parseInt(String(year));
+		if (!Number.isFinite(yearNum) || yearNum < 2000 || yearNum > 2100) {
+			throw new Error("Invalid year parameter");
+		}
+
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
@@ -27,7 +32,7 @@ export const getBookmarks = createServerFn({
 		const bookmarkData = await db.query.bookmark.findMany({
 			where: and(
 				eq(bookmarkTable.user_id, user.id),
-				eq(bookmarkTable.year, Number.parseInt(year)),
+				eq(bookmarkTable.year, yearNum),
 				eq(bookmarkTable.status, status),
 			),
 		});
@@ -46,6 +51,11 @@ export const getEventBookmark = createServerFn({
 	.handler(async (ctx: any) => {
 		const { year, slug } = ctx.data;
 
+		const yearNum = Number.parseInt(String(year));
+		if (!Number.isFinite(yearNum) || yearNum < 2000 || yearNum > 2100) {
+			throw new Error("Invalid year parameter");
+		}
+
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
@@ -55,7 +65,7 @@ export const getEventBookmark = createServerFn({
 		const existingBookmark = await db.query.bookmark.findFirst({
 			where: and(
 				eq(bookmarkTable.user_id, user.id),
-				eq(bookmarkTable.year, Number.parseInt(year)),
+				eq(bookmarkTable.year, yearNum),
 				eq(bookmarkTable.slug, slug),
 			),
 		});
@@ -77,6 +87,11 @@ export const createBookmark = createServerFn({
 			throw new Error("Invalid request");
 		}
 
+		const yearNum = Number.parseInt(String(year));
+		if (!Number.isFinite(yearNum) || yearNum < 2000 || yearNum > 2100) {
+			throw new Error("Invalid year parameter");
+		}
+
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
@@ -86,7 +101,7 @@ export const createBookmark = createServerFn({
 		const existingBookmark = await db.query.bookmark.findFirst({
 			where: and(
 				eq(bookmarkTable.user_id, user.id),
-				eq(bookmarkTable.year, Number.parseInt(year)),
+				eq(bookmarkTable.year, yearNum),
 				eq(bookmarkTable.slug, slug),
 			),
 		});
@@ -103,13 +118,17 @@ export const createBookmark = createServerFn({
 				await db
 					.insert(bookmarkTable)
 					.values({
-						id: `${user.id}_${year}_${slug}`,
+						id: `${user.id}_${yearNum}_${slug}`,
 						slug,
 						type: `bookmark_${type}`,
-						year: Number.parseInt(year),
+						year: yearNum,
 						status,
 						user_id: user.id,
 					})
+					.onConflictDoUpdate({
+						target: bookmarkTable.id,
+						set: { status },
+					});
 			}
 
 			return {

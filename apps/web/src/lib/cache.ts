@@ -33,11 +33,16 @@ export class CacheManager {
 			return null;
 		}
 
-		const data = await this.redis.get(this.getKey(key));
 		try {
-			return JSON.parse(data as string);
+			const data = await this.redis.get(this.getKey(key));
+			try {
+				return JSON.parse(data as string);
+			} catch (error) {
+				return data;
+			}
 		} catch (error) {
-			return data;
+			console.error(`Redis get error for key ${key}:`, error);
+			return null;
 		}
 	}
 
@@ -46,8 +51,12 @@ export class CacheManager {
 			return;
 		}
 
-		const stringData = typeof data === "string" ? data : JSON.stringify(data);
-		await this.redis.set(this.getKey(key), stringData, { ex: ttl || this.TTL });
+		try {
+			const stringData = typeof data === "string" ? data : JSON.stringify(data);
+			await this.redis.set(this.getKey(key), stringData, { ex: ttl || this.TTL });
+		} catch (error) {
+			console.error(`Redis set error for key ${key}:`, error);
+		}
 	}
 
 	async invalidate(key: string) {
@@ -55,6 +64,10 @@ export class CacheManager {
 			return;
 		}
 
-		await this.redis.del(this.getKey(key));
+		try {
+			await this.redis.del(this.getKey(key));
+		} catch (error) {
+			console.error(`Redis invalidate error for key ${key}:`, error);
+		}
 	}
 }
