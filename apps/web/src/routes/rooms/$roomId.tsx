@@ -12,6 +12,7 @@ import { createStandardDate } from "~/lib/dateTime";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/rooms/$roomId")({
 	component: RoomPage,
@@ -47,10 +48,15 @@ export const Route = createFileRoute("/rooms/$roomId")({
 
 		const days = Object.values(data.days);
 
+		const serverBookmarks = await getBookmarks({
+			data: { year, status: "favourited" },
+		});
+
 		return {
 			fosdem: { room, roomEvents, conference: data.conference, days },
 			year,
 			day,
+			serverBookmarks,
 		};
 	},
 	head: ({ loaderData }) => ({
@@ -65,7 +71,7 @@ export const Route = createFileRoute("/rooms/$roomId")({
 });
 
 function RoomPage() {
-	const { fosdem, day, year } = Route.useLoaderData();
+	const { fosdem, day, year, serverBookmarks } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
@@ -181,6 +187,7 @@ function RoomPage() {
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						displaySortByFavourites={true}
+						serverBookmarks={serverBookmarks}
 					/>
 				</div>
 			</div>

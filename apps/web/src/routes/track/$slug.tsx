@@ -8,6 +8,7 @@ import { constants } from "~/constants";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/track/$slug")({
 	component: TrackPage,
@@ -31,7 +32,11 @@ export const Route = createFileRoute("/track/$slug")({
 			(event: Event): event is Event => event.trackKey === slug,
 		);
 
-		return { fosdem: { days, track, type, eventData }, year, day };
+		const serverBookmarks = await getBookmarks({
+			data: { year, status: "favourited" },
+		});
+
+		return { fosdem: { days, track, type, eventData }, year, day, serverBookmarks };
 	},
 	head: ({ loaderData }) => ({
 		meta: [
@@ -45,7 +50,7 @@ export const Route = createFileRoute("/track/$slug")({
 });
 
 function TrackPage() {
-	const { fosdem, year, day } = Route.useLoaderData();
+	const { fosdem, year, day, serverBookmarks } = Route.useLoaderData();
 	const { view, sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
@@ -115,6 +120,7 @@ function TrackPage() {
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						displaySortByFavourites={true}
+						serverBookmarks={serverBookmarks}
 					/>
 				) : (
 					<EmptyStateCard

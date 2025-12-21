@@ -34,6 +34,10 @@ type TrackListProps = {
 		status: string;
 	}) => void;
 	displaySortByFavourites?: boolean;
+	serverBookmarks?: Array<{
+		slug: string;
+		status: string;
+	}>;
 };
 
 type TrackListItemProps = {
@@ -141,6 +145,10 @@ type TrackListContentProps = {
 		slug: string;
 		status: string;
 	}) => void;
+	serverBookmarks?: Array<{
+		slug: string;
+		status: string;
+	}>;
 };
 
 function TrackListContent({
@@ -149,11 +157,13 @@ function TrackListContent({
 	user,
 	sortByFavourites = false,
 	onCreateBookmark,
+	serverBookmarks,
 }: TrackListContentProps) {
 	const { items: sortedTracks, bookmarksLoading } = useTrackList({
 		items: tracks,
 		year,
 		sortByFavourites,
+		serverBookmarks,
 	});
 
 	return (
@@ -195,6 +205,7 @@ export function TrackList({
 	onCreateBookmark,
 	displaySortByFavourites = false,
 	onSortFavouritesChange,
+	serverBookmarks,
 }: TrackListProps) {
 	const sortByFavourites = sortFavourites === "true";
 	const sortSwitchId = useId();
@@ -237,6 +248,7 @@ export function TrackList({
 							user={user}
 							sortByFavourites={sortByFavourites}
 							onCreateBookmark={onCreateBookmark}
+							serverBookmarks={serverBookmarks}
 						/>
 					) : (
 						<EmptyStateCard
@@ -270,6 +282,7 @@ export function TrackList({
 				user={user}
 				sortByFavourites={sortByFavourites}
 				onCreateBookmark={onCreateBookmark}
+				serverBookmarks={serverBookmarks}
 			/>
 		</section>
 	);

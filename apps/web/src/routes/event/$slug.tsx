@@ -11,6 +11,8 @@ import { calculateEndTime } from "~/lib/dateTime";
 import { useBookmark } from "~/hooks/use-bookmark";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { useIsClient } from "~/hooks/use-is-client";
+import { getEventBookmark } from "~/server/functions/bookmarks";
 
 type BookmarkLike = {
 	status?: string;
@@ -58,10 +60,14 @@ export const Route = createFileRoute("/event/$slug")({
 				},
 				year,
 				isTest: true,
+				serverBookmark: null,
 			};
 		}
 
 		const fosdem = await getAllData({ data: { year } });
+		const serverBookmark = await getEventBookmark({
+			data: { year, slug: params.slug },
+		});
 		return {
 			fosdem: {
 				event: fosdem.events[params.slug],
@@ -74,6 +80,7 @@ export const Route = createFileRoute("/event/$slug")({
 			},
 			year,
 			isTest: false,
+			serverBookmark,
 		};
 	},
 	head: ({ loaderData }) => ({
@@ -88,7 +95,8 @@ export const Route = createFileRoute("/event/$slug")({
 });
 
 function EventPage() {
-	const { fosdem, year, isTest } = Route.useLoaderData();
+	const { fosdem, year, isTest, serverBookmark } = Route.useLoaderData();
+	const isClient = useIsClient();
 
 	const { bookmark, loading: bookmarkLoading } = useBookmark({
 		year,
@@ -98,10 +106,12 @@ function EventPage() {
 	const onCreateBookmark = async (bookmark: any) => {
 		await createBookmark(bookmark);
 	};
-	const favouriteStatus = resolveFavouriteStatus({
-		bookmark,
-		bookmarkLoading,
-	});
+	const favouriteStatus = isClient
+		? resolveFavouriteStatus({
+				bookmark,
+				bookmarkLoading,
+			})
+		: serverBookmark?.status ?? "unfavourited";
 
 	if (!fosdem.event?.title || !fosdem.conference) {
 		return (

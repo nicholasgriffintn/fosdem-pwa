@@ -10,6 +10,7 @@ import { isEventLive, isEventUpcoming } from "~/lib/dateTime";
 import { sortEvents, sortUpcomingEvents } from "~/lib/sorting";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
+import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/live/")({
 	component: LivePage,
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/live/")({
 				isEventUpcoming(event, testConferenceData, 30, testNow),
 			);
 
-			return { liveEvents, upcomingEvents, year };
+			return { liveEvents, upcomingEvents, year, serverBookmarks: [] };
 		}
 		const data = (await getAllData({ data: { year } })) as Conference;
 
@@ -42,7 +43,11 @@ export const Route = createFileRoute("/live/")({
 			.filter((event: Event) => isEventUpcoming(event, data.conference))
 			.sort(sortUpcomingEvents);
 
-		return { liveEvents, upcomingEvents, year };
+		const serverBookmarks = await getBookmarks({
+			data: { year, status: "favourited" },
+		});
+
+		return { liveEvents, upcomingEvents, year, serverBookmarks };
 	},
 	head: () => ({
 		meta: [
@@ -56,7 +61,7 @@ export const Route = createFileRoute("/live/")({
 });
 
 function LivePage() {
-	const { liveEvents, upcomingEvents, year } = Route.useLoaderData();
+	const { liveEvents, upcomingEvents, year, serverBookmarks } = Route.useLoaderData();
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -74,29 +79,31 @@ function LivePage() {
 				/>
 				<div className="w-full space-y-8">
 					<section>
-						<EventList
-							events={liveEvents}
-							year={year}
-							defaultViewMode="calendar"
-							title="Live Now"
-							user={user}
-							onCreateBookmark={onCreateBookmark}
-							emptyStateTitle="No live events found"
-							emptyStateMessage="Come back later to see live events"
-						/>
+					<EventList
+						events={liveEvents}
+						year={year}
+						defaultViewMode="calendar"
+						title="Live Now"
+						user={user}
+						onCreateBookmark={onCreateBookmark}
+						emptyStateTitle="No live events found"
+						emptyStateMessage="Come back later to see live events"
+						serverBookmarks={serverBookmarks}
+					/>
 					</section>
 
 					<section>
-						<EventList
-							events={upcomingEvents}
-							year={year}
-							defaultViewMode="calendar"
-							title="Starting Soon"
-							user={user}
-							onCreateBookmark={onCreateBookmark}
-							emptyStateTitle="No upcoming events found"
-							emptyStateMessage="Come back later to see upcoming events"
-						/>
+					<EventList
+						events={upcomingEvents}
+						year={year}
+						defaultViewMode="calendar"
+						title="Starting Soon"
+						user={user}
+						onCreateBookmark={onCreateBookmark}
+						emptyStateTitle="No upcoming events found"
+						emptyStateMessage="Come back later to see upcoming events"
+						serverBookmarks={serverBookmarks}
+					/>
 					</section>
 				</div>
 			</div>

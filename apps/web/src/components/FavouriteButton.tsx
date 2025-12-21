@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
 import { Spinner } from "~/components/Spinner";
 import { useIsClient } from "~/hooks/use-is-client";
+import { createBookmark } from "~/server/functions/bookmarks";
+import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 
 type FavouriteButtonProps = {
 	year: number;
@@ -34,6 +37,10 @@ export function FavouriteButton({
 	onCreateBookmark,
 }: FavouriteButtonProps) {
 	const isClient = useIsClient();
+	const { user: serverUser } = useAuthSnapshot();
+	const returnTo = useRouterState({
+		select: (state) => `${state.location.pathname}${state.location.search}`,
+	});
 	const [currentStatus, setCurrentStatus] = useState(status);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const lastSyncedStatusRef = useRef(status);
@@ -84,14 +91,32 @@ export function FavouriteButton({
 	};
 
 	if (!isClient) {
+		const nextStatus =
+			status === "favourited" ? "unfavourited" : "favourited";
+		const canSubmit = Boolean(serverUser?.id);
+
 		return (
-			<Button
-				variant="outline"
-				disabled
-				title="Enable JavaScript to bookmark events"
-			>
-				<Icons.star />
-			</Button>
+			<form method="post" action={createBookmark.url}>
+				<input type="hidden" name="year" value={year} />
+				<input type="hidden" name="type" value={type} />
+				<input type="hidden" name="slug" value={slug} />
+				<input type="hidden" name="status" value={nextStatus} />
+				<input type="hidden" name="returnTo" value={returnTo} />
+				<Button
+					variant="outline"
+					disabled={!canSubmit}
+					title={
+						canSubmit
+							? "Bookmark this item"
+							: "Sign in to bookmark events"
+					}
+					type="submit"
+				>
+					<Icons.star
+						className={status === "favourited" ? "icon--filled" : ""}
+					/>
+				</Button>
+			</form>
 		);
 	}
 

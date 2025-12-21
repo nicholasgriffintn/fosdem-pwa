@@ -77,11 +77,16 @@ export const createBookmark = createServerFn({
 	method: "POST",
 })
 	.inputValidator(
-		(data: { year: number; type: string; slug: string; status: string }) =>
-			data,
+		(data: {
+			year: number;
+			type: string;
+			slug: string;
+			status: string;
+			returnTo?: string;
+		}) => data,
 	)
 	.handler(async (ctx) => {
-		const { year, type, slug, status } = ctx.data;
+		const { year, type, slug, status, returnTo } = ctx.data;
 
 		if (!type || !slug || !status) {
 			throw new Error("Invalid request");
@@ -95,6 +100,14 @@ export const createBookmark = createServerFn({
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
+			if (returnTo) {
+				return new Response(null, {
+					status: 303,
+					headers: {
+						Location: returnTo.startsWith("/") ? returnTo : "/signin",
+					},
+				});
+			}
 			return null;
 		}
 
@@ -131,16 +144,29 @@ export const createBookmark = createServerFn({
 					});
 			}
 
-			return {
-				success: true,
-			};
+			if (returnTo) {
+				return new Response(null, {
+					status: 303,
+					headers: {
+						Location: returnTo.startsWith("/") ? returnTo : "/",
+					},
+				});
+			}
+
+			return { success: true };
 		} catch (error) {
 			console.error(error);
 
-			return {
-				success: false,
-				error: "Failed to save bookmark",
-			};
+			if (returnTo) {
+				return new Response(null, {
+					status: 303,
+					headers: {
+						Location: returnTo.startsWith("/") ? returnTo : "/",
+					},
+				});
+			}
+
+			return { success: false, error: "Failed to save bookmark" };
 		}
 	});
 
