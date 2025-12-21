@@ -34,6 +34,11 @@ export function Header() {
 			icon: <Icons.video className="h-4 w-4" />,
 		},
 		{
+			title: "Speakers",
+			href: "/speakers",
+			icon: <Icons.users className="h-4 w-4" />,
+		},
+		{
 			title: "Rooms",
 			href: "/rooms",
 			icon: <Icons.building className="h-4 w-4" />,
@@ -68,7 +73,7 @@ export function Header() {
 									) : (
 										<Button
 											variant="link"
-													size="sm"
+											size="sm"
 											className={cn(
 												"h-8 gap-2 px-3 text-muted-foreground no-underline whitespace-nowrap",
 											)}
@@ -81,7 +86,7 @@ export function Header() {
 													year: (prev.year as number) || constants.DEFAULT_YEAR,
 												})}
 											>
-														<Icons.login className="h-4 w-4" />
+												<Icons.login className="h-4 w-4" />
 												<span>Sign In</span>
 											</Link>
 										</Button>
