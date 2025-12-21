@@ -47,6 +47,10 @@ type EventListProps = {
 	displaySortByFavourites?: boolean;
 	emptyStateTitle?: string;
 	emptyStateMessage?: string;
+	serverBookmarks?: Array<{
+		slug: string;
+		status: string;
+	}>;
 };
 
 export function EventList({
@@ -69,6 +73,7 @@ export function EventList({
 	displaySortByFavourites = false,
 	emptyStateTitle = "No events to show",
 	emptyStateMessage = "Adjust filters or pick another day to see more sessions.",
+	serverBookmarks,
 }: EventListProps) {
 	const viewMode = (view as EventListViewModes) || defaultViewMode;
 	const sortByFavourites = sortFavourites === "true";
@@ -145,6 +150,7 @@ export function EventList({
 									showTrack={showTrack}
 									user={user}
 									onCreateBookmark={onCreateBookmark}
+									serverBookmarks={serverBookmarks}
 								/>
 							) : viewMode === "list" ? (
 								<EventItemList
@@ -156,6 +162,7 @@ export function EventList({
 										user={user}
 										sortByFavourites={sortByFavourites}
 										onCreateBookmark={onCreateBookmark}
+										serverBookmarks={serverBookmarks}
 									/>
 								) : (
 									<EventCalendarList
@@ -167,6 +174,7 @@ export function EventList({
 									user={user}
 									sortByFavourites={sortByFavourites}
 									onCreateBookmark={onCreateBookmark}
+									serverBookmarks={serverBookmarks}
 								/>
 							)}
 						</div>
@@ -214,6 +222,7 @@ export function EventList({
 							showTrack={showTrack}
 							user={user}
 							onCreateBookmark={onCreateBookmark}
+							serverBookmarks={serverBookmarks}
 						/>
 					) : viewMode === "list" ? (
 						<EventItemList
@@ -225,6 +234,7 @@ export function EventList({
 							user={user}
 							sortByFavourites={sortByFavourites}
 							onCreateBookmark={onCreateBookmark}
+							serverBookmarks={serverBookmarks}
 						/>
 					) : (
 						<EventCalendarList
@@ -236,6 +246,7 @@ export function EventList({
 							user={user}
 							sortByFavourites={sortByFavourites}
 							onCreateBookmark={onCreateBookmark}
+							serverBookmarks={serverBookmarks}
 						/>
 					)}
 				</>

@@ -25,6 +25,26 @@ import {
 } from "~/server/functions/bookmarks";
 import { createNote, updateNote, deleteNote } from "~/server/functions/notes";
 
+type ServerActionResult = {
+	success: boolean;
+	error?: string;
+};
+
+function normalizeServerActionResult(
+	response: unknown,
+	fallbackError = "Unknown error",
+): ServerActionResult {
+	if (response && typeof response === "object" && "success" in response) {
+		const result = response as ServerActionResult;
+		return {
+			success: Boolean(result.success),
+			error: result.error ?? (result.success ? undefined : fallbackError),
+		};
+	}
+
+	return { success: false, error: fallbackError };
+}
+
 export async function syncBookmarksToServer(): Promise<SyncResult> {
 	const syncQueue = await getSyncQueue();
 	const bookmarkItems = syncQueue.filter((item) => item.type === "bookmark");
@@ -49,14 +69,15 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 					}),
 				);
 
-				if (response?.success) {
+				const result = normalizeServerActionResult(response);
+				if (result.success) {
 					results.push({ success: true, id: item.id });
 					await removeFromSyncQueue(item.id);
 				} else {
 					results.push({
 						success: false,
 						id: item.id,
-						error: response?.error || "Unknown error",
+						error: result.error || "Unknown error",
 					});
 				}
 			} else if (item.action === "update") {
@@ -88,14 +109,15 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 						}),
 					);
 
-					if (response?.success) {
+					const result = normalizeServerActionResult(response);
+					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
 					} else {
 						results.push({
 							success: false,
 							id: item.id,
-							error: response?.error || "Unknown error",
+							error: result.error || "Unknown error",
 						});
 					}
 				} else {
@@ -110,14 +132,15 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 						}),
 					);
 
-					if (response?.success) {
+					const result = normalizeServerActionResult(response);
+					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
 					} else {
 						results.push({
 							success: false,
 							id: item.id,
-							error: response?.error || "Unknown error",
+							error: result.error || "Unknown error",
 						});
 					}
 				}
@@ -131,14 +154,15 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 							},
 						}),
 					);
-					if (response?.success) {
+					const result = normalizeServerActionResult(response);
+					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
 					} else {
 						results.push({
 							success: false,
 							id: item.id,
-							error: response?.error || "Unknown error",
+							error: result.error || "Unknown error",
 						});
 					}
 				} else {
@@ -188,14 +212,15 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 					}),
 				);
 
-				if (response?.success) {
+				const result = normalizeServerActionResult(response);
+				if (result.success) {
 					results.push({ success: true, id: item.id });
 					await removeFromSyncQueue(item.id);
 				} else {
 					results.push({
 						success: false,
 						id: item.id,
-						error: response?.error || "Unknown error",
+						error: result.error || "Unknown error",
 					});
 				}
 			} else if (item.action === "update") {
@@ -211,14 +236,15 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 							},
 						}),
 					);
-					if (response?.success) {
+					const result = normalizeServerActionResult(response);
+					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
 					} else {
 						results.push({
 							success: false,
 							id: item.id,
-							error: response?.error || "Unknown error",
+							error: result.error || "Unknown error",
 						});
 					}
 				} else {
@@ -232,14 +258,15 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 							},
 						}),
 					);
-					if (response?.success) {
+					const result = normalizeServerActionResult(response);
+					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
 					} else {
 						results.push({
 							success: false,
 							id: item.id,
-							error: response?.error || "Unknown error",
+							error: result.error || "Unknown error",
 						});
 					}
 				}
@@ -252,14 +279,15 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 							},
 						}),
 					);
-					if (response?.success) {
+					const result = normalizeServerActionResult(response);
+					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
 					} else {
 						results.push({
 							success: false,
 							id: item.id,
-							error: response?.error || "Unknown error",
+							error: result.error || "Unknown error",
 						});
 					}
 				} else {

@@ -3,6 +3,16 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { FavouriteButton } from "~/components/FavouriteButton";
 
+const routerMocks = vi.hoisted(() => ({
+	useRouterState: ({
+		select,
+	}: {
+		select: (state: { location: { pathname: string; search: string } }) => string;
+	}) => select({ location: { pathname: "/test", search: "" } }),
+}));
+
+vi.mock("@tanstack/react-router", () => routerMocks);
+
 vi.mock("~/hooks/use-toast", () => ({
 	toast: vi.fn(),
 }));

@@ -16,14 +16,18 @@ import { useAuth } from "~/hooks/use-auth";
 import { Spinner } from "~/components/Spinner";
 import { constants } from "~/constants";
 import { cn } from "../../lib/utils";
+import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 
 export function Header() {
 	const { year } = useSearch({ strict: false });
 	const selectedYear = Number(year) || constants.DEFAULT_YEAR;
 
 	const { user, loading } = useAuth();
+	const { user: serverUser } = useAuthSnapshot();
 
 	const isClient = useIsClient();
+	const resolvedUser = isClient ? user : serverUser;
+	const resolvedLoading = isClient ? loading : false;
 
 	const navItems = [
 		{
@@ -64,25 +68,25 @@ export function Header() {
 				<MainNav title="FOSDEM PWA" items={navItems} />
 				<div className="flex items-center justify-end gap-3">
 					<nav className="hidden md:flex items-center gap-2 shrink-0">
-						{user?.id ? (
-							<AvatarMenu user={user} />
-						) : loading && isClient ? (
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger asChild>
+						{resolvedUser?.id ? (
+							<AvatarMenu user={resolvedUser} />
+						) : resolvedLoading ? (
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
 										<div className="h-7 w-7 flex items-center justify-center">
 											<Spinner />
 										</div>
-										</TooltipTrigger>
-										<TooltipContent>
-											<p>Loading...</p>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							) : (
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger asChild>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Loading...</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						) : (
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
 										<Button
 											variant="link"
 											size="sm"
@@ -100,13 +104,13 @@ export function Header() {
 												<Icons.login className="h-4 w-4" />
 												<span>Sign In</span>
 											</Link>
-												</Button>
-											</TooltipTrigger>
-											<TooltipContent>
-												<p>Sign in to save favourites</p>
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
+										</Button>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>Sign in to save favourites</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
 						)}
 					</nav>
 					<NavSearch year={selectedYear} />

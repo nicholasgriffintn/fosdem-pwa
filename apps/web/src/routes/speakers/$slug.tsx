@@ -8,6 +8,7 @@ import { PageHeader } from "~/components/PageHeader";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
+import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/speakers/$slug")({
     component: SpeakerPage,
@@ -33,9 +34,14 @@ export const Route = createFileRoute("/speakers/$slug")({
             );
         }
 
+        const serverBookmarks = await getBookmarks({
+            data: { year, status: "favourited" },
+        });
+
         return {
             fosdem: { person, personEvents, conference: data.conference, days: Object.values(data.days) },
             year,
+            serverBookmarks,
         };
     },
     head: ({ loaderData }) => ({
@@ -50,7 +56,7 @@ export const Route = createFileRoute("/speakers/$slug")({
 });
 
 function SpeakerPage() {
-    const { fosdem, year } = Route.useLoaderData();
+    const { fosdem, year, serverBookmarks } = Route.useLoaderData();
     const { day, sortFavourites } = Route.useSearch();
     const navigate = Route.useNavigate();
     const { person, personEvents, days } = fosdem;
@@ -118,6 +124,7 @@ function SpeakerPage() {
                         user={user}
                         onCreateBookmark={onCreateBookmark}
                         displaySortByFavourites={true}
+                        serverBookmarks={serverBookmarks}
                     />
                 </div>
             </div>

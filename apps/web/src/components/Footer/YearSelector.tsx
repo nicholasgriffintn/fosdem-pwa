@@ -4,12 +4,15 @@ import { useRouter, useSearch } from "@tanstack/react-router";
 
 import { constants } from "~/constants";
 import { toast } from "~/hooks/use-toast";
+import { useIsClient } from "~/hooks/use-is-client";
 import { Select } from "~/components/ui/select";
 
 export function YearSelector() {
 	const router = useRouter();
 	const { year } = useSearch({ strict: false });
 	const selectedYear = year || constants.DEFAULT_YEAR;
+
+	const isClient = useIsClient();
 
 	const handleYearChange = (year: number) => {
 		router.navigate({
@@ -39,12 +42,14 @@ export function YearSelector() {
 					options={yearOptions}
 					className="h-9 w-24"
 				/>
-				<button
-					type="submit"
-					className="h-9 rounded-md border border-input bg-background px-3 text-sm hover:bg-accent"
-				>
-					Go
-				</button>
+				{!isClient && (
+					<button
+						type="submit"
+						className="h-9 rounded-md border border-input bg-background px-3 text-sm hover:bg-accent"
+					>
+						Go
+					</button>
+				)}
 			</form>
 		</div>
 	);

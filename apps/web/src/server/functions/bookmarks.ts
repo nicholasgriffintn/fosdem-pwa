@@ -9,6 +9,51 @@ import {
 } from "~/server/db/schema";
 import { getFullAuthSession } from "~/server/auth";
 
+type BookmarkPayload = {
+	year: number;
+	type: string;
+	slug: string;
+	status: string;
+};
+
+async function upsertBookmark(payload: BookmarkPayload, userId: number) {
+	const { year, type, slug, status } = payload;
+	const yearNum = Number.parseInt(String(year));
+	if (!Number.isFinite(yearNum) || yearNum < 2000 || yearNum > 2100) {
+		throw new Error("Invalid year parameter");
+	}
+
+	const existingBookmark = await db.query.bookmark.findFirst({
+		where: and(
+			eq(bookmarkTable.user_id, userId),
+			eq(bookmarkTable.year, yearNum),
+			eq(bookmarkTable.slug, slug),
+		),
+	});
+
+	if (existingBookmark) {
+		await db
+			.update(bookmarkTable)
+			.set({ status })
+			.where(eq(bookmarkTable.id, existingBookmark.id));
+	} else {
+		await db
+			.insert(bookmarkTable)
+			.values({
+				id: `${userId}_${yearNum}_${slug}`,
+				slug,
+				type: `bookmark_${type}`,
+				year: yearNum,
+				status,
+				user_id: userId,
+			})
+			.onConflictDoUpdate({
+				target: bookmarkTable.id,
+				set: { status },
+			});
+	}
+}
+
 export const getBookmarks = createServerFn({
 	method: "GET",
 })
@@ -77,71 +122,115 @@ export const createBookmark = createServerFn({
 	method: "POST",
 })
 	.inputValidator(
-		(data: { year: number; type: string; slug: string; status: string }) =>
-			data,
+		(data: {
+			year: number;
+			type: string;
+			slug: string;
+			status: string;
+			returnTo?: string;
+		}) => data,
 	)
 	.handler(async (ctx) => {
-		const { year, type, slug, status } = ctx.data;
+		const { year, type, slug, status, returnTo } = ctx.data;
 
 		if (!type || !slug || !status) {
 			throw new Error("Invalid request");
 		}
 
-		const yearNum = Number.parseInt(String(year));
-		if (!Number.isFinite(yearNum) || yearNum < 2000 || yearNum > 2100) {
-			throw new Error("Invalid year parameter");
-		}
-
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
+			if (returnTo) {
+				return new Response(null, {
+					status: 303,
+					headers: {
+						Location: returnTo.startsWith("/") ? returnTo : "/signin",
+					},
+				});
+			}
 			return null;
 		}
 
-		const existingBookmark = await db.query.bookmark.findFirst({
-			where: and(
-				eq(bookmarkTable.user_id, user.id),
-				eq(bookmarkTable.year, yearNum),
-				eq(bookmarkTable.slug, slug),
-			),
-		});
-
 		try {
-			if (existingBookmark) {
-				await db
-					.update(bookmarkTable)
-					.set({
-						status,
-					})
-					.where(eq(bookmarkTable.id, existingBookmark.id));
-			} else {
-				await db
-					.insert(bookmarkTable)
-					.values({
-						id: `${user.id}_${yearNum}_${slug}`,
-						slug,
-						type: `bookmark_${type}`,
-						year: yearNum,
-						status,
-						user_id: user.id,
-					})
-					.onConflictDoUpdate({
-						target: bookmarkTable.id,
-						set: { status },
-					});
+			await upsertBookmark({ year, type, slug, status }, user.id);
+
+			if (returnTo) {
+				return new Response(null, {
+					status: 303,
+					headers: {
+						Location: returnTo.startsWith("/") ? returnTo : "/",
+					},
+				});
 			}
 
-			return {
-				success: true,
-			};
+			return { success: true };
 		} catch (error) {
 			console.error(error);
 
-			return {
-				success: false,
-				error: "Failed to save bookmark",
-			};
+			if (returnTo) {
+				return new Response(null, {
+					status: 303,
+					headers: {
+						Location: returnTo.startsWith("/") ? returnTo : "/",
+					},
+				});
+			}
+
+			return { success: false, error: "Failed to save bookmark" };
 		}
+	});
+
+export const createBookmarkFromForm = createServerFn({
+	method: "POST",
+})
+	.inputValidator((data: FormData) => {
+		if (!(data instanceof FormData)) {
+			throw new Error("Invalid! FormData is required");
+		}
+
+		const year = data.get("year");
+		const type = data.get("type");
+		const slug = data.get("slug");
+		const status = data.get("status");
+		const returnTo = data.get("returnTo");
+
+		if (!year || !type || !slug || !status) {
+			throw new Error("Invalid request");
+		}
+
+		return {
+			year: Number(year),
+			type: type.toString(),
+			slug: slug.toString(),
+			status: status.toString(),
+			returnTo: returnTo?.toString(),
+		};
+	})
+	.handler(async (ctx) => {
+		const { year, type, slug, status, returnTo } = ctx.data;
+		const { user } = await getFullAuthSession();
+
+		if (!user) {
+			return new Response(null, {
+				status: 303,
+				headers: {
+					Location: "/signin",
+				},
+			});
+		}
+
+		try {
+			await upsertBookmark({ year, type, slug, status }, user.id);
+		} catch (error) {
+			console.error(error);
+		}
+
+		return new Response(null, {
+			status: 303,
+			headers: {
+				Location: returnTo?.startsWith("/") ? returnTo : "/",
+			},
+		});
 	});
 
 export const updateBookmark = createServerFn({

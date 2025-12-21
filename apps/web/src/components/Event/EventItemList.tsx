@@ -33,6 +33,10 @@ type EventListProps = {
 		slug: string;
 		status: string;
 	}) => void;
+	serverBookmarks?: Array<{
+		slug: string;
+		status: string;
+	}>;
 };
 
 type EventListItemProps = {
@@ -213,11 +217,13 @@ export function EventItemList({
 	user,
 	onCreateBookmark,
 	sortByFavourites = false,
+	serverBookmarks,
 }: EventListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({
 		items: events,
 		year,
 		sortByFavourites,
+		serverBookmarks,
 	});
 
 	return (

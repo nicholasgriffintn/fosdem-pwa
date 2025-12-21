@@ -51,6 +51,7 @@ type BookmarksListProps = {
 	year: number;
 	loading: boolean;
 	day?: string;
+	view?: string;
 	onUpdateBookmark?: (params: {
 		id: string;
 		serverId?: string;
@@ -79,6 +80,7 @@ export function BookmarksList({
 	year,
 	loading,
 	day,
+	view,
 	onUpdateBookmark,
 	showConflicts = true,
 	defaultViewMode = "calendar",
@@ -164,6 +166,11 @@ export function BookmarksList({
 
 	const { tracks, events, conflicts } = getFormattedData();
 	const days = fosdemData ? Object.values(fosdemData.days) : [];
+	const bookmarkSnapshot =
+		bookmarks?.map((bookmark) => ({
+			slug: bookmark.slug,
+			status: bookmark.status,
+		})) || [];
 
 	if (tracks.length === 0 && events.length === 0) {
 		return (
@@ -191,6 +198,7 @@ export function BookmarksList({
 							day={day}
 							user={user}
 							onCreateBookmark={onCreateBookmark}
+							serverBookmarks={bookmarkSnapshot}
 						/>
 					)}
 					{events.length > 0 && (
@@ -202,12 +210,14 @@ export function BookmarksList({
 							groupByDay={true}
 							days={days}
 							day={day}
+							view={view}
 							onSetPriority={handleSetPriority}
 							showTrack={true}
 							defaultViewMode={defaultViewMode}
 							displayViewMode={showViewMode}
 							user={user}
 							onCreateBookmark={onCreateBookmark}
+							serverBookmarks={bookmarkSnapshot}
 						/>
 					)}
 				</div>
