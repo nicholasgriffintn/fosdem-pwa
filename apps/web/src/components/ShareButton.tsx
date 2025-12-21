@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
@@ -12,6 +14,12 @@ type ShareButtonProps = {
 };
 
 export function ShareButton({ title, text, url }: ShareButtonProps) {
+	const [isClient, setIsClient] = useState(false);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
+
 	const handleShare = async () => {
 		try {
 			if (shareSupported() && navigator.canShare({ title, text, url })) {
@@ -45,6 +53,22 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
 			}
 		}
 	};
+
+	if (!isClient) {
+		return (
+			<div className="inline-flex items-center gap-2 px-3 py-2 text-xs border border-muted rounded-md max-w-[300px]">
+				<Icons.share className="h-4 w-4 flex-shrink-0" />
+				<input
+					type="text"
+					readOnly
+					value={url}
+					className="bg-transparent border-none text-[10px] font-mono w-full min-w-0 focus:outline-none focus:ring-1 focus:ring-primary rounded px-1"
+					onClick={(e) => e.currentTarget.select()}
+					title="Click to select URL"
+				/>
+			</div>
+		);
+	}
 
 	return (
 		<Button variant="outline" onClick={handleShare}>

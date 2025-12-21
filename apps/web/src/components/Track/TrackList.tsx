@@ -1,17 +1,15 @@
-import { useId, useState } from "react";
+import { useId } from "react";
 
 import type { Track } from "~/types/fosdem";
 import { ItemActions } from "~/components/ItemActions";
 import { useTrackList } from "~/hooks/use-item-list";
 import { groupTracksByDay } from "~/lib/grouping";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
 import type { User } from "~/server/db/schema";
-import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Icons } from "~/components/Icons";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { constants } from "../../constants";
 
 type TrackListProps = {
@@ -21,6 +19,7 @@ type TrackListProps = {
 	groupByDay?: boolean;
 	days?: Array<{ id: string; name: string }>;
 	day?: string;
+	sortFavourites?: string;
 	user?: User | null;
 	onCreateBookmark?: ({
 		type,
@@ -186,11 +185,13 @@ export function TrackList({
 	groupByDay = false,
 	days,
 	day,
+	sortFavourites,
 	user,
 	onCreateBookmark,
 	displaySortByFavourites = false,
 }: TrackListProps) {
-	const [sortByFavourites, setSortByFavourites] = useState(false);
+	const navigate = useNavigate();
+	const sortByFavourites = sortFavourites === "true";
 	const sortSwitchId = useId();
 
 	if (groupByDay && days) {
@@ -201,77 +202,85 @@ export function TrackList({
 		return (
 			<section>
 				<div className="flex flex-col space-y-4">
-					<Tabs defaultValue={dayId.toString()} className="w-full">
-						<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-							<div className="flex flex-col md:flex-row md:items-center gap-4">
-								{title && (
-									<h2 className="text-xl font-semibold shrink-0 text-foreground">
-										{title}
-									</h2>
-								)}
-								<TabsList className="bg-transparent p-0 h-auto justify-start gap-2">
-									{days.map((day) => {
-										const hasTracks = Boolean(trackDataSplitByDay[day.id]);
-										return (
-											<TabsTrigger
-												key={day.id}
-												value={day.id}
-												disabled={!hasTracks}
-												className={cn(
-													"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2",
-													"border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-													"data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary",
-												)}
-											>
-												{day.name}
-											</TabsTrigger>
-										);
-									})}
-								</TabsList>
-							</div>
-							{displaySortByFavourites && (
-								<div className="flex items-center gap-2">
-									<Switch
-										id={sortSwitchId}
-										checked={sortByFavourites}
-										onCheckedChange={setSortByFavourites}
-										aria-label="Toggle favourites-first sorting"
-									/>
-									<Label
-										htmlFor={sortSwitchId}
-										className="text-sm font-medium text-foreground"
-									>
-										Favourites first
-									</Label>
-								</div>
+					<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+						<div className="flex flex-col md:flex-row md:items-center gap-4">
+							{title && (
+								<h2 className="text-xl font-semibold shrink-0 text-foreground">
+									{title}
+								</h2>
 							)}
-						</div>
-						{days.map((day) => {
-							if (!trackDataSplitByDay[day.id]) {
-								return (
-									<TabsContent key={day.id} value={day.id}>
-										<EmptyStateCard
-											title="No tracks for this day"
-											description="Switch to another day to find available tracks."
-											className="my-4"
-										/>
-									</TabsContent>
-								);
-							}
+							<div className="flex gap-2 justify-start flex-wrap">
+								{days.map((dayItem) => {
+									const hasTracks = Boolean(trackDataSplitByDay[dayItem.id]);
+									const isActive = dayId === dayItem.id;
 
-							return (
-								<TabsContent key={day.id} value={day.id}>
-									<TrackListContent
-										tracks={trackDataSplitByDay[day.id]}
-										year={year}
-										user={user}
-										sortByFavourites={sortByFavourites}
-										onCreateBookmark={onCreateBookmark}
-									/>
-								</TabsContent>
-							);
-						})}
-					</Tabs>
+									return (
+										<Link
+											key={dayItem.id}
+											to="."
+											search={(prev) => ({ ...prev, day: dayItem.id })}
+											disabled={!hasTracks}
+											className={cn(
+												"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2",
+												"border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+												isActive && "bg-primary text-primary-foreground border-primary",
+												!hasTracks && "pointer-events-none opacity-50"
+											)}
+											aria-current={isActive ? "page" : undefined}
+										>
+											{dayItem.name}
+										</Link>
+									);
+								})}
+							</div>
+						</div>
+						{displaySortByFavourites && (
+							<div className="flex items-center gap-2">
+								<input
+									type="checkbox"
+									id={sortSwitchId}
+									checked={sortByFavourites}
+									onChange={(e) => {
+										navigate({
+											search: (prev) => ({
+												...prev,
+												sortFavourites: e.target.checked ? 'true' : undefined
+											})
+										});
+									}}
+									className="sr-only peer/sort"
+								/>
+								<label
+									htmlFor={sortSwitchId}
+									className="cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full bg-input peer-checked/sort:bg-primary transition-colors"
+								>
+									<span className="sr-only">Toggle favourites-first sorting</span>
+									<span className="inline-block h-4 w-4 ml-0.5 transform rounded-full bg-background transition peer-checked/sort:translate-x-5" />
+								</label>
+								<Label
+									htmlFor={sortSwitchId}
+									className="text-sm font-medium text-foreground cursor-pointer"
+								>
+									Favourites first
+								</Label>
+							</div>
+						)}
+					</div>
+					{trackDataSplitByDay[dayId] ? (
+						<TrackListContent
+							tracks={trackDataSplitByDay[dayId]}
+							year={year}
+							user={user}
+							sortByFavourites={sortByFavourites}
+							onCreateBookmark={onCreateBookmark}
+						/>
+					) : (
+						<EmptyStateCard
+							title="No tracks for this day"
+							description="Switch to another day to find available tracks."
+							className="my-4"
+						/>
+					)}
 				</div>
 			</section>
 		);
@@ -285,15 +294,30 @@ export function TrackList({
 				)}
 				{displaySortByFavourites && (
 					<div className="flex items-center gap-2">
-						<Switch
+						<input
+							type="checkbox"
 							id={sortSwitchId}
 							checked={sortByFavourites}
-							onCheckedChange={setSortByFavourites}
-							aria-label="Toggle favourites-first sorting"
+							onChange={(e) => {
+								navigate({
+									search: (prev) => ({
+										...prev,
+										sortFavourites: e.target.checked ? 'true' : undefined
+									})
+								});
+							}}
+							className="sr-only peer/sort"
 						/>
+						<label
+							htmlFor={sortSwitchId}
+							className="cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full bg-input peer-checked/sort:bg-primary transition-colors"
+						>
+							<span className="sr-only">Toggle favourites-first sorting</span>
+							<span className="inline-block h-4 w-4 ml-0.5 transform rounded-full bg-background transition peer-checked/sort:translate-x-5" />
+						</label>
 						<Label
 							htmlFor={sortSwitchId}
-							className="text-sm font-medium text-foreground"
+							className="text-sm font-medium text-foreground cursor-pointer"
 						>
 							Favourites first
 						</Label>

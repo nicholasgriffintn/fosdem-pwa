@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
 import { PageHeader } from "~/components/PageHeader";
 import { useBookmarks } from "~/hooks/use-bookmarks";
@@ -41,6 +42,11 @@ function BookmarksHome() {
 	const { create, update } = useMutateBookmark({ year });
 	const { fosdemData } = useFosdemData({ year });
 	const { user, loading: authLoading } = useAuth();
+	const [isClient, setIsClient] = useState(false);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
 
 	const onCreateBookmark = async (bookmark: any) => {
 		await create({
@@ -59,11 +65,30 @@ function BookmarksHome() {
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
 				<PageHeader heading="Bookmarks" year={year} />
-				{authLoading || loading ? (
-					<div className="flex justify-center items-center">
+				<noscript>
+					<div className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 p-6 rounded-lg mb-6">
+						<h2 className="font-semibold text-lg mb-3">JavaScript Required for Bookmarks</h2>
+						<p className="text-sm mb-3">
+							The bookmarks feature requires JavaScript to function properly.
+						</p>
+						<p className="text-sm text-muted-foreground mb-3">
+							To use bookmarks, you need to:
+						</p>
+						<ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside mb-3">
+							<li>Enable JavaScript in your browser settings</li>
+							<li><a href="/signin" className="text-primary hover:underline">Sign in</a> to sync bookmarks across devices</li>
+						</ol>
+						<p className="text-sm">
+							Without JavaScript, you can still browse the <a href="/" className="text-primary hover:underline font-medium">FOSDEM schedule</a>.
+						</p>
+					</div>
+				</noscript>
+				{isClient && (authLoading || loading) && (
+					<div className="flex justify-center items-center py-8">
 						<Spinner className="h-8 w-8" />
 					</div>
-				) : !bookmarks || bookmarks.length === 0 ? (
+				)}
+				{!authLoading && !loading && (!bookmarks || bookmarks.length === 0) ? (
 					<EmptyStateCard
 						title="No bookmarks yet"
 						description={

@@ -26,6 +26,17 @@ export function EventSidebar({
 
 	return (
 		<div className={sidebarClassName}>
+			<noscript>
+				<div className="border border-amber-500 bg-amber-50 dark:bg-amber-950 p-4 rounded-lg">
+					<h3 className="font-semibold text-sm mb-2">Notes Require JavaScript</h3>
+					<p className="text-xs text-muted-foreground mb-2">
+						To take notes during this event, please enable JavaScript in your browser.
+					</p>
+					<p className="text-xs text-muted-foreground">
+						You can still view event details and the schedule without JavaScript.
+					</p>
+				</div>
+			</noscript>
 			{loading ? (
 				<Skeleton
 					className={clsx("h-full", {

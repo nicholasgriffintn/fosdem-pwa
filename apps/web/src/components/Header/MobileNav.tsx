@@ -17,13 +17,19 @@ type MobileNavProps = {
 		icon?: React.ReactNode;
 		disabled?: boolean;
 	}[];
-	onCloseMenu: () => void;
+	menuCheckboxRef?: React.RefObject<HTMLInputElement | null>;
+	isOpen: boolean;
+	onClose: () => void;
 	children?: ReactNode;
-	returnFocusRef?: React.RefObject<HTMLElement | null>;
 };
 
-export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps) {
-	useLockBody();
+export function MobileNav({
+	items,
+	menuCheckboxRef,
+	isOpen,
+	onClose,
+}: MobileNavProps) {
+	useLockBody(isOpen);
 	const { user, logout } = useAuth();
 
 	const firstLinkRef = useRef<HTMLAnchorElement | null>(null);
@@ -32,10 +38,11 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 		firstLinkRef.current?.focus();
 
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === "Escape") {
+			if (event.key === "Escape" && menuCheckboxRef?.current) {
 				event.preventDefault();
-				onCloseMenu();
-				returnFocusRef?.current?.focus?.();
+				menuCheckboxRef.current.checked = false;
+				menuCheckboxRef.current.focus();
+				onClose();
 			}
 		};
 
@@ -43,7 +50,7 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [onCloseMenu, returnFocusRef]);
+	}, [menuCheckboxRef]);
 
 	return (
 		<div
@@ -71,7 +78,12 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 									item.disabled && "cursor-not-allowed opacity-60",
 								),
 							}}
-							onClick={onCloseMenu}
+							onClick={() => {
+								if (menuCheckboxRef?.current) {
+									menuCheckboxRef.current.checked = false;
+								}
+								onClose();
+							}}
 							search={(prev: Record<string, unknown>) => ({
 								...prev,
 								year: typeof prev.year === 'number' ? prev.year : constants.DEFAULT_YEAR,
@@ -114,7 +126,12 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 											year: typeof prev.year === 'number' ? prev.year : constants.DEFAULT_YEAR,
 										})}
 										to="/profile"
-										onClick={onCloseMenu}
+										onClick={() => {
+											if (menuCheckboxRef?.current) {
+												menuCheckboxRef.current.checked = false;
+											}
+											onClose();
+										}}
 										className="no-underline"
 									>
 										View Profile
@@ -138,7 +155,10 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 								className="flex items-center justify-start gap-2 w-full"
 								onClick={() => {
 									logout();
-									onCloseMenu();
+									if (menuCheckboxRef?.current) {
+										menuCheckboxRef.current.checked = false;
+									}
+									onClose();
 								}}
 							>
 								<Icons.logout className="h-5 w-5" />
@@ -151,7 +171,12 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 							className="flex items-center justify-start gap-2 w-full"
 							asChild
 						>
-								<Link to="/signin" onClick={onCloseMenu} className="no-underline">
+								<Link to="/signin" onClick={() => {
+									if (menuCheckboxRef?.current) {
+										menuCheckboxRef.current.checked = false;
+									}
+									onClose();
+								}} className="no-underline">
 								<Icons.login className="h-5 w-5" />
 								Sign In
 							</Link>
@@ -168,7 +193,6 @@ export function MobileNav({ items, onCloseMenu, returnFocusRef }: MobileNavProps
 							target="_blank"
 							rel="noreferrer"
 							className="no-underline"
-							onClick={onCloseMenu}
 						>
 							<Icons.gitHub className="h-5 w-5" />
 							View Source

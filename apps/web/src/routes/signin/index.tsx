@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "~/hooks/use-auth";
 import { PageHeader } from "~/components/PageHeader";
@@ -20,14 +21,11 @@ export const Route = createFileRoute("/signin/")({
 
 function SignInPage() {
 	const { user, loading } = useAuth();
+	const [isClient, setIsClient] = useState(false);
 
-	if (loading) {
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<Spinner className="h-8 w-8" />
-			</div>
-		);
-	}
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
 
 	if (user?.id) {
 		return (
@@ -42,6 +40,11 @@ function SignInPage() {
 		<div className="min-h-screen">
 			<div className="container max-w-2xl mx-auto px-4 py-12 lg:py-20">
 				<PageHeader heading="Sign in" className="mb-4" />
+				{isClient && loading && (
+					<div className="flex items-center justify-center py-12">
+						<Spinner className="h-8 w-8" />
+					</div>
+				)}
 				<div className="flex flex-col gap-8">
 					<div className="space-y-6">
 						<p className="text-lg text-muted-foreground">
