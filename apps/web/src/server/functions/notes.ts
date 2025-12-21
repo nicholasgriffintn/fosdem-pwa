@@ -67,7 +67,7 @@ export const createNote = createServerFn({
 		} catch (error) {
 			console.error(error);
 
-			return { error: "Failed to save note" };
+			return { success: false, error: "Failed to save note" };
 		}
 	});
 
@@ -89,7 +89,7 @@ export const updateNote = createServerFn({
 		}, {});
 
 		if (Object.keys(safeUpdates).length === 0) {
-			return { error: "No valid note fields to update" };
+			return { success: false, error: "No valid note fields to update" };
 		}
 
 		const { user } = await getFullAuthSession();
@@ -112,7 +112,7 @@ export const updateNote = createServerFn({
 			return { success: true };
 		} catch (error) {
 			console.error(error);
-			return { error: "Failed to update note" };
+			return { success: false, error: "Failed to update note" };
 		}
 	});
 
@@ -143,6 +143,6 @@ export const deleteNote = createServerFn({
 			return { success: true };
 		} catch (error) {
 			console.error(error);
-			return { error: "Failed to delete note" };
+			return { success: false, error: "Failed to delete note" };
 		}
 	});
