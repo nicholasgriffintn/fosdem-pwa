@@ -7,7 +7,9 @@
   "scripts": {
     "cf-typegen": "wrangler types",
     "dev": "vite dev --port 3000",
-    "build": "vite build",
+    "build:sw": "tsx ./scripts/generate-sw.ts",
+    "build": "vite build && pnpm build:sw",
+    "preview": "vite preview",
     "start": "node .output/server/index.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
