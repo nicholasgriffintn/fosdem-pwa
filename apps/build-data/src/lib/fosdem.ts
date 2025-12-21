@@ -21,6 +21,7 @@ import { slugify } from "../utils/slugs";
 
 const typeData = Object.freeze(constants.TYPES);
 const buildings = Object.freeze(constants.BUILDINGS);
+const keynotesByYear = Object.freeze(constants.KEYNOTES_BY_YEAR);
 
 class EventProcessor {
   private getType(event: XmlEvent): string {
@@ -153,14 +154,21 @@ class EventProcessor {
 
     if (!event?.type?._text || !event?.track?._text) return null;
 
-    const featuredEventIds = constants.KEYNOTES_BY_YEAR[year];
-    const isFeatured = featuredEventIds?.includes(event._attributes.id);
+    let type = this.getType(event);
+    let track = event.track._text;
+    let trackKey = this.getTrackKey(event);
 
-    const type = this.getType(event);
-    const track = event.track._text;
-    const trackKey = this.getTrackKey(event);
+    if (type === "other" && track === "stand") {
+      return null;
+    }
 
-    if (type === "other" && track === "stand") return null;
+    const isFeatured = keynotesByYear[year]?.includes(event._attributes.id);
+
+    if (type === "maintrack" && isFeatured) {
+      type = "keynote";
+      track = "Featured";
+      trackKey = "featured";
+    }
 
     const { names, ids } = this.processPersons(event.persons);
 
