@@ -5,6 +5,7 @@ import {
 	useMatch,
 	useRouter,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import { Button } from "~/components/ui/button";
 import { constants } from "~/constants";
@@ -17,7 +18,18 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 		select: (state) => state.id === rootRouteId,
 	});
 
-	console.error(error);
+	useEffect(() => {
+		console.error("Error boundary caught:", {
+			message: (error as Error)?.message,
+			stack: (error as Error)?.stack,
+			error,
+		});
+
+		// TODO: Send error to monitoring service (e.g., Sentry)
+		// if (typeof window !== "undefined" && window.Sentry) {
+		//   window.Sentry.captureException(error);
+		// }
+	}, [error]);
 
 	const message =
 		(error as Error)?.message ||
@@ -51,20 +63,14 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 								</Link>
 							</Button>
 						) : (
-							<Button asChild variant="secondary">
-								<Link
-									to="/"
-									search={(prev) => ({
-										...prev,
-										year: prev.year || constants.DEFAULT_YEAR,
-									})}
-									onClick={(e) => {
-										e.preventDefault();
-										window.history.back();
-									}}
-								>
-									Go Back
-								</Link>
+							<Button
+								variant="secondary"
+								type="button"
+								onClick={() => {
+									window.history.back();
+								}}
+							>
+								Go Back
 							</Button>
 						)}
 					</>

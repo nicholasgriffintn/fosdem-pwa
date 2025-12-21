@@ -38,14 +38,25 @@ export function PushNotifications() {
 			return;
 		}
 
+		let isMounted = true;
+
 		const checkCurrentSubscription = async () => {
-			const registration = await navigator.serviceWorker.ready;
-			const subscription = await registration.pushManager.getSubscription();
-			if (subscription) {
-				setCurrentEndpoint(subscription.endpoint);
+			try {
+				const registration = await navigator.serviceWorker.ready;
+				const subscription = await registration.pushManager.getSubscription();
+				if (subscription && isMounted) {
+					setCurrentEndpoint(subscription.endpoint);
+				}
+			} catch (error) {
+				console.error("Failed to check current subscription:", error);
 			}
 		};
-		checkCurrentSubscription();
+
+		void checkCurrentSubscription();
+
+		return () => {
+			isMounted = false;
+		};
 	}, [pushSupported]);
 
 	const handleSubscribe = async () => {

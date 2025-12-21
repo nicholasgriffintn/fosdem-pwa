@@ -128,7 +128,7 @@ describe("useNotes", () => {
 		});
 
 		await waitFor(() => {
-			expect(result.current.notes.some((note) => note.serverId === 10)).toBe(
+			expect(result.current.notes.some((note) => 'serverId' in note && note.serverId === 10)).toBe(
 				true,
 			);
 		});

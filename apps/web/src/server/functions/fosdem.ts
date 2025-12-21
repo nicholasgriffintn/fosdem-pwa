@@ -52,18 +52,18 @@ const getFullData = async (year: number): Promise<Conference> => {
 export const getAllData = createServerFn({
 	method: "GET",
 })
-	.inputValidator((data: unknown) => {
+	.inputValidator((data: unknown): { year: number } => {
 		if (
 			typeof data === "object" &&
 			data !== null &&
 			"year" in data &&
-			typeof (data as any).year === "number"
+			typeof data.year === "number"
 		) {
-			return { year: (data as any).year };
+			return { year: data.year };
 		}
 		throw new Error("Invalid input; expected { year: number }");
 	})
-	.handler(async (ctx: any) => {
+	.handler(async (ctx: { data: { year: number } }) => {
 		const data = await getFullData(ctx.data.year);
 		return data;
 	});

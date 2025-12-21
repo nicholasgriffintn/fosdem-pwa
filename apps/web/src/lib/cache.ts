@@ -35,18 +35,24 @@ export class CacheManager {
 
 		try {
 			const data = await this.redis.get(this.getKey(key));
-			try {
-				return JSON.parse(data as string);
-			} catch (error) {
-				return data;
+			if (data === null || data === undefined) {
+				return null;
 			}
+			if (typeof data === "string") {
+				try {
+					return JSON.parse(data);
+				} catch (error) {
+					return data;
+				}
+			}
+			return data;
 		} catch (error) {
 			console.error(`Redis get error for key ${key}:`, error);
 			return null;
 		}
 	}
 
-	async set(key: string, data: any, ttl?: number) {
+	async set(key: string, data: unknown, ttl?: number) {
 		if (!this.redis) {
 			return;
 		}

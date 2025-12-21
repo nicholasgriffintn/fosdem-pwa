@@ -90,11 +90,11 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 			return {
 				...local,
-				serverId: matchingServerNote && typeof matchingServerNote === 'object' ? matchingServerNote.id : undefined,
-				existsOnServer: !!matchingServerNote,
-				isPending: !!user?.id && !matchingServerNote,
+				serverId: matchingServerNote && typeof matchingServerNote === 'object' && 'id' in matchingServerNote ? matchingServerNote.id : undefined,
+				existsOnServer: !!matchingServerNote && typeof matchingServerNote === 'object',
+				isPending: !!user?.id && (!matchingServerNote || typeof matchingServerNote !== 'object'),
 			};
-		}) as any;
+		});
 
 		const localServerIds = new Set(
 			localNotes.map((n) => n.serverId).filter(Boolean),
@@ -190,7 +190,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 				isPending: true,
 			};
 
-			queryClient.setQueryData(localQueryKey, (old: any[] = []) => [
+			queryClient.setQueryData(localQueryKey, (old: LocalNote[] = []) => [
 				...old,
 				optimisticNote,
 			]);
@@ -202,8 +202,8 @@ export function useNotes({ year, event }: UseNotesArgs) {
 				return;
 			}
 
-			queryClient.setQueryData(localQueryKey, (old: any[] = []) => {
-				return old.map((note: any) =>
+			queryClient.setQueryData(localQueryKey, (old: LocalNote[] = []) => {
+				return old.map((note) =>
 					note.id === variables.tempId ? { ...note, isPending: false } : note,
 				);
 			});
@@ -227,10 +227,14 @@ export function useNotes({ year, event }: UseNotesArgs) {
 		if (!serverNotes || !localNotes) return;
 		if (reconciliationInProgress.current) return;
 
-		reconciliationInProgress.current = true;
 		let cancelled = false;
+		reconciliationInProgress.current = true;
 
 		const reconcile = async () => {
+			if (cancelled) {
+				reconciliationInProgress.current = false;
+				return;
+			}
 
 			try {
 				const validServerNotes = serverNotes.filter(
@@ -256,63 +260,78 @@ export function useNotes({ year, event }: UseNotesArgs) {
 				);
 
 				const operations = validServerNotes.map(async (serverNote) => {
-					if (cancelled) return;
+					if (cancelled) return { status: "skipped" };
 
 					const key = String(serverNote.id);
 					const existingLocalByServerId = localServerIdMap.get(key);
 
-					if (existingLocalByServerId) {
-						const needsUpdate =
-							existingLocalByServerId.note !== serverNote.note ||
-							(existingLocalByServerId.time ?? null) !==
-							(serverNote.time ?? null);
+					try {
+						if (existingLocalByServerId) {
+							const needsUpdate =
+								existingLocalByServerId.note !== serverNote.note ||
+								(existingLocalByServerId.time ?? null) !==
+								(serverNote.time ?? null);
 
-						if (needsUpdate) {
+							if (needsUpdate) {
+								await persistUpdateLocalNote(
+									existingLocalByServerId.id,
+									{
+										note: serverNote.note,
+										time: serverNote.time,
+									},
+									true,
+								);
+							}
+							return { status: "updated" as const };
+						}
+
+						const existingLocalMatch = localNotes.find(
+							(localNote) =>
+								!localNote.serverId &&
+								localNote.slug === serverNote.slug &&
+								localNote.year === serverNote.year &&
+								localNote.note.trim() === serverNote.note.trim() &&
+								(localNote.time ?? null) === (serverNote.time ?? null),
+						);
+
+						if (existingLocalMatch) {
 							await persistUpdateLocalNote(
-								existingLocalByServerId.id,
+								existingLocalMatch.id,
 								{
-									note: serverNote.note,
-									time: serverNote.time,
+									serverId: serverNote.id,
 								},
 								true,
 							);
+							return { status: "linked" as const };
 						}
-						return;
-					}
 
-					const existingLocalMatch = localNotes.find(
-						(localNote) =>
-							!localNote.serverId &&
-							localNote.slug === serverNote.slug &&
-							localNote.year === serverNote.year &&
-							localNote.note.trim() === serverNote.note.trim() &&
-							(localNote.time ?? null) === (serverNote.time ?? null),
-					);
-
-					if (existingLocalMatch) {
-						await persistUpdateLocalNote(
-							existingLocalMatch.id,
+						await persistLocalNote(
 							{
+								year: serverNote.year,
+								slug: serverNote.slug,
+								note: serverNote.note,
+								time: serverNote.time,
 								serverId: serverNote.id,
 							},
 							true,
 						);
-						return;
+						return { status: "created" as const };
+					} catch (error) {
+						console.error(`Failed to reconcile note ${serverNote.id}:`, error);
+						return { status: "failed" as const, error };
 					}
-
-					await persistLocalNote(
-						{
-							year: serverNote.year,
-							slug: serverNote.slug,
-							note: serverNote.note,
-							time: serverNote.time,
-							serverId: serverNote.id,
-						},
-						true,
-					);
 				});
 
-				await Promise.all(operations);
+				const results = await Promise.allSettled(operations);
+				const failures = results.filter(
+					(r) => r.status === "rejected" || (r.status === "fulfilled" && r.value?.status === "failed")
+				);
+
+				if (failures.length > 0) {
+					console.warn(
+						`Note reconciliation completed with ${failures.length} failures out of ${results.length} operations`
+					);
+				}
 
 				if (!cancelled) {
 					await queryClient.invalidateQueries({

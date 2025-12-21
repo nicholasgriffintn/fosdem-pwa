@@ -11,6 +11,20 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "~/hooks/use-toast";
 import { formatDate, formatTime, createStandardDate } from "~/lib/dateTime";
 
+type MergedNote = {
+	id: string | number;
+	year: number;
+	slug: string;
+	note: string;
+	time?: number | null;
+	created_at: string;
+	updated_at: string | null;
+	user_id?: number;
+	isPending?: boolean;
+	serverId?: number;
+	existsOnServer?: boolean;
+};
+
 type EventNotesProps = {
 	year: number;
 	event: Event;
@@ -88,7 +102,7 @@ export function EventNotes({
 				)}
 				{!loading && notes && (
 					<ul className="space-y-2">
-						{notes.map((note: { isPending?: boolean } & (LocalNote | Note)) => (
+						{notes.map((note: MergedNote) => (
 							<li
 								key={note.id}
 								className={`bg-muted/30 rounded-lg p-3 transition-opacity ${note.isPending ? "opacity-50" : ""}`}

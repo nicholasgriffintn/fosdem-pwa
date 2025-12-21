@@ -15,7 +15,7 @@ export const getBookmarks = createServerFn({
 	.inputValidator(
 		(data: { year: number; status: "favourited" | "unfavourited" }) => data,
 	)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { year, status } = ctx.data;
 
 		const yearNum = Number.parseInt(String(year));
@@ -48,7 +48,7 @@ export const getEventBookmark = createServerFn({
 	method: "GET",
 })
 	.inputValidator((data: { year: number; slug: string }) => data)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { year, slug } = ctx.data;
 
 		const yearNum = Number.parseInt(String(year));
@@ -80,7 +80,7 @@ export const createBookmark = createServerFn({
 		(data: { year: number; type: string; slug: string; status: string }) =>
 			data,
 	)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { year, type, slug, status } = ctx.data;
 
 		if (!type || !slug || !status) {
@@ -147,8 +147,8 @@ export const createBookmark = createServerFn({
 export const updateBookmark = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { id: string; updates: any }) => data)
-	.handler(async (ctx: any) => {
+	.inputValidator((data: { id: string; updates: Record<string, unknown> }) => data)
+	.handler(async (ctx) => {
 		const { id, updates } = ctx.data;
 
 		const allowedFields = [
@@ -208,7 +208,7 @@ export const getUserBookmarks = createServerFn({
 	method: "GET",
 })
 	.inputValidator((data: { year: number; userId: string }) => data)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { year, userId } = ctx.data;
 
 		if (!userId) {
@@ -244,7 +244,7 @@ export const deleteBookmark = createServerFn({
 	method: "POST",
 })
 	.inputValidator((data: { id: string }) => data)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { id } = ctx.data;
 
 		const { user } = await getFullAuthSession();

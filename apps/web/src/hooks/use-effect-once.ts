@@ -4,13 +4,25 @@ import { type EffectCallback, useEffect, useRef } from "react";
 
 const useEffectOnce = (effect: EffectCallback) => {
 	const hasRun = useRef(false);
+	const cleanupRef = useRef<(() => void) | undefined>(undefined);
 
 	useEffect(() => {
 		if (!hasRun.current) {
 			hasRun.current = true;
-			return effect();
+			const cleanup = effect();
+			if (cleanup) {
+				cleanupRef.current = cleanup;
+			}
 		}
-	}, [effect]);
+
+		return () => {
+			if (cleanupRef.current) {
+				cleanupRef.current();
+				cleanupRef.current = undefined;
+			}
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 };
 
 export default useEffectOnce;
