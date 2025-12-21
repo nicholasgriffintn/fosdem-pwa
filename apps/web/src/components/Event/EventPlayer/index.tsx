@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
@@ -34,15 +34,10 @@ export function EventPlayer({
 	const [isMounted, setIsMounted] = useState(false);
 	const isOnline = useOnlineStatus();
 	const player = usePlayer();
-	const wasPlayingRef = useRef(false);
 
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
-
-	useEffect(() => {
-		wasPlayingRef.current = isPlaying;
-	}, [isPlaying]);
 
 	const videoRecordings =
 		event.links?.filter((link) => link.type?.startsWith("video/")) || [];
@@ -83,23 +78,10 @@ export function EventPlayer({
 	};
 
 	useEffect(() => {
-		if (isPlaying && player.currentEvent?.id === event.id) {
+		if (isPlaying && player.currentEvent?.id === event?.id) {
 			player.close();
 		}
-	}, [isPlaying, player, event.id]);
-
-	useEffect(() => {
-		return () => {
-			if (wasPlayingRef.current && streamUrl) {
-				setTimeout(() => {
-					if (!player.currentEvent || player.currentEvent.id !== event.id) {
-						player.loadEvent(event, year, streamUrl, eventIsLive);
-						player.play();
-					}
-				}, 0);
-			}
-		};
-	}, [streamUrl, event, year, eventIsLive, player]);
+	}, [isPlaying, player, event?.id]);
 
 	return (
 		<div className={clsx(containerClassName, "group")}>

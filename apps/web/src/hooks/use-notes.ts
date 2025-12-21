@@ -30,12 +30,12 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 	const { notes: localNotes, loading: localLoading } = useLocalNotes({
 		year,
-		slug: event.id,
+		slug: event?.id,
 	});
 
 	const userKey = user?.id ?? "guest";
-	const serverQueryKey = ["notes", userKey, year, event.id] as const;
-	const localQueryKey = ["local-notes", year, event.id] as const;
+	const serverQueryKey = ["notes", userKey, year, event?.id] as const;
+	const localQueryKey = ["local-notes", year, event?.id] as const;
 
 	const { data: serverNotes, isLoading: serverLoading } = useQuery({
 		queryKey: serverQueryKey,
@@ -43,7 +43,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 			if (!user?.id) return [];
 
 			const notes = await getNotesFromServer({
-				data: { year, eventId: event.id },
+				data: { year, eventId: event?.id },
 			});
 			return notes;
 		},
@@ -124,7 +124,6 @@ export function useNotes({ year, event }: UseNotesArgs) {
 			tempId: string;
 		}) => {
 			if (!event?.id) {
-				console.error("Cannot save note: event.id is undefined", event);
 				throw new Error("Cannot save note: event information is incomplete");
 			}
 
@@ -133,7 +132,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 				localNote = await persistLocalNote(
 					{
 						year,
-						slug: event.id,
+						slug: event?.id,
 						note,
 						time,
 					},
@@ -160,7 +159,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 			try {
 				const response = await createNoteFromServer({
-					data: { year, eventId: event.id, note, time },
+					data: { year, eventId: event?.id, note, time },
 				});
 
 				return { ...response, tempId, queued: false };
@@ -186,7 +185,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 				time: newNote.time,
 				created_at: timestamp,
 				year,
-				slug: event.id,
+				slug: event?.id,
 				isPending: true,
 			};
 
@@ -335,7 +334,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 				if (!cancelled) {
 					await queryClient.invalidateQueries({
-						queryKey: ["local-notes", year, event.id],
+						queryKey: ["local-notes", year, event?.id],
 					});
 				}
 			} catch (error) {
@@ -350,7 +349,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 		return () => {
 			cancelled = true;
 		};
-	}, [user?.id, serverNotes, localNotes, year, event.id, queryClient]);
+	}, [user?.id, serverNotes, localNotes, year, event?.id, queryClient]);
 
 	return {
 		notes: mergedNotes,

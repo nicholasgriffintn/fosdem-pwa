@@ -92,7 +92,7 @@ function EventPage() {
 
 	const { bookmark, loading: bookmarkLoading } = useBookmark({
 		year,
-		slug: fosdem.event.id,
+		slug: fosdem?.event?.id,
 	});
 	const { create: createBookmark } = useMutateBookmark({ year });
 	const onCreateBookmark = async (bookmark: any) => {
@@ -152,14 +152,14 @@ function EventPage() {
 						<FavouriteButton
 							year={year}
 							type="event"
-							slug={fosdem.event.id}
+							slug={fosdem?.event?.id}
 							status={favouriteStatus}
 							onCreateBookmark={onCreateBookmark}
 						/>
 						<ShareButton
-							title={fosdem.event.title}
-							text={`Check out ${fosdem.event.title} at FOSDEM`}
-							url={`https://fosdempwa.com/event/${fosdem.event.id}?year=${year}`}
+							title={fosdem?.event?.title}
+							text={`Check out ${fosdem?.event?.title} at FOSDEM`}
+							url={`https://fosdempwa.com/event/${fosdem?.event?.id}?year=${year}`}
 						/>
 					</div>
 				</PageHeader>
