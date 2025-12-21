@@ -43,6 +43,7 @@ const PlayerContext = createContext<PlayerContextValue | undefined>(undefined);
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const pendingPlayRef = useRef(false);
 
 	const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
 	const [year, setYear] = useState<number | null>(null);
@@ -63,6 +64,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 		if (!isClient) return;
 		const state = getPlayerState();
 		if (state.eventSlug && state.streamUrl) {
+			if (state.isMinimized && state.isPlaying) {
+				const shouldRestore = window.confirm(
+					`Continue playing "${state.eventTitle || "video"}" in floating player?`
+				);
+
+				if (!shouldRestore) {
+					clearPlayerState();
+					return;
+				}
+			}
+
 			setYear(state.year);
 			setIsMuted(state.isMuted);
 			setIsMinimized(state.isMinimized);
@@ -99,8 +111,24 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
 			setCurrentEvent(restoredEvent);
 			setCurrentTimeState(state.currentTime);
+			setIsPlaying(state.isPlaying);
 
-			setIsPlaying(false);
+			if (state.isPlaying && videoRef.current) {
+				const playWhenReady = () => {
+					if (videoRef.current) {
+						videoRef.current.play().catch((error) => {
+							console.error("Failed to auto-play restored video:", error);
+							setIsPlaying(false);
+						});
+					}
+				};
+
+				if (videoRef.current.readyState >= 2) {
+					playWhenReady();
+				} else {
+					videoRef.current.addEventListener("loadeddata", playWhenReady, { once: true });
+				}
+			}
 		}
 	}, [isClient]);
 
@@ -228,7 +256,19 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 	};
 
 	const play = () => {
-		videoRef.current?.play();
+		pendingPlayRef.current = true;
+		const video = videoRef.current;
+		if (!video) {
+			return;
+		}
+		const playPromise = video.play();
+		if (playPromise?.catch) {
+			playPromise.catch((error) => {
+				console.error("Failed to play video:", error);
+				pendingPlayRef.current = false;
+				setIsPlaying(false);
+			});
+		}
 	};
 
 	const pause = () => {
@@ -242,6 +282,22 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			play();
 		}
 	};
+
+	useEffect(() => {
+		if (!pendingPlayRef.current) return;
+		const video = videoRef.current;
+		if (!video) return;
+
+		const playPromise = video.play();
+		if (playPromise?.catch) {
+			playPromise.catch((error) => {
+				console.error("Failed to auto-play video:", error);
+				pendingPlayRef.current = false;
+				setIsPlaying(false);
+			});
+		}
+		pendingPlayRef.current = false;
+	}, [currentEvent, streamUrl, isLive]);
 
 	const setVolume = (vol: number) => {
 		if (videoRef.current) {

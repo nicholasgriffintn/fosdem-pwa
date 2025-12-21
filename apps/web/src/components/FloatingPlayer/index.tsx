@@ -147,7 +147,6 @@ export function FloatingPlayer() {
 					hidden: isMinimized,
 				})}
 				controls={!isMinimized}
-				autoPlay
 				playsInline
 				webkit-playsinline="true"
 			>

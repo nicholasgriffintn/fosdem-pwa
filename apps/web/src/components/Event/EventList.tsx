@@ -74,7 +74,7 @@ export function EventList({
 	const scheduleEvents = events.filter((event) => {
 		const hasConflict = conflicts?.some(
 			(conflict) =>
-				conflict.event1.id === event.id || conflict.event2.id === event.id,
+				conflict.event1.id === event?.id || conflict.event2.id === event?.id,
 		);
 		return event.priority === 1 || !hasConflict;
 	});

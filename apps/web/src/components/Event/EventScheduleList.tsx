@@ -132,7 +132,7 @@ export function EventScheduleList({
 		<div className="space-y-2">
 			{sortedEvents.map((event, index) => (
 				<EventScheduleListItem
-					key={event.id}
+					key={event?.id}
 					event={event}
 					nextEvent={sortedEvents[index + 1]}
 					year={year}
