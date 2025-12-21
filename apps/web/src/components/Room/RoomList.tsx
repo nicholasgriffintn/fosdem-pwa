@@ -26,10 +26,11 @@ function RoomListItem({ year, room, index, isLast }: RoomListItemProps) {
 				<Link
 					to="/rooms/$roomId"
 					params={{ roomId: room.slug }}
-					search={(prev: Record<string, unknown>) => ({
-						year: typeof prev.year === 'number' ? prev.year : constants.DEFAULT_YEAR,
+					search={{
+						year: Number.isFinite(year) ? year : constants.DEFAULT_YEAR,
 						day: undefined,
-					})}
+						sortFavourites: undefined,
+					}}
 					className="no-underline"
 				>
 					<h3 className="font-semibold leading-none tracking-tight">

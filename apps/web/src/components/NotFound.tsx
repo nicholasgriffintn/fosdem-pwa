@@ -15,7 +15,6 @@ export function NotFound() {
 					<Link
 						to="/"
 						search={(prev) => ({
-							...prev,
 							year: prev.year || constants.DEFAULT_YEAR,
 						})}
 					>

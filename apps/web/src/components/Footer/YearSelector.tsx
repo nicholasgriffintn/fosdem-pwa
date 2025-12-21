@@ -4,13 +4,7 @@ import { useRouter, useSearch } from "@tanstack/react-router";
 
 import { constants } from "~/constants";
 import { toast } from "~/hooks/use-toast";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "~/components/ui/select";
+import { Select } from "~/components/ui/select";
 
 export function YearSelector() {
 	const router = useRouter();
@@ -29,24 +23,29 @@ export function YearSelector() {
 		});
 	};
 
+	const yearOptions = constants.AVAILABLE_YEARS.map((year) => ({
+		label: year.toString(),
+		value: year.toString(),
+	}));
+
 	return (
 		<div className="flex items-center gap-2">
 			<span>Year</span>
-			<Select
-				value={selectedYear.toString()}
-				onValueChange={(value) => handleYearChange(Number(value))}
-			>
-				<SelectTrigger>
-					<SelectValue placeholder="Select year" />
-				</SelectTrigger>
-				<SelectContent>
-					{constants.AVAILABLE_YEARS.map((year) => (
-						<SelectItem key={year} value={year.toString()}>
-							{year}
-						</SelectItem>
-					))}
-				</SelectContent>
-			</Select>
+			<form method="GET" action="/" className="flex items-center gap-2">
+				<Select
+					name="year"
+					value={selectedYear.toString()}
+					onValueChange={(value) => handleYearChange(Number(value))}
+					options={yearOptions}
+					className="h-9 w-24"
+				/>
+				<button
+					type="submit"
+					className="h-9 rounded-md border border-input bg-background px-3 text-sm hover:bg-accent"
+				>
+					Go
+				</button>
+			</form>
 		</div>
 	);
 }

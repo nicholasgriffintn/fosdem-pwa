@@ -6,25 +6,37 @@ import clsx from "clsx";
 import type { Event } from "~/types/fosdem";
 
 interface SharedVideoElementProps {
-	event: Event | null;
+	event?: Event | null;
+	sources?: Array<{ href: string; type: string }>;
 	videoRef: React.RefObject<HTMLVideoElement | null>;
 	isLive: boolean;
 	showControls?: boolean;
+	autoPlay?: boolean;
 	className?: string;
 }
 
 export function SharedVideoElement({
 	event,
+	sources,
 	videoRef,
 	isLive,
 	showControls = true,
+	autoPlay = true,
 	className,
 }: SharedVideoElementProps) {
 	const hlsRef = useRef<Hls | null>(null);
 
+	const resolvedSources = sources?.length
+		? sources
+		: isLive
+			? event?.streams ?? []
+			: event?.links?.filter((link) => link.type?.startsWith("video/")) ?? [];
+
 	const streamUrl = isLive
-		? event?.streams?.find((s) => s.type === "application/vnd.apple.mpegurl")?.href
-		: event?.links?.find((l) => l.type?.startsWith("video/"))?.href;
+		? resolvedSources.find((source) =>
+				source.type?.includes("application/vnd.apple.mpegurl"),
+			)?.href
+		: null;
 
 	useEffect(() => {
 		if (!streamUrl || !videoRef.current) return;
@@ -59,39 +71,27 @@ export function SharedVideoElement({
 		};
 	}, [streamUrl, isLive]);
 
-	if (!event) return null;
+	if (!event && (!resolvedSources || resolvedSources.length === 0)) return null;
 
-	const videoRecordings =
-		event.links?.filter((link) => link.type?.startsWith("video/")) || [];
-
-	const subtitleTrack = event.links?.find((link) =>
-		link.href.endsWith(".vtt"),
-	);
+	const subtitleTrack = event?.links?.find((link) => link.href.endsWith(".vtt"));
 	const proxiedSubtitleUrl = subtitleTrack
 		? `/api/proxy/subtitles?url=${encodeURIComponent(subtitleTrack.href)}`
 		: null;
 
 	return (
 		<video
-			key={event.id}
+			key={event?.id ?? streamUrl ?? "shared-video"}
 			ref={videoRef}
 			className={clsx("w-full h-full object-contain", className)}
 			controls={showControls}
-			autoPlay
+			autoPlay={autoPlay}
 			playsInline
 			webkit-playsinline="true"
+			preload="metadata"
 		>
-			{isLive && event.streams?.length
-				? event.streams.map((stream) => (
-						<source key={stream.href} src={stream.href} type={stream.type} />
-					))
-				: videoRecordings.map((recording) => (
-						<source
-							key={recording.href}
-							src={recording.href}
-							type={recording.type}
-						/>
-					))}
+			{resolvedSources.map((source) => (
+				<source key={source.href} src={source.href} type={source.type} />
+			))}
 			{proxiedSubtitleUrl && (
 				<track
 					kind="subtitles"

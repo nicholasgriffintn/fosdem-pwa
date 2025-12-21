@@ -55,7 +55,6 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 								<Link
 									to="/"
 									search={(prev) => ({
-										...prev,
 										year: prev.year || constants.DEFAULT_YEAR,
 									})}
 								>

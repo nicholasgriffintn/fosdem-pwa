@@ -67,6 +67,28 @@ function ProfilePage() {
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
 				<PageHeader heading="Profile" displayHeading={false} year={year} />
+				<noscript>
+					<div className="container py-6">
+						<div className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 p-6 rounded-lg mb-6">
+							<h2 className="font-semibold text-lg mb-3">JavaScript Required for Profile</h2>
+							<p className="text-sm mb-3">
+								Your profile page requires JavaScript to display your conference badge, bookmarks, and settings.
+							</p>
+							<p className="text-sm text-muted-foreground mb-3">
+								Profile features that require JavaScript:
+							</p>
+							<ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside mb-3">
+								<li>Conference badge display</li>
+								<li>Viewing and managing bookmarks</li>
+								<li>Push notification settings</li>
+								<li>Profile visibility settings</li>
+							</ul>
+							<p className="text-sm">
+								Please enable JavaScript or <a href="/" className="text-primary hover:underline font-medium">return to the homepage</a>.
+							</p>
+						</div>
+					</div>
+				</noscript>
 				<div className="space-y-8">
 					<div className="flex flex-col lg:flex-row items-start gap-8">
 						<div className="w-full lg:w-auto lg:max-w-md">
