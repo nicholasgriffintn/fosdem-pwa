@@ -161,7 +161,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 	}, [currentEvent]);
 
 	useEffect(() => {
-		if (currentEvent) {
+		const shouldPersist =
+			currentEvent && portalTarget === "floating" && isPlaying;
+
+		if (currentEvent && !shouldPersist) {
+			clearPlayerState();
+			return;
+		}
+
+		if (shouldPersist && currentEvent) {
 			savePlayerState({
 				eventSlug: currentEvent.id,
 				year,
@@ -175,10 +183,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 				isLive,
 			});
 		}
-	}, [currentEvent, year, volume, isPlaying, isMuted, isMinimized, streamUrl, isLive]);
+	}, [
+		currentEvent,
+		year,
+		currentTime,
+		volume,
+		isPlaying,
+		isMuted,
+		isMinimized,
+		streamUrl,
+		isLive,
+		portalTarget,
+	]);
 
 	useEffect(() => {
-		if (!currentEvent || !isPlaying) return;
+		if (!currentEvent || !isPlaying || portalTarget !== "floating") return;
 
 		const interval = setInterval(() => {
 			const video = videoRef.current;
