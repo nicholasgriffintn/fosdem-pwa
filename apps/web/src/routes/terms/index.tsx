@@ -72,6 +72,17 @@ function TermsPage() {
 
 					<section className="space-y-3">
 						<h2 className="text-2xl font-semibold text-foreground">
+							External links
+						</h2>
+						<p className="text-muted-foreground">
+							The app may include links to third-party sites and resources. We do
+							not control those sites and are not responsible for their content,
+							policies, or availability. Access them at your own risk.
+						</p>
+					</section>
+
+					<section className="space-y-3">
+						<h2 className="text-2xl font-semibold text-foreground">
 							Availability and changes
 						</h2>
 						<p className="text-muted-foreground">
