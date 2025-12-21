@@ -362,7 +362,7 @@ if (self.location.hostname === 'localhost') {
   });
 }`
 
-  writeFileSync(`${outputDir}/sw.js`, sw);
+  writeFileSync(`${outputDir}/client/sw.js`, sw);
   console.info('Service worker generated successfully!');
 }
 
