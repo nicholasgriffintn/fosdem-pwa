@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 
 import { PageHeader } from "~/components/PageHeader";
@@ -6,6 +6,7 @@ import { TypesList } from "~/components/Type/TypesList";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { useAuth } from "~/hooks/use-auth";
+import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { Button } from "~/components/ui/button";
 import {
 	Card,
@@ -37,9 +38,19 @@ export const Route = createFileRoute("/offline/")({
 
 function OfflinePage() {
 	const { year } = Route.useSearch();
-	const [isOnline, setIsOnline] = useState(true);
-	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
+	const [isOnline, setIsOnline] = useState(() => {
+		if (typeof window === "undefined") {
+			return true;
+		}
+		return window.navigator.onLine;
+	});
+	const { bookmarks, loading: bookmarksLoading } = useBookmarks({
+		year,
+		localOnly: !isOnline,
+	});
 	const { user } = useAuth();
+
+	const currentPathname = typeof window !== "undefined" ? window.location.pathname : "";
 
 	const cachedData = useFosdemData({ year });
 
@@ -74,6 +85,31 @@ function OfflinePage() {
 		}
 	}, [year]);
 
+	const getBookmarkDisplay = (bookmark: (typeof bookmarks)[number]) => {
+		const isEvent =
+			bookmark.type === "bookmark_event" || bookmark.type === "event";
+		const cachedItem = isEvent
+			? cachedData.fosdemData?.events?.[bookmark.slug]
+			: cachedData.fosdemData?.tracks?.[bookmark.slug];
+		const title = cachedItem
+			? isEvent
+				? cachedItem.title
+				: cachedItem.name
+			: bookmark.slug;
+		const detail = cachedItem?.room
+			? cachedItem.room
+			: cachedData.fosdemData
+				? "Not found in cached schedule"
+				: `Slug: ${bookmark.slug}`;
+
+		return {
+			kindLabel: isEvent ? "Event" : "Track",
+			title,
+			detail,
+			isEvent,
+		};
+	};
+
 	return (
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
@@ -97,9 +133,11 @@ function OfflinePage() {
 								</Badge>
 							</CardTitle>
 							<div className="flex flex-col sm:flex-row gap-2">
-								<Button size="sm" onClick={handleRetry}>
-									{isOnline ? "Refresh Page" : "Try Again"}
-								</Button>
+								{currentPathname !== "/offline" && (
+									<Button size="sm" onClick={handleRetry}>
+										{isOnline ? "Refresh Page" : "Try Again"}
+									</Button>
+								)}
 								<Button variant="outline" size="sm" onClick={handleGoHome}>
 									Go to Homepage
 								</Button>
@@ -156,48 +194,86 @@ function OfflinePage() {
 
 				<Card className="mb-6">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							Your Bookmarks
-							{!user?.id && <Badge variant="outline">Local Only</Badge>}
-						</CardTitle>
-						<CardDescription>
-							{!user?.id
-								? "Your bookmarks are saved locally on this device"
-								: "Your bookmarked events and tracks"}
-						</CardDescription>
+						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<div className="space-y-2">
+								<CardTitle className="flex items-center gap-2">
+									Your Bookmarks
+									{!user?.id && <Badge variant="outline">Local Only</Badge>}
+								</CardTitle>
+								<CardDescription>
+									{!user?.id
+										? "Your bookmarks are saved locally on this device"
+										: "Your bookmarked events and tracks"}
+								</CardDescription>
+							</div>
+							<Button asChild variant="outline" size="sm">
+								<Link to="/bookmarks" search={{ year }}>
+									View all bookmarks
+								</Link>
+							</Button>
+						</div>
 					</CardHeader>
 					<CardContent>
 						{bookmarksLoading ? (
 							<p className="text-muted-foreground">Loading bookmarks...</p>
 						) : bookmarks && bookmarks.length > 0 ? (
-							<div className="space-y-2">
-								{bookmarks.slice(0, 5).map((bookmark) => (
-									<div
-										key={bookmark.id}
-										className="p-3 border rounded-lg bg-muted/50"
-									>
-										<div className="flex justify-between items-start">
-											<div>
-												<p className="font-medium">
-													{bookmark.type === "bookmark_event" ||
-													bookmark.type === "event"
-														? "Event"
-														: "Track"}
-												</p>
-												<p className="text-sm text-muted-foreground">
-													Slug: {bookmark.slug}
-												</p>
-											</div>
-											<Badge variant="outline">{bookmark.status}</Badge>
-										</div>
-									</div>
-								))}
-								{bookmarks.length > 5 && (
-									<p className="text-sm text-muted-foreground text-center">
-										And {bookmarks.length - 5} more bookmarks...
+							cachedData.fosdemData ? (
+								<BookmarksList
+									bookmarks={bookmarks}
+									fosdemData={cachedData.fosdemData}
+									year={year}
+									loading={bookmarksLoading}
+									defaultViewMode="list"
+									showViewMode={false}
+									showConflicts={false}
+									user={user}
+									emptyStateTitle="No cached bookmark details"
+									emptyStateMessage="These bookmarks are saved, but their details are not in the cached schedule yet."
+								/>
+							) : (
+								<div className="space-y-3">
+									<p className="text-sm text-muted-foreground">
+										Bookmark details are not in the cached schedule yet.
 									</p>
-								)}
-							</div>
+									<div className="space-y-2">
+										{bookmarks.map((bookmark) => {
+											const display = getBookmarkDisplay(bookmark);
+											return (
+												<div
+													key={bookmark.id}
+													className="p-3 border rounded-lg bg-muted/50"
+												>
+													<div className="flex justify-between items-start gap-3">
+														<div className="space-y-1">
+															<p className="text-xs uppercase tracking-wide text-muted-foreground">
+																{display.kindLabel}
+															</p>
+															<Link
+																to={
+																	display.isEvent
+																		? "/event/$slug"
+																		: "/track/$slug"
+																}
+																params={{ slug: bookmark.slug }}
+																search={{ year }}
+																className="font-medium no-underline hover:underline"
+															>
+																{display.title}
+															</Link>
+															<p className="text-sm text-muted-foreground">
+																{display.detail}
+															</p>
+														</div>
+														<Badge variant="outline">
+															{bookmark.status}
+														</Badge>
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								</div>
+							)
 						) : (
 							<div className="text-center py-8">
 								<p className="text-muted-foreground mb-4">
