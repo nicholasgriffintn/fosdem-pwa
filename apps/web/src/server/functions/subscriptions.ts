@@ -21,6 +21,20 @@ export const createSubscription = createServerFn({
 		}
 
 		try {
+			const existingSubscription = await db.query.subscription.findFirst({
+				where: and(
+					eq(subscriptionTable.user_id, user.id),
+					eq(subscriptionTable.endpoint, endpoint),
+				),
+			});
+
+			if (existingSubscription) {
+				return {
+					success: true,
+					id: existingSubscription.id,
+				};
+			}
+
 			const subscription = await db
 				.insert(subscriptionTable)
 				.values({
