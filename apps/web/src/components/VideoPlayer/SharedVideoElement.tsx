@@ -73,6 +73,7 @@ export function SharedVideoElement({
 
 	return (
 		<video
+			key={event.id}
 			ref={videoRef}
 			className={clsx("w-full h-full object-contain", className)}
 			controls={showControls}
