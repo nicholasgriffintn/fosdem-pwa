@@ -60,8 +60,7 @@ function Home() {
 
 							{fosdem.types ? (
 								<TypesList
-									types={Object.values(fosdem.types)}
-									year={year}
+									types={fosdem.types}
 								/>
 							) : (
 								<EmptyStateCard
