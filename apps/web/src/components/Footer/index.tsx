@@ -39,6 +39,20 @@ export function Footer() {
 						</a>
 						<span>•</span>
 						<a
+							href="/privacy"
+							className="font-medium text-foreground hover:underline"
+						>
+							Privacy
+						</a>
+						<span>•</span>
+						<a
+							href="/terms"
+							className="font-medium text-foreground hover:underline"
+						>
+							Terms
+						</a>
+						<span>•</span>
+						<a
 							href="https://github.com/nicholasgriffintn/fosdem-pwa"
 							target="_blank"
 							rel="noreferrer"

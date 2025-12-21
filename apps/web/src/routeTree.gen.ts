@@ -10,11 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TermsIndexRouteImport } from './routes/terms/index'
 import { Route as SpeakersIndexRouteImport } from './routes/speakers/index'
 import { Route as SigninIndexRouteImport } from './routes/signin/index'
 import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
+import { Route as PrivacyIndexRouteImport } from './routes/privacy/index'
 import { Route as OfflineIndexRouteImport } from './routes/offline/index'
 import { Route as MapIndexRouteImport } from './routes/map/index'
 import { Route as LiveIndexRouteImport } from './routes/live/index'
@@ -36,6 +38,11 @@ import { Route as ApiAuthCallbackGithubRouteImport } from './routes/api/auth/cal
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsIndexRoute = TermsIndexRouteImport.update({
+  id: '/terms/',
+  path: '/terms/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
@@ -61,6 +68,11 @@ const RoomsIndexRoute = RoomsIndexRouteImport.update({
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
   id: '/profile/',
   path: '/profile/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyIndexRoute = PrivacyIndexRouteImport.update({
+  id: '/privacy/',
+  path: '/privacy/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfflineIndexRoute = OfflineIndexRouteImport.update({
@@ -160,11 +172,13 @@ export interface FileRoutesByFullPath {
   '/live': typeof LiveIndexRoute
   '/map': typeof MapIndexRoute
   '/offline': typeof OfflineIndexRoute
+  '/privacy': typeof PrivacyIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/rooms': typeof RoomsIndexRoute
   '/search': typeof SearchIndexRoute
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
+  '/terms': typeof TermsIndexRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -185,11 +199,13 @@ export interface FileRoutesByTo {
   '/live': typeof LiveIndexRoute
   '/map': typeof MapIndexRoute
   '/offline': typeof OfflineIndexRoute
+  '/privacy': typeof PrivacyIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/rooms': typeof RoomsIndexRoute
   '/search': typeof SearchIndexRoute
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
+  '/terms': typeof TermsIndexRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -211,11 +227,13 @@ export interface FileRoutesById {
   '/live/': typeof LiveIndexRoute
   '/map/': typeof MapIndexRoute
   '/offline/': typeof OfflineIndexRoute
+  '/privacy/': typeof PrivacyIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/rooms/': typeof RoomsIndexRoute
   '/search/': typeof SearchIndexRoute
   '/signin/': typeof SigninIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
+  '/terms/': typeof TermsIndexRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -238,11 +256,13 @@ export interface FileRouteTypes {
     | '/live'
     | '/map'
     | '/offline'
+    | '/privacy'
     | '/profile'
     | '/rooms'
     | '/search'
     | '/signin'
     | '/speakers'
+    | '/terms'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
@@ -263,11 +283,13 @@ export interface FileRouteTypes {
     | '/live'
     | '/map'
     | '/offline'
+    | '/privacy'
     | '/profile'
     | '/rooms'
     | '/search'
     | '/signin'
     | '/speakers'
+    | '/terms'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
@@ -288,11 +310,13 @@ export interface FileRouteTypes {
     | '/live/'
     | '/map/'
     | '/offline/'
+    | '/privacy/'
     | '/profile/'
     | '/rooms/'
     | '/search/'
     | '/signin/'
     | '/speakers/'
+    | '/terms/'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
@@ -314,11 +338,13 @@ export interface RootRouteChildren {
   LiveIndexRoute: typeof LiveIndexRoute
   MapIndexRoute: typeof MapIndexRoute
   OfflineIndexRoute: typeof OfflineIndexRoute
+  PrivacyIndexRoute: typeof PrivacyIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   RoomsIndexRoute: typeof RoomsIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
   SigninIndexRoute: typeof SigninIndexRoute
   SpeakersIndexRoute: typeof SpeakersIndexRoute
+  TermsIndexRoute: typeof TermsIndexRoute
   ApiAuthGithubRoute: typeof ApiAuthGithubRoute
   ApiAuthGuestRoute: typeof ApiAuthGuestRoute
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
@@ -336,6 +362,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms/': {
+      id: '/terms/'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/speakers/': {
@@ -371,6 +404,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy/': {
+      id: '/privacy/'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offline/': {
@@ -506,11 +546,13 @@ const rootRouteChildren: RootRouteChildren = {
   LiveIndexRoute: LiveIndexRoute,
   MapIndexRoute: MapIndexRoute,
   OfflineIndexRoute: OfflineIndexRoute,
+  PrivacyIndexRoute: PrivacyIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   RoomsIndexRoute: RoomsIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
   SigninIndexRoute: SigninIndexRoute,
   SpeakersIndexRoute: SpeakersIndexRoute,
+  TermsIndexRoute: TermsIndexRoute,
   ApiAuthGithubRoute: ApiAuthGithubRoute,
   ApiAuthGuestRoute: ApiAuthGuestRoute,
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,
