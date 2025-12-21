@@ -9,6 +9,7 @@ import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -29,7 +30,11 @@ export const Route = createFileRoute("/type/$slug")({
 			(track: Track): track is Track => track.type === params.slug,
 		);
 
-		return { fosdem: { days, type, trackData }, year, day };
+		const serverBookmarks = await getBookmarks({
+			data: { year, status: "favourited" },
+		});
+
+		return { fosdem: { days, type, trackData }, year, day, serverBookmarks };
 	},
 	head: ({ loaderData }) => ({
 		meta: [
@@ -46,7 +51,7 @@ export const Route = createFileRoute("/type/$slug")({
 });
 
 function TypePage() {
-	const { fosdem, year, day } = Route.useLoaderData();
+	const { fosdem, year, day, serverBookmarks } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
@@ -106,6 +111,7 @@ function TypePage() {
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						displaySortByFavourites={true}
+						serverBookmarks={serverBookmarks}
 					/>
 				) : (
 					<EmptyStateCard

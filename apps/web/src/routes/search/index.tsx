@@ -29,6 +29,7 @@ import { Input } from "~/components/ui/input";
 import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
 import { getAllData } from "~/server/functions/fosdem";
+import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -71,6 +72,9 @@ export const Route = createFileRoute("/search/")({
 	}),
 	loader: async ({ deps: { year, q, track, time, type } }) => {
 		const fosdemData = await getAllData({ data: { year } });
+		const serverBookmarks = await getBookmarks({
+			data: { year, status: "favourited" },
+		});
 		return {
 			year,
 			q,
@@ -78,12 +82,14 @@ export const Route = createFileRoute("/search/")({
 			time,
 			type,
 			fosdemData,
+			serverBookmarks,
 		};
 	},
 });
 
 export default function SearchPage() {
-	const { year, q, track, time, type, fosdemData } = Route.useLoaderData();
+	const { year, q, track, time, type, fosdemData, serverBookmarks } =
+		Route.useLoaderData();
 	const navigate = useNavigate();
 
 	const { user } = useAuth();
@@ -342,6 +348,7 @@ export default function SearchPage() {
 						title="Track Results"
 						user={user}
 						onCreateBookmark={onCreateBookmark}
+						serverBookmarks={serverBookmarks}
 					/>
 				),
 		},
@@ -357,6 +364,7 @@ export default function SearchPage() {
 						title="Event Results"
 						user={user}
 						onCreateBookmark={onCreateBookmark}
+						serverBookmarks={serverBookmarks}
 					/>
 				),
 		},
