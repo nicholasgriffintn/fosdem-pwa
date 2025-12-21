@@ -44,6 +44,14 @@ export function ItemActions({
 	const encodedSlug = encodeURIComponent(slug);
 	const resolvedYear = Number.isFinite(year) ? year : constants.DEFAULT_YEAR;
 	const shareUrl = `https://fosdempwa.com/${type}/${encodedSlug}?year=${resolvedYear}`;
+	const linkSearch = isEvent
+		? { year: resolvedYear, test: false }
+		: {
+				year: resolvedYear,
+				day: undefined,
+				view: undefined,
+				sortFavourites: undefined,
+			};
 
 	return (
 		<div className={`flex items-center gap-2 ${className}`}>
@@ -72,10 +80,7 @@ export function ItemActions({
 				<Link
 					to={`/${type}/$slug`}
 					params={{ slug }}
-					search={{
-						year: Number.isFinite(year) ? year : constants.DEFAULT_YEAR,
-						day: undefined,
-					}}
+					search={linkSearch}
 				>
 					View {isEvent ? "Event" : "Track"}
 				</Link>

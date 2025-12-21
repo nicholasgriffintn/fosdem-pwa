@@ -145,7 +145,11 @@ function SpeakerListClient({
                                         key={person.id}
                                         to="/speakers/$slug"
                                         params={{ slug: person.slug || person.id }}
-                                        search={{ year }}
+                                        search={{
+                                            year,
+                                            day: undefined,
+                                            sortFavourites: undefined,
+                                        }}
                                         className="group no-underline h-fit"
                                     >
                                         <Card className="transition-all duration-200 group-hover:border-primary/50 group-hover:shadow-md bg-card/40 backdrop-blur-sm">
@@ -215,7 +219,7 @@ function SpeakerListStatic({
                                 key={person.id}
                                 to="/speakers/$slug"
                                 params={{ slug: person.slug || person.id }}
-                                search={{ year }}
+                                search={{ year, day: undefined, sortFavourites: undefined }}
                                 className="group no-underline"
                             >
                                 <Card className="transition-all duration-200 group-hover:border-primary/50 group-hover:shadow-md bg-card/40 backdrop-blur-sm">

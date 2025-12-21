@@ -67,11 +67,20 @@ export const Route = createFileRoute("/rooms/$roomId")({
 function RoomPage() {
 	const { fosdem, day, year } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
+	const navigate = Route.useNavigate();
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
 	const onCreateBookmark = async (bookmark: any) => {
 		await createBookmark(bookmark);
+	};
+	const handleSortFavouritesChange = (checked: boolean) => {
+		navigate({
+			search: (prev) => ({
+				...prev,
+				sortFavourites: checked ? "true" : undefined,
+			}),
+		});
 	};
 
 	const videoRef = useRef<HTMLVideoElement>(null);
@@ -168,6 +177,7 @@ function RoomPage() {
 						days={days}
 						day={day}
 						sortFavourites={sortFavourites}
+						onSortFavouritesChange={handleSortFavouritesChange}
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						displaySortByFavourites={true}

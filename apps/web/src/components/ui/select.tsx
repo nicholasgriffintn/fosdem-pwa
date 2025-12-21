@@ -8,10 +8,7 @@ export type SelectOption = {
 	disabled?: boolean;
 };
 
-type SelectProps = Omit<
-	React.SelectHTMLAttributes<HTMLSelectElement>,
-	"onChange"
-> & {
+type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
 	options: SelectOption[];
 	onValueChange?: (value: string) => void;
 };

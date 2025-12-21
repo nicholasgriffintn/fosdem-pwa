@@ -9,7 +9,7 @@ import type { User } from "~/server/db/schema";
 import { Label } from "~/components/ui/label";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Icons } from "~/components/Icons";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { constants } from "../../constants";
 import { SortFavouritesSwitch } from "../SortFavouritesSwitch";
 import { DaySwitcher } from "../DaySwitcher";
@@ -22,6 +22,7 @@ type TrackListProps = {
 	days?: Array<{ id: string; name: string }>;
 	day?: string;
 	sortFavourites?: string;
+	onSortFavouritesChange?: (checked: boolean) => void;
 	user?: User | null;
 	onCreateBookmark?: ({
 		type,
@@ -93,6 +94,8 @@ function TrackListItem({
 							search={{
 								year: Number.isFinite(year) ? year : constants.DEFAULT_YEAR,
 								day: undefined,
+								view: undefined,
+								sortFavourites: undefined,
 							}}
 							className="no-underline hover:underline"
 						>
@@ -191,8 +194,8 @@ export function TrackList({
 	user,
 	onCreateBookmark,
 	displaySortByFavourites = false,
+	onSortFavouritesChange,
 }: TrackListProps) {
-	const navigate = useNavigate();
 	const sortByFavourites = sortFavourites === "true";
 	const sortSwitchId = useId();
 
@@ -223,6 +226,7 @@ export function TrackList({
 							<SortFavouritesSwitch
 								sortByFavourites={sortByFavourites}
 								sortSwitchId={sortSwitchId}
+								onToggle={onSortFavouritesChange}
 							/>
 						)}
 					</div>
@@ -256,6 +260,7 @@ export function TrackList({
 					<SortFavouritesSwitch
 						sortByFavourites={sortByFavourites}
 						sortSwitchId={sortSwitchId}
+						onToggle={onSortFavouritesChange}
 					/>
 				)}
 			</div>

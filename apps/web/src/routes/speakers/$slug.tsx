@@ -52,11 +52,20 @@ export const Route = createFileRoute("/speakers/$slug")({
 function SpeakerPage() {
     const { fosdem, year } = Route.useLoaderData();
     const { day, sortFavourites } = Route.useSearch();
+    const navigate = Route.useNavigate();
     const { person, personEvents, days } = fosdem;
     const { user } = useAuth();
     const { create: createBookmark } = useMutateBookmark({ year });
     const onCreateBookmark = async (bookmark: any) => {
         await createBookmark(bookmark);
+    };
+    const handleSortFavouritesChange = (checked: boolean) => {
+        navigate({
+            search: (prev) => ({
+                ...prev,
+                sortFavourites: checked ? "true" : undefined,
+            }),
+        });
     };
 
     if (!person) {
@@ -105,6 +114,7 @@ function SpeakerPage() {
                         days={days}
                         day={day}
                         sortFavourites={sortFavourites}
+                        onSortFavouritesChange={handleSortFavouritesChange}
                         user={user}
                         onCreateBookmark={onCreateBookmark}
                         displaySortByFavourites={true}
