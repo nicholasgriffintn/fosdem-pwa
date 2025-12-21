@@ -101,7 +101,7 @@ export function EventMain({
 				</ResizablePanel>
 			</ResizablePanelGroup>
 			<div className="w-full">
-				<EventContent event={event} persons={persons} />
+				<EventContent year={year} event={event} persons={persons} />
 				<div className="mt-4">
 					{(event.abstract || event.links?.length > 0) && (
 						<hr className="my-4" />
