@@ -1,13 +1,13 @@
 import type { Event, Person } from "~/types/fosdem";
-import { Badge } from "~/components/ui/badge";
 import { EventSpeakers } from "~/components/Event/EventSpeakers";
 
 type EventContentProps = {
+	year: number;
 	event: Event;
 	persons?: Record<string, Person>;
 };
 
-export function EventContent({ event, persons }: EventContentProps) {
+export function EventContent({ year, event, persons }: EventContentProps) {
 	return (
 		<>
 			{event.language && event.language !== "en" && (
@@ -17,20 +17,20 @@ export function EventContent({ event, persons }: EventContentProps) {
 				</div>
 			)}
 			{event.abstract && (
-				<div className="prose prose-lg prose-indigo mt-4 text-foreground">
+				<div className="mt-4">
 					<h2 className="text-xl font-medium text-foreground">Abstract</h2>
 					<div
-						className="mt-2"
+						className="mt-2 prose prose-lg prose-indigo mt-4 text-foreground"
 						// biome-ignore lint/security/noDangerouslySetInnerHtml: We're using the abstract as HTML
 						dangerouslySetInnerHTML={{ __html: event.abstract }}
 					/>
 				</div>
 			)}
 			{event.description && (
-				<div className="prose prose-lg prose-indigo mt-4 text-foreground">
+				<div className="mt-4">
 					<h2 className="text-xl font-medium text-foreground">Description</h2>
 					<div
-						className="mt-2"
+						className="mt-2 prose prose-lg prose-indigo mt-4 text-foreground"
 						// biome-ignore lint/security/noDangerouslySetInnerHtml: We're using the description as HTML
 						dangerouslySetInnerHTML={{ __html: event.description }}
 					/>
@@ -50,7 +50,7 @@ export function EventContent({ event, persons }: EventContentProps) {
 					</ul>
 				</div>
 			)}
-			<EventSpeakers event={event} persons={persons} />
+			<EventSpeakers year={year} event={event} persons={persons} />
 			{event.links?.length > 0 && (
 				<div className="mt-2">
 					<h2 className="text-xl font-medium text-foreground">Links</h2>

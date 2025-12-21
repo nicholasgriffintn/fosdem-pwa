@@ -107,3 +107,7 @@ a:hover {
 .icon--filled {
 	fill: hsl(var(--primary));
 }
+
+.prose.text-foreground * {
+	color: hsl(var(--foreground));
+}
