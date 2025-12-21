@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 
 import { useAuth } from "~/hooks/use-auth";
 import { PageHeader } from "~/components/PageHeader";
@@ -45,12 +45,29 @@ function SignInPage() {
 				<div className="flex flex-col gap-8">
 					<div className="space-y-6">
 						<p className="text-lg text-muted-foreground">
-							Connect with your GitHub account to sync your notes and bookmarks
-							across devices and more.
+							FOSDEM PWA works fully offline and locally. Signing in is optional
+							and only enables syncing across devices and sharing your schedule.
+						</p>
+						<p className="text-sm text-muted-foreground">
+							Continuing as a guest creates a local-only account that won't sync
+							across devices, but it will still save bookmarks and notes if you
+							need something more persistent or the device doesn't support
+							JavaScript.
+						</p>
+						<p className="text-sm text-muted-foreground">
+							Read our{" "}
+							<Link to="/privacy" className="font-medium text-foreground hover:underline">
+								Privacy Policy
+							</Link>{" "}
+							and{" "}
+							<Link to="/terms" className="font-medium text-foreground hover:underline">
+								Terms of Service
+							</Link>
+							{' '}for more information.
 						</p>
 						<div className="space-y-3">
 							<h2 className="text-lg font-semibold text-foreground">
-								What you'll be able to do:
+								Signing in lets you:
 							</h2>
 							<ul className="space-y-2 text-muted-foreground">
 								<li className="flex items-start gap-2">
@@ -63,15 +80,15 @@ function SignInPage() {
 								<li className="flex items-start gap-2">
 									<span className="text-xl">📝</span>
 									<span>
-										Sync your notes and bookmarks across multiple devices and
-										store them for multiple years.
+										Sync notes and bookmarks across multiple devices and store
+										them for multiple years.
 									</span>
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-xl">🔗</span>
 									<span>
-										Share your curated schedule and discover others through
-										profile pages.
+										Share your schedule and discover others through profile
+										pages.
 									</span>
 								</li>
 							</ul>
