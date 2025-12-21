@@ -7,6 +7,7 @@ import { ConferenceScheduleNotice } from "~/components/ConferenceScheduleNotice"
 import { constants } from "~/constants";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Button } from "~/components/ui/button";
+import { YearSelector } from "~/components/Footer/YearSelector";
 import { Icons } from "../components/Icons";
 
 export const Route = createFileRoute("/")({
@@ -44,7 +45,9 @@ function Home() {
 					heading={fosdem.conference.title}
 					text={`${fosdem.conference.city} / ${fosdem.conference.start} - ${fosdem.conference.end}`}
 					year={year}
-				/>
+				>
+					<YearSelector />
+				</PageHeader>
 
 				{!fosdem.types || Object.keys(fosdem.types).length === 0 ? (
 					<EmptyStateCard
