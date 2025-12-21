@@ -62,15 +62,21 @@ export function OfflineIndicator() {
 		registerBackgroundSync();
 
 		let resetTimeoutId: number | undefined;
+		let isCleanedUp = false;
 
 		const handleOnline = () => {
-			if (wasOfflineRef.current) {
+			if (wasOfflineRef.current && !isCleanedUp) {
 				setIsVisible(true);
 				setSyncStatus("syncing");
 
 				void syncOfflineData().finally(() => {
-					window.clearTimeout(resetTimeoutId);
+					if (isCleanedUp) return;
+
+					if (resetTimeoutId !== undefined) {
+						window.clearTimeout(resetTimeoutId);
+					}
 					resetTimeoutId = window.setTimeout(() => {
+						if (isCleanedUp) return;
 						setIsVisible(false);
 						setSyncStatus("idle");
 					}, 5000);
@@ -81,13 +87,14 @@ export function OfflineIndicator() {
 		};
 
 		const handleOffline = () => {
+			if (isCleanedUp) return;
 			setIsVisible(true);
 			setSyncStatus("idle");
 			setWasOffline(true);
 		};
 
 		const serviceWorkerMessageHandler = (event: MessageEvent) => {
-			if (event.data?.type === "TRIGGER_BACKGROUND_SYNC") {
+			if (event.data?.type === "TRIGGER_BACKGROUND_SYNC" && !isCleanedUp) {
 				void syncOfflineData();
 			}
 		};
@@ -109,11 +116,13 @@ export function OfflineIndicator() {
 		}
 
 		return () => {
+			isCleanedUp = true;
+
 			if (typeof window === "undefined") {
 				return;
 			}
 
-			if (resetTimeoutId) {
+			if (resetTimeoutId !== undefined) {
 				window.clearTimeout(resetTimeoutId);
 			}
 
