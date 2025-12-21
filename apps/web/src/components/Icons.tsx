@@ -30,6 +30,7 @@ import {
 	AlertCircle,
 	Download,
 	Users,
+	ExternalLink,
 } from "lucide-react";
 
 export const Icons = {
@@ -105,4 +106,6 @@ export const Icons = {
 	clock: Clock,
 	download: Download,
 	users: Users,
+	externalLink: ExternalLink,
+	x: X,
 };

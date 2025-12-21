@@ -80,6 +80,7 @@ export function EventMain({
 								conference={conference}
 								videoRef={videoRef}
 								testTime={testTime}
+								year={year}
 							/>
 						</div>
 						{event.chat && <ChatAlert chatUrl={event.chat} />}
