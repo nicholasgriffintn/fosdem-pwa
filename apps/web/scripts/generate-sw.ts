@@ -88,8 +88,10 @@ async function generateServiceWorker(outputDir = 'dist') {
 
   const dataUrls = [fosdemDataUrl]
 
-  const files = await glob(`${outputDir}/**/*`, { nodir: true })
-  const filesAndDataUrls = [...dataUrls, ...files, '/offline']
+  const clientFiles = await glob(`${outputDir}/client/**/*`, { nodir: true })
+  const serverFiles = await glob(`${outputDir}/server/**/*`, { nodir: true })
+
+  const filesAndDataUrls = [...dataUrls, ...clientFiles, ...serverFiles, '/offline']
 
   const ignoredRoutes = [
     '/robots.txt',
@@ -106,7 +108,9 @@ async function generateServiceWorker(outputDir = 'dist') {
       if (file.startsWith('/_serverFn') || file.startsWith('/offline')) {
         return file
       }
-      return `/${file.replace(new RegExp(`^${outputDir}/`), '')}`
+      // Remove outputDir and also strip client/ or server/ prefixes
+      const relativePath = file.replace(new RegExp(`^${outputDir}/`), '');
+      return `/${relativePath.replace(/^(client|server)\//, '')}`
     })
     .filter(file => !ignoredRoutes.includes(file))
 
