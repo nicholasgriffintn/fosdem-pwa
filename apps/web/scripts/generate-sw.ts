@@ -1,7 +1,7 @@
 import { glob } from 'glob'
 import { writeFileSync, readFileSync, readdirSync } from 'node:fs'
 
-const CURRENT_YEAR = new Date().getFullYear();
+const CURRENT_YEAR = 2026;
 
 async function generateServiceWorker(outputDir = 'dist') {
   let manifest: Record<string, any>;
@@ -53,7 +53,7 @@ async function generateServiceWorker(outputDir = 'dist') {
   }
 
   // This creates a payload to fetch all data for the current year, this should match what the app uses.
-  const fosdemDataPayload = {
+  const getFosdemPayload = (year: number) => ({
     t: {
       t: 10,
       i: 0,
@@ -68,7 +68,7 @@ async function generateServiceWorker(outputDir = 'dist') {
               v: [
                 {
                   t: 0,
-                  s: CURRENT_YEAR
+                  s: year
                 }
               ],
               s: 1
@@ -82,11 +82,11 @@ async function generateServiceWorker(outputDir = 'dist') {
     },
     f: 31,
     m: []
-  };
+  });
 
-  const fosdemDataUrl = `/_serverFn/${fosdemFunctionId}?payload=${encodeURIComponent(JSON.stringify(fosdemDataPayload))}&createServerFn`;
-
-  const dataUrls = [fosdemDataUrl]
+  const dataUrls = [
+    `/_serverFn/${fosdemFunctionId}?payload=${encodeURIComponent(JSON.stringify(getFosdemPayload(CURRENT_YEAR)))}&createServerFn`
+  ]
 
   const clientFiles = await glob(`${outputDir}/client/**/*`, { nodir: true })
 
