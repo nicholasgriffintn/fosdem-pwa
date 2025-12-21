@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
 import { Icons } from "~/components/Icons";
@@ -19,6 +19,16 @@ type MainNavProps = {
 export function MainNav({ title, items }: MainNavProps) {
 	const menuCheckboxRef = useRef<HTMLInputElement>(null);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const locationKey = useRouterState({
+		select: (state) => state.location.href,
+	});
+
+	useEffect(() => {
+		if (menuCheckboxRef.current?.checked) {
+			menuCheckboxRef.current.checked = false;
+			setIsMenuOpen(false);
+		}
+	}, [locationKey]);
 
 	return (
 		<div className="flex items-center gap-4 md:gap-6 lg:gap-10 shrink-0">

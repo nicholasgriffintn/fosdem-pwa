@@ -29,10 +29,9 @@ export function SortFavouritesSwitch({
       />
       <label
         htmlFor={sortSwitchId}
-        className="cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full bg-input peer-checked/sort:bg-primary transition-colors"
+        className="cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full bg-input transition-colors peer-checked/sort:bg-primary after:content-[''] after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-background after:transition peer-checked/sort:after:translate-x-5"
       >
         <span className="sr-only">Toggle favourites-first sorting</span>
-        <span className="inline-block h-4 w-4 ml-0.5 transform rounded-full bg-background transition peer-checked/sort:translate-x-5" />
       </label>
       <Label
         htmlFor={sortSwitchId}

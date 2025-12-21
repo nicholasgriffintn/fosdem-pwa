@@ -11,6 +11,7 @@ import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { Spinner } from "~/components/Spinner";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Card } from "~/components/ui/card";
+import { useIsClient } from "~/hooks/use-is-client";
 import {
 	type SearchResult,
 	TRACK_SEARCH_KEYS,
@@ -27,10 +28,7 @@ type NavSearchProps = {
 export function NavSearch({ year, className, ...props }: NavSearchProps) {
 	const { fosdemData, loading } = useFosdemData({ year });
 
-	const [isClient, setIsClient] = useState(false);
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
+	const isClient = useIsClient();
 
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const [isSearching, setIsSearching] = useState(false);

@@ -16,6 +16,7 @@ import {
 	type PlayerState,
 } from "~/lib/playerPersistence";
 import type { Event } from "~/types/fosdem";
+import { useIsClient } from "~/hooks/use-is-client";
 
 export type PortalTarget = "floating" | "event-page" | null;
 
@@ -59,12 +60,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 	const [volume, setVolumeState] = useState(1);
 	const [isLive, setIsLive] = useState(false);
 	const [streamUrl, setStreamUrl] = useState<string | null>(null);
-	const [isClient, setIsClient] = useState(false);
+	const isClient = useIsClient();
 	const [portalTarget, setPortalTarget] = useState<PortalTarget>(null);
-
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
 
 	useEffect(() => {
 		if (!isClient) return;

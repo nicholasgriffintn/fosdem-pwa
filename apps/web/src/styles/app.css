@@ -119,3 +119,11 @@ a:hover {
 html.js-enabled .js-only {
 	display: revert !important;
 }
+
+.no-js-only {
+	display: revert !important;
+}
+
+html.js-enabled .no-js-only {
+	display: none !important;
+}

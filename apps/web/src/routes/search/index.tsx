@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { PageHeader } from "~/components/PageHeader";
-import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { EventList } from "~/components/Event/EventList";
 import { TrackList } from "~/components/Track/TrackList";
 import { RoomList } from "~/components/Room/RoomList";
@@ -17,8 +16,6 @@ import {
 	formatTrack,
 	formatEvent,
 	formatRoom,
-	type SearchResults,
-	type SearchResult,
 } from "~/lib/search";
 import { generateTimeSlots } from "~/lib/fosdem";
 import { useAuth } from "~/hooks/use-auth";
@@ -26,18 +23,12 @@ import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { Label } from "~/components/ui/label";
 import { Icons } from "~/components/Icons";
 import { Button } from "~/components/ui/button";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "~/components/ui/select";
+import { Select } from "~/components/ui/select";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Input } from "~/components/ui/input";
-import { Skeleton } from "~/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
+import { getAllData } from "~/server/functions/fosdem";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -79,18 +70,20 @@ export const Route = createFileRoute("/search/")({
 		type,
 	}),
 	loader: async ({ deps: { year, q, track, time, type } }) => {
+		const fosdemData = await getAllData({ data: { year } });
 		return {
 			year,
 			q,
 			track,
 			time,
 			type,
+			fosdemData,
 		};
 	},
 });
 
 export default function SearchPage() {
-	const { year, q, track, time, type } = Route.useLoaderData();
+	const { year, q, track, time, type, fosdemData } = Route.useLoaderData();
 	const navigate = useNavigate();
 
 	const { user } = useAuth();
@@ -99,7 +92,6 @@ export default function SearchPage() {
 		await createBookmark(bookmark);
 	};
 
-	const { fosdemData, loading } = useFosdemData({ year });
 	const query = q || "";
 	const selectedTrack = track || "";
 	const selectedTime = time || "";
@@ -248,6 +240,14 @@ export default function SearchPage() {
 			return aHours * 60 + aMinutes - (bHours * 60 + bMinutes);
 		});
 	}, [fosdemData]);
+	const trackSelectOptions = [
+		{ label: "All tracks", value: "all" },
+		...trackOptions,
+	];
+	const timeSelectOptions = [
+		{ label: "Any time", value: "all" },
+		...timeSlotOptions.map((option) => ({ label: option, value: option })),
+	];
 
 	const updateSearchParams = ({
 		nextQuery = localQuery,
@@ -389,64 +389,54 @@ export default function SearchPage() {
 
 				<div className="flex flex-wrap gap-4 items-end mb-6">
 					<form
-						className="flex flex-col gap-1 min-w-[220px] max-w-sm"
+						className="flex flex-wrap items-end gap-4"
+						method="GET"
+						action="/search"
 						onSubmit={handleSubmit}
 					>
-						<Label htmlFor="search-query">Search the schedule</Label>
-						<div className="flex gap-2">
-							<Input
-								id="search-query"
-								placeholder="Events, tracks, rooms"
-								value={localQuery}
-								onChange={(e) => setLocalQuery(e.target.value)}
+						<input type="hidden" name="year" value={year} />
+						<div className="flex flex-col gap-1 min-w-[220px] max-w-sm">
+							<Label htmlFor="search-query">Search the schedule</Label>
+							<div className="flex gap-2">
+								<Input
+									id="search-query"
+									name="q"
+									placeholder="Events, tracks, rooms"
+									value={localQuery}
+									onChange={(e) => setLocalQuery(e.target.value)}
+								/>
+								<Button type="submit" size="sm">
+									Search
+								</Button>
+							</div>
+						</div>
+
+						<div className="flex flex-col gap-1 min-w-[180px]">
+							<Label htmlFor="track-filter">Track</Label>
+							<Select
+								id="track-filter"
+								name="track"
+								value={selectedTrack || "all"}
+								onValueChange={handleTrackChange}
+								disabled={!fosdemData}
+								options={trackSelectOptions}
+								className="min-w-[180px]"
 							/>
-							<Button type="submit" size="sm">
-								Search
-							</Button>
+						</div>
+
+						<div className="flex flex-col gap-1 min-w-[160px]">
+							<Label htmlFor="time-filter">Time slot</Label>
+							<Select
+								id="time-filter"
+								name="time"
+								value={selectedTime || "all"}
+								onValueChange={handleTimeChange}
+								disabled={!fosdemData}
+								options={timeSelectOptions}
+								className="min-w-[160px]"
+							/>
 						</div>
 					</form>
-
-					<div className="flex flex-col gap-1 min-w-[180px]">
-						<Label htmlFor="track-filter">Track</Label>
-						<Select
-							value={selectedTrack || "all"}
-							onValueChange={handleTrackChange}
-							disabled={!fosdemData}
-						>
-							<SelectTrigger id="track-filter" className="min-w-[180px]">
-								<SelectValue placeholder="All tracks" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">All tracks</SelectItem>
-								{trackOptions.map((option) => (
-									<SelectItem key={option.value} value={option.value}>
-										{option.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
-
-					<div className="flex flex-col gap-1 min-w-[160px]">
-						<Label htmlFor="time-filter">Time slot</Label>
-						<Select
-							value={selectedTime || "all"}
-							onValueChange={handleTimeChange}
-							disabled={!fosdemData}
-						>
-							<SelectTrigger id="time-filter" className="min-w-[160px]">
-								<SelectValue placeholder="Any time" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">Any time</SelectItem>
-								{timeSlotOptions.map((option) => (
-									<SelectItem key={option} value={option}>
-										{option}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
 					<div className="flex flex-col gap-1">
 						<Label>Show</Label>
 						<div className="flex flex-wrap gap-2">
@@ -457,6 +447,7 @@ export default function SearchPage() {
 									search={(prev) => ({ ...prev, type: filter.value })}
 									className={cn(
 										"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2",
+										"no-underline hover:underline",
 										selectedType === filter.value
 											? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
 											: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
@@ -481,19 +472,11 @@ export default function SearchPage() {
 					)}
 				</div>
 
-				{loading ? (
-					<div className="space-y-6" role="status" aria-busy="true">
-						<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-							<Skeleton className="h-10" />
-							<Skeleton className="h-10" />
-							<Skeleton className="h-10" />
-						</div>
-						<div className="space-y-3">
-							{Array.from({ length: 4 }).map((_, idx) => (
-								<Skeleton key={idx} className="h-20 w-full rounded-lg" />
-							))}
-						</div>
-					</div>
+				{!fosdemData ? (
+					<EmptyStateCard
+						title="Search unavailable"
+						description="The schedule data is still loading. Please try again in a moment."
+					/>
 				) : !query ? (
 					<EmptyStateCard
 						title="Search the schedule"

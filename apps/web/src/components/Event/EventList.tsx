@@ -117,7 +117,7 @@ export function EventList({
 								<DaySwitcher
 									days={days}
 									dayId={dayId}
-									eventDataSplitByDay={eventDataSplitByDay}
+									datSplitByDay={eventDataSplitByDay}
 								/>
 							</div>
 						</div>

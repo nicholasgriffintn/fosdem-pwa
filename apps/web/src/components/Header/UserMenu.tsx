@@ -1,7 +1,7 @@
 "use client";
 
-import { useId } from "react";
-import { Link } from "@tanstack/react-router";
+import { useEffect, useId, useRef } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -15,12 +15,23 @@ type AvatarMenuProps = {
 
 export function AvatarMenu({ user }: AvatarMenuProps) {
 	const menuId = useId();
+	const checkboxRef = useRef<HTMLInputElement>(null);
+	const locationKey = useRouterState({
+		select: (state) => state.location.href,
+	});
+
+	useEffect(() => {
+		if (checkboxRef.current) {
+			checkboxRef.current.checked = false;
+		}
+	}, [locationKey]);
 
 	return (
 		<div className="relative">
 			<input
 				type="checkbox"
 				id={`user-menu-${menuId}`}
+				ref={checkboxRef}
 				className="peer/avatar sr-only"
 			/>
 			<label htmlFor={`user-menu-${menuId}`} className="cursor-pointer">

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
 import { Spinner } from "~/components/Spinner";
+import { useIsClient } from "~/hooks/use-is-client";
 
 type FavouriteButtonProps = {
 	year: number;
@@ -32,14 +33,10 @@ export function FavouriteButton({
 	status,
 	onCreateBookmark,
 }: FavouriteButtonProps) {
-	const [isClient, setIsClient] = useState(false);
+	const isClient = useIsClient();
 	const [currentStatus, setCurrentStatus] = useState(status);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const lastSyncedStatusRef = useRef(status);
-
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
 
 	useEffect(() => {
 		if (isProcessing) {

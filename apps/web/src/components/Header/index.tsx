@@ -1,5 +1,5 @@
 import { Link, useSearch } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useIsClient } from "~/hooks/use-is-client";
 
 import { Icons } from "~/components/Icons";
 import { MainNav } from "~/components/Header/MainNav";
@@ -23,10 +23,7 @@ export function Header() {
 
 	const { user, loading } = useAuth();
 
-	const [isClient, setIsClient] = useState(false);
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
+	const isClient = useIsClient();
 
 	const navItems = [
 		{
