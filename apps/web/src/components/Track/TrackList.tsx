@@ -55,6 +55,8 @@ function TrackListItem({
 	user,
 	onCreateBookmark,
 }: TrackListItemProps) {
+	const layoutClass =
+		"flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3";
 	const metaBadges = [
 		track.room
 			? {
@@ -78,29 +80,33 @@ function TrackListItem({
 	].filter(Boolean) as { key: string; label: string; icon?: React.ReactNode }[];
 
 	return (
-		<div className="flex items-start justify-between gap-3 relative py-4 px-3 sm:px-4 hover:bg-muted/40 transition-colors">
-			<div className="flex flex-1 flex-col gap-2 min-w-0">
-				<h3 className="font-semibold leading-tight text-base">{track.name}</h3>
-				<div className="flex flex-wrap gap-2">
-					{metaBadges.map((meta) => (
-						<div
-							key={meta.key}
-							className="flex items-center gap-1 text-xs"
-						>
-							{meta.icon}
-							<span className="truncate">{meta.label}</span>
-						</div>
-					))}
+		<div className="relative py-4 px-3 sm:px-4 hover:bg-muted/40 transition-colors">
+			<div className={layoutClass}>
+				<div className="flex flex-1 flex-col gap-2 min-w-0">
+					<h3 className="font-semibold leading-tight text-base">
+						{track.name}
+					</h3>
+					<div className="flex flex-wrap gap-2">
+						{metaBadges.map((meta) => (
+							<div
+								key={meta.key}
+								className="flex items-center gap-1 text-xs"
+							>
+								{meta.icon}
+								<span className="truncate">{meta.label}</span>
+							</div>
+						))}
+					</div>
 				</div>
+				<ItemActions
+					item={track}
+					year={year}
+					type="track"
+					bookmarksLoading={bookmarksLoading}
+					className="pt-1 lg:pt-0 lg:pl-6"
+					onCreateBookmark={onCreateBookmark}
+				/>
 			</div>
-			<ItemActions
-				item={track}
-				year={year}
-				type="track"
-				bookmarksLoading={bookmarksLoading}
-				className="pl-1 lg:pl-6"
-				onCreateBookmark={onCreateBookmark}
-			/>
 		</div>
 	);
 }

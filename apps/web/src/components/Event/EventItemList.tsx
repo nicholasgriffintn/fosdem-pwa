@@ -112,32 +112,36 @@ export function EventListItem({
 	]
 		.filter(Boolean)
 		.map((meta) => meta as { key: string; label: string; icon?: React.ReactNode });
+	const hasStatusBadges = Boolean(
+		event.isLive || hasConflicts || event.priority === 1,
+	);
+
+	const containerClass = clsx(
+		variant === "card"
+			? "bg-card border rounded-lg p-3 hover:shadow-md transition-shadow relative flex flex-col"
+			: "relative py-4 px-3 sm:px-4 hover:bg-muted/40 transition-colors",
+		hasConflicts &&
+			!event.priority &&
+			(variant === "card"
+				? "border-destructive/70"
+				: "border-l-4 border-l-destructive/70"),
+		className,
+	);
 
 	return (
-		<div
-			className={clsx(
-				variant === "card"
-					? "bg-card border rounded-lg p-3 hover:shadow-md transition-shadow relative flex flex-col"
-					: "flex items-start justify-between gap-3 relative py-4 px-3 sm:px-4 hover:bg-muted/40 transition-colors",
-				hasConflicts &&
-				!event.priority &&
-				(variant === "card"
-					? "border-destructive/70"
-					: "border-l-4 border-l-destructive/70"),
-				className,
-			)}
-			style={style}
-		>
+		<div className={containerClass} style={style}>
 			<div className="flex flex-1 flex-col gap-2 min-w-0">
-				<div className="flex flex-wrap items-start gap-2">
-					{event.isLive && (
-						<Badge variant="default" className="bg-red-500 hover:bg-red-500">
-							Live
-						</Badge>
-					)}
-					{hasConflicts && <Badge variant="destructive">Conflict</Badge>}
-					{event.priority === 1 && <Badge variant="secondary">Pinned</Badge>}
-				</div>
+				{hasStatusBadges && (
+					<div className="flex flex-wrap items-start gap-2">
+						{event.isLive && (
+							<Badge variant="default" className="bg-red-500 hover:bg-red-500">
+								Live
+							</Badge>
+						)}
+						{hasConflicts && <Badge variant="destructive">Conflict</Badge>}
+						{event.priority === 1 && <Badge variant="secondary">Pinned</Badge>}
+					</div>
+				)}
 				<div className={layoutClass}>
 					<div className="flex-1 space-y-2 min-w-0">
 						<h3 className="font-semibold leading-tight text-base">
@@ -178,7 +182,7 @@ export function EventListItem({
 						className={
 							variant === "card"
 								? "pt-2 mt-auto"
-								: "pl-1 lg:pl-6"
+								: "pt-1 lg:pt-0 lg:pl-6"
 						}
 						onCreateBookmark={onCreateBookmark}
 					/>
