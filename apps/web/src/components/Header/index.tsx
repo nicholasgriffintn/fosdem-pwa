@@ -94,7 +94,6 @@ export function Header() {
 											<Link
 												to="/signin"
 												search={(prev: Record<string, unknown>) => ({
-													...prev,
 													year: (prev.year as number) || constants.DEFAULT_YEAR,
 												})}
 											>

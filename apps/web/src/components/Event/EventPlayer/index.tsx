@@ -83,6 +83,8 @@ export function EventPlayer({
 		player.currentEvent?.id === event.id && player.portalTarget === "event-page";
 	const isThisEventFloating =
 		player.currentEvent?.id === event.id && player.portalTarget === "floating";
+	const hasPlayableMedia =
+		(eventIsLive && event.streams?.length) || hasRecordings;
 
 	const handlePlay = () => {
 		if (streamUrl) {
@@ -125,12 +127,11 @@ export function EventPlayer({
 				/>
 			)}
 
-			{((eventIsLive && event.streams?.length) || hasRecordings) &&
-				!isThisEventFloating && (
+			{hasPlayableMedia && !isThisEventFloating && (
 				<button
 					type="button"
 					onClick={handlePopOut}
-					className="absolute top-2 right-2 z-20 p-2 bg-black/60 hover:bg-black/80 text-white rounded-md transition-all flex items-center gap-2 opacity-0 group-hover:opacity-100"
+					className="js-required absolute top-2 right-2 z-20 p-2 bg-black/60 hover:bg-black/80 text-white rounded-md transition-all flex items-center gap-2 opacity-0 group-hover:opacity-100"
 					title="Pop out player"
 				>
 					<Icons.externalLink className="w-4 h-4" />
@@ -139,25 +140,55 @@ export function EventPlayer({
 			)}
 
 			<div className="flex items-center justify-center text-muted-foreground w-full h-full">
-				{(eventIsLive && event.streams?.length) || hasRecordings ? (
+				{hasPlayableMedia ? (
 					<>
-						{!isThisEventPlaying && (
-							<button
-								type="button"
-								onClick={isThisEventFloating ? handlePopBackIn : handlePlay}
-								className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
-							>
-								{isThisEventFloating ? (
-									<Icons.chevronUp className="w-16 h-16 text-white" />
-								) : (
+						<div className="js-only w-full h-full">
+							{!isThisEventPlaying && (
+								<button
+									type="button"
+									onClick={isThisEventFloating ? handlePopBackIn : handlePlay}
+									className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
+								>
+									{isThisEventFloating ? (
+										<Icons.chevronUp className="w-16 h-16 text-white" />
+									) : (
+										<Icons.play className="w-16 h-16 text-white" />
+									)}
+									<span className="text-white text-lg font-medium">
+										{isThisEventFloating ? "Pop Back In" : "Play Video"}
+									</span>
+								</button>
+							)}
+							<div id="event-page-video-portal" className="w-full h-full" />
+							{isMounted && !isOnline && (
+								<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
+									<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
+										<p className="text-sm md:text-base font-medium text-foreground">
+											You are offline. Live video will start once you reconnect.
+										</p>
+									</div>
+								</div>
+							)}
+						</div>
+						<div className="no-js-only absolute inset-0 z-10">
+							{streamUrl ? (
+								<a
+									href={streamUrl}
+									target="_blank"
+									rel="noreferrer"
+									className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
+								>
 									<Icons.play className="w-16 h-16 text-white" />
-								)}
-								<span className="text-white text-lg font-medium">
-									{isThisEventFloating ? "Pop Back In" : "Play Video"}
-								</span>
-							</button>
-						)}
-						<div id="event-page-video-portal" className="w-full h-full" />
+									<span className="text-white text-lg font-medium">
+										Play Video
+									</span>
+								</a>
+							) : (
+								<p className="text-sm text-muted-foreground">
+									No video available.
+								</p>
+							)}
+						</div>
 					</>
 				) : (
 					<EventPlayerNotStarted
@@ -165,15 +196,6 @@ export function EventPlayer({
 						conference={conference}
 						testTime={testTime ?? new Date()}
 					/>
-				)}
-				{isMounted && !isOnline && (
-					<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
-						<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
-							<p className="text-sm md:text-base font-medium text-foreground">
-								You are offline. Live video will start once you reconnect.
-							</p>
-						</div>
-					</div>
 				)}
 			</div>
 		</div>

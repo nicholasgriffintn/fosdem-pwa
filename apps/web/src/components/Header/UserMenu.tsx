@@ -79,7 +79,6 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 				<Link
 					to="/profile"
 					search={(prev) => ({
-						...prev,
 						year: prev.year || constants.DEFAULT_YEAR,
 					})}
 					className="flex items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
