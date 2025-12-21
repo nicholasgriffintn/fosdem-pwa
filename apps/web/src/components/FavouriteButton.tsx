@@ -8,7 +8,7 @@ import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
 import { Spinner } from "~/components/Spinner";
 import { useIsClient } from "~/hooks/use-is-client";
-import { createBookmark } from "~/server/functions/bookmarks";
+import { createBookmarkFromForm } from "~/server/functions/bookmarks";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 
 type FavouriteButtonProps = {
@@ -29,6 +29,29 @@ type FavouriteButtonProps = {
 	}) => Promise<void> | void;
 };
 
+function buildUpSearchParams(search: {
+	year?: number | undefined;
+	type?: string | undefined;
+	day?: string | null | undefined;
+	test?: boolean | undefined;
+	time?: string | undefined;
+	track?: string | undefined;
+	sortFavourites?: string | undefined;
+	view?: string | undefined;
+	q?: string | undefined;
+}) {
+	const params = Object.entries(search)
+		.filter(([, value]) => value !== undefined && value !== null)
+		.map(
+			([key, value]) =>
+				`${encodeURIComponent(key)}=${encodeURIComponent(
+					String(value),
+				)}`,
+		)
+		.join("&");
+	return params ? `?${params}` : "";
+}
+
 export function FavouriteButton({
 	year,
 	type,
@@ -39,7 +62,13 @@ export function FavouriteButton({
 	const isClient = useIsClient();
 	const { user: serverUser } = useAuthSnapshot();
 	const returnTo = useRouterState({
-		select: (state) => `${state.location.pathname}${state.location.search}`,
+		select: (state) => {
+			const searchValue = state.location.search;
+			if (searchValue) {
+				return `${state.location.pathname}${buildUpSearchParams(searchValue)}`;
+			}
+			return state.location.pathname;
+		},
 	});
 	const [currentStatus, setCurrentStatus] = useState(status);
 	const [isProcessing, setIsProcessing] = useState(false);
@@ -96,7 +125,7 @@ export function FavouriteButton({
 		const canSubmit = Boolean(serverUser?.id);
 
 		return (
-			<form method="post" action={createBookmark.url}>
+			<form method="post" action={createBookmarkFromForm.url}>
 				<input type="hidden" name="year" value={year} />
 				<input type="hidden" name="type" value={type} />
 				<input type="hidden" name="slug" value={slug} />
