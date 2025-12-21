@@ -10,6 +10,7 @@ import { useNotes } from "~/hooks/use-notes";
 import { Skeleton } from "~/components/ui/skeleton";
 import { toast } from "~/hooks/use-toast";
 import { formatDate, formatTime, createStandardDate } from "~/lib/dateTime";
+import { usePlayer } from "~/contexts/PlayerContext";
 
 type MergedNote = {
 	id: string | number;
@@ -28,17 +29,16 @@ type MergedNote = {
 type EventNotesProps = {
 	year: number;
 	event: Event;
-	videoRef: React.RefObject<HTMLVideoElement | null>;
 	isMobile?: boolean;
 };
 
 export function EventNotes({
 	year,
 	event,
-	videoRef,
 	isMobile,
 }: EventNotesProps) {
 	const { notes, loading, create } = useNotes({ year, event });
+	const { videoRef } = usePlayer();
 	const [note, setNote] = useState("");
 	const [noteTime, setNoteTime] = useState<number | undefined>();
 

@@ -1,7 +1,5 @@
 "use client";
 
-import { useRef } from "react";
-
 import { cn } from "~/lib/utils";
 import { EventSidebar } from "~/components/Event/EventSidebar";
 import { EventPlayer } from "~/components/Event/EventPlayer";
@@ -38,7 +36,6 @@ export function EventMain({
 	const testTime = isTest ? new Date(conference.start) : undefined;
 	const imageDetails = fosdemImageDetails[event.type as TypeIds];
 
-	const videoRef = useRef<HTMLVideoElement>(null);
 	const { width } = useWindowSize();
 	const isMobile = width > 0 ? width < 768 : false;
 
@@ -78,7 +75,6 @@ export function EventMain({
 							<EventPlayer
 								event={event}
 								conference={conference}
-								videoRef={videoRef}
 								testTime={testTime}
 								year={year}
 							/>
@@ -96,7 +92,6 @@ export function EventMain({
 					<EventSidebar
 						event={event}
 						year={year}
-						videoRef={videoRef}
 						isMobile={isMobile}
 					/>
 				</ResizablePanel>
