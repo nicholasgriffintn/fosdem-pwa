@@ -19,6 +19,7 @@ import { Toaster } from "~/components/ui/toaster";
 import { OfflineIndicator } from "~/components/OfflineIndicator";
 import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
 import { GuestBanner } from "~/components/GuestBanner";
+import { AppNotice } from "~/components/AppNotice";
 import { siteMeta } from "~/constants/site";
 
 const TanStackRouterDevtools =
@@ -113,6 +114,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 				</a>
 				<main id="main-content" className="flex min-h-screen flex-col">
 					<Header />
+					<AppNotice />
 					<GuestBanner />
 					<div className="container flex-1">
 						{children}
