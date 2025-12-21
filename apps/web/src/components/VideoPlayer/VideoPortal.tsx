@@ -47,7 +47,7 @@ export function VideoPortal() {
 		if (targetElement) {
 			targetElement.appendChild(container);
 		}
-	}, [portalTarget]);
+	}, [portalTarget, currentEvent?.id]);
 
 	if (!currentEvent || !isPortalReady || !portalContainerRef.current) {
 		return null;
