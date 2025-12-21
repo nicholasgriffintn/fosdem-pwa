@@ -21,6 +21,7 @@ export interface SyncResult {
 import {
 	createBookmark,
 	deleteBookmark,
+	updateBookmark,
 } from "~/server/functions/bookmarks";
 import { createNote, updateNote, deleteNote } from "~/server/functions/notes";
 
@@ -36,7 +37,7 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 
 	for (const item of bookmarkItems) {
 		try {
-			if (item.action === "create" || item.action === "update") {
+			if (item.action === "create") {
 				const response = await withRetry(() =>
 					createBookmark({
 						data: {
@@ -58,6 +59,69 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 						error: response?.error || "Unknown error",
 					});
 				}
+			} else if (item.action === "update") {
+				if (item.data.serverId) {
+					const updates: Record<string, unknown> = {
+						status: item.data.status,
+					};
+
+					if (Object.prototype.hasOwnProperty.call(item.data, "priority")) {
+						updates.priority = item.data.priority;
+					}
+
+					if (
+						Object.prototype.hasOwnProperty.call(
+							item.data,
+							"last_notification_sent_at",
+						)
+					) {
+						updates.last_notification_sent_at =
+							item.data.last_notification_sent_at;
+					}
+
+					const response = await withRetry(() =>
+						updateBookmark({
+							data: {
+								id: item.data.serverId,
+								updates,
+							},
+						}),
+					);
+
+					if (response?.success) {
+						results.push({ success: true, id: item.id });
+						await removeFromSyncQueue(item.id);
+					} else {
+						results.push({
+							success: false,
+							id: item.id,
+							error: response?.error || "Unknown error",
+						});
+					}
+				} else {
+					const response = await withRetry(() =>
+						createBookmark({
+							data: {
+								year: item.data.year,
+								type: item.data.type,
+								slug: item.data.slug,
+								status: item.data.status,
+							},
+						}),
+					);
+
+					if (response?.success) {
+						results.push({ success: true, id: item.id });
+						await removeFromSyncQueue(item.id);
+					} else {
+						results.push({
+							success: false,
+							id: item.id,
+							error: response?.error || "Unknown error",
+						});
+					}
+				}
+
 			} else if (item.action === "delete") {
 				if (item.data.serverId) {
 					const response = await withRetry(() =>
