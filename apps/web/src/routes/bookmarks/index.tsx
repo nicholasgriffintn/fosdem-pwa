@@ -13,6 +13,7 @@ import { useIsClient } from "~/hooks/use-is-client";
 import { getAllData } from "~/server/functions/fosdem";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { getBookmarks } from "~/server/functions/bookmarks";
+import { Button } from "~/components/ui/button";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
@@ -105,17 +106,20 @@ function BookmarksHome() {
 								<p>Start bookmarking events to see them here.</p>
 								{!resolvedUser?.id && (
 									<p className="text-sm">
-										Your bookmarks are saved locally and will sync when you sign
-										in.
+										If you have JavaScript enabled, your bookmarks will be
+										saved locally in your browser.{" "} Sign in to sync across
+										devices or to bookmark without JavaScript.
 									</p>
 								)}
 							</div>
 						}
 						actions={
 							!resolvedUser?.id ? (
-								<Link to="/signin" className="text-primary hover:underline">
-									Sign in to sync across devices
-								</Link>
+								<Button asChild variant="secondary">
+									<Link to="/signin" className="text-primary no-underline hover:underline cursor-pointer">
+										Sign in
+									</Link>
+								</Button>
 							) : undefined
 						}
 					/>
