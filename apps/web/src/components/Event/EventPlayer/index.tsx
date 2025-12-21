@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
@@ -27,10 +27,41 @@ export function EventPlayer({
 	const [isMounted, setIsMounted] = useState(false);
 	const isOnline = useOnlineStatus();
 	const player = usePlayer();
+	const lastStateRef = useRef({
+		isPlaying: false,
+		portalTarget: player.portalTarget,
+		currentEventId: player.currentEvent?.id ?? null,
+	});
+	const setPortalTargetRef = useRef(player.setPortalTarget);
 
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
+
+	useEffect(() => {
+		lastStateRef.current = {
+			isPlaying: player.isPlaying,
+			portalTarget: player.portalTarget,
+			currentEventId: player.currentEvent?.id ?? null,
+		};
+	}, [player.isPlaying, player.portalTarget, player.currentEvent?.id]);
+
+	useEffect(() => {
+		setPortalTargetRef.current = player.setPortalTarget;
+	}, [player.setPortalTarget]);
+
+	useEffect(() => {
+		return () => {
+			const { isPlaying, portalTarget, currentEventId } = lastStateRef.current;
+			if (
+				isPlaying &&
+				portalTarget === "event-page" &&
+				currentEventId === event.id
+			) {
+				setPortalTargetRef.current("floating");
+			}
+		};
+	}, [event.id]);
 
 	const videoRecordings =
 		event.links?.filter((link) => link.type?.startsWith("video/")) || [];
