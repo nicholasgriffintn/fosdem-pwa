@@ -62,20 +62,29 @@ function BookmarksHome() {
 			<div className="relative py-6 lg:py-10">
 				<PageHeader heading="Bookmarks" year={year} />
 				<noscript>
-					<div className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 p-6 rounded-lg mb-6">
+					<div className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 p-6 rounded-lg mb-6 text-amber-950 dark:text-amber-100">
 						<h2 className="font-semibold text-lg mb-3">JavaScript Required for Bookmarks</h2>
-						<p className="text-sm mb-3">
+						<p className="text-sm mb-3 text-amber-900 dark:text-amber-200">
 							The bookmarks feature requires JavaScript to function properly.
 						</p>
-						<p className="text-sm text-muted-foreground mb-3">
+						<p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
 							To use bookmarks, you need to:
 						</p>
-						<ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside mb-3">
+						<ol className="text-sm text-amber-800 dark:text-amber-200 space-y-1 list-decimal list-inside mb-3">
 							<li>Enable JavaScript in your browser settings</li>
-							<li><a href="/signin" className="text-primary hover:underline">Sign in</a> to sync bookmarks across devices</li>
+							<li>
+								<a href="/signin" className="text-amber-900 dark:text-amber-100 hover:underline font-medium">
+									Sign in
+								</a>{" "}
+								to sync bookmarks across devices
+							</li>
 						</ol>
-						<p className="text-sm">
-							Without JavaScript, you can still browse the <a href="/" className="text-primary hover:underline font-medium">FOSDEM schedule</a>.
+						<p className="text-sm text-amber-900 dark:text-amber-200">
+							Without JavaScript, you can still browse the{" "}
+							<a href="/" className="text-amber-900 dark:text-amber-100 hover:underline font-medium">
+								FOSDEM schedule
+							</a>
+							.
 						</p>
 					</div>
 				</noscript>
