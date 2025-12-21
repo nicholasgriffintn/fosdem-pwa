@@ -1,4 +1,3 @@
-import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import {
@@ -10,19 +9,24 @@ import {
 import type { Event, Track } from "~/types/fosdem";
 import { useIsClient } from "~/hooks/use-is-client";
 
+type BookmarkSnapshot = {
+	slug: string;
+	status: string;
+};
+
 interface UseEventListProps {
 	items: Event[];
 	year: number;
 	sortFn?: (a: Event, b: Event) => number;
 	sortByFavourites?: boolean;
-	serverBookmarks?: Bookmark[];
+	serverBookmarks?: BookmarkSnapshot[];
 }
 
 interface UseTrackListProps {
 	items: Track[];
 	year: number;
 	sortByFavourites?: boolean;
-	serverBookmarks?: Bookmark[];
+	serverBookmarks?: BookmarkSnapshot[];
 }
 
 export function useEventList({
@@ -43,7 +47,7 @@ export function useEventList({
 				isFavourited: resolvedBookmarks?.length
 					? Boolean(
 							resolvedBookmarks.find(
-								(bookmark: Bookmark | LocalBookmark) =>
+								(bookmark: BookmarkSnapshot | LocalBookmark) =>
 									bookmark.slug === item.id && bookmark.status === "favourited",
 							),
 						)
@@ -53,7 +57,10 @@ export function useEventList({
 
 	const favorites =
 		resolvedBookmarks?.reduce(
-			(acc: Record<string, boolean>, bookmark: Bookmark | LocalBookmark) => {
+			(
+				acc: Record<string, boolean>,
+				bookmark: BookmarkSnapshot | LocalBookmark,
+			) => {
 				if (bookmark.status === "favourited") {
 					acc[bookmark.slug] = true;
 				}
@@ -91,7 +98,7 @@ export function useTrackList({
 				isFavourited: resolvedBookmarks?.length
 					? Boolean(
 							resolvedBookmarks.find(
-								(bookmark: Bookmark | LocalBookmark) =>
+								(bookmark: BookmarkSnapshot | LocalBookmark) =>
 									bookmark.slug === item.id && bookmark.status === "favourited",
 							),
 						)
@@ -101,7 +108,10 @@ export function useTrackList({
 
 	const favorites =
 		resolvedBookmarks?.reduce(
-			(acc: Record<string, boolean>, bookmark: Bookmark | LocalBookmark) => {
+			(
+				acc: Record<string, boolean>,
+				bookmark: BookmarkSnapshot | LocalBookmark,
+			) => {
 				if (bookmark.status === "favourited") {
 					acc[bookmark.slug] = true;
 				}

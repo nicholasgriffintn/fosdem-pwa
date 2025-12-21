@@ -16,11 +16,20 @@ import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
-	validateSearch: ({ year, day }: { year: number; day?: string }) => ({
+	validateSearch: ({
+		year,
+		day,
+		view,
+	}: {
+		year: number;
+		day?: string;
+		view?: string;
+	}) => ({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
 			constants.DEFAULT_YEAR,
 		day: day || undefined,
+		view: view || undefined,
 	}),
 	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
 	loader: async ({ deps: { year, day } }) => {
@@ -48,6 +57,7 @@ export const Route = createFileRoute("/bookmarks/")({
 function BookmarksHome() {
 	const { year, day, serverBookmarks, fosdemData: serverFosdemData } =
 		Route.useLoaderData();
+	const { view } = Route.useSearch();
 	const { bookmarks, loading } = useBookmarks({ year });
 	const { create, update } = useMutateBookmark({ year });
 	const { fosdemData } = useFosdemData({ year });
@@ -116,6 +126,7 @@ function BookmarksHome() {
 						year={year}
 						loading={resolvedLoading}
 						day={day}
+						view={view}
 						onUpdateBookmark={onUpdateBookmark}
 						user={resolvedUser}
 						onCreateBookmark={onCreateBookmark}

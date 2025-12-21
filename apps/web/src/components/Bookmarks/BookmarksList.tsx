@@ -51,6 +51,7 @@ type BookmarksListProps = {
 	year: number;
 	loading: boolean;
 	day?: string;
+	view?: string;
 	onUpdateBookmark?: (params: {
 		id: string;
 		serverId?: string;
@@ -79,6 +80,7 @@ export function BookmarksList({
 	year,
 	loading,
 	day,
+	view,
 	onUpdateBookmark,
 	showConflicts = true,
 	defaultViewMode = "calendar",
@@ -208,6 +210,7 @@ export function BookmarksList({
 							groupByDay={true}
 							days={days}
 							day={day}
+							view={view}
 							onSetPriority={handleSetPriority}
 							showTrack={true}
 							defaultViewMode={defaultViewMode}
