@@ -52,7 +52,8 @@ export function FavouriteButton({
 		}
 	}, [status, isProcessing]);
 
-	const handleFavourite = async () => {
+	const handleFavourite = async (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
 		if (onCreateBookmark && !isProcessing) {
 			const newStatus = currentStatus === "favourited" ? "unfavourited" : "favourited";
 			const previousStatus = currentStatus;
@@ -85,11 +86,23 @@ export function FavouriteButton({
 		}
 	};
 
+	if (!isClient) {
+		return (
+			<Button
+				variant="outline"
+				disabled
+				title="Enable JavaScript to bookmark events"
+			>
+				<Icons.star />
+			</Button>
+		);
+	}
+
 	return (
 		<Button
 			variant="outline"
 			onClick={handleFavourite}
-			disabled={isClient && (currentStatus === "loading" || isProcessing)}
+			disabled={currentStatus === "loading" || isProcessing}
 		>
 			{currentStatus === "loading" || isProcessing ? (
 				<Spinner />

@@ -11,13 +11,15 @@ import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/track/$slug")({
 	component: TrackPage,
-	validateSearch: ({ year, day }: { year: number; day: string }) => ({
+	validateSearch: ({ year, day, view, sortFavourites }: { year: number; day?: string; view?: string; sortFavourites?: string }) => ({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
 			constants.DEFAULT_YEAR,
 		day: day || undefined,
+		view: view || undefined,
+		sortFavourites: sortFavourites || undefined,
 	}),
-	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
+	loaderDeps: ({ search: { year, day, view, sortFavourites } }) => ({ year, day, view, sortFavourites }),
 	loader: async ({ params, deps: { year, day } }) => {
 		const slug = decodeURIComponent(params.slug);
 		const data = (await getAllData({ data: { year } })) as Conference;
@@ -44,6 +46,7 @@ export const Route = createFileRoute("/track/$slug")({
 
 function TrackPage() {
 	const { fosdem, year, day } = Route.useLoaderData();
+	const { view, sortFavourites } = Route.useSearch();
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -97,6 +100,8 @@ function TrackPage() {
 						defaultViewMode="list"
 						displayViewMode={false}
 						day={day}
+						view={view}
+						sortFavourites={sortFavourites}
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						displaySortByFavourites={true}

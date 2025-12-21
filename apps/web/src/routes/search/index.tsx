@@ -36,6 +36,8 @@ import {
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
+import { Link } from "@tanstack/react-router";
+import { cn } from "~/lib/utils";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -449,33 +451,33 @@ export default function SearchPage() {
 						<Label>Show</Label>
 						<div className="flex flex-wrap gap-2">
 							{typeFilters.map((filter) => (
-								<Button
+								<Link
 									key={filter.value}
-									type="button"
-									variant={
-										selectedType === filter.value ? "secondary" : "outline"
-									}
-									size="sm"
-									onClick={() => handleTypeChange(filter.value)}
-									aria-pressed={selectedType === filter.value}
+									to="."
+									search={(prev) => ({ ...prev, type: filter.value })}
+									className={cn(
+										"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2",
+										selectedType === filter.value
+											? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+											: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+									)}
+									aria-current={selectedType === filter.value ? "page" : undefined}
 								>
 									{filter.label}
-								</Button>
+								</Link>
 							))}
 						</div>
 					</div>
 					{hasActiveFilters && (
-						<Button
-							type="button"
-							variant="ghost"
-							size="sm"
-							className="h-10 px-3 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
-							onClick={handleClearSearch}
+						<Link
+							to="."
+							search={{ year }}
+							className="h-10 px-3 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-accent transition-colors"
 							aria-label="Clear search and filters"
 						>
 							<Icons.close className="h-4 w-4" />
 							Clear
-						</Button>
+						</Link>
 					)}
 				</div>
 

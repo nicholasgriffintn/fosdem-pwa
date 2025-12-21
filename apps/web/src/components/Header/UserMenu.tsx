@@ -1,15 +1,9 @@
 "use client";
 
+import { useId } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import { Badge } from "~/components/ui/badge";
 import type { SessionUser } from "~/server/auth";
 import { constants } from "~/constants";
@@ -20,9 +14,16 @@ type AvatarMenuProps = {
 };
 
 export function AvatarMenu({ user }: AvatarMenuProps) {
+	const menuId = useId();
+
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger className="outline-none">
+		<div className="relative">
+			<input
+				type="checkbox"
+				id={`user-menu-${menuId}`}
+				className="peer/avatar sr-only"
+			/>
+			<label htmlFor={`user-menu-${menuId}`} className="cursor-pointer">
 				<Avatar className="h-7 w-7">
 					<AvatarImage
 						src={user.avatar_url ?? undefined}
@@ -32,8 +33,8 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 						<Icons.user className="h-4 w-4" />
 					</AvatarFallback>
 				</Avatar>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" className="w-56">
+			</label>
+			<div className="hidden peer-checked/avatar:block absolute right-0 mt-2 w-56 rounded-md border bg-popover text-popover-foreground shadow-md z-50 p-1">
 				<div className="flex items-center justify-start gap-2 p-2">
 					<div className="flex flex-col space-y-1">
 						<div className="flex items-center gap-2">
@@ -49,35 +50,38 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 						</p>
 					</div>
 				</div>
-				<DropdownMenuSeparator />
+				<div className="border-t my-1" />
 				{user.is_guest && (
 					<>
-						<DropdownMenuItem asChild>
-							<a href="/api/auth/upgrade-github">
-								<Icons.gitHub className="h-4 w-4 mr-2" />
-								Upgrade with GitHub
-							</a>
-						</DropdownMenuItem>
-						<DropdownMenuItem className="text-xs text-muted-foreground">
+						<a
+							href="/api/auth/upgrade-github"
+							className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline"
+						>
+							<Icons.gitHub className="h-4 w-4" />
+							Upgrade with GitHub
+						</a>
+						<p className="px-2 py-1.5 text-xs text-muted-foreground">
 							Upgrade to persist your data.
-						</DropdownMenuItem>
+						</p>
 					</>
 				)}
-				<DropdownMenuItem asChild>
-					<Link
-						search={(prev) => ({
-							...prev,
-							year: prev.year || constants.DEFAULT_YEAR,
-						})}
-						to="/profile"
-					>
-						View profile
-					</Link>
-				</DropdownMenuItem>
-				<DropdownMenuItem asChild>
-					<a href="/api/auth/logout">Sign out</a>
-				</DropdownMenuItem>
-			</DropdownMenuContent>
-		</DropdownMenu>
+				<Link
+					to="/profile"
+					search={(prev) => ({
+						...prev,
+						year: prev.year || constants.DEFAULT_YEAR,
+					})}
+					className="flex items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
+				>
+					View profile
+				</Link>
+				<a
+					href="/api/auth/logout"
+					className="flex items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline"
+				>
+					Sign out
+				</a>
+			</div>
+		</div>
 	);
 }

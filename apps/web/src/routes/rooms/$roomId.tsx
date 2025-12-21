@@ -15,13 +15,14 @@ import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 export const Route = createFileRoute("/rooms/$roomId")({
 	component: RoomPage,
-	validateSearch: ({ year, day }: { year: number; day: string }) => ({
+	validateSearch: ({ year, day, sortFavourites }: { year: number; day?: string; sortFavourites?: string }) => ({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
 			constants.DEFAULT_YEAR,
 		day: day || undefined,
+		sortFavourites: sortFavourites || undefined,
 	}),
-	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
+	loaderDeps: ({ search: { year, day, sortFavourites } }) => ({ year, day, sortFavourites }),
 	loader: async ({ params, deps: { year, day } }) => {
 		const data = (await getAllData({ data: { year } })) as Conference;
 
@@ -65,6 +66,7 @@ export const Route = createFileRoute("/rooms/$roomId")({
 
 function RoomPage() {
 	const { fosdem, day, year } = Route.useLoaderData();
+	const { sortFavourites } = Route.useSearch();
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -165,6 +167,7 @@ function RoomPage() {
 						groupByDay={true}
 						days={days}
 						day={day}
+						sortFavourites={sortFavourites}
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						displaySortByFavourites={true}

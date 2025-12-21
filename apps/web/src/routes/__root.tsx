@@ -101,6 +101,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             const shouldUseDark = stored === 'dark' || (!stored && prefersDark);
             root.classList.toggle('dark', shouldUseDark);
+            root.classList.add('js-enabled');
           })();`}
 				</ScriptOnce>
 			</head>

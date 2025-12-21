@@ -111,3 +111,11 @@ a:hover {
 .prose.text-foreground * {
 	color: hsl(var(--foreground));
 }
+
+.js-only {
+	display: none !important;
+}
+
+html.js-enabled .js-only {
+	display: revert !important;
+}
