@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import type { ConferenceData, Event } from "~/types/fosdem";
 import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
@@ -10,6 +10,8 @@ import { isEventLive } from "~/lib/dateTime";
 import { EventPlayerNotStarted } from "./components/NotStarted";
 import { EventPlayerStarted } from "./components/Started";
 import { useOnlineStatus } from "~/hooks/use-online-status";
+import { usePlayer } from "~/contexts/PlayerContext";
+import { Icons } from "~/components/Icons";
 
 type EventPlayerProps = {
 	event: Event;
@@ -17,6 +19,7 @@ type EventPlayerProps = {
 	videoRef: React.RefObject<HTMLVideoElement | null>;
 	isFloating?: boolean;
 	testTime?: Date;
+	year?: number;
 };
 
 export function EventPlayer({
@@ -25,9 +28,21 @@ export function EventPlayer({
 	videoRef,
 	isFloating = false,
 	testTime,
+	year = new Date().getFullYear(),
 }: EventPlayerProps) {
 	const [isPlaying, setIsPlaying] = useState(false);
+	const [isMounted, setIsMounted] = useState(false);
 	const isOnline = useOnlineStatus();
+	const player = usePlayer();
+	const wasPlayingRef = useRef(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
+	useEffect(() => {
+		wasPlayingRef.current = isPlaying;
+	}, [isPlaying]);
 
 	const videoRecordings =
 		event.links?.filter((link) => link.type?.startsWith("video/")) || [];
@@ -38,6 +53,12 @@ export function EventPlayer({
 		event.streams?.some(
 			(stream) => stream.type === "application/vnd.apple.mpegurl",
 		);
+
+	const streamUrl = eventIsLive
+		? event.streams?.find(
+				(stream) => stream.type === "application/vnd.apple.mpegurl",
+			)?.href ?? videoRecordings[0]?.href ?? null
+		: videoRecordings[0]?.href ?? null;
 
 	const containerClassName = clsx("relative w-full", {
 		"fixed right-0 bottom-14 w-[450px] max-w-[60vw] border-l border-t border-border":
@@ -50,8 +71,38 @@ export function EventPlayer({
 		"w-full h-full",
 	);
 
+	const handlePopOut = () => {
+		if (streamUrl) {
+			setIsPlaying(false);
+			if (videoRef.current) {
+				videoRef.current.pause();
+			}
+			player.loadEvent(event, year, streamUrl, eventIsLive);
+			player.play();
+		}
+	};
+
+	useEffect(() => {
+		if (isPlaying && player.currentEvent?.id === event.id) {
+			player.close();
+		}
+	}, [isPlaying, player, event.id]);
+
+	useEffect(() => {
+		return () => {
+			if (wasPlayingRef.current && streamUrl) {
+				setTimeout(() => {
+					if (!player.currentEvent || player.currentEvent.id !== event.id) {
+						player.loadEvent(event, year, streamUrl, eventIsLive);
+						player.play();
+					}
+				}, 0);
+			}
+		};
+	}, [streamUrl, event, year, eventIsLive, player]);
+
 	return (
-		<div className={containerClassName}>
+		<div className={clsx(containerClassName, "group")}>
 			{!isPlaying && (
 				<FeaturedFosdemImage
 					type={event.type as TypeIds}
@@ -59,6 +110,18 @@ export function EventPlayer({
 					className="w-full h-full absolute top-0 left-0 z-0 object-cover"
 					displayCaption={false}
 				/>
+			)}
+
+			{((eventIsLive && event.streams?.length) || hasRecordings) && (
+				<button
+					type="button"
+					onClick={handlePopOut}
+					className="absolute top-2 right-2 z-20 p-2 bg-black/60 hover:bg-black/80 text-white rounded-md transition-all flex items-center gap-2 opacity-0 group-hover:opacity-100"
+					title="Pop out player"
+				>
+					<Icons.externalLink className="w-4 h-4" />
+					<span className="text-sm font-medium">Pop Out</span>
+				</button>
 			)}
 
 			<div className={videoWrapperClassName}>
@@ -77,7 +140,7 @@ export function EventPlayer({
 						testTime={testTime ?? new Date()}
 					/>
 				)}
-				{!isOnline && (
+				{isMounted && !isOnline && (
 					<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
 						<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
 							<p className="text-sm md:text-base font-medium text-foreground">

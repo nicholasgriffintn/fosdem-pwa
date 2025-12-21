@@ -21,6 +21,8 @@ import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
 import { GuestBanner } from "~/components/GuestBanner";
 // import { AppNotice } from "~/components/AppNotice";
 import { siteMeta } from "~/constants/site";
+import { PlayerProvider } from "~/contexts/PlayerContext";
+import { FloatingPlayer } from "~/components/FloatingPlayer";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
@@ -77,9 +79,11 @@ function RootComponent() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<RootDocument>
-				<Outlet />
-			</RootDocument>
+			<PlayerProvider>
+				<RootDocument>
+					<Outlet />
+				</RootDocument>
+			</PlayerProvider>
 		</QueryClientProvider>
 	);
 }
@@ -127,6 +131,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					</Suspense>
 					<OfflineIndicator />
 					<ServiceWorkerUpdater />
+					<FloatingPlayer />
 				</main>
 
 				<ScriptOnce>
