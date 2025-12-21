@@ -17,6 +17,8 @@ import {
 } from "~/lib/playerPersistence";
 import type { Event } from "~/types/fosdem";
 
+export type PortalTarget = "floating" | "event-page" | null;
+
 interface PlayerContextValue {
 	videoRef: React.RefObject<HTMLVideoElement | null>;
 	currentEvent: Event | null;
@@ -27,6 +29,8 @@ interface PlayerContextValue {
 	currentTime: number;
 	volume: number;
 	isLive: boolean;
+	portalTarget: PortalTarget;
+	streamUrl: string | null;
 	loadEvent: (event: Event, year: number, streamUrl: string, isLive: boolean) => void;
 	play: () => void;
 	pause: () => void;
@@ -37,6 +41,7 @@ interface PlayerContextValue {
 	minimize: () => void;
 	restore: () => void;
 	close: () => void;
+	setPortalTarget: (target: PortalTarget) => void;
 }
 
 const PlayerContext = createContext<PlayerContextValue | undefined>(undefined);
@@ -55,6 +60,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 	const [isLive, setIsLive] = useState(false);
 	const [streamUrl, setStreamUrl] = useState<string | null>(null);
 	const [isClient, setIsClient] = useState(false);
+	const [portalTarget, setPortalTarget] = useState<PortalTarget>(null);
 
 	useEffect(() => {
 		setIsClient(true);
@@ -81,6 +87,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			setVolumeState(state.volume);
 			setIsLive(state.isLive);
 			setStreamUrl(state.streamUrl);
+			setPortalTarget("floating");
 
 			const restoredEvent: Event = {
 				id: state.eventSlug,
@@ -331,6 +338,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 		setYear(null);
 		setStreamUrl(null);
 		setIsMinimized(false);
+		setPortalTarget(null);
 		clearPlayerState();
 	};
 
@@ -345,6 +353,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			currentTime,
 			volume,
 			isLive,
+			portalTarget,
+			streamUrl,
 			loadEvent,
 			play,
 			pause,
@@ -355,6 +365,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			minimize,
 			restore,
 			close,
+			setPortalTarget,
 		}),
 		[
 			currentEvent,
@@ -365,6 +376,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			currentTime,
 			volume,
 			isLive,
+			portalTarget,
+			streamUrl,
 		],
 	);
 

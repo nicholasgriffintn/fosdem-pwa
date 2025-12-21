@@ -23,6 +23,7 @@ import { GuestBanner } from "~/components/GuestBanner";
 import { siteMeta } from "~/constants/site";
 import { PlayerProvider } from "~/contexts/PlayerContext";
 import { FloatingPlayer } from "~/components/FloatingPlayer";
+import { VideoPortal } from "~/components/VideoPlayer/VideoPortal";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
@@ -132,6 +133,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					<OfflineIndicator />
 					<ServiceWorkerUpdater />
 					<FloatingPlayer />
+					<VideoPortal />
 				</main>
 
 				<ScriptOnce>

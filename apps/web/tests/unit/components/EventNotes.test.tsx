@@ -18,6 +18,14 @@ vi.mock("~/hooks/use-toast", () => ({
 	toast: (...args: unknown[]) => toastMock(...args),
 }));
 
+const playerModule = vi.hoisted(() => ({
+	usePlayer: vi.fn(),
+}));
+
+vi.mock("~/contexts/PlayerContext", () => playerModule);
+
+const usePlayerMock = vi.mocked(playerModule.usePlayer);
+
 const baseEvent = {
 	id: "event-1",
 } as any;
@@ -26,6 +34,7 @@ describe("EventNotes", () => {
 	beforeEach(() => {
 		useNotesMock.mockReset();
 		toastMock.mockReset();
+		usePlayerMock.mockReset();
 		useNotesMock.mockReturnValue({
 			notes: [
 				{
@@ -45,11 +54,14 @@ describe("EventNotes", () => {
 		const play = vi.fn();
 		videoRef.current = { currentTime: 0, play } as unknown as HTMLVideoElement;
 
+		usePlayerMock.mockReturnValue({
+			videoRef,
+		} as any);
+
 		render(
 			<EventNotes
 				year={2024}
 				event={baseEvent}
-				videoRef={videoRef}
 				isMobile={false}
 			/>,
 		);
@@ -72,11 +84,14 @@ describe("EventNotes", () => {
 		const videoRef = createRef<HTMLVideoElement>();
 		videoRef.current = { currentTime: 10, play: vi.fn() } as any;
 
+		usePlayerMock.mockReturnValue({
+			videoRef,
+		} as any);
+
 		render(
 			<EventNotes
 				year={2024}
 				event={baseEvent}
-				videoRef={videoRef}
 				isMobile={false}
 			/>,
 		);

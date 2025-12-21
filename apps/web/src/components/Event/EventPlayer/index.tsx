@@ -1,6 +1,5 @@
 "use client";
 
-import clsx from "clsx";
 import { useState, useEffect } from "react";
 
 import type { ConferenceData, Event } from "~/types/fosdem";
@@ -8,7 +7,6 @@ import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
 import { isEventLive } from "~/lib/dateTime";
 import { EventPlayerNotStarted } from "./components/NotStarted";
-import { EventPlayerStarted } from "./components/Started";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { usePlayer } from "~/contexts/PlayerContext";
 import { Icons } from "~/components/Icons";
@@ -16,8 +14,6 @@ import { Icons } from "~/components/Icons";
 type EventPlayerProps = {
 	event: Event;
 	conference: ConferenceData;
-	videoRef: React.RefObject<HTMLVideoElement | null>;
-	isFloating?: boolean;
 	testTime?: Date;
 	year?: number;
 };
@@ -25,12 +21,9 @@ type EventPlayerProps = {
 export function EventPlayer({
 	event,
 	conference,
-	videoRef,
-	isFloating = false,
 	testTime,
 	year = new Date().getFullYear(),
 }: EventPlayerProps) {
-	const [isPlaying, setIsPlaying] = useState(false);
 	const [isMounted, setIsMounted] = useState(false);
 	const isOnline = useOnlineStatus();
 	const player = usePlayer();
@@ -55,37 +48,29 @@ export function EventPlayer({
 			)?.href ?? videoRecordings[0]?.href ?? null
 		: videoRecordings[0]?.href ?? null;
 
-	const containerClassName = clsx("relative w-full", {
-		"fixed right-0 bottom-14 w-[450px] max-w-[60vw] border-l border-t border-border":
-			isFloating,
-		"aspect-video": true,
-	});
+	const isThisEventPlaying = player.currentEvent?.id === event.id && player.portalTarget === "event-page";
 
-	const videoWrapperClassName = clsx(
-		"flex items-center justify-center text-muted-foreground",
-		"w-full h-full",
-	);
-
-	const handlePopOut = () => {
+	const handlePlay = () => {
 		if (streamUrl) {
-			setIsPlaying(false);
-			if (videoRef.current) {
-				videoRef.current.pause();
-			}
+			player.setPortalTarget("event-page");
 			player.loadEvent(event, year, streamUrl, eventIsLive);
 			player.play();
 		}
 	};
 
-	useEffect(() => {
-		if (isPlaying && player.currentEvent?.id === event?.id) {
-			player.close();
+	const handlePopOut = () => {
+		if (streamUrl) {
+			if (!player.currentEvent || player.currentEvent.id !== event.id) {
+				player.loadEvent(event, year, streamUrl, eventIsLive);
+			}
+			player.setPortalTarget("floating");
+			player.play();
 		}
-	}, [isPlaying, player, event?.id]);
+	};
 
 	return (
-		<div className={clsx(containerClassName, "group")}>
-			{!isPlaying && (
+		<div className="relative w-full aspect-video group">
+			{!isThisEventPlaying && (
 				<FeaturedFosdemImage
 					type={event.type as TypeIds}
 					size="full"
@@ -106,15 +91,21 @@ export function EventPlayer({
 				</button>
 			)}
 
-			<div className={videoWrapperClassName}>
+			<div className="flex items-center justify-center text-muted-foreground w-full h-full">
 				{(eventIsLive && event.streams?.length) || hasRecordings ? (
-					<EventPlayerStarted
-						event={event}
-						videoRef={videoRef}
-						isPlaying={isPlaying}
-						setIsPlaying={setIsPlaying}
-						eventIsLive={eventIsLive}
-					/>
+					<>
+						{!isThisEventPlaying && (
+							<button
+								type="button"
+								onClick={handlePlay}
+								className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
+							>
+								<Icons.play className="w-16 h-16 text-white" />
+								<span className="text-white text-lg font-medium">Play Video</span>
+							</button>
+						)}
+						<div id="event-page-video-portal" className="w-full h-full" />
+					</>
 				) : (
 					<EventPlayerNotStarted
 						event={event}
@@ -128,13 +119,6 @@ export function EventPlayer({
 							<p className="text-sm md:text-base font-medium text-foreground">
 								You are offline. Live video will start once you reconnect.
 							</p>
-							<a
-								className="text-sm text-primary underline"
-								href="/offline"
-								rel="noreferrer"
-							>
-								View offline schedule
-							</a>
 						</div>
 					</div>
 				)}
