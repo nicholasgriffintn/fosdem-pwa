@@ -2,10 +2,6 @@
 
 This is a companion app for [FOSDEM](https://fosdem.org/), built with [TanStack Start](https://tanstack.com/start/) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop, or just used as a website.
 
-It is mostly a passion project to get a chance to play with some other technologies, alongside that, I personally attend FOSDEM, a lot of the features in this app are to make my experience better, such as tracking sessions I want to attend, taking notes, and sharing my bookmarks.
-
-Also, this project is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), so huge props to them!
-
 ## Check it out
 
 You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
@@ -36,11 +32,25 @@ You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
 
 | ![Shared Profiles](./.github/docs/images/shared_profiles.png) |
 |:--:|
-| **User Features** <br> • Personal profile page with generated event pass <br> • Share bookmarks with others <br> • Collaborative planning capabilities |
+| **User Features** <br> • Personal profile page with generated event pass <br> • Share bookmarks with others <br> • Collaborative planning capabilities <br> • Sign in is not required unless you want to sync your data across devices or share |
 
 </div>
 
-*Data sync service deployed separately: [Build Data Repository](https://github.com/nicholasgriffintn/fosdem-pwa-build-data)*
+## Why did you build this?
+
+The FOSDEM website is great, but it lacks some features that I wanted to make my conference experience better.
+
+One of the biggest things it is missing is the ability to bookmark events and build a personal schedule. I find this capability super useful for this conference as there are so many events happening at the same, across a lot of rooms.
+
+Alongside that, I wanted the ability to take notes during sessions and share my schedule with friends, so they can see what I am planning to attend, and we can coordinate better.
+
+Finally, I wanted to build a PWA using some of the latest web technologies, and this seemed like a fun project to work on.
+
+## Credits
+
+This project uses the FOSDEM public API to fetch event data. Thanks to the FOSDEM team for making this data available!
+
+Also, this project is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), so huge props to them!
 
 ## Contributing
 
