@@ -10,9 +10,9 @@ import { useAuth } from "~/hooks/use-auth";
 import { Spinner } from "~/components/Spinner";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { useIsClient } from "~/hooks/use-is-client";
-import { getBookmarks } from "~/server/functions/bookmarks";
 import { getAllData } from "~/server/functions/fosdem";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
+import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
@@ -54,11 +54,14 @@ function BookmarksHome() {
 	const { user, loading: authLoading } = useAuth();
 	const { user: serverUser } = useAuthSnapshot();
 	const isClient = useIsClient();
-	const resolvedBookmarks = isClient ? bookmarks : serverBookmarks;
-	const resolvedLoading = isClient ? loading : false;
-	const resolvedAuthLoading = isClient ? authLoading : false;
-	const resolvedFosdemData = isClient ? fosdemData : serverFosdemData;
-	const resolvedUser = isClient ? user : serverUser;
+	const hasServerSnapshot = Boolean(serverFosdemData);
+	const useServerSnapshot =
+		!isClient || loading || authLoading || !fosdemData || !bookmarks;
+	const resolvedBookmarks = useServerSnapshot ? serverBookmarks : bookmarks;
+	const resolvedLoading = useServerSnapshot ? false : loading;
+	const resolvedAuthLoading = useServerSnapshot ? false : authLoading;
+	const resolvedFosdemData = useServerSnapshot ? serverFosdemData : fosdemData;
+	const resolvedUser = useServerSnapshot ? serverUser : user;
 
 	const onCreateBookmark = async (bookmark: any) => {
 		await create({
@@ -77,7 +80,7 @@ function BookmarksHome() {
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
 				<PageHeader heading="Bookmarks" year={year} />
-				{isClient && (authLoading || loading) && (
+				{isClient && (authLoading || loading) && !hasServerSnapshot && (
 					<div className="flex justify-center items-center py-8">
 						<Spinner className="h-8 w-8" />
 					</div>
