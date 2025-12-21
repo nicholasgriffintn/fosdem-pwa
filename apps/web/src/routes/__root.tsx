@@ -19,11 +19,13 @@ import { Toaster } from "~/components/ui/toaster";
 import { OfflineIndicator } from "~/components/OfflineIndicator";
 import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
 import { GuestBanner } from "~/components/GuestBanner";
+import { AuthSnapshotProvider } from "~/contexts/AuthSnapshotContext";
 // import { AppNotice } from "~/components/AppNotice";
 import { siteMeta } from "~/constants/site";
 import { PlayerProvider } from "~/contexts/PlayerContext";
 import { FloatingPlayer } from "~/components/FloatingPlayer";
 import { VideoPortal } from "~/components/VideoPlayer/VideoPortal";
+import { getSession } from "~/server/functions/session";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
@@ -71,19 +73,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 				{ rel: "manifest", href: "/manifest.webmanifest" },
 			],
 		}),
+		loader: async () => {
+			const user = await getSession();
+			return { user };
+		},
 		component: RootComponent,
 	},
 );
 
 function RootComponent() {
 	const { queryClient } = Route.useRouteContext();
+	const { user } = Route.useLoaderData();
 
 	return (
 		<QueryClientProvider client={queryClient}>
 			<PlayerProvider>
-				<RootDocument>
-					<Outlet />
-				</RootDocument>
+				<AuthSnapshotProvider user={user ?? null}>
+					<RootDocument>
+						<Outlet />
+					</RootDocument>
+				</AuthSnapshotProvider>
 			</PlayerProvider>
 		</QueryClientProvider>
 	);

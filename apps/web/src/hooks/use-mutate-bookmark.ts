@@ -32,6 +32,29 @@ export type OptimisticCreateDeps = {
 	userId?: string;
 };
 
+type ServerBookmarkResult = {
+	success: boolean;
+	error?: string;
+};
+
+function normalizeServerBookmarkResult(
+	response: unknown,
+): ServerBookmarkResult | null {
+	if (!response || typeof response !== "object") {
+		return null;
+	}
+
+	if ("success" in response) {
+		const result = response as ServerBookmarkResult;
+		return {
+			success: Boolean(result.success),
+			error: result.error,
+		};
+	}
+
+	return null;
+}
+
 async function clearBookmarkSyncQueue(bookmarkId: string) {
 	try {
 		await removeFromSyncQueue(bookmarkId);
@@ -122,8 +145,9 @@ export function useMutateBookmark({ year }: { year: number }) {
 				data: { year, type, slug, status },
 			});
 
-			if (!data?.success) {
-				throw new Error("Failed to create bookmark");
+			const result = normalizeServerBookmarkResult(data);
+			if (!result?.success) {
+				throw new Error(result?.error || "Failed to create bookmark");
 			}
 
 			return data;
@@ -153,8 +177,9 @@ export function useMutateBookmark({ year }: { year: number }) {
 		}) => {
 			const data = await updateBookmarkOnServer({ data: { id, updates } });
 
-			if (!data?.success) {
-				throw new Error("Failed to update bookmark");
+			const result = normalizeServerBookmarkResult(data);
+			if (!result?.success) {
+				throw new Error(result?.error || "Failed to update bookmark");
 			}
 
 			return data;

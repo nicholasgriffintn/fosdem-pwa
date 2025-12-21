@@ -215,7 +215,10 @@ function OfflinePage() {
 								</CardDescription>
 							</div>
 							<Button asChild variant="outline" size="sm">
-								<Link to="/bookmarks" search={{ year, day: undefined }}>
+								<Link
+									to="/bookmarks"
+									search={{ year, day: undefined, view: undefined }}
+								>
 									View all bookmarks
 								</Link>
 							</Button>

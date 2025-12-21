@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
 import { Spinner } from "~/components/Spinner";
 import { useIsClient } from "~/hooks/use-is-client";
+import { createBookmarkFromForm } from "~/server/functions/bookmarks";
+import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 
 type FavouriteButtonProps = {
 	year: number;
@@ -26,6 +29,29 @@ type FavouriteButtonProps = {
 	}) => Promise<void> | void;
 };
 
+function buildUpSearchParams(search: {
+	year?: number | undefined;
+	type?: string | undefined;
+	day?: string | null | undefined;
+	test?: boolean | undefined;
+	time?: string | undefined;
+	track?: string | undefined;
+	sortFavourites?: string | undefined;
+	view?: string | undefined;
+	q?: string | undefined;
+}) {
+	const params = Object.entries(search)
+		.filter(([, value]) => value !== undefined && value !== null)
+		.map(
+			([key, value]) =>
+				`${encodeURIComponent(key)}=${encodeURIComponent(
+					String(value),
+				)}`,
+		)
+		.join("&");
+	return params ? `?${params}` : "";
+}
+
 export function FavouriteButton({
 	year,
 	type,
@@ -34,6 +60,16 @@ export function FavouriteButton({
 	onCreateBookmark,
 }: FavouriteButtonProps) {
 	const isClient = useIsClient();
+	const { user: serverUser } = useAuthSnapshot();
+	const returnTo = useRouterState({
+		select: (state) => {
+			const searchValue = state.location.search;
+			if (searchValue) {
+				return `${state.location.pathname}${buildUpSearchParams(searchValue)}`;
+			}
+			return state.location.pathname;
+		},
+	});
 	const [currentStatus, setCurrentStatus] = useState(status);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const lastSyncedStatusRef = useRef(status);
@@ -84,14 +120,32 @@ export function FavouriteButton({
 	};
 
 	if (!isClient) {
+		const nextStatus =
+			status === "favourited" ? "unfavourited" : "favourited";
+		const canSubmit = Boolean(serverUser?.id);
+
 		return (
-			<Button
-				variant="outline"
-				disabled
-				title="Enable JavaScript to bookmark events"
-			>
-				<Icons.star />
-			</Button>
+			<form method="post" action={createBookmarkFromForm.url}>
+				<input type="hidden" name="year" value={year} />
+				<input type="hidden" name="type" value={type} />
+				<input type="hidden" name="slug" value={slug} />
+				<input type="hidden" name="status" value={nextStatus} />
+				<input type="hidden" name="returnTo" value={returnTo} />
+				<Button
+					variant="outline"
+					disabled={!canSubmit}
+					title={
+						canSubmit
+							? "Bookmark this item"
+							: "Sign in to bookmark events"
+					}
+					type="submit"
+				>
+					<Icons.star
+						className={status === "favourited" ? "icon--filled" : ""}
+					/>
+				</Button>
+			</form>
 		);
 	}
 
