@@ -37,7 +37,7 @@ export function EventContent({ year, event, persons }: EventContentProps) {
 				</div>
 			)}
 			{event.attachments?.length > 0 && (
-				<div className="mt-2">
+				<div className="mt-4">
 					<h2 className="text-xl font-medium text-foreground">Attachments</h2>
 					<ul className="mt-2 space-y-2 list-disc list-inside">
 						{event.attachments.map((attachment) => (
@@ -52,7 +52,7 @@ export function EventContent({ year, event, persons }: EventContentProps) {
 			)}
 			<EventSpeakers year={year} event={event} persons={persons} />
 			{event.links?.length > 0 && (
-				<div className="mt-2">
+				<div className="mt-4">
 					<h2 className="text-xl font-medium text-foreground">Links</h2>
 					<ul className="mt-2 space-y-2 list-disc list-inside">
 						{event.links.map((link) => (
@@ -66,7 +66,7 @@ export function EventContent({ year, event, persons }: EventContentProps) {
 				</div>
 			)}
 			{(event.url || event.feedbackUrl) && (
-				<div className="mt-2">
+				<div className="mt-4">
 					<h2 className="text-xl font-medium text-foreground">
 						External Links
 					</h2>
