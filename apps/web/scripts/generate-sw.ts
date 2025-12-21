@@ -70,14 +70,14 @@ async function generateServiceWorker(outputDir = 'dist') {
                   t: 0,
                   s: CURRENT_YEAR
                 }
-              ]
+              ],
+              s: 1
             },
-            s: 1,
             o: 0
           }
-        ]
+        ],
+        s: 1
       },
-      s: 1,
       o: 0
     },
     f: 31,
@@ -101,7 +101,45 @@ async function generateServiceWorker(outputDir = 'dist') {
     '/sw.js',
     '/_worker.js',
     '/wrangler.json',
-    '/manifest.webmanifest'
+    '/manifest.webmanifest',
+    '/favicon.ico',
+    "/screenshots/2.png",
+    "/screenshots/1.jpg",
+    "/icons/safari-pinned-tab.svg",
+    "/icons/mstile-150x150.png",
+    "/icons/favicon.ico",
+    "/icons/favicon-32x32.png",
+    "/icons/favicon-16x16.png",
+    "/icons/browserconfig.xml",
+    "/icons/apple-touch-icon.png",
+    "/icons/apple-touch-icon-precomposed.png",
+    "/icons/apple-touch-icon-76x76.png",
+    "/icons/apple-touch-icon-76x76-precomposed.png",
+    "/icons/apple-touch-icon-72x72.png",
+    "/icons/apple-touch-icon-72x72-precomposed.png",
+    "/icons/apple-touch-icon-60x60.png",
+    "/icons/apple-touch-icon-60x60-precomposed.png",
+    "/icons/apple-touch-icon-57x57.png",
+    "/icons/apple-touch-icon-57x57-precomposed.png",
+    "/icons/apple-touch-icon-180x180.png",
+    "/icons/apple-touch-icon-180x180-precomposed.png",
+    "/icons/apple-touch-icon-152x152.png",
+    "/icons/apple-touch-icon-152x152-precomposed.png",
+    "/icons/apple-touch-icon-144x144.png",
+    "/icons/apple-touch-icon-144x144-precomposed.png",
+    "/icons/apple-touch-icon-120x120.png",
+    "/icons/apple-touch-icon-120x120-precomposed.png",
+    "/icons/apple-touch-icon-114x114.png",
+    "/icons/apple-touch-icon-114x114-precomposed.png",
+    "/icons/android-chrome-96x96.png",
+    "/icons/android-chrome-72x72.png",
+    "/icons/android-chrome-512x512.png",
+    "/icons/android-chrome-48x48.png",
+    "/icons/android-chrome-384x384.png",
+    "/icons/android-chrome-36x36.png",
+    "/icons/android-chrome-256x256.png",
+    "/icons/android-chrome-192x192.png",
+    "/icons/android-chrome-144x144.png",
   ]
 
   const assetsToCache = filesAndDataUrls
