@@ -189,221 +189,216 @@ const backgroundSyncQueue = new workbox.backgroundSync.Queue('fosdemQueue', {
   maxRetentionTime: 24 * 60 // Retry for up to 24 hours (specified in minutes)
 });
 
-if (self.location.hostname === 'localhost') {
-  setDefaultHandler(new NetworkFirst());
-  self.skipWaiting();
-  clients.claim();
-} else {
-  const CACHE_NAME = 'fosdem-pwa-v${Date.now()}';
+const CACHE_NAME = 'fosdem-pwa-v${Date.now()}';
 
-  self.addEventListener('activate', event => {
-    event.waitUntil(clients.claim());
-  });
-  
-  let updateInterval;
-  self.addEventListener('online', () => {
-    updateInterval = setInterval(() => {
-      self.registration.update();
-    }, 5 * 60 * 1000); // 5 minutes
-  });
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', event => {
+  event.waitUntil(clients.claim());
+});
 
-  self.addEventListener('offline', () => {
-    if (updateInterval) clearInterval(updateInterval);
-  });
+let updateInterval;
+self.addEventListener('online', () => {
+  updateInterval = setInterval(() => {
+    self.registration.update();
+  }, 5 * 60 * 1000); // 5 minutes
+});
 
-  const urlsToCache = ${JSON.stringify(assetsToCache, null, 2)};
+self.addEventListener('offline', () => {
+  if (updateInterval) clearInterval(updateInterval);
+});
 
-  workbox.precaching.precacheAndRoute(
-    urlsToCache.map(url => ({
-      url,
-      revision: CACHE_NAME
-    }))
-  );
+const urlsToCache = ${JSON.stringify(assetsToCache, null, 2)};
 
-  registerRoute(
-    ({ url }) => url.hostname === 'r2.fosdempwa.com',
-    new StaleWhileRevalidate({
-      cacheName: 'fosdem-data',
+workbox.precaching.precacheAndRoute(
+  urlsToCache.map(url => ({
+    url,
+    revision: CACHE_NAME
+  }))
+);
+
+registerRoute(
+  ({ url }) => url.hostname === 'r2.fosdempwa.com',
+  new StaleWhileRevalidate({
+    cacheName: 'fosdem-data',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200]
+      }),
+      new ExpirationPlugin({
+        maxEntries: 50,
+        maxAgeSeconds: 1 * 60 * 60 // 1 hour
+      }),
+      new BroadcastUpdatePlugin({
+        channelName: 'fosdem-data-updates',
+        headersToCheck: ['etag', 'last-modified']
+      }),
+      new BackgroundSyncPlugin('fosdem-data-queue', {
+        maxRetentionTime: 24 * 60 // Retry for up to 24 hours
+      })
+    ]
+  })
+);
+
+registerRoute(
+  ({ url }) => url.pathname.includes('/api/user'),
+  new NetworkFirst({
+    cacheName: 'user-data',
+    plugins: [
+      new BackgroundSyncPlugin('user-data-queue', {
+        maxRetentionTime: 24 * 60,
+        onSync: async ({ queue }) => {
+          try {
+            await queue.replayRequests();
+            // Broadcast success to the app
+            const bc = new BroadcastChannel('user-data-sync');
+            bc.postMessage({ type: 'SYNC_COMPLETE' });
+          } catch (error) {
+            // Handle sync failures
+            console.error('Background sync failed:', error);
+          }
+        }
+      })
+    ],
+    networkTimeoutSeconds: 3
+  })
+);
+
+registerRoute(
+  ({ url }) => url.hostname === 'avatars.githubusercontent.com',
+  new CacheFirst({
+    cacheName: 'github-avatars',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200]
+      }),
+      new ExpirationPlugin({
+        maxEntries: 100,
+        maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
+      })
+    ]
+  })
+);
+
+registerRoute(
+  new NavigationRoute(
+    new NetworkFirst({
+      cacheName: 'navigations',
       plugins: [
         new CacheableResponsePlugin({
           statuses: [0, 200]
         }),
         new ExpirationPlugin({
           maxEntries: 50,
-          maxAgeSeconds: 1 * 60 * 60 // 1 hour
-        }),
-        new BroadcastUpdatePlugin({
-          channelName: 'fosdem-data-updates',
-          headersToCheck: ['etag', 'last-modified']
-        }),
-        new BackgroundSyncPlugin('fosdem-data-queue', {
-          maxRetentionTime: 24 * 60 // Retry for up to 24 hours
+          maxAgeSeconds: 24 * 60 * 60 // 24 hours
         })
       ]
-    })
-  );
+    }),
+    {
+      allowlist: [new RegExp('^(?!/api/).*$')], // All non-API routes
+    }
+  )
+);
 
-  registerRoute(
-    ({ url }) => url.pathname.includes('/api/user'),
-    new NetworkFirst({
-      cacheName: 'user-data',
-      plugins: [
-        new BackgroundSyncPlugin('user-data-queue', {
-          maxRetentionTime: 24 * 60,
-          onSync: async ({ queue }) => {
-            try {
-              await queue.replayRequests();
-              // Broadcast success to the app
-              const bc = new BroadcastChannel('user-data-sync');
-              bc.postMessage({ type: 'SYNC_COMPLETE' });
-            } catch (error) {
-              // Handle sync failures
-              console.error('Background sync failed:', error);
-            }
-          }
-        })
-      ],
-      networkTimeoutSeconds: 3
-    })
-  );
-
-  registerRoute(
-    ({ url }) => url.hostname === 'avatars.githubusercontent.com',
-    new CacheFirst({
-      cacheName: 'github-avatars',
-      plugins: [
-        new CacheableResponsePlugin({
-          statuses: [0, 200]
-        }),
-        new ExpirationPlugin({
-          maxEntries: 100,
-          maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
-        })
-      ]
-    })
-  );
-
-  registerRoute(
-    new NavigationRoute(
-      new NetworkFirst({
-        cacheName: 'navigations',
-        plugins: [
-          new CacheableResponsePlugin({
-            statuses: [0, 200]
-          }),
-          new ExpirationPlugin({
-            maxEntries: 50,
-            maxAgeSeconds: 24 * 60 * 60 // 24 hours
-          })
-        ]
+registerRoute(
+  ({ url }) => url.pathname.startsWith('/_serverFn'),
+  new NetworkFirst({
+    cacheName: 'server-functions',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200]
       }),
-      {
-        allowlist: [new RegExp('^(?!/api/).*$')], // All non-API routes
-      }
-    )
-  );
-
-  registerRoute(
-    ({ url }) => url.pathname.startsWith('/_serverFn'),
-    new NetworkFirst({
-      cacheName: 'server-functions',
-      plugins: [
-        new CacheableResponsePlugin({
-          statuses: [0, 200]
-        }),
-        new BackgroundSyncPlugin('server-functions-queue', {
-          maxRetentionTime: 24 * 60,
-          onSync: async ({ queue }) => {
-            console.info('[ServiceWorker] Attempting to sync server functions queue');
-            try {
-              await queue.replayRequests();
-              const bc = new BroadcastChannel('server-functions-sync');
-              bc.postMessage({ type: 'SYNC_COMPLETE' });
-              console.info('[ServiceWorker] Server functions queue sync complete');
-            } catch (error) {
-              console.error('[ServiceWorker] Server functions queue sync failed:', error);
-            }
-          }
-        })
-      ],
-      networkTimeoutSeconds: 6
-    })
-  );
-
-  setDefaultHandler(
-    new NetworkOnly({
-      plugins: [
-        {
-          handlerDidError: async ({ request }) => {
-            const cache = await caches.open('fosdem-data');
-            const cachedResponse = await cache.match(request);
-            if (cachedResponse) return cachedResponse;
-
-            return caches.match('/offline');
+      new BackgroundSyncPlugin('server-functions-queue', {
+        maxRetentionTime: 24 * 60,
+        onSync: async ({ queue }) => {
+          console.info('[ServiceWorker] Attempting to sync server functions queue');
+          try {
+            await queue.replayRequests();
+            const bc = new BroadcastChannel('server-functions-sync');
+            bc.postMessage({ type: 'SYNC_COMPLETE' });
+            console.info('[ServiceWorker] Server functions queue sync complete');
+          } catch (error) {
+            console.error('[ServiceWorker] Server functions queue sync failed:', error);
           }
         }
-      ]
+      })
+    ],
+    networkTimeoutSeconds: 6
+  })
+);
+
+setDefaultHandler(
+  new NetworkOnly({
+    plugins: [
+      {
+        handlerDidError: async ({ request }) => {
+          const cache = await caches.open('fosdem-data');
+          const cachedResponse = await cache.match(request);
+          if (cachedResponse) return cachedResponse;
+
+          return caches.match('/offline');
+        }
+      }
+    ]
+  })
+);
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!cacheName.startsWith('workbox-') && 
+              cacheName !== 'fosdem-data' && 
+              cacheName !== 'github-avatars' &&
+              cacheName !== 'navigations' &&
+              cacheName !== 'user-data' &&
+              cacheName !== 'default') {
+            return caches.delete(cacheName);
+          }
+        })
+      );
     })
   );
+});
 
-  self.addEventListener('activate', (event) => {
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'user-data-sync') {
+    // Handle user data requests
+    event.waitUntil(backgroundSyncQueue.replayRequests());
+  } else if (event.tag === 'server-functions-queue') {
+    // Handle server function requests
+    const serverFunctionsQueue = new workbox.backgroundSync.Queue('server-functions-queue');
+    event.waitUntil(serverFunctionsQueue.replayRequests());
+  } else if (event.tag === 'fosdem-data-queue') {
+    // Handle fosdem data requests
+    const fosdemDataQueue = new workbox.backgroundSync.Queue('fosdem-data-queue');
+    event.waitUntil(fosdemDataQueue.replayRequests());
+  } else if (event.tag === 'bookmark-sync') {
+    // Handle bookmark sync requests
+    event.waitUntil(syncBookmarks());
+  }
+});
+
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    const data = event.data.json();
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/icons/android-chrome-192x192.png',
+      badge: '/icons/android-chrome-72x72.png',
+      data: data.url
+    });
+  }
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  if (event.notification.data) {
     event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (!cacheName.startsWith('workbox-') && 
-                cacheName !== 'fosdem-data' && 
-                cacheName !== 'github-avatars' &&
-                cacheName !== 'navigations' &&
-                cacheName !== 'user-data' &&
-                cacheName !== 'default') {
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
+      clients.openWindow(event.notification.data)
     );
-  });
-
-  self.addEventListener('sync', (event) => {
-    if (event.tag === 'user-data-sync') {
-      // Handle user data requests
-      event.waitUntil(backgroundSyncQueue.replayRequests());
-    } else if (event.tag === 'server-functions-queue') {
-      // Handle server function requests
-      const serverFunctionsQueue = new workbox.backgroundSync.Queue('server-functions-queue');
-      event.waitUntil(serverFunctionsQueue.replayRequests());
-    } else if (event.tag === 'fosdem-data-queue') {
-      // Handle fosdem data requests
-      const fosdemDataQueue = new workbox.backgroundSync.Queue('fosdem-data-queue');
-      event.waitUntil(fosdemDataQueue.replayRequests());
-    } else if (event.tag === 'bookmark-sync') {
-      // Handle bookmark sync requests
-      event.waitUntil(syncBookmarks());
-    }
-  });
-
-  self.addEventListener('push', (event) => {
-    if (event.data) {
-      const data = event.data.json();
-      self.registration.showNotification(data.title, {
-        body: data.body,
-        icon: '/icons/android-chrome-192x192.png',
-        badge: '/icons/android-chrome-72x72.png',
-        data: data.url
-      });
-    }
-  });
-
-  self.addEventListener('notificationclick', (event) => {
-    event.notification.close();
-    if (event.notification.data) {
-      event.waitUntil(
-        clients.openWindow(event.notification.data)
-      );
-    }
-  });
-}`
+  }
+});`
 
   writeFileSync(`${outputDir}/client/sw.js`, sw);
   console.info('Service worker generated successfully!');
