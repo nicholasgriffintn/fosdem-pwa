@@ -90,7 +90,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { readonly children: React.ReactNode }) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<head>
 				<HeadContent />
 				<ScriptOnce>
@@ -133,13 +133,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					<ServiceWorkerUpdater />
 					<FloatingPlayer />
 				</main>
-
-				<ScriptOnce>
-					{`document.documentElement.classList.toggle(
-            'dark',
-            localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            )`}
-				</ScriptOnce>
 
 				<ScriptOnce>
 					{`(async () => {
