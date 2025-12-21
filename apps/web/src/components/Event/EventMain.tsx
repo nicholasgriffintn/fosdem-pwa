@@ -53,7 +53,7 @@ export function EventMain({
 						<ChatAlert chatUrl={event.chat} />
 					</div>
 				)}
-				<EventContent event={event} persons={persons} />
+				<EventContent year={year} event={event} persons={persons} />
 			</div>
 		);
 	}
