@@ -51,7 +51,7 @@ function SignInPage() {
 							Continuing as a guest creates a local-only account that won't sync
 							across devices, but it will still save bookmarks and notes if you
 							need something more persistent or the device doesn't support
-							JavaScript.
+							JavaScript (although support for non JS interactions is limited).
 						</p>
 						<p className="text-sm text-muted-foreground">
 							Read our{" "}
