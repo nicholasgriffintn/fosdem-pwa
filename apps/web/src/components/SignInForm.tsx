@@ -1,20 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import { Spinner } from "~/components/Spinner";
 import { Icons } from "~/components/Icons";
 import { constants } from "~/constants";
+import { useIsClient } from "~/hooks/use-is-client";
 
 export function SignInForm() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isGuestSubmitting, setIsGuestSubmitting] = useState(false);
-	const [isClient, setIsClient] = useState(false);
-
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
+	const isClient = useIsClient();
 
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		setIsSubmitting(true);

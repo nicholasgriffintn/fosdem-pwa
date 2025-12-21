@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 
 import { PageHeader } from "~/components/PageHeader";
 import { useBookmarks } from "~/hooks/use-bookmarks";
@@ -10,6 +9,7 @@ import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useAuth } from "~/hooks/use-auth";
 import { Spinner } from "~/components/Spinner";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { useIsClient } from "~/hooks/use-is-client";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
@@ -42,11 +42,7 @@ function BookmarksHome() {
 	const { create, update } = useMutateBookmark({ year });
 	const { fosdemData } = useFosdemData({ year });
 	const { user, loading: authLoading } = useAuth();
-	const [isClient, setIsClient] = useState(false);
-
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
+	const isClient = useIsClient();
 
 	const onCreateBookmark = async (bookmark: any) => {
 		await create({

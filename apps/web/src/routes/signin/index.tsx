@@ -1,11 +1,11 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 
 import { useAuth } from "~/hooks/use-auth";
 import { PageHeader } from "~/components/PageHeader";
 import { Spinner } from "~/components/Spinner";
 import { SignInForm } from "~/components/SignInForm";
 import { constants } from "~/constants";
+import { useIsClient } from "~/hooks/use-is-client";
 
 export const Route = createFileRoute("/signin/")({
 	component: SignInPage,
@@ -21,11 +21,7 @@ export const Route = createFileRoute("/signin/")({
 
 function SignInPage() {
 	const { user, loading } = useAuth();
-	const [isClient, setIsClient] = useState(false);
-
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
+	const isClient = useIsClient();
 
 	if (user?.id) {
 		return (

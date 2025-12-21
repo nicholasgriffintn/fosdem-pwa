@@ -11,6 +11,8 @@ import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Icons } from "~/components/Icons";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { constants } from "../../constants";
+import { SortFavouritesSwitch } from "../SortFavouritesSwitch";
+import { DaySwitcher } from "../DaySwitcher";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -210,60 +212,18 @@ export function TrackList({
 								</h2>
 							)}
 							<div className="flex gap-2 justify-start flex-wrap">
-								{days.map((dayItem) => {
-									const hasTracks = Boolean(trackDataSplitByDay[dayItem.id]);
-									const isActive = dayId === dayItem.id;
-
-									return (
-										<Link
-											key={dayItem.id}
-											to="."
-											search={(prev) => ({ ...prev, day: dayItem.id })}
-											disabled={!hasTracks}
-											className={cn(
-												"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2",
-												"border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-												isActive && "bg-primary text-primary-foreground border-primary",
-												!hasTracks && "pointer-events-none opacity-50"
-											)}
-											aria-current={isActive ? "page" : undefined}
-										>
-											{dayItem.name}
-										</Link>
-									);
-								})}
+								<DaySwitcher
+									days={days}
+									datSplitByDay={trackDataSplitByDay}
+									dayId={dayId}
+								/>
 							</div>
 						</div>
 						{displaySortByFavourites && (
-							<div className="flex items-center gap-2">
-								<input
-									type="checkbox"
-									id={sortSwitchId}
-									checked={sortByFavourites}
-									onChange={(e) => {
-										navigate({
-											search: (prev) => ({
-												...prev,
-												sortFavourites: e.target.checked ? 'true' : undefined
-											})
-										});
-									}}
-									className="sr-only peer/sort"
-								/>
-								<label
-									htmlFor={sortSwitchId}
-									className="cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full bg-input peer-checked/sort:bg-primary transition-colors"
-								>
-									<span className="sr-only">Toggle favourites-first sorting</span>
-									<span className="inline-block h-4 w-4 ml-0.5 transform rounded-full bg-background transition peer-checked/sort:translate-x-5" />
-								</label>
-								<Label
-									htmlFor={sortSwitchId}
-									className="text-sm font-medium text-foreground cursor-pointer"
-								>
-									Favourites first
-								</Label>
-							</div>
+							<SortFavouritesSwitch
+								sortByFavourites={sortByFavourites}
+								sortSwitchId={sortSwitchId}
+							/>
 						)}
 					</div>
 					{trackDataSplitByDay[dayId] ? (
@@ -293,35 +253,10 @@ export function TrackList({
 					<h2 className="text-xl font-semibold text-foreground">{title}</h2>
 				)}
 				{displaySortByFavourites && (
-					<div className="flex items-center gap-2">
-						<input
-							type="checkbox"
-							id={sortSwitchId}
-							checked={sortByFavourites}
-							onChange={(e) => {
-								navigate({
-									search: (prev) => ({
-										...prev,
-										sortFavourites: e.target.checked ? 'true' : undefined
-									})
-								});
-							}}
-							className="sr-only peer/sort"
-						/>
-						<label
-							htmlFor={sortSwitchId}
-							className="cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full bg-input peer-checked/sort:bg-primary transition-colors"
-						>
-							<span className="sr-only">Toggle favourites-first sorting</span>
-							<span className="inline-block h-4 w-4 ml-0.5 transform rounded-full bg-background transition peer-checked/sort:translate-x-5" />
-						</label>
-						<Label
-							htmlFor={sortSwitchId}
-							className="text-sm font-medium text-foreground cursor-pointer"
-						>
-							Favourites first
-						</Label>
-					</div>
+					<SortFavouritesSwitch
+						sortByFavourites={sortByFavourites}
+						sortSwitchId={sortSwitchId}
+					/>
 				)}
 			</div>
 			<TrackListContent

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useIsClient } from "~/hooks/use-is-client";
 
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
@@ -14,11 +14,7 @@ type ShareButtonProps = {
 };
 
 export function ShareButton({ title, text, url }: ShareButtonProps) {
-	const [isClient, setIsClient] = useState(false);
-
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
+	const isClient = useIsClient();
 
 	const handleShare = async () => {
 		try {

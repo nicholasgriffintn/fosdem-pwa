@@ -5,16 +5,16 @@ import { cn } from "~/lib/utils";
 export function DaySwitcher({
   days,
   dayId,
-  eventDataSplitByDay,
+  datSplitByDay,
 }: {
   days: { id: string; name: string }[];
   dayId?: string | number | string[] | number[];
-  eventDataSplitByDay: Record<string, any[]>;
+    datSplitByDay: Record<string, any[]>;
 }) {
   return (
     <>
       {days.map((dayItem) => {
-        const hasEvents = Boolean(eventDataSplitByDay[dayItem.id]);
+        const hasEvents = Boolean(datSplitByDay[dayItem.id]);
         const isActive = dayId === dayItem.id;
 
         return (

@@ -8,15 +8,24 @@ import { SpeakerList } from "~/components/Speaker/SpeakerList";
 
 export const Route = createFileRoute("/speakers/")({
     component: SpeakersPage,
-    validateSearch: ({ year }: { year: number }) => ({
+    validateSearch: ({ year, q }: { year: number; q?: string }) => ({
         year:
             (constants.AVAILABLE_YEARS.includes(year) && year) ||
             constants.DEFAULT_YEAR,
+        q: q || "",
     }),
-    loaderDeps: ({ search: { year } }) => ({ year }),
-    loader: async ({ deps: { year } }) => {
+    loaderDeps: ({ search: { year, q } }) => ({ year, q }),
+    loader: async ({ deps: { year, q } }) => {
         const data = (await getAllData({ data: { year } })) as Conference;
-        return { fosdem: { persons: data.persons }, year };
+        const persons = Object.values(data.persons);
+        const normalizedQuery = (q || "").toLowerCase().trim();
+        const filteredPersons = normalizedQuery
+            ? persons.filter((person) =>
+                person.name.toLowerCase().includes(normalizedQuery),
+            )
+            : persons;
+
+        return { persons: filteredPersons, year, query: q || "" };
     },
     head: () => ({
         meta: [
@@ -30,15 +39,18 @@ export const Route = createFileRoute("/speakers/")({
 });
 
 function SpeakersPage() {
-    const { fosdem, year } = Route.useLoaderData();
-    const persons = fosdem.persons ? Object.values(fosdem.persons) : [];
+    const { persons, year, query } = Route.useLoaderData();
 
     return (
         <div className="min-h-screen">
             <div className="relative py-6 lg:py-10">
-                <PageHeader heading="Speakers" subtitle={`There are ${persons.length} speakers at this year's FOSDEM!`} year={year} />
+                <PageHeader
+                    heading="Speakers"
+                    subtitle={`There are ${persons.length} speakers at this year's FOSDEM!`}
+                    year={year}
+                />
                 <div className="mt-6">
-                    <SpeakerList persons={persons} year={year} />
+                    <SpeakerList persons={persons} year={year} initialQuery={query} />
                 </div>
             </div>
         </div>
