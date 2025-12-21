@@ -53,6 +53,7 @@ export function RoomPlayer({
 		return () => {
 			if (hlsRef.current) {
 				hlsRef.current.destroy();
+				hlsRef.current = null;
 			}
 		};
 	}, [roomId, isPlaying, videoRef]);
