@@ -154,8 +154,8 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 
 	const successCount = results.filter((r) => r.success).length;
 	const errors = results
-		.filter((r) => !r.success)
-		.map((r) => r.error || "Unknown error");
+		.filter((r): r is { success: false; id: string; error: string } => !r.success)
+		.map((r) => r.error);
 
 	return {
 		success: errors.length === 0,
@@ -275,8 +275,8 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 
 	const successCount = results.filter((r) => r.success).length;
 	const errors = results
-		.filter((r) => !r.success)
-		.map((r) => r.error || "Unknown error");
+		.filter((r): r is { success: false; id: string; error: string } => !r.success)
+		.map((r) => r.error);
 
 	return {
 		success: errors.length === 0,

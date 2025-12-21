@@ -11,7 +11,7 @@ export const createSubscription = createServerFn({
 	.inputValidator(
 		(data: { endpoint: string; auth: string; p256dh: string }) => data,
 	)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { endpoint, auth, p256dh } = ctx.data;
 
 		const { user } = await getFullAuthSession();
@@ -63,7 +63,7 @@ export const deleteSubscription = createServerFn({
 	method: "POST",
 })
 	.inputValidator((data: { id: number }) => data)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { id } = ctx.data;
 
 		const { user } = await getFullAuthSession();

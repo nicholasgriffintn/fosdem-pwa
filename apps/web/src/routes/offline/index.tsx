@@ -8,6 +8,7 @@ import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { useAuth } from "~/hooks/use-auth";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { Button } from "~/components/ui/button";
+import type { Event, Track } from "~/types/fosdem";
 import {
 	Card,
 	CardContent,
@@ -91,11 +92,18 @@ function OfflinePage() {
 		const cachedItem = isEvent
 			? cachedData.fosdemData?.events?.[bookmark.slug]
 			: cachedData.fosdemData?.tracks?.[bookmark.slug];
-		const title = cachedItem
-			? isEvent
-				? cachedItem.title
-				: cachedItem.name
-			: bookmark.slug;
+
+		let title: string;
+		if (cachedItem) {
+			if (isEvent) {
+				title = (cachedItem as Event).title;
+			} else {
+				title = (cachedItem as Track).name;
+			}
+		} else {
+			title = bookmark.slug;
+		}
+
 		const detail = cachedItem?.room
 			? cachedItem.room
 			: cachedData.fosdemData
@@ -207,7 +215,7 @@ function OfflinePage() {
 								</CardDescription>
 							</div>
 							<Button asChild variant="outline" size="sm">
-								<Link to="/bookmarks" search={{ year }}>
+								<Link to="/bookmarks" search={{ year, day: undefined }}>
 									View all bookmarks
 								</Link>
 							</Button>
@@ -255,7 +263,11 @@ function OfflinePage() {
 																		: "/track/$slug"
 																}
 																params={{ slug: bookmark.slug }}
-																search={{ year }}
+																search={
+																	display.isEvent
+																		? { year, test: false }
+																		: { year, day: undefined }
+																}
 																className="font-medium no-underline hover:underline"
 															>
 																{display.title}

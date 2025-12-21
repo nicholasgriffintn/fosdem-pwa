@@ -106,53 +106,74 @@ export function useBookmarks({
 		if (!serverBookmarks || !localBookmarks) return;
 		if (reconciliationInProgress.current) return;
 
-		reconciliationInProgress.current = true;
 		let cancelled = false;
+		reconciliationInProgress.current = true;
 
 		const reconcile = async () => {
+			if (cancelled) {
+				reconciliationInProgress.current = false;
+				return;
+			}
 
 			try {
 				const localBySlug = new Map(localBookmarks.map((b) => [b.slug, b]));
 
 				const operations = serverBookmarks.map(async (serverBookmark) => {
-					if (cancelled) return;
+					if (cancelled) return { status: "skipped" as const };
 
 					const existingLocal = localBySlug.get(serverBookmark.slug);
 
-					if (!existingLocal) {
-						await saveLocalBookmark(
-							{
-								year: serverBookmark.year,
-								slug: serverBookmark.slug,
-								type: serverBookmark.type,
-								status: serverBookmark.status,
-								serverId: serverBookmark.id,
-							},
-							true,
-						);
-						return;
-					}
+					try {
+						if (!existingLocal) {
+							await saveLocalBookmark(
+								{
+									year: serverBookmark.year,
+									slug: serverBookmark.slug,
+									type: serverBookmark.type,
+									status: serverBookmark.status,
+									serverId: serverBookmark.id,
+								},
+								true,
+							);
+							return { status: "created" as const };
+						}
 
-					const needsUpdate =
-						existingLocal.serverId !== serverBookmark.id ||
-						existingLocal.status !== serverBookmark.status ||
-						existingLocal.type !== serverBookmark.type;
+						const needsUpdate =
+							existingLocal.serverId !== serverBookmark.id ||
+							existingLocal.status !== serverBookmark.status ||
+							existingLocal.type !== serverBookmark.type;
 
-					if (needsUpdate) {
-						await updateLocalBookmark(
-							existingLocal.id,
-							{
-								serverId: serverBookmark.id,
-								status: serverBookmark.status,
-								type: serverBookmark.type,
-							},
-							true,
-						);
+						if (needsUpdate) {
+							await updateLocalBookmark(
+								existingLocal.id,
+								{
+									serverId: serverBookmark.id,
+									status: serverBookmark.status,
+									type: serverBookmark.type,
+								},
+								true,
+							);
+							return { status: "updated" as const };
+						}
+
+						return { status: "unchanged" as const };
+					} catch (error) {
+						console.error(`Failed to reconcile bookmark ${serverBookmark.slug}:`, error);
+						return { status: "failed" as const, error };
 					}
 				});
 
 				if (operations.length > 0) {
-					await Promise.all(operations);
+					const results = await Promise.allSettled(operations);
+					const failures = results.filter(
+						(r) => r.status === "rejected" || (r.status === "fulfilled" && r.value?.status === "failed")
+					);
+
+					if (failures.length > 0) {
+						console.warn(
+							`Bookmark reconciliation completed with ${failures.length} failures out of ${results.length} operations`
+						);
+					}
 
 					if (!cancelled) {
 						await queryClient.invalidateQueries({

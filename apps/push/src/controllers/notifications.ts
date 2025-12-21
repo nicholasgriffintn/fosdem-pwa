@@ -19,7 +19,7 @@ async function processUserNotifications(
 	env: Env,
 	queueMode = false
 ) {
-	await Promise.all(bookmarks.map(async (bookmark) => {
+	const results = await Promise.allSettled(bookmarks.map(async (bookmark) => {
 		try {
 			const notification = createNotificationPayload(bookmark);
 			if (queueMode) {
@@ -33,14 +33,20 @@ async function processUserNotifications(
 				await sendNotification(subscription, notification, keys, env);
 				await markNotificationSent(bookmark.id, env);
 			}
+			return { success: true, bookmarkId: bookmark.id };
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : "Unknown error";
 			console.error(
-				`Error sending notification to ${subscription.user_id}: ${errorMessage}`,
+				`Error sending notification to ${subscription.user_id} for bookmark ${bookmark.id}: ${errorMessage}`,
 			);
-			throw error;
+			return { success: false, bookmarkId: bookmark.id, error: errorMessage };
 		}
 	}));
+
+	const failures = results.filter(r => r.status === "rejected" || (r.status === "fulfilled" && !r.value.success));
+	if (failures.length > 0) {
+		console.warn(`${failures.length}/${bookmarks.length} notifications failed for user ${subscription.user_id}`);
+	}
 }
 
 export async function triggerTestNotification(env: Env, ctx: ExecutionContext) {

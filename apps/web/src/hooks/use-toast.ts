@@ -90,12 +90,9 @@ export const reducer = (state: State, action: Action): State => {
 		case "DISMISS_TOAST": {
 			const { toastId } = action;
 
-			// ! Side effects ! - This could be extracted into a dismissToast() action,
-			// but I'll keep it here for simplicity
 			if (toastId) {
 				addToRemoveQueue(toastId);
 			} else {
-				// biome-ignore lint/complexity/noForEach: CBA
 				state.toasts.forEach((toast) => {
 					addToRemoveQueue(toast.id);
 				});
@@ -133,7 +130,6 @@ let memoryState: State = { toasts: [] };
 
 function dispatch(action: Action) {
 	memoryState = reducer(memoryState, action);
-	// biome-ignore lint/complexity/noForEach: CBA
 	listeners.forEach((listener) => {
 		listener(memoryState);
 	});
@@ -173,7 +169,6 @@ function toast({ ...props }: Toast) {
 function useToast() {
 	const [state, setState] = React.useState<State>(memoryState);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: CBA
 	React.useEffect(() => {
 		listeners.push(setState);
 		return () => {
@@ -181,8 +176,13 @@ function useToast() {
 			if (index > -1) {
 				listeners.splice(index, 1);
 			}
+			if (listeners.length === 0) {
+				toastTimeouts.forEach((timeout) => clearTimeout(timeout));
+				toastTimeouts.clear();
+			}
 		};
-	}, [state]);
+		// Empty dependency array - listener should only be added once on mount
+	}, []);
 
 	return {
 		...state,

@@ -147,7 +147,6 @@ async function generateServiceWorker(outputDir = 'dist') {
       if (file.startsWith('/_serverFn') || file.startsWith('/offline')) {
         return file
       }
-      // Remove outputDir and also strip client/ or server/ prefixes
       const relativePath = file.replace(new RegExp(`^${outputDir}/`), '');
       return `/${relativePath.replace(/^(client|server)\//, '')}`
     })
@@ -187,19 +186,20 @@ async function syncBookmarks() {
 const CACHE_NAME = 'fosdem-pwa-v${Date.now()}';
 
 self.addEventListener('install', () => self.skipWaiting());
-self.addEventListener('activate', event => {
-  event.waitUntil(clients.claim());
-});
 
 let updateInterval;
 self.addEventListener('online', () => {
+  if (updateInterval) clearInterval(updateInterval);
   updateInterval = setInterval(() => {
     self.registration.update();
   }, 5 * 60 * 1000); // 5 minutes
 });
 
 self.addEventListener('offline', () => {
-  if (updateInterval) clearInterval(updateInterval);
+  if (updateInterval) {
+    clearInterval(updateInterval);
+    updateInterval = null;
+  }
 });
 
 const urlsToCache = ${JSON.stringify(assetsToCache, null, 2)};
@@ -307,20 +307,23 @@ setDefaultHandler(
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (!cacheName.startsWith('workbox-') && 
-              cacheName !== 'fosdem-data' && 
-              cacheName !== 'github-avatars' &&
-              cacheName !== 'navigations' &&
-              cacheName !== 'user-data' &&
-              cacheName !== 'default') {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    Promise.all([
+      clients.claim(),
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (!cacheName.startsWith('workbox-') &&
+                cacheName !== 'fosdem-data' &&
+                cacheName !== 'github-avatars' &&
+                cacheName !== 'navigations' &&
+                cacheName !== 'user-data' &&
+                cacheName !== 'default') {
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+    ])
   );
 });
 

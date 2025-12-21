@@ -10,7 +10,7 @@ export const getNotes = createServerFn({
 	method: "GET",
 })
 	.inputValidator((data: { year: number; eventId: string }) => data)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { year, eventId } = ctx.data;
 
 		const { user } = await getFullAuthSession();
@@ -41,7 +41,7 @@ export const createNote = createServerFn({
 		(data: { year: number; eventId: string; note: string; time?: number }) =>
 			data,
 	)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { year, eventId, note, time } = ctx.data;
 
 		if (!note) {
@@ -74,8 +74,8 @@ export const createNote = createServerFn({
 export const updateNote = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { id: number; updates: any }) => data)
-	.handler(async (ctx: any) => {
+	.inputValidator((data: { id: number; updates: Record<string, unknown> }) => data)
+	.handler(async (ctx) => {
 		const { id, updates } = ctx.data;
 
 		const allowedFields = ["note", "time"] as const;
@@ -120,7 +120,7 @@ export const deleteNote = createServerFn({
 	method: "POST",
 })
 	.inputValidator((data: { id: number }) => data)
-	.handler(async (ctx: any) => {
+	.handler(async (ctx) => {
 		const { id } = ctx.data;
 
 		const { user } = await getFullAuthSession();
