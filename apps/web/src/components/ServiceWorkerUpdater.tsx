@@ -66,22 +66,6 @@ export function ServiceWorkerUpdater() {
 			};
 		}
 
-		const serverFunctionsChannel = supportsBroadcastChannel
-			? new BroadcastChannel("server-functions-sync")
-			: null;
-
-		if (serverFunctionsChannel) {
-			serverFunctionsChannel.onmessage = (event) => {
-				if (event.data?.type === "SYNC_COMPLETE") {
-					toast({
-						title: "Offline requests processed",
-						description:
-							"Requests that were queued while offline have been processed",
-						duration: 3000,
-					});
-				}
-			};
-		}
 
 		window.addEventListener("swUpdated", handleSwUpdate);
 
@@ -93,7 +77,6 @@ export function ServiceWorkerUpdater() {
 			);
 			window.removeEventListener("appinstalled", handleAppInstalled);
 			dataChannel?.close();
-			serverFunctionsChannel?.close();
 		};
 	}, []);
 
