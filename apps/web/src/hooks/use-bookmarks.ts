@@ -18,7 +18,13 @@ type MergedBookmark = LocalBookmark & {
 	serverId?: string;
 };
 
-export function useBookmarks({ year }: { year: number }): {
+export function useBookmarks({
+	year,
+	localOnly = false,
+}: {
+	year: number;
+	localOnly?: boolean;
+}): {
 	bookmarks: MergedBookmark[];
 	loading: boolean;
 } {
@@ -46,11 +52,15 @@ export function useBookmarks({ year }: { year: number }): {
 
 			return data;
 		},
-		enabled: !!user?.id,
+		enabled: !!user?.id && !localOnly,
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
 
 	const mergedBookmarks = useMemo(() => {
+		if (localOnly) {
+			return localBookmarks || [];
+		}
+
 		if (!user?.id) {
 			return localBookmarks || [];
 		}
@@ -88,9 +98,10 @@ export function useBookmarks({ year }: { year: number }): {
 		}
 
 		return merged;
-	}, [user?.id, localBookmarks, serverBookmarks]);
+	}, [localOnly, user?.id, localBookmarks, serverBookmarks]);
 
 	useEffect(() => {
+		if (localOnly) return;
 		if (!user?.id) return;
 		if (!serverBookmarks || !localBookmarks) return;
 		if (reconciliationInProgress.current) return;
@@ -161,10 +172,10 @@ export function useBookmarks({ year }: { year: number }): {
 		return () => {
 			cancelled = true;
 		};
-	}, [user?.id, serverBookmarks, localBookmarks, year, queryClient]);
+	}, [localOnly, user?.id, serverBookmarks, localBookmarks, year, queryClient]);
 
 	return {
 		bookmarks: mergedBookmarks,
-		loading: localLoading || (user?.id ? serverLoading : false),
+		loading: localLoading || (!localOnly && user?.id ? serverLoading : false),
 	};
 }

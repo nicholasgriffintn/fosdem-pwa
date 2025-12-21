@@ -60,6 +60,8 @@ type BookmarksListProps = {
 	defaultViewMode?: "list" | "schedule" | "calendar";
 	showViewMode?: boolean;
 	user?: User | null;
+	emptyStateTitle?: string;
+	emptyStateMessage?: string;
 	onCreateBookmark?: ({
 		type,
 		slug,
@@ -82,13 +84,15 @@ export function BookmarksList({
 	defaultViewMode = "calendar",
 	showViewMode = true,
 	user,
+	emptyStateTitle = "No bookmarks yet",
+	emptyStateMessage = "Start bookmarking events to see them here.",
 	onCreateBookmark,
 }: BookmarksListProps) {
 	if (!bookmarks || bookmarks.length === 0) {
 		return (
 			<EmptyStateCard
-				title="No bookmarks yet"
-				description="Start bookmarking events to see them here."
+				title={emptyStateTitle}
+				description={emptyStateMessage}
 				className="my-6"
 			/>
 		);
@@ -164,8 +168,8 @@ export function BookmarksList({
 	if (tracks.length === 0 && events.length === 0) {
 		return (
 			<EmptyStateCard
-				title="No bookmarks yet"
-				description="Start bookmarking events to see them here."
+				title={emptyStateTitle}
+				description={emptyStateMessage}
 				className="my-6"
 			/>
 		);
