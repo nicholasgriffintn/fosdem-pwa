@@ -163,7 +163,6 @@ const { registerRoute, NavigationRoute, setDefaultHandler } = workbox.routing;
 const { NetworkFirst, CacheFirst, StaleWhileRevalidate, NetworkOnly } = workbox.strategies;
 const { CacheableResponsePlugin } = workbox.cacheableResponse;
 const { ExpirationPlugin } = workbox.expiration;
-const { BackgroundSyncPlugin } = workbox.backgroundSync;
 const { BroadcastUpdatePlugin } = workbox.broadcastUpdate;
 
 self.addEventListener('message', (event) => {
@@ -184,10 +183,6 @@ async function syncBookmarks() {
     console.error('Bookmark sync trigger failed:', error);
   }
 }
-
-const backgroundSyncQueue = new workbox.backgroundSync.Queue('fosdemQueue', {
-  maxRetentionTime: 24 * 60 // Retry for up to 24 hours (specified in minutes)
-});
 
 const CACHE_NAME = 'fosdem-pwa-v${Date.now()}';
 
@@ -231,9 +226,6 @@ registerRoute(
       new BroadcastUpdatePlugin({
         channelName: 'fosdem-data-updates',
         headersToCheck: ['etag', 'last-modified']
-      }),
-      new BackgroundSyncPlugin('fosdem-data-queue', {
-        maxRetentionTime: 24 * 60 // Retry for up to 24 hours
       })
     ]
   })
@@ -243,22 +235,7 @@ registerRoute(
   ({ url }) => url.pathname.includes('/api/user'),
   new NetworkFirst({
     cacheName: 'user-data',
-    plugins: [
-      new BackgroundSyncPlugin('user-data-queue', {
-        maxRetentionTime: 24 * 60,
-        onSync: async ({ queue }) => {
-          try {
-            await queue.replayRequests();
-            // Broadcast success to the app
-            const bc = new BroadcastChannel('user-data-sync');
-            bc.postMessage({ type: 'SYNC_COMPLETE' });
-          } catch (error) {
-            // Handle sync failures
-            console.error('Background sync failed:', error);
-          }
-        }
-      })
-    ],
+    plugins: [],
     networkTimeoutSeconds: 3
   })
 );
@@ -306,20 +283,6 @@ registerRoute(
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200]
-      }),
-      new BackgroundSyncPlugin('server-functions-queue', {
-        maxRetentionTime: 24 * 60,
-        onSync: async ({ queue }) => {
-          console.info('[ServiceWorker] Attempting to sync server functions queue');
-          try {
-            await queue.replayRequests();
-            const bc = new BroadcastChannel('server-functions-sync');
-            bc.postMessage({ type: 'SYNC_COMPLETE' });
-            console.info('[ServiceWorker] Server functions queue sync complete');
-          } catch (error) {
-            console.error('[ServiceWorker] Server functions queue sync failed:', error);
-          }
-        }
       })
     ],
     networkTimeoutSeconds: 6
@@ -359,24 +322,6 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-});
-
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'user-data-sync') {
-    // Handle user data requests
-    event.waitUntil(backgroundSyncQueue.replayRequests());
-  } else if (event.tag === 'server-functions-queue') {
-    // Handle server function requests
-    const serverFunctionsQueue = new workbox.backgroundSync.Queue('server-functions-queue');
-    event.waitUntil(serverFunctionsQueue.replayRequests());
-  } else if (event.tag === 'fosdem-data-queue') {
-    // Handle fosdem data requests
-    const fosdemDataQueue = new workbox.backgroundSync.Queue('fosdem-data-queue');
-    event.waitUntil(fosdemDataQueue.replayRequests());
-  } else if (event.tag === 'bookmark-sync') {
-    // Handle bookmark sync requests
-    event.waitUntil(syncBookmarks());
-  }
 });
 
 self.addEventListener('push', (event) => {

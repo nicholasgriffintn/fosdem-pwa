@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Button } from "~/components/ui/button";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { useAuth } from "~/hooks/use-auth";
 import { getSyncQueue } from "~/lib/localStorage";
@@ -173,45 +172,16 @@ export function OfflineIndicator() {
 				) : (
 					<WifiOff className="h-4 w-4 text-orange-600" />
 				)}
-				<span className="text-sm font-medium">
+				<span className="text-sm font-medium sr-only">
 					{isOnline ? "Back Online" : "Offline Mode"}
 				</span>
 			</div>
-
-			{!isOnline && (
-				<span className="text-xs text-muted-foreground">
-					Using cached data when available.
-				</span>
-			)}
-
-			{!isOnline && (
-				<Button
-					size="sm"
-					variant="outline"
-					onClick={() => {
-						window.location.href = "/offline";
-					}}
-				>
-					View Offline
-				</Button>
-			)}
 
 			{isOnline && syncStatus !== "idle" && (
 				<div className="flex items-center gap-1">
 					{getSyncIcon()}
 					<span className="text-xs text-muted-foreground">{getSyncText()}</span>
 				</div>
-			)}
-
-			{isOnline && (
-				<Button
-					size="sm"
-					variant="outline"
-					onClick={() => window.location.reload()}
-				>
-					<RefreshCw className="h-3 w-3 mr-1" />
-					Refresh
-				</Button>
 			)}
 		</div>
 	);
