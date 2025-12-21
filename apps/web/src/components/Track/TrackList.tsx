@@ -11,6 +11,8 @@ import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Icons } from "~/components/Icons";
+import { Link } from "@tanstack/react-router";
+import { constants } from "../../constants";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -84,7 +86,17 @@ function TrackListItem({
 			<div className={layoutClass}>
 				<div className="flex flex-1 flex-col gap-2 min-w-0">
 					<h3 className="font-semibold leading-tight text-base">
-						{track.name}
+						<Link
+							to={`/track/$slug`}
+							params={{ slug: track.id }}
+							search={{
+								year: Number.isFinite(year) ? year : constants.DEFAULT_YEAR,
+								day: undefined,
+							}}
+							className="no-underline hover:underline"
+						>
+							{track.name}
+						</Link>
 					</h3>
 					<div className="flex flex-wrap gap-2">
 						{metaBadges.map((meta) => (

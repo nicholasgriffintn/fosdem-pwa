@@ -5,7 +5,6 @@ import { FavouriteButton } from "~/components/FavouriteButton";
 import { ShareButton } from "~/components/ShareButton";
 import { constants } from "~/constants";
 import type { Event, Track } from "~/types/fosdem";
-import type { User } from "~/server/db/schema";
 
 type ItemWithFavorite = (Event | Track) & { isFavourited?: boolean };
 

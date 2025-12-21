@@ -1,5 +1,6 @@
 import type React from "react";
 import clsx from "clsx";
+import { Link } from "@tanstack/react-router";
 
 import type { Event } from "~/types/fosdem";
 import type { EventConflict } from "~/lib/fosdem";
@@ -10,6 +11,7 @@ import { calculateEndTime } from "~/lib/dateTime";
 import type { User } from "~/server/db/schema";
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/Icons";
+import { constants } from "../../constants";
 
 type EventListProps = {
 	events: Event[];
@@ -145,7 +147,17 @@ export function EventListItem({
 				<div className={layoutClass}>
 					<div className="flex-1 space-y-2 min-w-0">
 						<h3 className="font-semibold leading-tight text-base">
-							{event.title}
+							<Link
+								to={`/event/$slug`}
+								params={{ slug: event.id }}
+								search={{
+									year: Number.isFinite(year) ? year : constants.DEFAULT_YEAR,
+									test: false,
+								}}
+								className="no-underline hover:underline"
+							>
+								{event.title}
+							</Link>
 						</h3>
 						<div
 							className={clsx(
