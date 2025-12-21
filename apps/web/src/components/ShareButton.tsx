@@ -1,9 +1,12 @@
 "use client";
 
-import { Button } from "~/components/ui/button";
+import { useIsClient } from "~/hooks/use-is-client";
+
+import { Button, buttonVariants } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
 import { shareSupported, clipboardSupported } from "~/lib/browserSupport";
+import { cn } from "~/lib/utils";
 
 type ShareButtonProps = {
 	title: string;
@@ -12,6 +15,8 @@ type ShareButtonProps = {
 };
 
 export function ShareButton({ title, text, url }: ShareButtonProps) {
+	const isClient = useIsClient();
+
 	const handleShare = async () => {
 		try {
 			if (shareSupported() && navigator.canShare({ title, text, url })) {
@@ -45,6 +50,32 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
 			}
 		}
 	};
+
+	if (!isClient) {
+		return (
+			<details className="relative">
+				<summary
+					className={cn(
+						buttonVariants({ variant: "outline" }),
+						"cursor-pointer list-none [&::-webkit-details-marker]:hidden",
+					)}
+					title="Share"
+				>
+					<Icons.share className="h-4 w-4" />
+				</summary>
+				<div className="absolute right-0 mt-2 w-64 rounded-md border bg-background p-2 shadow-md z-50">
+					<label className="text-xs text-muted-foreground">Copy link</label>
+					<input
+						type="text"
+						readOnly
+						value={url}
+						className="mt-1 h-8 w-full rounded-md border border-input bg-background px-2 text-[10px] font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+						onClick={(e) => e.currentTarget.select()}
+					/>
+				</div>
+			</details>
+		);
+	}
 
 	return (
 		<Button variant="outline" onClick={handleShare}>

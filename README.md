@@ -1,6 +1,8 @@
 # FOSDEM PWA Companion App
 
-This is a companion app for [FOSDEM](https://fosdem.org/), built with [TanStack Start](https://tanstack.com/start/) and using [the shadcn UI library](https://ui.shadcn.com/), it is a PWA that can be installed on your phone or desktop, or just used as a website.
+This is a companion app for [FOSDEM](https://fosdem.org/) to provide an enhanced experience for attendees. It is built as a Progressive Web App (PWA) using modern web technologies.
+
+It has also been designed to work without JavaScript enabled, although some features will be limited in that mode.
 
 ## Check it out
 
@@ -50,7 +52,9 @@ Finally, I wanted to build a PWA using some of the latest web technologies, and 
 
 This project uses the FOSDEM public API to fetch event data. Thanks to the FOSDEM team for making this data available!
 
-Also, this project is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), so huge props to them!
+This project is heavily inspired by [sojourner-web](https://github.com/loomchild/sojourner-web/tree/master), so huge props to them!
+
+Finally, I built this with [TanStack Start](https://tanstack.com/start/) and used [the shadcn UI library](https://ui.shadcn.com/) for the components.
 
 ## Contributing
 

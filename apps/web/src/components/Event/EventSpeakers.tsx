@@ -48,7 +48,7 @@ export function EventSpeakers({ event, year, persons }: EventSpeakersProps) {
                 key={person.id || index}
                 to="/speakers/$slug"
                 params={{ slug: person.slug || person.id }}
-                search={{ year }}
+                search={{ year, day: undefined, sortFavourites: undefined }}
                 className="no-underline"
               >
                 {content}

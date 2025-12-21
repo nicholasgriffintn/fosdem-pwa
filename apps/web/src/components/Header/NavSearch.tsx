@@ -11,6 +11,7 @@ import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { Spinner } from "~/components/Spinner";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Card } from "~/components/ui/card";
+import { useIsClient } from "~/hooks/use-is-client";
 import {
 	type SearchResult,
 	TRACK_SEARCH_KEYS,
@@ -26,6 +27,8 @@ type NavSearchProps = {
 
 export function NavSearch({ year, className, ...props }: NavSearchProps) {
 	const { fosdemData, loading } = useFosdemData({ year });
+
+	const isClient = useIsClient();
 
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -134,7 +137,7 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 				navigate({
 					to: "/track/$slug",
 					params: { slug: result.item.id },
-					search: { year, day: undefined },
+					search: { year, day: undefined, sortFavourites: "false", view: "list" },
 				});
 				break;
 			case "event":
@@ -148,7 +151,7 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 				navigate({
 					to: "/rooms/$roomId",
 					params: { roomId: result.item.slug || result.item.id },
-					search: { year, day: undefined },
+					search: { year, day: undefined, sortFavourites: "false" },
 				});
 				break;
 		}
@@ -336,13 +339,23 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 	return (
 		<div ref={containerRef} className={cn("relative w-full", className)}>
 			<form
+				action="/search"
+				method="GET"
 				className="relative w-full"
 				{...props}
-				onSubmit={(e) => e.preventDefault()}
+				onSubmit={(e) => {
+					if (inputValue.trim()) {
+						e.preventDefault();
+						goToSearchPage(inputValue);
+					}
+				}}
 			>
+				<input type="hidden" name="year" value={year} />
+				<input type="hidden" name="type" value="all" />
 				<Input
 					id="search"
 					ref={searchInputRef}
+					name="q"
 					type="search"
 					value={inputValue}
 					placeholder="Search events..."
@@ -353,7 +366,7 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 					onKeyDown={handleKeyDown}
 				/>
 				<kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
-					{(loading || isSearching) && <Spinner className="h-3 w-3" />}
+					{(isClient && (loading || isSearching)) && <Spinner className="h-3 w-3" />}
 					<span className="text-xs">⌘</span>K
 				</kbd>
 			</form>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
 import { Spinner } from "~/components/Spinner";
+import { useIsClient } from "~/hooks/use-is-client";
 
 type FavouriteButtonProps = {
 	year: number;
@@ -32,14 +33,10 @@ export function FavouriteButton({
 	status,
 	onCreateBookmark,
 }: FavouriteButtonProps) {
-	const [isClient, setIsClient] = useState(false);
+	const isClient = useIsClient();
 	const [currentStatus, setCurrentStatus] = useState(status);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const lastSyncedStatusRef = useRef(status);
-
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
 
 	useEffect(() => {
 		if (isProcessing) {
@@ -52,7 +49,8 @@ export function FavouriteButton({
 		}
 	}, [status, isProcessing]);
 
-	const handleFavourite = async () => {
+	const handleFavourite = async (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
 		if (onCreateBookmark && !isProcessing) {
 			const newStatus = currentStatus === "favourited" ? "unfavourited" : "favourited";
 			const previousStatus = currentStatus;
@@ -85,11 +83,23 @@ export function FavouriteButton({
 		}
 	};
 
+	if (!isClient) {
+		return (
+			<Button
+				variant="outline"
+				disabled
+				title="Enable JavaScript to bookmark events"
+			>
+				<Icons.star />
+			</Button>
+		);
+	}
+
 	return (
 		<Button
 			variant="outline"
 			onClick={handleFavourite}
-			disabled={isClient && (currentStatus === "loading" || isProcessing)}
+			disabled={currentStatus === "loading" || isProcessing}
 		>
 			{currentStatus === "loading" || isProcessing ? (
 				<Spinner />

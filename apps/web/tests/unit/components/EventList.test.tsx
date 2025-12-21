@@ -94,13 +94,13 @@ describe("EventList", () => {
 
 		expect(screen.getByRole("heading", { name: /Schedule/i })).toBeInTheDocument();
 
-		const calendarButton = screen.getByRole("button", { name: /calendar/i });
-		fireEvent.click(calendarButton);
+		const calendarLink = screen.getByText(/calendar/i, { selector: "a" });
+		fireEvent.click(calendarLink);
 		expect(screen.getByText(/Talk A/i)).toBeInTheDocument();
 		expect(screen.getByText(/Talk B/i)).toBeInTheDocument();
 		
-		const scheduleButton = screen.getByRole("button", { name: /schedule/i });
-		fireEvent.click(scheduleButton);
+		const scheduleLink = screen.getByText(/schedule/i, { selector: "a" });
+		fireEvent.click(scheduleLink);
 		expect(screen.getByText(/Talk A/i)).toBeInTheDocument();
 
 		queryClient.clear();

@@ -266,7 +266,12 @@ function OfflinePage() {
 																search={
 																	display.isEvent
 																		? { year, test: false }
-																		: { year, day: undefined }
+																		: {
+																				year,
+																				day: undefined,
+																				view: undefined,
+																				sortFavourites: undefined,
+																			}
 																}
 																className="font-medium no-underline hover:underline"
 															>

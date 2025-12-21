@@ -5,6 +5,7 @@ import { PageHeader } from "~/components/PageHeader";
 import { Spinner } from "~/components/Spinner";
 import { SignInForm } from "~/components/SignInForm";
 import { constants } from "~/constants";
+import { useIsClient } from "~/hooks/use-is-client";
 
 export const Route = createFileRoute("/signin/")({
 	component: SignInPage,
@@ -20,14 +21,7 @@ export const Route = createFileRoute("/signin/")({
 
 function SignInPage() {
 	const { user, loading } = useAuth();
-
-	if (loading) {
-		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<Spinner className="h-8 w-8" />
-			</div>
-		);
-	}
+	const isClient = useIsClient();
 
 	if (user?.id) {
 		return (
@@ -42,6 +36,11 @@ function SignInPage() {
 		<div className="min-h-screen">
 			<div className="container max-w-2xl mx-auto px-4 py-12 lg:py-20">
 				<PageHeader heading="Sign in" className="mb-4" />
+				{isClient && loading && (
+					<div className="flex items-center justify-center py-12">
+						<Spinner className="h-8 w-8" />
+					</div>
+				)}
 				<div className="flex flex-col gap-8">
 					<div className="space-y-6">
 						<p className="text-lg text-muted-foreground">
@@ -52,7 +51,7 @@ function SignInPage() {
 							Continuing as a guest creates a local-only account that won't sync
 							across devices, but it will still save bookmarks and notes if you
 							need something more persistent or the device doesn't support
-							JavaScript.
+							JavaScript (although support for non JS interactions is limited).
 						</p>
 						<p className="text-sm text-muted-foreground">
 							Read our{" "}

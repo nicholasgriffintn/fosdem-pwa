@@ -11,12 +11,14 @@ import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 
 export const Route = createFileRoute("/speakers/$slug")({
     component: SpeakerPage,
-    validateSearch: ({ year }: { year: number }) => ({
+    validateSearch: ({ year, day, sortFavourites }: { year: number; day?: string; sortFavourites?: string }) => ({
         year:
             (constants.AVAILABLE_YEARS.includes(year) && year) ||
             constants.DEFAULT_YEAR,
+        day: day || undefined,
+        sortFavourites: sortFavourites || undefined,
     }),
-    loaderDeps: ({ search: { year } }) => ({ year }),
+    loaderDeps: ({ search: { year, day, sortFavourites } }) => ({ year, day, sortFavourites }),
     loader: async ({ params, deps: { year } }) => {
         const data = (await getAllData({ data: { year } })) as Conference;
 
@@ -49,11 +51,21 @@ export const Route = createFileRoute("/speakers/$slug")({
 
 function SpeakerPage() {
     const { fosdem, year } = Route.useLoaderData();
+    const { day, sortFavourites } = Route.useSearch();
+    const navigate = Route.useNavigate();
     const { person, personEvents, days } = fosdem;
     const { user } = useAuth();
     const { create: createBookmark } = useMutateBookmark({ year });
     const onCreateBookmark = async (bookmark: any) => {
         await createBookmark(bookmark);
+    };
+    const handleSortFavouritesChange = (checked: boolean) => {
+        navigate({
+            search: (prev) => ({
+                ...prev,
+                sortFavourites: checked ? "true" : undefined,
+            }),
+        });
     };
 
     if (!person) {
@@ -100,6 +112,9 @@ function SpeakerPage() {
                         displayViewMode={false}
                         groupByDay={true}
                         days={days}
+                        day={day}
+                        sortFavourites={sortFavourites}
+                        onSortFavouritesChange={handleSortFavouritesChange}
                         user={user}
                         onCreateBookmark={onCreateBookmark}
                         displaySortByFavourites={true}
