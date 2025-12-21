@@ -89,9 +89,8 @@ async function generateServiceWorker(outputDir = 'dist') {
   const dataUrls = [fosdemDataUrl]
 
   const clientFiles = await glob(`${outputDir}/client/**/*`, { nodir: true })
-  const serverFiles = await glob(`${outputDir}/server/**/*`, { nodir: true })
 
-  const filesAndDataUrls = [...dataUrls, ...clientFiles, ...serverFiles, '/offline']
+  const filesAndDataUrls = [...dataUrls, ...clientFiles, '/offline']
 
   const ignoredRoutes = [
     '/robots.txt',
@@ -101,6 +100,8 @@ async function generateServiceWorker(outputDir = 'dist') {
     '/_headers',
     '/sw.js',
     '/_worker.js',
+    '/wrangler.json',
+    '/manifest.webmanifest'
   ]
 
   const assetsToCache = filesAndDataUrls
