@@ -79,7 +79,10 @@ export function EventPlayer({
 			)?.href ?? videoRecordings[0]?.href ?? null
 		: videoRecordings[0]?.href ?? null;
 
-	const isThisEventPlaying = player.currentEvent?.id === event.id && player.portalTarget === "event-page";
+	const isThisEventPlaying =
+		player.currentEvent?.id === event.id && player.portalTarget === "event-page";
+	const isThisEventFloating =
+		player.currentEvent?.id === event.id && player.portalTarget === "floating";
 
 	const handlePlay = () => {
 		if (streamUrl) {
@@ -99,6 +102,18 @@ export function EventPlayer({
 		}
 	};
 
+	const handlePopBackIn = () => {
+		if (streamUrl) {
+			if (!player.currentEvent || player.currentEvent.id !== event.id) {
+				player.loadEvent(event, year, streamUrl, eventIsLive);
+			}
+			player.setPortalTarget("event-page");
+			if (player.isPlaying) {
+				player.play();
+			}
+		}
+	};
+
 	return (
 		<div className="relative w-full aspect-video group">
 			{!isThisEventPlaying && (
@@ -110,7 +125,8 @@ export function EventPlayer({
 				/>
 			)}
 
-			{((eventIsLive && event.streams?.length) || hasRecordings) && (
+			{((eventIsLive && event.streams?.length) || hasRecordings) &&
+				!isThisEventFloating && (
 				<button
 					type="button"
 					onClick={handlePopOut}
@@ -128,11 +144,17 @@ export function EventPlayer({
 						{!isThisEventPlaying && (
 							<button
 								type="button"
-								onClick={handlePlay}
+								onClick={isThisEventFloating ? handlePopBackIn : handlePlay}
 								className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
 							>
-								<Icons.play className="w-16 h-16 text-white" />
-								<span className="text-white text-lg font-medium">Play Video</span>
+								{isThisEventFloating ? (
+									<Icons.chevronUp className="w-16 h-16 text-white" />
+								) : (
+									<Icons.play className="w-16 h-16 text-white" />
+								)}
+								<span className="text-white text-lg font-medium">
+									{isThisEventFloating ? "Pop Back In" : "Play Video"}
+								</span>
 							</button>
 						)}
 						<div id="event-page-video-portal" className="w-full h-full" />
