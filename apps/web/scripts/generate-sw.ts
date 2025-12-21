@@ -343,6 +343,12 @@ self.addEventListener('notificationclick', (event) => {
       clients.openWindow(event.notification.data)
     );
   }
+});
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'bookmark-sync') {
+    event.waitUntil(syncBookmarks());
+  }
 });`
 
   writeFileSync(`${outputDir}/client/sw.js`, sw);
