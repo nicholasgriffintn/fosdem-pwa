@@ -48,11 +48,20 @@ export const Route = createFileRoute("/type/$slug")({
 function TypePage() {
 	const { fosdem, year, day } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
+	const navigate = Route.useNavigate();
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
 	const onCreateBookmark = async (bookmark: any) => {
 		await createBookmark(bookmark);
+	};
+	const handleSortFavouritesChange = (checked: boolean) => {
+		navigate({
+			search: (prev) => ({
+				...prev,
+				sortFavourites: checked ? "true" : undefined,
+			}),
+		});
 	};
 
 	if (!fosdem.type) {
@@ -93,6 +102,7 @@ function TypePage() {
 						days={fosdem.days}
 						day={day}
 						sortFavourites={sortFavourites}
+						onSortFavouritesChange={handleSortFavouritesChange}
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						displaySortByFavourites={true}

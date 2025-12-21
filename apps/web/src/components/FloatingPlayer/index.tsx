@@ -65,7 +65,7 @@ export function FloatingPlayer() {
 					<Link
 						to="/event/$slug"
 						params={{ slug: currentEvent.id }}
-						search={{ year: year ?? undefined }}
+						search={{ year: year ?? undefined, test: false }}
 						className="text-sm font-medium text-white hover:underline truncate flex-1 min-w-0 pr-2"
 					>
 						{currentEvent.title}

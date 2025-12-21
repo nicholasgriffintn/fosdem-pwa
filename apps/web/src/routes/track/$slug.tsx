@@ -47,11 +47,20 @@ export const Route = createFileRoute("/track/$slug")({
 function TrackPage() {
 	const { fosdem, year, day } = Route.useLoaderData();
 	const { view, sortFavourites } = Route.useSearch();
+	const navigate = Route.useNavigate();
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
 	const onCreateBookmark = async (bookmark: any) => {
 		await createBookmark(bookmark);
+	};
+	const handleSortFavouritesChange = (checked: boolean) => {
+		navigate({
+			search: (prev) => ({
+				...prev,
+				sortFavourites: checked ? "true" : undefined,
+			}),
+		});
 	};
 
 	if (!fosdem.track) {
@@ -102,6 +111,7 @@ function TrackPage() {
 						day={day}
 						view={view}
 						sortFavourites={sortFavourites}
+						onSortFavouritesChange={handleSortFavouritesChange}
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						displaySortByFavourites={true}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useId } from "react";
-import { useNavigate } from "@tanstack/react-router";
 
 import type { EventConflict } from "~/lib/fosdem";
 import type { Event } from "~/types/fosdem";
@@ -29,6 +28,7 @@ type EventListProps = {
 	day?: string;
 	view?: string;
 	sortFavourites?: string;
+	onSortFavouritesChange?: (checked: boolean) => void;
 	onSetPriority?: (
 		eventId: string,
 		updates: { priority: number | null },
@@ -61,6 +61,7 @@ export function EventList({
 	day,
 	view,
 	sortFavourites,
+	onSortFavouritesChange,
 	onSetPriority,
 	showTrack = false,
 	user = null,
@@ -69,7 +70,6 @@ export function EventList({
 	emptyStateTitle = "No events to show",
 	emptyStateMessage = "Adjust filters or pick another day to see more sessions.",
 }: EventListProps) {
-	const navigate = useNavigate();
 	const viewMode = (view as EventListViewModes) || defaultViewMode;
 	const sortByFavourites = sortFavourites === "true";
 	const sortSwitchId = useId();
@@ -126,6 +126,7 @@ export function EventList({
 								<SortFavouritesSwitch
 									sortSwitchId={sortSwitchId}
 									sortByFavourites={sortByFavourites}
+									onToggle={onSortFavouritesChange}
 								/>
 							)}
 							{displayViewMode && (
@@ -194,6 +195,7 @@ export function EventList({
 						<SortFavouritesSwitch
 							sortSwitchId={sortSwitchId}
 							sortByFavourites={sortByFavourites}
+							onToggle={onSortFavouritesChange}
 						/>
 					)}
 					{displayViewMode && (
