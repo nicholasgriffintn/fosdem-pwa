@@ -32,9 +32,14 @@ export function FavouriteButton({
 	status,
 	onCreateBookmark,
 }: FavouriteButtonProps) {
+	const [isClient, setIsClient] = useState(false);
 	const [currentStatus, setCurrentStatus] = useState(status);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const lastSyncedStatusRef = useRef(status);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
 
 	useEffect(() => {
 		if (isProcessing) {
@@ -84,7 +89,7 @@ export function FavouriteButton({
 		<Button
 			variant="outline"
 			onClick={handleFavourite}
-			disabled={currentStatus === "loading" || isProcessing}
+			disabled={isClient && (currentStatus === "loading" || isProcessing)}
 		>
 			{currentStatus === "loading" || isProcessing ? (
 				<Spinner />

@@ -53,8 +53,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 	const [volume, setVolumeState] = useState(1);
 	const [isLive, setIsLive] = useState(false);
 	const [streamUrl, setStreamUrl] = useState<string | null>(null);
+	const [isClient, setIsClient] = useState(false);
 
 	useEffect(() => {
+		setIsClient(true);
+	}, []);
+
+	useEffect(() => {
+		if (!isClient) return;
 		const state = getPlayerState();
 		if (state.eventSlug && state.streamUrl) {
 			setYear(state.year);
@@ -96,7 +102,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
 			setIsPlaying(false);
 		}
-	}, []);
+	}, [isClient]);
 
 	useEffect(() => {
 		const video = videoRef.current;
