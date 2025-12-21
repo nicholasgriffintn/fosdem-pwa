@@ -12,6 +12,11 @@ const routerMocks = vi.hoisted(() => ({
 		<a {...props}>{children}</a>
 	),
 	useNavigate: () => () => {},
+	useRouterState: ({
+		select,
+	}: {
+		select: (state: { location: { pathname: string; search: string } }) => string;
+	}) => select({ location: { pathname: "/test", search: "" } }),
 }));
 
 vi.mock("@tanstack/react-router", () => routerMocks);

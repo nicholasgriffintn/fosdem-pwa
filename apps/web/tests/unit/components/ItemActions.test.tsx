@@ -10,6 +10,11 @@ const routerMocks = vi.hoisted(() => ({
 	Link: ({ children, ...props }: { children: ReactNode }) => (
 		<a {...props}>{children}</a>
 	),
+	useRouterState: ({
+		select,
+	}: {
+		select: (state: { location: { pathname: string; search: string } }) => string;
+	}) => select({ location: { pathname: "/test", search: "" } }),
 }));
 
 const toastMock = vi.hoisted(() => vi.fn());
