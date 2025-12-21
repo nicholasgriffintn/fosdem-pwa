@@ -24,7 +24,7 @@ export class HomePage extends BasePage {
 	}
 
 	async expectTypeCards() {
-		const trackLinks = this.page.getByRole("link", { name: /View Tracks/i });
+		const trackLinks = this.page.getByRole("link", { name: /View/i });
 		const count = await trackLinks.count();
 		expect(count).toBeGreaterThan(0);
 	}

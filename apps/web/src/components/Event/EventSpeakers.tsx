@@ -1,57 +1,64 @@
+import { Link } from "@tanstack/react-router";
 import type { Event, Person } from "~/types/fosdem";
 
 type EventSpeakersProps = {
-	event: Event;
-	persons?: Record<string, Person>;
+  event: Event;
+  year: number;
+  persons?: Record<string, Person>;
 };
 
-export function EventSpeakers({ event, persons }: EventSpeakersProps) {
-	if (!event.persons || event.persons.length === 0) {
-		return null;
-	}
+export function EventSpeakers({ event, year, persons }: EventSpeakersProps) {
+  if (!event.persons || event.persons.length === 0) {
+    return null;
+  }
 
-	return (
-		<div className="prose prose-lg prose-indigo mt-4 text-foreground">
-			<h2 className="text-xl font-medium text-foreground">Speakers</h2>
-			<div className="mt-2 space-y-4">
-				{event.persons.map((personName, index) => {
-					const personId = event.personIds?.[index];
-					const person =
-						personId && persons?.[personId]
-							? persons[personId]
-							: Object.values(persons || {}).find(
-								(p) => p.name === personName,
-							);
+  return (
+    <div className="mt-8">
+      <h2 className="text-xl font-bold text-foreground mb-4">Speakers</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {event.persons.map((personName, index) => {
+          const personId = event.personIds?.[index];
+          const person =
+            personId && persons?.[personId]
+              ? persons[personId]
+              : Object.values(persons || {}).find((p) => p.name === personName);
 
-					if (person && (person.biography || person.extended_biography)) {
-						return (
-							<div key={person.id || index} className="border-l-4 border-primary pl-4 py-2">
-								<h3 className="text-normal font-semibold text-foreground mb-2">
-									{person.name}
-								</h3>
-								{(person.biography || person.extended_biography) && (
-									<div
-										className="text-sm text-muted-foreground"
-										// biome-ignore lint/security/noDangerouslySetInnerHtml: Biography is HTML from FOSDEM
-										dangerouslySetInnerHTML={{
-											__html:
-												person.extended_biography ||
-												person.biography ||
-												"",
-										}}
-									/>
-								)}
-							</div>
-						);
-					}
+          const content = (
+            <div className="flex items-start gap-4 p-4 rounded-lg border bg-card/40 backdrop-blur-sm transition-colors hover:border-primary/50">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-foreground mb-1 truncate">
+                  {personName}
+                </h3>
+                {person && (person.biography || person.extended_biography) && (
+                  <div
+                    className="text-sm text-muted-foreground line-clamp-3 prose-sm prose-indigo"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Biography is HTML from FOSDEM
+                    dangerouslySetInnerHTML={{
+                      __html: person.biography || person.extended_biography || "",
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          );
 
-					return (
-						<div key={index} className="text-foreground">
-							<span>{personName}</span>
-						</div>
-					);
-				})}
-			</div>
-		</div>
-	);
+          if (person) {
+            return (
+              <Link
+                key={person.id || index}
+                to="/speakers/$slug"
+                params={{ slug: person.slug || person.id }}
+                search={{ year }}
+                className="no-underline"
+              >
+                {content}
+              </Link>
+            );
+          }
+
+          return <div key={index}>{content}</div>;
+        })}
+      </div>
+    </div>
+  );
 }

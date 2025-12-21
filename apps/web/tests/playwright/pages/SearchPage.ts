@@ -140,9 +140,9 @@ export class SearchPage extends BasePage {
 		expect(await options.count()).toBeGreaterThan(1);
 
 		const option = options.nth(1);
-		const value =
-			(await option.getAttribute("data-value")) ??
-			((await option.textContent()) || "").trim();
+		const dataValue = await option.getAttribute("data-value");
+		const textContent = (await option.textContent()) || "";
+		const value = (dataValue || textContent).trim();
 
 		await option.click();
 
@@ -159,9 +159,9 @@ export class SearchPage extends BasePage {
 		expect(await options.count()).toBeGreaterThan(1);
 
 		const option = options.nth(1);
-		const value =
-			(await option.getAttribute("data-value")) ??
-			((await option.textContent()) || "").trim();
+		const dataValue = await option.getAttribute("data-value");
+		const textContent = (await option.textContent()) || "";
+		const value = (dataValue || textContent).trim();
 
 		await option.click();
 

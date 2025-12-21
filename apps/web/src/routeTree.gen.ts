@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SpeakersIndexRouteImport } from './routes/speakers/index'
 import { Route as SigninIndexRouteImport } from './routes/signin/index'
 import { Route as SearchIndexRouteImport } from './routes/search/index'
 import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
@@ -20,6 +21,7 @@ import { Route as LiveIndexRouteImport } from './routes/live/index'
 import { Route as BookmarksIndexRouteImport } from './routes/bookmarks/index'
 import { Route as TypeSlugRouteImport } from './routes/type/$slug'
 import { Route as TrackSlugRouteImport } from './routes/track/$slug'
+import { Route as SpeakersSlugRouteImport } from './routes/speakers/$slug'
 import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
 import { Route as EventSlugRouteImport } from './routes/event/$slug'
 import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
@@ -34,6 +36,11 @@ import { Route as ApiAuthCallbackGithubRouteImport } from './routes/api/auth/cal
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
+  id: '/speakers/',
+  path: '/speakers/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SigninIndexRoute = SigninIndexRouteImport.update({
@@ -84,6 +91,11 @@ const TypeSlugRoute = TypeSlugRouteImport.update({
 const TrackSlugRoute = TrackSlugRouteImport.update({
   id: '/track/$slug',
   path: '/track/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersSlugRoute = SpeakersSlugRouteImport.update({
+  id: '/speakers/$slug',
+  path: '/speakers/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
@@ -141,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
+  '/speakers/$slug': typeof SpeakersSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
   '/bookmarks': typeof BookmarksIndexRoute
@@ -151,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/rooms': typeof RoomsIndexRoute
   '/search': typeof SearchIndexRoute
   '/signin': typeof SigninIndexRoute
+  '/speakers': typeof SpeakersIndexRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -164,6 +178,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
+  '/speakers/$slug': typeof SpeakersSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
   '/bookmarks': typeof BookmarksIndexRoute
@@ -174,6 +189,7 @@ export interface FileRoutesByTo {
   '/rooms': typeof RoomsIndexRoute
   '/search': typeof SearchIndexRoute
   '/signin': typeof SigninIndexRoute
+  '/speakers': typeof SpeakersIndexRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -188,6 +204,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
+  '/speakers/$slug': typeof SpeakersSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
   '/bookmarks/': typeof BookmarksIndexRoute
@@ -198,6 +215,7 @@ export interface FileRoutesById {
   '/rooms/': typeof RoomsIndexRoute
   '/search/': typeof SearchIndexRoute
   '/signin/': typeof SigninIndexRoute
+  '/speakers/': typeof SpeakersIndexRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -213,6 +231,7 @@ export interface FileRouteTypes {
     | '/'
     | '/event/$slug'
     | '/rooms/$roomId'
+    | '/speakers/$slug'
     | '/track/$slug'
     | '/type/$slug'
     | '/bookmarks'
@@ -223,6 +242,7 @@ export interface FileRouteTypes {
     | '/rooms'
     | '/search'
     | '/signin'
+    | '/speakers'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
@@ -236,6 +256,7 @@ export interface FileRouteTypes {
     | '/'
     | '/event/$slug'
     | '/rooms/$roomId'
+    | '/speakers/$slug'
     | '/track/$slug'
     | '/type/$slug'
     | '/bookmarks'
@@ -246,6 +267,7 @@ export interface FileRouteTypes {
     | '/rooms'
     | '/search'
     | '/signin'
+    | '/speakers'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
@@ -259,6 +281,7 @@ export interface FileRouteTypes {
     | '/'
     | '/event/$slug'
     | '/rooms/$roomId'
+    | '/speakers/$slug'
     | '/track/$slug'
     | '/type/$slug'
     | '/bookmarks/'
@@ -269,6 +292,7 @@ export interface FileRouteTypes {
     | '/rooms/'
     | '/search/'
     | '/signin/'
+    | '/speakers/'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
@@ -283,6 +307,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventSlugRoute: typeof EventSlugRoute
   RoomsRoomIdRoute: typeof RoomsRoomIdRoute
+  SpeakersSlugRoute: typeof SpeakersSlugRoute
   TrackSlugRoute: typeof TrackSlugRoute
   TypeSlugRoute: typeof TypeSlugRoute
   BookmarksIndexRoute: typeof BookmarksIndexRoute
@@ -293,6 +318,7 @@ export interface RootRouteChildren {
   RoomsIndexRoute: typeof RoomsIndexRoute
   SearchIndexRoute: typeof SearchIndexRoute
   SigninIndexRoute: typeof SigninIndexRoute
+  SpeakersIndexRoute: typeof SpeakersIndexRoute
   ApiAuthGithubRoute: typeof ApiAuthGithubRoute
   ApiAuthGuestRoute: typeof ApiAuthGuestRoute
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
@@ -310,6 +336,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers/': {
+      id: '/speakers/'
+      path: '/speakers'
+      fullPath: '/speakers'
+      preLoaderRoute: typeof SpeakersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signin/': {
@@ -380,6 +413,13 @@ declare module '@tanstack/react-router' {
       path: '/track/$slug'
       fullPath: '/track/$slug'
       preLoaderRoute: typeof TrackSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers/$slug': {
+      id: '/speakers/$slug'
+      path: '/speakers/$slug'
+      fullPath: '/speakers/$slug'
+      preLoaderRoute: typeof SpeakersSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rooms/$roomId': {
@@ -459,6 +499,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventSlugRoute: EventSlugRoute,
   RoomsRoomIdRoute: RoomsRoomIdRoute,
+  SpeakersSlugRoute: SpeakersSlugRoute,
   TrackSlugRoute: TrackSlugRoute,
   TypeSlugRoute: TypeSlugRoute,
   BookmarksIndexRoute: BookmarksIndexRoute,
@@ -469,6 +510,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoomsIndexRoute: RoomsIndexRoute,
   SearchIndexRoute: SearchIndexRoute,
   SigninIndexRoute: SigninIndexRoute,
+  SpeakersIndexRoute: SpeakersIndexRoute,
   ApiAuthGithubRoute: ApiAuthGithubRoute,
   ApiAuthGuestRoute: ApiAuthGuestRoute,
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,

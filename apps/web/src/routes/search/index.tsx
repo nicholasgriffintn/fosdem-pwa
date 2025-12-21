@@ -58,7 +58,7 @@ export const Route = createFileRoute("/search/")({
 		q: string;
 		track?: string;
 		time?: string;
-			type?: "events" | "tracks" | "rooms" | "all";
+		type?: "events" | "tracks" | "rooms" | "all";
 	}) => ({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
@@ -112,12 +112,18 @@ export default function SearchPage() {
 		query || selectedTrack || selectedTime || selectedType !== "all",
 	);
 
-	const getSearchResults = (): SearchResults & {
-		tracksWithScores: SearchResult[];
-		eventsWithScores: SearchResult[];
-		roomsWithScores: SearchResult[];
-	} => {
-		if (!fosdemData || !query)
+	const fuseIndexes = useMemo(() => {
+		if (!fosdemData) return null;
+
+		return {
+			tracks: createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS),
+			events: createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS),
+			rooms: createSearchIndex(Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS),
+		};
+	}, [fosdemData]);
+
+	const searchResults = useMemo(() => {
+		if (!fosdemData || !query || !fuseIndexes)
 			return {
 				tracks: [],
 				events: [],
@@ -127,20 +133,7 @@ export default function SearchPage() {
 				roomsWithScores: [],
 			};
 
-		const tracksFuse = createSearchIndex(
-			Object.values(fosdemData.tracks),
-			TRACK_SEARCH_KEYS,
-		);
-		const eventsFuse = createSearchIndex(
-			Object.values(fosdemData.events),
-			EVENT_SEARCH_KEYS,
-		);
-		const roomsFuse = createSearchIndex(
-			Object.values(fosdemData.rooms),
-			ROOM_SEARCH_KEYS,
-		);
-
-		const tracksWithScores = tracksFuse
+		const tracksWithScores = fuseIndexes.tracks
 			.search(query)
 			.slice(0, 10)
 			.map((result) => ({
@@ -149,7 +142,7 @@ export default function SearchPage() {
 				score: result.score ?? 1,
 			}));
 
-		const eventsWithScores = eventsFuse
+		const eventsWithScores = fuseIndexes.events
 			.search(query)
 			.slice(0, 20)
 			.map((result) => ({
@@ -159,7 +152,7 @@ export default function SearchPage() {
 			}))
 			.sort((a, b) => a.score - b.score);
 
-		const roomsWithScores = roomsFuse
+		const roomsWithScores = fuseIndexes.rooms
 			.search(query)
 			.slice(0, 10)
 			.map((result) => ({
@@ -176,7 +169,7 @@ export default function SearchPage() {
 			eventsWithScores,
 			roomsWithScores,
 		};
-	};
+	}, [fuseIndexes, query, fosdemData]);
 
 	const {
 		tracks: rawTracks,
@@ -185,7 +178,7 @@ export default function SearchPage() {
 		tracksWithScores,
 		eventsWithScores,
 		roomsWithScores,
-	} = getSearchResults();
+	} = searchResults;
 
 	const trackIdToName = useMemo(() => {
 		if (!fosdemData) return {};
@@ -260,10 +253,10 @@ export default function SearchPage() {
 		nextTime = selectedTime,
 		nextType = selectedType,
 	}: {
-			nextQuery?: string;
+		nextQuery?: string;
 		nextTrack?: string;
 		nextTime?: string;
-			nextType?: string;
+		nextType?: string;
 	}) => {
 		const normalizedQuery = (nextQuery ?? "").trim();
 		const normalizedType: "events" | "tracks" | "rooms" | "all" =
@@ -500,18 +493,18 @@ export default function SearchPage() {
 						</div>
 					</div>
 				) : !query ? (
-						<EmptyStateCard
-							title="Search the schedule"
-							description="Enter a search term to see results. You can also filter by track, type, or time."
-						/>
-					) : !hasVisibleResults ? (
-						<EmptyStateCard
-							title="No results found"
-							description="No results match this search with the selected filters. Try adjusting your search or clearing filters."
-							/>
+					<EmptyStateCard
+						title="Search the schedule"
+						description="Enter a search term to see results. You can also filter by track, type, or time."
+					/>
+				) : !hasVisibleResults ? (
+					<EmptyStateCard
+						title="No results found"
+						description="No results match this search with the selected filters. Try adjusting your search or clearing filters."
+					/>
 				) : (
 					<div className="space-y-8">
-									{visibleSections.map((section) => section.component())}
+						{visibleSections.map((section) => section.component())}
 					</div>
 				)}
 			</div>
