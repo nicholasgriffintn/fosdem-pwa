@@ -27,36 +27,33 @@ export function EventSidebar({
 	return (
 		<div className={sidebarClassName}>
 			<noscript>
-				<div className="border border-amber-500 bg-amber-50 dark:bg-amber-950 p-4 rounded-lg">
-					<h3 className="font-semibold text-sm mb-2">Notes Require JavaScript</h3>
-					<p className="text-xs text-muted-foreground mb-2">
-						To take notes during this event, please enable JavaScript in your browser.
-					</p>
-					<p className="text-xs text-muted-foreground">
-						You can still view event details and the schedule without JavaScript.
-					</p>
+				<div className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+					Notes are available with JavaScript enabled. You can still browse the
+					event details and schedule.
 				</div>
 			</noscript>
-			{loading ? (
-				<Skeleton
-					className={clsx("h-full", {
-						"min-h-[40px] max-h-[40px]": isMobile,
-					})}
-				/>
-			) : (
-				<div className="flex-1 flex flex-col min-h-0">
-					{isMobile ? (
-						<EventNotesMobile event={event} year={year} />
-					) : (
-						<>
-							<h2 className="text-xl font-medium mb-4 text-foreground">
-								Notes
-							</h2>
-							<EventNotes event={event} year={year} />
-						</>
-					)}
-				</div>
-			)}
+			<div className="js-required flex-1 flex flex-col min-h-0">
+				{loading ? (
+					<Skeleton
+						className={clsx("h-full", {
+							"min-h-[40px] max-h-[40px]": isMobile,
+						})}
+					/>
+				) : (
+					<div className="flex-1 flex flex-col min-h-0">
+						{isMobile ? (
+							<EventNotesMobile event={event} year={year} />
+						) : (
+							<>
+								<h2 className="text-xl font-medium mb-4 text-foreground">
+									Notes
+								</h2>
+								<EventNotes event={event} year={year} />
+							</>
+						)}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }

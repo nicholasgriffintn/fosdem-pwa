@@ -1,13 +1,13 @@
 "use client";
 
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
-import Hls from "hls.js";
+import { useState } from "react";
 
 import { Icons } from "~/components/Icons";
 import { constants } from "~/constants";
 import { Image } from "~/components/Image";
 import { useOnlineStatus } from "~/hooks/use-online-status";
+import { SharedVideoElement } from "~/components/VideoPlayer/SharedVideoElement";
 
 type RoomPlayerProps = {
 	roomId: string;
@@ -24,39 +24,13 @@ export function RoomPlayer({
 	onClose,
 	isFloating = false,
 }: RoomPlayerProps) {
-	const hlsRef = useRef<Hls | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [streamError, setStreamError] = useState(false);
 	const isOnline = useOnlineStatus();
-
-	useEffect(() => {
-		if (!videoRef.current || !isPlaying) return;
-
-		const streamUrl = constants.STREAM_LINK.replace("${ROOM_ID}", roomId);
-
-		if (Hls.isSupported()) {
-			const hls = new Hls();
-			hlsRef.current = hls;
-			hls.attachMedia(videoRef.current);
-
-			hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-				hls.loadSource(streamUrl);
-			});
-
-			hls.on(Hls.Events.ERROR, (event, data) => {
-				if (data.fatal) {
-					setStreamError(true);
-				}
-			});
-		}
-
-		return () => {
-			if (hlsRef.current) {
-				hlsRef.current.destroy();
-				hlsRef.current = null;
-			}
-		};
-	}, [roomId, isPlaying, videoRef]);
+	const streamUrl = constants.STREAM_LINK.replace("${ROOM_ID}", roomId);
+	const streamSources = [
+		{ href: streamUrl, type: "application/vnd.apple.mpegurl" },
+	];
 
 	const handlePlay = () => {
 		setIsPlaying(true);
@@ -85,60 +59,68 @@ export function RoomPlayer({
 			)}
 
 			<div className={videoWrapperClassName}>
-				{!isPlaying && isOnline && (
-					<button
-						type="button"
-						onClick={handlePlay}
+				<div className="js-only w-full h-full">
+					{!isPlaying && isOnline && (
+						<button
+							type="button"
+							onClick={handlePlay}
+							className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
+						>
+							<Icons.play className="w-16 h-16 text-white" />
+							<span className="text-white text-lg font-medium">
+								Watch Room Stream
+							</span>
+						</button>
+					)}
+					{isPlaying && (
+						<SharedVideoElement
+							sources={streamSources}
+							videoRef={videoRef}
+							isLive={true}
+							showControls={true}
+							className="w-full h-full"
+						/>
+					)}
+					{streamError && (
+						<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
+							<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md">
+								<span className="text-sm md:text-base">
+									The stream is currently unavailable. The room might not be
+									streaming at the moment.
+								</span>
+							</div>
+						</div>
+					)}
+					{!isOnline && (
+						<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
+							<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
+								<p className="text-sm md:text-base font-medium">
+									You are offline. Live streams are unavailable.
+								</p>
+								<a
+									className="text-sm text-primary underline"
+									href="/offline"
+									rel="noreferrer"
+								>
+									View offline schedule
+								</a>
+							</div>
+						</div>
+					)}
+				</div>
+				<div className="no-js-only w-full h-full">
+					<a
+						href={streamUrl}
+						target="_blank"
+						rel="noreferrer"
 						className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
 					>
 						<Icons.play className="w-16 h-16 text-white" />
 						<span className="text-white text-lg font-medium">
 							Watch Room Stream
 						</span>
-					</button>
-				)}
-				{isPlaying && (
-					// biome-ignore lint/a11y/useMediaCaption: We don't have captions for the streams
-					<video
-						ref={videoRef}
-						className="w-full h-full object-contain"
-						controls
-						autoPlay
-						playsInline
-						webkit-playsinline="true"
-					>
-						<source
-							src={constants.STREAM_LINK.replace("${ROOM_ID}", roomId)}
-							type="application/vnd.apple.mpegurl"
-						/>
-					</video>
-				)}
-				{streamError && (
-					<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
-						<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md">
-							<span className="text-sm md:text-base">
-								The stream is currently unavailable. The room might not be
-								streaming at the moment.
-							</span>
-						</div>
-					</div>
-				)}
-				{!isOnline && (
-					<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
-						<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
-							<p className="text-sm md:text-base font-medium">
-								You are offline. Live streams are unavailable.
-							</p>
-							<a
-								className="text-sm text-primary underline"
-								href="/offline"
-								rel="noreferrer"
-							>
-								View offline schedule
-							</a>
-						</div>
-					</div>
-				)}
+					</a>
+				</div>
 			</div>
 		</div>
 	);
