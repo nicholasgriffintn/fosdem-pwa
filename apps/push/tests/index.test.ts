@@ -27,8 +27,8 @@ vi.mock("../src/services/bookmarks", () => ({
 }));
 
 const handler = (await import("../src/index")).default;
-const notifications = await import("../src/services/notifications");
-const bookmarks = await import("../src/services/bookmarks");
+const notifications = await import("../src/lib/notifications");
+const bookmarks = await import("../src/lib/bookmarks");
 
 const validEnv = {
 	DB: {},

@@ -20,7 +20,7 @@ describe("getFosdemData caching", () => {
 			.mockResolvedValue({ ok: true, json: async () => ({ events: {} }) });
 		vi.stubGlobal("fetch", fetchMock);
 
-		const { getFosdemData } = await import("../src/services/fosdem-data");
+		const { getFosdemData } = await import("../src/lib/fosdem-data");
 
 		await getFosdemData();
 		await getFosdemData();

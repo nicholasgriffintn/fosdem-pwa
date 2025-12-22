@@ -9,7 +9,18 @@
   "workers_dev": false,
   "preview_urls": false,
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "logs": {
+      "enabled": false,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
   },
   "triggers": {
     "crons": [
@@ -22,12 +33,8 @@
     {
       "binding": "DB",
       "database_name": "fosdem",
-      "database_id": "a9e2ef23-b95b-49e4-b1aa-5abc2bd26152"
-    },
-    {
-      "binding": "DB_PREVIEW",
-      "database_name": "fosdem-preview",
-      "database_id": "2ec973b1-6e46-49a8-825b-1928ec34cd22"
+      "database_id": "a9e2ef23-b95b-49e4-b1aa-5abc2bd26152",
+      "preview_database_id": "2ec973b1-6e46-49a8-825b-1928ec34cd22"
     }
   ],
   "analytics_engine_datasets": [

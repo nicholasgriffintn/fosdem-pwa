@@ -1,15 +1,15 @@
 import type { ApplicationServerKeys } from "webpush-webcrypto";
 
-import { getFosdemData, getCurrentDay } from "../services/fosdem-data";
+import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { 
 	getUserBookmarks, 
 	enrichBookmarks, 
 	getBookmarksForDay,
 	getBookmarksStartingSoon,
 	markNotificationSent,
-} from "../services/bookmarks";
-import { getApplicationKeys, sendNotification, createNotificationPayload } from "../services/notifications";
-import { bookmarkNotificationsEnabled } from "../services/config";
+} from "../lib/bookmarks";
+import { getApplicationKeys, sendNotification, createNotificationPayload } from "../lib/notifications";
+import { bookmarkNotificationsEnabled } from "../utils/config";
 import type { Subscription, EnrichedBookmark, Env } from "../types";
 
 async function processUserNotifications(

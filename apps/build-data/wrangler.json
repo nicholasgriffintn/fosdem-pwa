@@ -9,13 +9,25 @@
   "workers_dev": false,
   "preview_urls": false,
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "logs": {
+      "enabled": false,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
   },
   "r2_buckets": [
     {
       "binding": "R2",
       "bucket_name": "fosdem",
-      "preview_bucket_name": "fosdem-preview"
+      "preview_bucket_name": "fosdem-preview",
+      "remote": true
     }
   ],
   "triggers": {
