@@ -1,4 +1,4 @@
-import { Redis } from "@upstash/redis";
+import { Redis } from "@upstash/redis/cloudflare";
 
 import { getCloudflareEnv } from "~/server/config";
 
