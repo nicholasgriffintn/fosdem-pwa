@@ -9,6 +9,7 @@ import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { getBookmarks } from "~/server/functions/bookmarks";
+import { isEvent } from "~/lib/type-guards";
 
 export const Route = createFileRoute("/speakers/$slug")({
     component: SpeakerPage,
@@ -29,8 +30,8 @@ export const Route = createFileRoute("/speakers/$slug")({
 
         let personEvents: Event[] = [];
         if (person) {
-            personEvents = Object.values(data.events).filter((event: Event) =>
-                event.personIds?.includes(person.id),
+            personEvents = Object.values(data.events).filter((event) =>
+                isEvent(event) && event.personIds?.includes(person.id),
             );
         }
 

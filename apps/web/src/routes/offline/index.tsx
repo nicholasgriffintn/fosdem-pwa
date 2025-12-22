@@ -9,6 +9,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { Button } from "~/components/ui/button";
 import type { Event, Track } from "~/types/fosdem";
+import { isEvent, isTrack } from "~/lib/type-guards";
 import {
 	Card,
 	CardContent,
@@ -87,18 +88,20 @@ function OfflinePage() {
 	}, [year]);
 
 	const getBookmarkDisplay = (bookmark: (typeof bookmarks)[number]) => {
-		const isEvent =
+		const isEventBookmark =
 			bookmark.type === "bookmark_event" || bookmark.type === "event";
-		const cachedItem = isEvent
+		const cachedItem = isEventBookmark
 			? cachedData.fosdemData?.events?.[bookmark.slug]
 			: cachedData.fosdemData?.tracks?.[bookmark.slug];
 
 		let title: string;
 		if (cachedItem) {
-			if (isEvent) {
+			if (isEventBookmark || isEvent(cachedItem)) {
 				title = (cachedItem as Event).title;
-			} else {
+			} else if (isTrack(cachedItem)) {
 				title = (cachedItem as Track).name;
+			} else {
+				title = bookmark.slug;
 			}
 		} else {
 			title = bookmark.slug;
@@ -111,10 +114,10 @@ function OfflinePage() {
 				: `Slug: ${bookmark.slug}`;
 
 		return {
-			kindLabel: isEvent ? "Event" : "Track",
+			kindLabel: isEventBookmark || (cachedItem && isEvent(cachedItem)) ? "Event" : "Track",
 			title,
 			detail,
-			isEvent,
+			isEvent: isEventBookmark || (cachedItem && isEvent(cachedItem)),
 		};
 	};
 

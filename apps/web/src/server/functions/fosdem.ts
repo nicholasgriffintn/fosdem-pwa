@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { constants } from "~/constants";
 import type { Conference } from "~/types/fosdem";
+import { isValidYear, isNumber } from "~/lib/type-guards";
 
 const FETCH_TIMEOUT_MS = 8000;
 const CURRENT_YEAR_TTL = 60 * 5; // 5 minutes
@@ -12,7 +13,7 @@ const getCacheTTL = (year: number): number => {
 };
 
 const getFullData = async (year: number): Promise<Conference> => {
-	if (!Number.isInteger(year) || year < 2000 || year > 2100) {
+	if (!isValidYear(year)) {
 		throw new Error("Invalid year; expected YYYY between 2000-2100");
 	}
 
@@ -62,7 +63,7 @@ export const getAllData = createServerFn({
 			typeof data === "object" &&
 			data !== null &&
 			"year" in data &&
-			typeof data.year === "number"
+			isNumber(data.year)
 		) {
 			return { year: data.year };
 		}

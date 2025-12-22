@@ -5,6 +5,7 @@ import { cn } from "~/lib/utils";
 import { Icons } from "~/components/Icons";
 import { MobileNav } from "~/components/Header/MobileNav";
 import { constants } from "~/constants";
+import { isNumber } from "~/lib/type-guards";
 
 type MainNavProps = {
 	title: string;
@@ -35,7 +36,7 @@ export function MainNav({ title, items }: MainNavProps) {
 			<Link
 				to="/"
 				search={(prev: Record<string, unknown>) => ({
-					year: typeof prev.year === "number" ? prev.year : constants.DEFAULT_YEAR,
+					year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
 				})}
 				className="items-center space-x-2 flex logo-link shrink-0"
 			>
@@ -60,7 +61,7 @@ export function MainNav({ title, items }: MainNavProps) {
 								),
 							}}
 							search={(prev: Record<string, unknown>) => ({
-								year: typeof prev.year === "number" ? prev.year : constants.DEFAULT_YEAR,
+								year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
 							})}
 							activeOptions={{ exact: item.href === "/" }}
 						>

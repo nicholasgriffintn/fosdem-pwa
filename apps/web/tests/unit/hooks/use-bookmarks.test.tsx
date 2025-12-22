@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useBookmarks } from "~/hooks/use-bookmarks";
+import { isNumber } from "~/lib/type-guards";
 
 vi.mock("@tanstack/react-start", () => ({
 	useServerFn: (fn: unknown) => fn,
@@ -14,7 +15,7 @@ const localBookmarksStore: any[] = [];
 vi.mock("~/lib/localStorage", () => {
 	return {
 		getLocalBookmarks: vi.fn(async (year?: number) => {
-			if (typeof year === "number") {
+			if (isNumber(year)) {
 				return localBookmarksStore.filter((bookmark) => bookmark.year === year);
 			}
 			return [...localBookmarksStore];

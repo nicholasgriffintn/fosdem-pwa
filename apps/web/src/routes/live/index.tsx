@@ -4,13 +4,14 @@ import { PageHeader } from "~/components/PageHeader";
 import { EventList } from "~/components/Event/EventList";
 import { getAllData } from "~/server/functions/fosdem";
 import { testLiveEvents, testConferenceData } from "~/data/test-data";
-import type { Conference, Event } from "~/types/fosdem";
+import type { Conference } from "~/types/fosdem";
 import { constants } from "../../constants";
 import { isEventLive, isEventUpcoming } from "~/lib/dateTime";
 import { sortEvents, sortUpcomingEvents } from "~/lib/sorting";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { getBookmarks } from "~/server/functions/bookmarks";
+import { isEvent } from "~/lib/type-guards";
 
 export const Route = createFileRoute("/live/")({
 	component: LivePage,
@@ -36,11 +37,11 @@ export const Route = createFileRoute("/live/")({
 		const data = (await getAllData({ data: { year } })) as Conference;
 
 		const liveEvents = Object.values(data.events)
-			.filter((event: Event) => isEventLive(event, data.conference))
+			.filter((event) => isEvent(event) && isEventLive(event, data.conference))
 			.sort(sortEvents);
 
 		const upcomingEvents = Object.values(data.events)
-			.filter((event: Event) => isEventUpcoming(event, data.conference))
+			.filter((event) => isEvent(event) && isEventUpcoming(event, data.conference))
 			.sort(sortUpcomingEvents);
 
 		const serverBookmarks = await getBookmarks({

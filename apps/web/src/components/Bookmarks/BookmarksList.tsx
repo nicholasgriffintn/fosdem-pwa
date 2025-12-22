@@ -9,6 +9,7 @@ import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
 import { EmptyStateCard } from "../EmptyStateCard";
 import { doesEventMatchTrack } from "~/lib/tracks";
+import { isEvent, isTrack } from "~/lib/type-guards";
 
 type BookmarkListItem = (Bookmark | LocalBookmark) & { serverId?: string };
 
@@ -132,7 +133,7 @@ export function BookmarksList({
 		const formattedEvents = bookmarkedEvents
 			.map((bookmark) => {
 				const event = fosdemData.events[bookmark.slug];
-				if (!event) return null;
+				if (!event || !isEvent(event)) return null;
 				return {
 					...event,
 					priority: "priority" in bookmark ? bookmark.priority || null : null,
@@ -148,13 +149,13 @@ export function BookmarksList({
 		const formattedTracks = bookmarkedTracks
 			.map((bookmark) => {
 				const track = fosdemData.tracks[bookmark.slug];
-				if (!track) return null;
+				if (!track || !isTrack(track)) return null;
 				return {
 					id: track.id,
 					name: track.name,
 					room: track.room,
 					eventCount: Object.values(fosdemData.events).filter((event) =>
-						doesEventMatchTrack(event, track),
+						isEvent(event) && doesEventMatchTrack(event, track),
 					).length,
 				} as Track;
 			})
