@@ -66,7 +66,12 @@ export function SharedVideoElement({
 				hlsRef.current.destroy();
 			}
 
-			const hls = new Hls();
+			const hls = new Hls({
+				liveDurationInfinity: true,
+				enableWorker: true,
+				lowLatencyMode: true,
+				backBufferLength: 90,
+			});
 			hlsRef.current = hls;
 			hls.attachMedia(video);
 
