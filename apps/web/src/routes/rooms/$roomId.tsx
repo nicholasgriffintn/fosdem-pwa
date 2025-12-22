@@ -5,7 +5,7 @@ import { constants } from "~/constants";
 import { EventList } from "~/components/Event/EventList";
 import { RoomPlayer } from "~/components/Room/RoomPlayer";
 import { RoomStatus } from "~/components/Room/RoomStatus";
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData, getTracksData, getEventsData } from "~/server/functions/fosdem";
 import type { Conference, Event, RoomData } from "~/types/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { createStandardDate } from "~/lib/dateTime";
@@ -25,13 +25,18 @@ export const Route = createFileRoute("/rooms/$roomId")({
 	}),
 	loaderDeps: ({ search: { year, day, sortFavourites } }) => ({ year, day, sortFavourites }),
 	loader: async ({ params, deps: { year, day } }) => {
-		const data = (await getAllData({ data: { year } })) as Conference;
+		const [coreData, tracksData, eventsData, serverBookmarks] = await Promise.all([
+			getCoreData({ data: { year } }),
+			getTracksData({ data: { year } }),
+			getEventsData({ data: { year } }),
+			getBookmarks({ data: { year, status: "favourited" } }),
+		]);
 
 		let room: RoomData | undefined;
-		if (data.rooms[params.roomId]) {
-			room = data.rooms[params.roomId];
+		if (tracksData.rooms[params.roomId]) {
+			room = tracksData.rooms[params.roomId];
 		} else {
-			const roomBySlug = Object.values(data.rooms).find(
+			const roomBySlug = Object.values(tracksData.rooms).find(
 				(room) => room.slug === params.roomId,
 			);
 			if (roomBySlug) {
@@ -41,19 +46,15 @@ export const Route = createFileRoute("/rooms/$roomId")({
 
 		let roomEvents: Event[] = [];
 		if (room?.name) {
-			roomEvents = Object.values(data.events).filter(
+			roomEvents = Object.values(eventsData.events).filter(
 				(event: Event): event is Event => event.room === room.name,
 			);
 		}
 
-		const days = Object.values(data.days);
-
-		const serverBookmarks = await getBookmarks({
-			data: { year, status: "favourited" },
-		});
+		const days = Object.values(coreData.days);
 
 		return {
-			fosdem: { room, roomEvents, conference: data.conference, days },
+			fosdem: { room, roomEvents, conference: coreData.conference, days },
 			year,
 			day,
 			serverBookmarks,

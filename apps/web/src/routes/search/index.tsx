@@ -28,7 +28,7 @@ import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Input } from "~/components/ui/input";
 import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
-import { getAllData } from "~/server/functions/fosdem";
+import { getTracksData, getEventsData } from "~/server/functions/fosdem";
 import { getBookmarks } from "~/server/functions/bookmarks";
 
 export const Route = createFileRoute("/search/")({
@@ -71,10 +71,18 @@ export const Route = createFileRoute("/search/")({
 		type,
 	}),
 	loader: async ({ deps: { year, q, track, time, type } }) => {
-		const fosdemData = await getAllData({ data: { year } });
-		const serverBookmarks = await getBookmarks({
-			data: { year, status: "favourited" },
-		});
+		const [tracksData, eventsData, serverBookmarks] = await Promise.all([
+			getTracksData({ data: { year } }),
+			getEventsData({ data: { year } }),
+			getBookmarks({ data: { year, status: "favourited" } }),
+		]);
+
+		const fosdemData = {
+			tracks: tracksData.tracks,
+			rooms: tracksData.rooms,
+			events: eventsData.events,
+		};
+
 		return {
 			year,
 			q,

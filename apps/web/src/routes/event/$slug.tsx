@@ -4,7 +4,7 @@ import { PageHeader } from "~/components/PageHeader";
 import { FavouriteButton } from "~/components/FavouriteButton";
 import { ShareButton } from "~/components/ShareButton";
 import { testLiveEvent, testConferenceData } from "~/data/test-data";
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData, getTracksData, getEventsData, getPersonsData } from "~/server/functions/fosdem";
 import { EventMain } from "~/components/Event/EventMain";
 import { constants } from "~/constants";
 import { calculateEndTime } from "~/lib/dateTime";
@@ -64,19 +64,25 @@ export const Route = createFileRoute("/event/$slug")({
 			};
 		}
 
-		const fosdem = await getAllData({ data: { year } });
-		const serverBookmark = await getEventBookmark({
-			data: { year, slug: params.slug },
-		});
+		const [coreData, tracksData, eventsData, personsData, serverBookmark] = await Promise.all([
+			getCoreData({ data: { year } }),
+			getTracksData({ data: { year } }),
+			getEventsData({ data: { year } }),
+			getPersonsData({ data: { year } }),
+			getEventBookmark({ data: { year, slug: params.slug } }),
+		]);
+
+		const event = eventsData.events[params.slug];
+		const track = tracksData.tracks[event?.trackKey];
+		const type = coreData.types[track?.type];
+
 		return {
 			fosdem: {
-				event: fosdem.events[params.slug],
-				conference: fosdem.conference,
-				track: fosdem.tracks[fosdem.events[params.slug]?.trackKey],
-				type: fosdem.types[
-					fosdem.tracks[fosdem.events[params.slug]?.trackKey]?.type
-				],
-				persons: fosdem.persons,
+				event,
+				conference: coreData.conference,
+				track,
+				type,
+				persons: personsData.persons,
 			},
 			year,
 			isTest: false,

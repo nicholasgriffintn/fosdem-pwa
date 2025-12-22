@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { PageHeader } from "~/components/PageHeader";
 import { EventList } from "~/components/Event/EventList";
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData, getEventsData } from "~/server/functions/fosdem";
 import { testLiveEvents, testConferenceData } from "~/data/test-data";
 import type { Conference, Event } from "~/types/fosdem";
 import { constants } from "../../constants";
@@ -33,14 +33,17 @@ export const Route = createFileRoute("/live/")({
 
 			return { liveEvents, upcomingEvents, year, serverBookmarks: [] };
 		}
-		const data = (await getAllData({ data: { year } })) as Conference;
+		const [coreData, eventsData] = await Promise.all([
+			getCoreData({ data: { year } }),
+			getEventsData({ data: { year } }),
+		]);
 
-		const liveEvents = Object.values(data.events)
-			.filter((event: Event) => isEventLive(event, data.conference))
+		const liveEvents = Object.values(eventsData.events)
+			.filter((event: Event) => isEventLive(event, coreData.conference))
 			.sort(sortEvents);
 
-		const upcomingEvents = Object.values(data.events)
-			.filter((event: Event) => isEventUpcoming(event, data.conference))
+		const upcomingEvents = Object.values(eventsData.events)
+			.filter((event: Event) => isEventUpcoming(event, coreData.conference))
 			.sort(sortUpcomingEvents);
 
 		const serverBookmarks = await getBookmarks({

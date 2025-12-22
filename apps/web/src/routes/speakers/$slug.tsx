@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { constants } from "~/constants";
 import { EventList } from "~/components/Event/EventList";
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData, getPersonsData, getEventsData } from "~/server/functions/fosdem";
 import type { Conference, Event, Person } from "~/types/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
@@ -21,25 +21,26 @@ export const Route = createFileRoute("/speakers/$slug")({
     }),
     loaderDeps: ({ search: { year, day, sortFavourites } }) => ({ year, day, sortFavourites }),
     loader: async ({ params, deps: { year } }) => {
-        const data = (await getAllData({ data: { year } })) as Conference;
+        const [coreData, personsData, eventsData, serverBookmarks] = await Promise.all([
+            getCoreData({ data: { year } }),
+            getPersonsData({ data: { year } }),
+            getEventsData({ data: { year } }),
+            getBookmarks({ data: { year, status: "favourited" } }),
+        ]);
 
-        const person = Object.values(data.persons || {}).find(
+        const person = Object.values(personsData.persons || {}).find(
             (p) => p.slug === params.slug || p.id === params.slug,
         );
 
         let personEvents: Event[] = [];
         if (person) {
-            personEvents = Object.values(data.events).filter((event: Event) =>
+            personEvents = Object.values(eventsData.events).filter((event: Event) =>
                 event.personIds?.includes(person.id),
             );
         }
 
-        const serverBookmarks = await getBookmarks({
-            data: { year, status: "favourited" },
-        });
-
         return {
-            fosdem: { person, personEvents, conference: data.conference, days: Object.values(data.days) },
+            fosdem: { person, personEvents, conference: coreData.conference, days: Object.values(coreData.days) },
             year,
             serverBookmarks,
         };

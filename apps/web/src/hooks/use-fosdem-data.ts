@@ -3,10 +3,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData, getTracksData, getEventsData, getPersonsData } from "~/server/functions/fosdem";
 
 export function useFosdemData({ year }: { year: number }) {
-	const getData = useServerFn(getAllData);
+	const getCoreDataFn = useServerFn(getCoreData);
+	const getTracksDataFn = useServerFn(getTracksData);
+	const getEventsDataFn = useServerFn(getEventsData);
+	const getPersonsDataFn = useServerFn(getPersonsData);
 
 	const {
 		data: fosdemData,
@@ -15,13 +18,23 @@ export function useFosdemData({ year }: { year: number }) {
 	} = useQuery({
 		queryKey: ["fosdem", "full", year],
 		queryFn: async () => {
-			const data = await getData({
-				data: {
-					year,
-				},
-			});
+			const [coreData, tracksData, eventsData, personsData] = await Promise.all([
+				getCoreDataFn({ data: { year } }),
+				getTracksDataFn({ data: { year } }),
+				getEventsDataFn({ data: { year } }),
+				getPersonsDataFn({ data: { year } }),
+			]);
 
-			return data;
+			return {
+				conference: coreData.conference,
+				days: coreData.days,
+				types: coreData.types,
+				buildings: coreData.buildings,
+				tracks: tracksData.tracks,
+				rooms: tracksData.rooms,
+				events: eventsData.events,
+				persons: personsData.persons,
+			};
 		},
 		staleTime: 5 * 60 * 1000,
 		gcTime: 10 * 60 * 1000,

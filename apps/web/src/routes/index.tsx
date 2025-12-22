@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { TypesList } from "~/components/Type/TypesList";
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData } from "~/server/functions/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { ConferenceScheduleNotice } from "~/components/ConferenceScheduleNotice";
 import { constants } from "~/constants";
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
 	}),
 	loaderDeps: ({ search: { year } }) => ({ year }),
 	loader: async ({ deps: { year } }) => {
-		const data = await getAllData({ data: { year } });
+		const data = await getCoreData({ data: { year } });
 		return {
 			fosdem: {
 				conference: data.conference,
