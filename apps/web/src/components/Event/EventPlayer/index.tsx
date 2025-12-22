@@ -10,6 +10,7 @@ import { EventPlayerNotStarted } from "./components/NotStarted";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { usePlayer } from "~/contexts/PlayerContext";
 import { Icons } from "~/components/Icons";
+import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
 
 type EventPlayerProps = {
 	event: Event;
@@ -177,43 +178,17 @@ export function EventPlayer({
 						</div>
 						<div className="no-js-only absolute inset-0 z-10">
 							{streamUrl ? (
-								<div className="relative w-full h-full flex flex-col bg-black overflow-hidden">
-									<video
-										className="w-full flex-1 object-contain bg-black"
-										controls
-										playsInline
-										preload="none"
-									>
-										{eventIsLive && (
-											<source
-												src={streamUrl}
-												type="application/vnd.apple.mpegurl"
-											/>
-										)}
-										{videoRecordings.map((source) => (
-											<source key={source.href} src={source.href} type={source.type} />
-										))}
-										{proxiedSubtitleUrl && (
-											<track
-												kind="subtitles"
-												src={proxiedSubtitleUrl}
-												srcLang="en"
-												label="English"
-												default
-											/>
-										)}
-									</video>
-									<a
-										href={streamUrl}
-										target="_blank"
-										rel="noreferrer"
-										className="no-underline absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white hover:bg-black/80"
-										title="Open video in browser"
-									>
-										<Icons.externalLink className="w-3.5 h-3.5" />
-										<span className="whitespace-nowrap">Open in browser</span>
-									</a>
-								</div>
+								<NoJsVideoFallback
+									openUrl={streamUrl}
+									backgroundImageUrl="/images/fosdem/full/fallback.png"
+									subtitleUrl={proxiedSubtitleUrl}
+									sources={[
+										...(eventIsLive
+											? [{ href: streamUrl, type: "application/vnd.apple.mpegurl" }]
+											: []),
+										...videoRecordings,
+									]}
+								/>
 							) : (
 								<p className="text-sm text-muted-foreground">
 									No video available.

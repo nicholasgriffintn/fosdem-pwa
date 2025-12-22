@@ -8,6 +8,7 @@ import { constants } from "~/constants";
 import { Image } from "~/components/Image";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { SharedVideoElement } from "~/components/VideoPlayer/SharedVideoElement";
+import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
 
 type RoomPlayerProps = {
 	roomId: string;
@@ -109,30 +110,11 @@ export function RoomPlayer({
 					)}
 				</div>
 				<div className="no-js-only w-full h-full">
-					<div className="relative w-full h-full flex flex-col bg-black">
-						<video
-							className="w-full flex-1 object-contain bg-black"
-							controls
-							playsInline
-							preload="none"
-						>
-							<source
-								src={streamUrl}
-								type="application/vnd.apple.mpegurl"
-							/>
-							Your browser does not support HTML5 video.
-						</video>
-						<a
-							href={streamUrl}
-							target="_blank"
-							rel="noreferrer"
-							className="no-underline absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white hover:bg-black/80"
-							title="Open stream in browser"
-						>
-							<Icons.externalLink className="w-3.5 h-3.5" />
-							<span className="whitespace-nowrap">Open in browser</span>
-						</a>
-					</div>
+					<NoJsVideoFallback
+						openUrl={streamUrl}
+						backgroundImageUrl="/images/fosdem/full/fallback.png"
+						sources={[{ href: streamUrl, type: "application/vnd.apple.mpegurl" }]}
+					/>
 				</div>
 			</div>
 		</div>
