@@ -1,17 +1,17 @@
 import type { ExecutionContext } from "@cloudflare/workers-types";
 
 import { constants } from "../constants";
-import { getFosdemData } from "../services/fosdem-data";
-import { getUserBookmarks, enrichBookmarks } from "../services/bookmarks";
+import { getFosdemData } from "../lib/fosdem-data";
+import { getUserBookmarks, enrichBookmarks } from "../lib/bookmarks";
 import {
 	getApplicationKeys,
 	sendNotification,
 	createScheduleChangePayload,
-} from "../services/notifications";
+} from "../lib/notifications";
 import {
 	bookmarkNotificationsEnabled,
 	scheduleChangeNotificationsEnabled,
-} from "../services/config";
+} from "../utils/config";
 import type { Env, Subscription, ScheduleSnapshot } from "../types";
 
 type SnapshotRow = ScheduleSnapshot;

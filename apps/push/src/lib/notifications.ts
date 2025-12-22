@@ -12,10 +12,11 @@ import type {
 	Env,
 	ScheduleSnapshot,
 } from "../types";
-import { trackPushNotificationSuccess, trackPushNotificationFailure } from "../lib/analytics";
+import { trackPushNotificationSuccess, trackPushNotificationFailure } from "./analytics";
 
 const PUSH_TTL_SECONDS = 60;
 const FETCH_TIMEOUT_MS = 8000;
+const DOMAIN = "fosdempwa.com";
 
 function minutesUntilStart(start: string, now = new Date()): number {
 	const [hours, minutes] = start.split(":").map(Number);
@@ -40,7 +41,7 @@ export function createNotificationPayload(bookmark: EnrichedBookmark): Notificat
 	return {
 		title: "Event Starting Soon",
 		body: `${bookmark.title} starts in ${minutesUntil} minutes in ${bookmark.room}`,
-		url: `https://fosdempwa.com/event/${bookmark.slug}?year=${constants.YEAR}`,
+		url: `https://${DOMAIN}/event/${bookmark.slug}?year=${constants.YEAR}`,
 	};
 }
 
@@ -49,26 +50,26 @@ export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: st
 		return {
 			title: `FOSDEM Day ${day} Summary`,
 			body: "No events in your schedule today.",
-			url: `https://fosdempwa.com/bookmarks?day=${day}&year=${constants.YEAR}`,
+			url: `https://${DOMAIN}/bookmarks?day=${day}&year=${constants.YEAR}`,
 		};
 	}
 
 	const totalEvents = bookmarks.length;
 	const firstEvent = bookmarks[0];
 	const lastEvent = bookmarks[bookmarks.length - 1];
-	
+
 	if (isEvening) {
 		return {
 			title: `FOSDEM Day ${day} Wrap-up`,
 			body: `You attended ${totalEvents} events today! See you ${day === "1" ? "tomorrow" : "next year"}! 🎉`,
-			url: `https://fosdempwa.com/bookmarks?day=${day}&year=${constants.YEAR}`,
+			url: `https://${DOMAIN}/bookmarks?day=${day}&year=${constants.YEAR}`,
 		};
 	}
-	
+
 	return {
 		title: `Your FOSDEM Day ${day} Summary`,
 		body: `You have ${totalEvents} events today, starting from ${firstEvent.startTime} (${firstEvent.title}) until ${lastEvent.startTime} (${lastEvent.title})`,
-		url: `https://fosdempwa.com/bookmarks?day=${day}&year=${constants.YEAR}`,
+		url: `https://${DOMAIN}/bookmarks?day=${day}&year=${constants.YEAR}`,
 	};
 }
 
@@ -82,7 +83,7 @@ export function createScheduleChangePayload(
 	return {
 		title: "Schedule updated",
 		body: `${bookmark.title} now starts at ${bookmark.startTime} in ${bookmark.room} (was ${previousTime} in ${previousRoom})`,
-		url: `https://fosdempwa.com/event/${bookmark.slug}?year=${constants.YEAR}`,
+		url: `https://${DOMAIN}/event/${bookmark.slug}?year=${constants.YEAR}`,
 	};
 }
 

@@ -22,7 +22,7 @@ vi.mock("~/server/config", () => ({
 	getCloudflareEnv: () => mockEnv,
 }));
 
-import { CacheManager } from "~/lib/cache";
+import { CacheManager } from "~/server/cache";
 import { Redis } from "@upstash/redis";
 
 describe("CacheManager", () => {
