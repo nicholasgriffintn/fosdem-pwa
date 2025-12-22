@@ -10,6 +10,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
+import { isTrack } from "~/lib/type-guards";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/type/$slug")({
 		const type = data.types[params.slug];
 
 		const trackData = Object.values(data.tracks).filter(
-			(track: Track): track is Track => track.type === params.slug,
+			(track): track is Track => isTrack(track) && track.type === params.slug,
 		);
 
 		const serverBookmarks = await getBookmarks({

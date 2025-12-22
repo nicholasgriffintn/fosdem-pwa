@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef } from "react";
 
 import type { Event } from "~/types/fosdem";
 import { getNotes, createNote } from "~/server/functions/notes";
-import type { Note } from "~/server/db/schema";
 import { useAuth } from "~/hooks/use-auth";
 import { useLocalNotes } from "~/hooks/use-local-notes";
 import {
@@ -15,6 +14,7 @@ import {
 	addToSyncQueue,
 	type LocalNote,
 } from "~/lib/localStorage";
+import { isValidServerNote, isNumber } from "~/lib/type-guards";
 
 type UseNotesArgs = {
 	year: number;
@@ -236,14 +236,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 			}
 
 			try {
-				const validServerNotes = serverNotes.filter(
-					(note): note is Note & { id: number; year: number; slug: string } =>
-						note &&
-						typeof note.id === "number" &&
-						typeof note.year === "number" &&
-						typeof note.slug === "string" &&
-						note.slug.length > 0,
-				);
+				const validServerNotes = serverNotes.filter(isValidServerNote);
 
 				if (validServerNotes.length === 0) {
 					return;
@@ -251,10 +244,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 				const localServerIdMap = new Map(
 					localNotes
-						.filter(
-							(note): note is LocalNote & { serverId: number } =>
-								typeof note.serverId === "number",
-						)
+						.filter((note): note is LocalNote & { serverId: number } => isNumber(note.serverId))
 						.map((note) => [String(note.serverId), note]),
 				);
 

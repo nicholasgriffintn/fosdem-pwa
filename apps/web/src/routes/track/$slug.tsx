@@ -9,6 +9,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
+import { isEvent } from "~/lib/type-guards";
 
 export const Route = createFileRoute("/track/$slug")({
 	component: TrackPage,
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/track/$slug")({
 		const type = data.types[track?.type];
 
 		const eventData = Object.values(data.events).filter(
-			(event: Event): event is Event => event.trackKey === slug,
+			(event): event is Event => isEvent(event) && event.trackKey === slug,
 		);
 
 		const serverBookmarks = await getBookmarks({

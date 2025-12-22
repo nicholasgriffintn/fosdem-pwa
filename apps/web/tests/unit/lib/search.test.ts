@@ -49,8 +49,8 @@ describe("search helpers", () => {
 			room: "A",
 		} as Track;
 		const events = {
-			a: { trackKey: "t" },
-			b: { trackKey: "Other" },
+			a: { trackKey: "t", title: "Event 1", startTime: "10:00" },
+			b: { trackKey: "Other", title: "Event 2", startTime: "11:00" },
 		} as unknown as Record<string, Event>;
 
 		const formatted = formatTrack(track, events);
@@ -64,7 +64,7 @@ describe("search helpers", () => {
 			room: "A",
 		} as Track;
 		const events = {
-			a: { trackKey: "Track" },
+			a: { trackKey: "Track", title: "Event 1", startTime: "10:00" },
 		} as unknown as Record<string, Event>;
 
 		const formatted = formatTrack(track, events);

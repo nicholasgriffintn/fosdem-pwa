@@ -13,6 +13,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
+import { isEvent } from "~/lib/type-guards";
 
 export const Route = createFileRoute("/rooms/$roomId")({
 	component: RoomPage,
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/rooms/$roomId")({
 		let roomEvents: Event[] = [];
 		if (room?.name) {
 			roomEvents = Object.values(data.events).filter(
-				(event: Event): event is Event => event.room === room.name,
+				(event): event is Event => isEvent(event) && event.room === room.name,
 			);
 		}
 

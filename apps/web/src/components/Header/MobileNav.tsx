@@ -9,6 +9,7 @@ import { Icons } from "~/components/Icons";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { constants } from "~/constants";
+import { isNumber } from "~/lib/type-guards";
 
 type MobileNavProps = {
 	items: {
@@ -85,7 +86,7 @@ export function MobileNav({
 								onClose();
 							}}
 							search={(prev: Record<string, unknown>) => ({
-								year: typeof prev.year === "number" ? prev.year : constants.DEFAULT_YEAR,
+								year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
 							})}
 							activeOptions={{ exact: item.href === "/" }}
 							ref={index === 0 ? firstLinkRef : undefined}
@@ -121,7 +122,7 @@ export function MobileNav({
 								>
 									<Link
 										search={(prev: Record<string, unknown>) => ({
-											year: typeof prev.year === "number" ? prev.year : constants.DEFAULT_YEAR,
+											year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
 										})}
 										to="/profile"
 										onClick={() => {
