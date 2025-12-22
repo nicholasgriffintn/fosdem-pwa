@@ -17,18 +17,18 @@ vi.mock("../src/controllers/daily-summary", () => ({
 	triggerDailySummary: vi.fn(),
 }));
 
-vi.mock("../src/services/notifications", () => ({
+vi.mock("../src/lib/notifications", () => ({
 	getApplicationKeys: vi.fn(),
 	sendNotification: vi.fn(),
 }));
 
-vi.mock("../src/services/bookmarks", () => ({
+vi.mock("../src/lib/bookmarks", () => ({
 	markNotificationSent: vi.fn(),
 }));
 
 const handler = (await import("../src/index")).default;
-const notifications = await import("../src/services/notifications");
-const bookmarks = await import("../src/services/bookmarks");
+const notifications = await import("../src/lib/notifications");
+const bookmarks = await import("../src/lib/bookmarks");
 
 const validEnv = {
 	DB: {},

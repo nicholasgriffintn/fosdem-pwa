@@ -2,33 +2,33 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Env, Subscription } from "../src/types";
 
-vi.mock("../src/services/fosdem-data", () => ({
+vi.mock("../src/lib/fosdem-data", () => ({
 	getFosdemData: vi.fn(),
 }));
 
-vi.mock("../src/services/bookmarks", () => ({
+vi.mock("../src/lib/bookmarks", () => ({
 	getUserBookmarks: vi.fn(),
 	enrichBookmarks: vi.fn(),
 }));
 
-vi.mock("../src/services/notifications", () => ({
+vi.mock("../src/lib/notifications", () => ({
 	getApplicationKeys: vi.fn(),
 	sendNotification: vi.fn(),
 	createScheduleChangePayload: vi.fn(),
 }));
 
-vi.mock("../src/services/config", () => ({
+vi.mock("../src/utils/config", () => ({
 	bookmarkNotificationsEnabled: vi.fn(() => true),
 	scheduleChangeNotificationsEnabled: vi.fn(() => true),
 }));
 
-const { getFosdemData } = await import("../src/services/fosdem-data");
-const { getUserBookmarks, enrichBookmarks } = await import("../src/services/bookmarks");
+const { getFosdemData } = await import("../src/lib/fosdem-data");
+const { getUserBookmarks, enrichBookmarks } = await import("../src/lib/bookmarks");
 const {
 	getApplicationKeys,
 	sendNotification,
 	createScheduleChangePayload,
-} = await import("../src/services/notifications");
+} = await import("../src/lib/notifications");
 
 const { triggerScheduleChangeNotifications } = await import(
 	"../src/controllers/schedule-changes"

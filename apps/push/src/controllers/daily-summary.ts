@@ -1,10 +1,10 @@
-import { getFosdemData, getCurrentDay } from "../services/fosdem-data";
+import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { 
 	getUserBookmarks, 
 	enrichBookmarks, 
 	getBookmarksForDay,
-} from "../services/bookmarks";
-import { getApplicationKeys, sendNotification, createDailySummaryPayload } from "../services/notifications";
+} from "../lib/bookmarks";
+import { getApplicationKeys, sendNotification, createDailySummaryPayload } from "../lib/notifications";
 import type { Subscription, Env } from "../types";
 
 export async function triggerDailySummary(

@@ -4,15 +4,15 @@ import {
 	createDailySummaryPayload,
 	createNotificationPayload,
 	createScheduleChangePayload,
-} from "../src/services/notifications";
+} from "../src/lib/notifications";
 import {
 	getBookmarksForDay,
 	getBookmarksStartingSoon,
-} from "../src/services/bookmarks";
+} from "../src/lib/bookmarks";
 import {
 	bookmarkNotificationsEnabled,
 	scheduleChangeNotificationsEnabled,
-} from "../src/services/config";
+} from "../src/utils/config";
 import type { EnrichedBookmark, ScheduleSnapshot, Env } from "../src/types";
 
 const baseBookmark: EnrichedBookmark = {

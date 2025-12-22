@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "fosdem-pwa-push-notifications",
-  "main": "src/index.ts",
+  "name": "fosdempwa",
+  "main": "@tanstack/react-start/server-entry",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": [
     "nodejs_compat"
@@ -22,40 +22,22 @@
       "head_sampling_rate": 1
     }
   },
-  "triggers": {
-    "crons": [
-      "0 8 1,2 2 *",
-      "15 17 1,2 2 *",
-      "*/15 * 1,2 2 *"
-    ]
-  },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "fosdem",
       "database_id": "a9e2ef23-b95b-49e4-b1aa-5abc2bd26152",
-      "preview_database_id": "2ec973b1-6e46-49a8-825b-1928ec34cd22"
+      "preview_database_id": "2ec973b1-6e46-49a8-825b-1928ec34cd22",
+      "migrations_dir": "migrations",
+      "remote": true
     }
   ],
-  "analytics_engine_datasets": [
+  "kv_namespaces": [
     {
-      "binding": "ANALYTICS",
-      "dataset": "fosdem-notifications"
+      "binding": "KV",
+      "id": "eaa0ebf8ad2e4c9da021aeffc43f74b4",
+      "preview_id": "ed965a930c33427a9ffb985634f8febb",
+      "remote": true
     }
-  ],
-  "queues": {
-    "producers": [
-      {
-        "queue": "fosdem-notifications",
-        "binding": "NOTIFICATION_QUEUE"
-      }
-    ],
-    "consumers": [
-      {
-        "queue": "fosdem-notifications",
-        "max_batch_size": 50,
-        "max_batch_timeout": 30
-      }
-    ]
-  }
+  ]
 }

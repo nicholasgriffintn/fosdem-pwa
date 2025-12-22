@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getCoreData, getTracksData, getEventsData } from "~/server/functions/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { EventList } from "~/components/Event/EventList";
-import type { Conference, Event } from "~/types/fosdem";
+import type { Event, Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
