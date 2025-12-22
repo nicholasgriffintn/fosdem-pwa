@@ -50,10 +50,23 @@ function PrivacyPolicyPage() {
 							Data stored in your browser
 						</h2>
 						<p className="text-muted-foreground">
-							FOSDEM PWA uses localStorage and IndexedDB for offline features
+							FOSDEM PWA uses cookies, localStorage and IndexedDB for sessions, offline features
 							and faster access:
 						</p>
 						<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+							<li>
+								Session data to keep you signed in if you choose to sign in
+								(cookies), these include:
+								<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+									<li>"github_oauth_state" - The state used for GitHub OAuth authentication (not used for guest accounts)</li>
+									<li>"session" - An identifier to hold your signed in session</li>
+								</ul>
+							</li>
+							<li>
+								Our service provider, Cloudflare may also set cookies.{' '}
+								<a href="https://developers.cloudflare.com/fundamentals/reference/policies-compliances/cloudflare-cookies/" target="_blank" rel="noreferrer" className="font-medium text-foreground hover:underline">Learn more about those here</a>.
+								{' '}Note: We may not use any of these and will never use all of them.
+							</li>
 							<li>
 								Theme preference, player state, and install prompt state
 								(localStorage).
