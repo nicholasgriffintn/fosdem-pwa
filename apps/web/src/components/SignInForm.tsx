@@ -6,12 +6,10 @@ import { Button } from "~/components/ui/button";
 import { Spinner } from "~/components/Spinner";
 import { Icons } from "~/components/Icons";
 import { constants } from "~/constants";
-import { useIsClient } from "~/hooks/use-is-client";
 
 export function SignInForm() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isGuestSubmitting, setIsGuestSubmitting] = useState(false);
-	const isClient = useIsClient();
 
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		setIsSubmitting(true);
@@ -30,13 +28,10 @@ export function SignInForm() {
 					variant="outline"
 					size="lg"
 					className="w-full cursor-pointer"
-					disabled={isClient && (isSubmitting || isGuestSubmitting)}
+					disabled={isSubmitting || isGuestSubmitting}
 				>
-					{isClient && isSubmitting ? (
-						<Spinner className="w-4 h-4 mr-2" />
-					) : (
-						<Icons.gitHub className="w-4 h-4 mr-2" />
-					)}
+					{isSubmitting && <Spinner className="w-4 h-4 mr-2" />}
+					{!isSubmitting && <Icons.gitHub className="w-4 h-4 mr-2" />}
 					Sign in with GitHub
 				</Button>
 			</form>
@@ -56,13 +51,10 @@ export function SignInForm() {
 					variant="secondary"
 					size="lg"
 					className="w-full cursor-pointer"
-					disabled={isClient && (isSubmitting || isGuestSubmitting)}
+					disabled={isSubmitting || isGuestSubmitting}
 				>
-					{isClient && isGuestSubmitting ? (
-						<Spinner className="w-4 h-4 mr-2" />
-					) : (
-						<Icons.user className="w-4 h-4 mr-2" />
-					)}
+					{isGuestSubmitting && <Spinner className="w-4 h-4 mr-2" />}
+					{!isGuestSubmitting && <Icons.user className="w-4 h-4 mr-2" />}
 					Continue as Guest
 				</Button>
 			</form>
@@ -74,7 +66,7 @@ export function SignInForm() {
 			</p>
 
 			<div
-				className="cf-turnstile"
+				className="cf-turnstile js-required"
 				data-sitekey={constants.TURNSTILE_SITE_KEY}
 			/>
 		</div>

@@ -1,7 +1,5 @@
 "use client";
 
-import { useIsClient } from "~/hooks/use-is-client";
-
 import { Button, buttonVariants } from "~/components/ui/button";
 import { Icons } from "~/components/Icons";
 import { toast } from "~/hooks/use-toast";
@@ -15,8 +13,6 @@ type ShareButtonProps = {
 };
 
 export function ShareButton({ title, text, url }: ShareButtonProps) {
-	const isClient = useIsClient();
-
 	const handleShare = async () => {
 		try {
 			if (shareSupported() && navigator.canShare({ title, text, url })) {
@@ -51,9 +47,9 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
 		}
 	};
 
-	if (!isClient) {
-		return (
-			<details className="relative">
+	return (
+		<>
+			<details className="no-js-only relative">
 				<summary
 					className={cn(
 						buttonVariants({ variant: "outline" }),
@@ -74,12 +70,9 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
 					/>
 				</div>
 			</details>
-		);
-	}
-
-	return (
-		<Button variant="outline" onClick={handleShare}>
-			<Icons.share className="h-4 w-4" />
-		</Button>
+			<Button variant="outline" onClick={handleShare} className="js-only">
+				<Icons.share className="h-4 w-4" />
+			</Button>
+		</>
 	);
 }
