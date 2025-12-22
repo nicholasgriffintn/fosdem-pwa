@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import type { RoomData } from "~/types/fosdem";
 import { sortRooms } from "~/lib/sorting";
 import { constants } from "../../constants";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 type RoomListProps = {
 	rooms: RoomData[];
@@ -135,7 +136,11 @@ export function RoomList({
 					))}
 				</ul>
 			) : (
-				<div className="text-muted-foreground">No rooms found</div>
+					<EmptyStateCard
+						title="No rooms found"
+						description="Try adjusting your filters or check back later for room updates."
+						className="my-4"
+					/>
 			)}
 		</section>
 	);
