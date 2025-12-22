@@ -84,36 +84,99 @@ const run = async (env: Env) => {
   const data = await buildData({ year: yearString });
   validateBuildData(data);
 
-  const shouldMinify = year.value >= 2026;
-  const serialized = JSON.stringify(data);
+  const serializedFull = JSON.stringify(data);
 
-  if (!serialized.length) {
+  if (!serializedFull.length) {
     logger.error("Generated payload was empty");
     throw new Error("Generated data payload is empty");
   }
 
-  const etag = await computeEtag(serialized);
-  const key = `fosdem-${yearString}.json`;
+  const fullEtag = await computeEtag(serializedFull);
+  const fullKey = `fosdem-${yearString}.json`;
 
-  logger.info("Serialized data", {
-    minified: shouldMinify,
-    size: serialized.length,
-    etag,
-    key
-  });
-
-  await env.R2.put(key, serialized, {
+  await env.R2.put(fullKey, serializedFull, {
     httpMetadata: {
       contentType: "application/json",
       cacheControl: "public, max-age=600",
     },
     customMetadata: {
       year: yearString,
-      etag,
+      etag: fullEtag,
     },
   });
 
-  logger.info("Uploaded build data to R2", { key });
+  logger.info("Uploaded full data to R2", {
+    key: fullKey,
+    size: serializedFull.length,
+    etag: fullEtag,
+  });
+
+  const coreData = {
+    conference: data.conference,
+    days: data.days,
+    types: data.types,
+    buildings: data.buildings,
+  };
+
+  const tracksData = {
+    tracks: data.tracks,
+    rooms: data.rooms,
+  };
+
+  const eventsData = {
+    events: data.events,
+  };
+
+  const personsData = data.persons ? { persons: data.persons } : null;
+
+  const uploads: Array<{key: string; data: unknown; description: string}> = [
+    {
+      key: `fosdem-${yearString}-core.json`,
+      data: coreData,
+      description: "core",
+    },
+    {
+      key: `fosdem-${yearString}-tracks.json`,
+      data: tracksData,
+      description: "tracks",
+    },
+    {
+      key: `fosdem-${yearString}-events.json`,
+      data: eventsData,
+      description: "events",
+    },
+  ];
+
+  if (personsData) {
+    uploads.push({
+      key: `fosdem-${yearString}-persons.json`,
+      data: personsData,
+      description: "persons",
+    });
+  }
+
+  for (const upload of uploads) {
+    const serialized = JSON.stringify(upload.data);
+    const etag = await computeEtag(serialized);
+
+    await env.R2.put(upload.key, serialized, {
+      httpMetadata: {
+        contentType: "application/json",
+        cacheControl: "public, max-age=600",
+      },
+      customMetadata: {
+        year: yearString,
+        etag,
+        type: upload.description,
+      },
+    });
+
+    logger.info("Uploaded split file to R2", {
+      key: upload.key,
+      size: serialized.length,
+      etag,
+    });
+  }
 
   return data;
 };
