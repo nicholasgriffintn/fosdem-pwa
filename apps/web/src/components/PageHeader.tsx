@@ -49,18 +49,18 @@ export function PageHeader({
 				</Alert>
 			)}
 			{breadcrumbs && breadcrumbs.length > 0 && (
-				<ul className="flex flex-row gap-2 mb-4 text-sm text-muted-foreground">
+				<ul className="flex flex-row flex-nowrap gap-2 mb-4 text-sm text-muted-foreground overflow-hidden">
 					{breadcrumbs.map((breadcrumb, index) => (
-						<li key={breadcrumb.href}>
+						<li key={breadcrumb.href} className="flex flex-row items-center flex-shrink min-w-0">
 							<Link
 								to={breadcrumb.href}
 								search={(prev: Record<string, unknown>) => ({ ...prev, ...breadcrumb.search })}
-								className="no-underline"
+								className="no-underline truncate"
 							>
 								{breadcrumb.title}
 							</Link>
 							{index < breadcrumbs.length - 1 && (
-								<span className="text-muted-foreground">{" / "}</span>
+								<span className="text-muted-foreground ml-2 flex-shrink-0">{" / "}</span>
 							)}
 						</li>
 					))}
