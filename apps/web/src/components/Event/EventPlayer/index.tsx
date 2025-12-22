@@ -79,6 +79,11 @@ export function EventPlayer({
 			)?.href ?? videoRecordings[0]?.href ?? null
 		: videoRecordings[0]?.href ?? null;
 
+	const subtitleTrack = event.links?.find((link) => link.href.endsWith(".vtt"));
+	const proxiedSubtitleUrl = subtitleTrack
+		? `/api/proxy/subtitles?url=${encodeURIComponent(subtitleTrack.href)}`
+		: null;
+
 	const isThisEventPlaying =
 		player.currentEvent?.id === event.id && player.portalTarget === "event-page";
 	const isThisEventFloating =
@@ -172,17 +177,43 @@ export function EventPlayer({
 						</div>
 						<div className="no-js-only absolute inset-0 z-10">
 							{streamUrl ? (
-								<a
-									href={streamUrl}
-									target="_blank"
-									rel="noreferrer"
-									className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 hover:bg-black/60 transition-colors"
-								>
-									<Icons.play className="w-16 h-16 text-white" />
-									<span className="text-white text-lg font-medium">
-										Play Video
-									</span>
-								</a>
+								<div className="relative w-full h-full flex flex-col bg-black overflow-hidden">
+									<video
+										className="w-full flex-1 object-contain bg-black"
+										controls
+										playsInline
+										preload="none"
+									>
+										{eventIsLive && (
+											<source
+												src={streamUrl}
+												type="application/vnd.apple.mpegurl"
+											/>
+										)}
+										{videoRecordings.map((source) => (
+											<source key={source.href} src={source.href} type={source.type} />
+										))}
+										{proxiedSubtitleUrl && (
+											<track
+												kind="subtitles"
+												src={proxiedSubtitleUrl}
+												srcLang="en"
+												label="English"
+												default
+											/>
+										)}
+									</video>
+									<a
+										href={streamUrl}
+										target="_blank"
+										rel="noreferrer"
+										className="no-underline absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white hover:bg-black/80"
+										title="Open video in browser"
+									>
+										<Icons.externalLink className="w-3.5 h-3.5" />
+										<span className="whitespace-nowrap">Open in browser</span>
+									</a>
+								</div>
 							) : (
 								<p className="text-sm text-muted-foreground">
 									No video available.
