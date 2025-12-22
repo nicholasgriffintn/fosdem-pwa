@@ -32,18 +32,29 @@ export function SharedVideoElement({
 			? event?.streams ?? []
 			: event?.links?.filter((link) => link.type?.startsWith("video/")) ?? [];
 
+	const isHlsType = (type?: string) =>
+		type === "application/vnd.apple.mpegurl" ||
+		type === "application/x-mpegURL";
+
 	const streamUrl = isLive
 		? resolvedSources.find((source) =>
-				source.type?.includes("application/vnd.apple.mpegurl"),
-			)?.href
+			isHlsType(source.type),
+		)?.href
 		: null;
 
 	useEffect(() => {
-		if (!streamUrl || !videoRef.current) return;
+		if (!videoRef.current || !streamUrl) {
+			return;
+		}
 
 		const video = videoRef.current;
 
-		if (isLive && Hls.isSupported()) {
+		if (video.canPlayType("application/vnd.apple.mpegurl")) {
+			video.src = streamUrl;
+			return;
+		}
+
+		if (Hls.isSupported()) {
 			if (hlsRef.current) {
 				hlsRef.current.destroy();
 			}
@@ -89,7 +100,7 @@ export function SharedVideoElement({
 			webkit-playsinline="true"
 			preload="metadata"
 		>
-			{resolvedSources.map((source) => (
+			{!isLive && resolvedSources.map((source) => (
 				<source key={source.href} src={source.href} type={source.type} />
 			))}
 			{proxiedSubtitleUrl && (
