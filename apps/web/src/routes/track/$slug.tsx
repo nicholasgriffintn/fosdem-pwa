@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData, getTracksData, getEventsData } from "~/server/functions/fosdem";
 import { PageHeader } from "~/components/PageHeader";
 import { EventList } from "~/components/Event/EventList";
 import type { Conference, Event } from "~/types/fosdem";
@@ -23,18 +23,20 @@ export const Route = createFileRoute("/track/$slug")({
 	loaderDeps: ({ search: { year, day, view, sortFavourites } }) => ({ year, day, view, sortFavourites }),
 	loader: async ({ params, deps: { year, day } }) => {
 		const slug = decodeURIComponent(params.slug);
-		const data = (await getAllData({ data: { year } })) as Conference;
-		const days = Object.values(data.days);
-		const track = data.tracks[slug];
-		const type = data.types[track?.type];
+		const [coreData, tracksData, eventsData, serverBookmarks] = await Promise.all([
+			getCoreData({ data: { year } }),
+			getTracksData({ data: { year } }),
+			getEventsData({ data: { year } }),
+			getBookmarks({ data: { year, status: "favourited" } }),
+		]);
 
-		const eventData = Object.values(data.events).filter(
+		const days = Object.values(coreData.days);
+		const track = tracksData.tracks[slug];
+		const type = coreData.types[track?.type];
+
+		const eventData = Object.values(eventsData.events).filter(
 			(event: Event): event is Event => event.trackKey === slug,
 		);
-
-		const serverBookmarks = await getBookmarks({
-			data: { year, status: "favourited" },
-		});
 
 		return { fosdem: { days, track, type, eventData }, year, day, serverBookmarks };
 	},

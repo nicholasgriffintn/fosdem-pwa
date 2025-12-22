@@ -19,40 +19,35 @@ async function generateServiceWorker(outputDir = 'dist') {
   }
 
   const serverAssetsDir = 'dist/server/assets';
-  let fosdemFunctionId: string | undefined;
+  const functionIds: Record<string, string | undefined> = {
+    getCoreData: undefined,
+    getTracksData: undefined,
+    getEventsData: undefined,
+    getPersonsData: undefined,
+  };
 
   try {
-    // We need to get the function ID for the server function so we can pre cache it.
-    // To do this, we read the worker-entry file and extract the hash for the fosdem function.
-    // Then we can use that hash to construct the server function URL.
     const workerEntryFile = readdirSync(serverAssetsDir)
       .find(f => f.startsWith('worker-entry-') && f.endsWith('.js'));
 
     if (workerEntryFile) {
       const workerEntryContent = readFileSync(`${serverAssetsDir}/${workerEntryFile}`, 'utf-8');
-      const match = workerEntryContent.match(/"([a-f0-9]{60,})":\s*\{\s*functionName:\s*"getAllData_createServerFn_handler"/);
-      if (match) {
-        fosdemFunctionId = match[1];
+
+      for (const [fnName, _] of Object.entries(functionIds)) {
+        const match = workerEntryContent.match(new RegExp(`"([a-f0-9]{60,})":\\s*\\{\\s*functionName:\\s*"${fnName}_createServerFn_handler"`));
+        if (match) {
+          functionIds[fnName] = match[1];
+        }
       }
     }
   } catch (error: any) {
-    console.warn('Could not find worker-entry or extract hash, falling back to manifest:', error.message);
+    console.warn('Could not find worker-entry or extract hashes:', error.message);
   }
 
-  if (!fosdemFunctionId) {
-    fosdemFunctionId = Object.keys(manifest)
-      .find(key => key.startsWith('src/server/functions/fosdem.ts'))
-      ? manifest[
-        Object.keys(manifest).find(key => key.startsWith('src/server/functions/fosdem.ts'))!
-      ]?.name
-      : undefined;
+  if (!functionIds.getCoreData || !functionIds.getTracksData || !functionIds.getEventsData) {
+    throw new Error('Required function hashes not found (getCoreData, getTracksData, getEventsData)')
   }
 
-  if (!fosdemFunctionId) {
-    throw new Error('Fosdem server function hash not found.')
-  }
-
-  // This creates a payload to fetch all data for the current year, this should match what the app uses.
   const getFosdemPayload = (year: number) => ({
     t: {
       t: 10,
@@ -85,8 +80,11 @@ async function generateServiceWorker(outputDir = 'dist') {
   });
 
   const dataUrls = [
-    `/_serverFn/${fosdemFunctionId}?payload=${encodeURIComponent(JSON.stringify(getFosdemPayload(CURRENT_YEAR)))}&createServerFn`
-  ]
+    `/_serverFn/${functionIds.getCoreData}?payload=${encodeURIComponent(JSON.stringify(getFosdemPayload(CURRENT_YEAR)))}&createServerFn`,
+    `/_serverFn/${functionIds.getTracksData}?payload=${encodeURIComponent(JSON.stringify(getFosdemPayload(CURRENT_YEAR)))}&createServerFn`,
+    `/_serverFn/${functionIds.getEventsData}?payload=${encodeURIComponent(JSON.stringify(getFosdemPayload(CURRENT_YEAR)))}&createServerFn`,
+    functionIds.getPersonsData ? `/_serverFn/${functionIds.getPersonsData}?payload=${encodeURIComponent(JSON.stringify(getFosdemPayload(CURRENT_YEAR)))}&createServerFn` : null,
+  ].filter(Boolean) as string[]
 
   const clientFiles = await glob(`${outputDir}/client/**/*`, { nodir: true })
 

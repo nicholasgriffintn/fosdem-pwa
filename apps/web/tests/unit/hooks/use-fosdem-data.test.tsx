@@ -9,20 +9,48 @@ vi.mock("@tanstack/react-start", () => ({
 }));
 
 const fosdemMocks = vi.hoisted(() => ({
-	getAllData: vi.fn(),
+	getCoreData: vi.fn(),
+	getTracksData: vi.fn(),
+	getEventsData: vi.fn(),
+	getPersonsData: vi.fn(),
 }));
 
 vi.mock("~/server/functions/fosdem", () => fosdemMocks);
 
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData, getTracksData, getEventsData, getPersonsData } from "~/server/functions/fosdem";
 
-const getAllDataMock = vi.mocked(getAllData);
+const getCoreDataMock = vi.mocked(getCoreData);
+const getTracksDataMock = vi.mocked(getTracksData);
+const getEventsDataMock = vi.mocked(getEventsData);
+const getPersonsDataMock = vi.mocked(getPersonsData);
 
 describe("useFosdemData", () => {
 	beforeEach(() => {
-		getAllDataMock.mockReset();
+		getCoreDataMock.mockReset();
+		getTracksDataMock.mockReset();
+		getEventsDataMock.mockReset();
+		getPersonsDataMock.mockReset();
+
+		getCoreDataMock.mockResolvedValue({
+			// @ts-ignore - test
+			conference: {},
+			days: {},
+			types: {},
+			buildings: {}
+		});
 		// @ts-ignore - test
-		getAllDataMock.mockResolvedValue({ conference: {}, events: {}, tracks: {} });
+		getTracksDataMock.mockResolvedValue({
+			tracks: {},
+			rooms: {}
+		});
+		// @ts-ignore - test
+		getEventsDataMock.mockResolvedValue({
+			events: {}
+		});
+		// @ts-ignore - test
+		getPersonsDataMock.mockResolvedValue({
+			persons: {}
+		});
 	});
 
 	it("fetches data for a given year", async () => {
@@ -34,9 +62,20 @@ describe("useFosdemData", () => {
 		await waitFor(() => {
 			expect(result.current.fosdemData).toBeTruthy();
 		});
-		expect(getAllDataMock).toHaveBeenCalledWith({
+
+		expect(getCoreDataMock).toHaveBeenCalledWith({
 			data: { year: 2024 },
 		});
+		expect(getTracksDataMock).toHaveBeenCalledWith({
+			data: { year: 2024 },
+		});
+		expect(getEventsDataMock).toHaveBeenCalledWith({
+			data: { year: 2024 },
+		});
+		expect(getPersonsDataMock).toHaveBeenCalledWith({
+			data: { year: 2024 },
+		});
+
 		queryClient.clear();
 	});
 });

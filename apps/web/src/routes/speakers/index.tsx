@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getAllData } from "~/server/functions/fosdem";
+import { getPersonsData } from "~/server/functions/fosdem";
 import type { Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { PageHeader } from "~/components/PageHeader";
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/speakers/")({
     }),
     loaderDeps: ({ search: { year, q } }) => ({ year, q }),
     loader: async ({ deps: { year, q } }) => {
-        const data = (await getAllData({ data: { year } })) as Conference;
+        const data = await getPersonsData({ data: { year } });
         const persons = Object.values(data.persons ?? {});
         const normalizedQuery = (q || "").toLowerCase().trim();
         const filteredPersons = normalizedQuery

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getAllData } from "~/server/functions/fosdem";
+import { getTracksData } from "~/server/functions/fosdem";
 import type { Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { PageHeader } from "~/components/PageHeader";
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/rooms/")({
 	}),
 	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
 	loader: async ({ deps: { year, day } }) => {
-		const data = (await getAllData({ data: { year } })) as Conference;
+		const data = await getTracksData({ data: { year } });
 		const rooms = data.rooms;
 
 		return { fosdem: { rooms }, year, day };

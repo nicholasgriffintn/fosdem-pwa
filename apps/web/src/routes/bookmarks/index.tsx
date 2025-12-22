@@ -10,7 +10,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { Spinner } from "~/components/Spinner";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { useIsClient } from "~/hooks/use-is-client";
-import { getAllData } from "~/server/functions/fosdem";
+import { getCoreData, getTracksData, getEventsData, getPersonsData } from "~/server/functions/fosdem";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { Button } from "~/components/ui/button";
@@ -34,10 +34,25 @@ export const Route = createFileRoute("/bookmarks/")({
 	}),
 	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
 	loader: async ({ deps: { year, day } }) => {
-		const fosdemData = await getAllData({ data: { year } });
-		const serverBookmarks = await getBookmarks({
-			data: { year, status: "favourited" },
-		});
+		const [coreData, tracksData, eventsData, personsData, serverBookmarks] = await Promise.all([
+			getCoreData({ data: { year } }),
+			getTracksData({ data: { year } }),
+			getEventsData({ data: { year } }),
+			getPersonsData({ data: { year } }),
+			getBookmarks({ data: { year, status: "favourited" } }),
+		]);
+
+		const fosdemData = {
+			conference: coreData.conference,
+			days: coreData.days,
+			types: coreData.types,
+			buildings: coreData.buildings,
+			tracks: tracksData.tracks,
+			rooms: tracksData.rooms,
+			events: eventsData.events,
+			persons: personsData.persons,
+		};
+
 		return {
 			year,
 			day,
