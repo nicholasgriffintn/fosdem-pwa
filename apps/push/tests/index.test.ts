@@ -17,12 +17,12 @@ vi.mock("../src/controllers/daily-summary", () => ({
 	triggerDailySummary: vi.fn(),
 }));
 
-vi.mock("../src/services/notifications", () => ({
+vi.mock("../src/lib/notifications", () => ({
 	getApplicationKeys: vi.fn(),
 	sendNotification: vi.fn(),
 }));
 
-vi.mock("../src/services/bookmarks", () => ({
+vi.mock("../src/lib/bookmarks", () => ({
 	markNotificationSent: vi.fn(),
 }));
 
