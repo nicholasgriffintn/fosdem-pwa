@@ -6,9 +6,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 
 import { getSession } from "~/server/functions/session";
-import { constants } from "~/constants";
 import { checkAndSyncOnOnline } from "~/lib/backgroundSync";
 import { enableSync } from "~/lib/localStorage";
+import { buildHomeLink } from "~/lib/link-builder";
 
 export function useAuth() {
 	const queryClient = useQueryClient();
@@ -35,7 +35,7 @@ export function useAuth() {
 		},
 		onSuccess: () => {
 			queryClient.setQueryData(["auth"], null);
-			navigate({ to: "/", search: { year: constants.DEFAULT_YEAR } });
+			navigate(buildHomeLink());
 		},
 	});
 

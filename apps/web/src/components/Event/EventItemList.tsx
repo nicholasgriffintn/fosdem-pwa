@@ -11,7 +11,7 @@ import { calculateEndTime } from "~/lib/dateTime";
 import type { User } from "~/server/db/schema";
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/Icons";
-import { constants } from "../../constants";
+import { buildEventLink } from "~/lib/link-builder";
 
 type EventListProps = {
 	events: Event[];
@@ -152,12 +152,9 @@ export function EventListItem({
 					<div className="flex-1 space-y-2 min-w-0">
 						<h3 className="font-semibold leading-tight text-base">
 							<Link
-								to={`/event/$slug`}
-								params={{ slug: event.id }}
-								search={{
-									year: Number.isFinite(year) ? year : constants.DEFAULT_YEAR,
-									test: false,
-								}}
+								{...buildEventLink(event.id, {
+									year: Number.isFinite(year) ? year : undefined
+								})}
 								className="no-underline hover:underline"
 							>
 								{event.title}

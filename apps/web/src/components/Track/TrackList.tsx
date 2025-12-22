@@ -6,7 +6,7 @@ import type { User } from "~/server/db/schema";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Icons } from "~/components/Icons";
 import { Link } from "@tanstack/react-router";
-import { constants } from "../../constants";
+import { buildTrackLink } from "~/lib/link-builder";
 import { ItemListContainer } from "~/components/shared/ItemListContainer";
 
 type TrackListProps = {
@@ -88,14 +88,9 @@ function TrackListItem({
 				<div className="flex flex-1 flex-col gap-2 min-w-0">
 					<h3 className="font-semibold leading-tight text-base">
 						<Link
-							to={"/track/$slug"}
-							params={{ slug: track.id }}
-							search={{
-								year: Number.isFinite(year) ? year : constants.DEFAULT_YEAR,
-								day: undefined,
-								view: undefined,
-								sortFavourites: undefined,
-							}}
+							{...buildTrackLink(track.id, {
+								year: Number.isFinite(year) ? year : undefined,
+							})}
 							className="no-underline hover:underline"
 						>
 							{track.name}

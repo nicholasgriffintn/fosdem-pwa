@@ -3,6 +3,7 @@
 import { Link } from "@tanstack/react-router";
 import { Icons } from "~/components/Icons";
 import { usePlayer } from "~/contexts/PlayerContext";
+import { buildEventLink } from "~/lib/link-builder";
 import clsx from "clsx";
 
 export function FloatingPlayer() {
@@ -63,9 +64,9 @@ export function FloatingPlayer() {
 			{shouldShow && currentEvent && !isMinimized && (
 				<div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-2 bg-gradient-to-b from-black/80 to-transparent">
 					<Link
-						to="/event/$slug"
-						params={{ slug: currentEvent.id }}
-						search={{ year: year ?? undefined, test: false }}
+						{...buildEventLink(currentEvent.id, {
+							year: year ?? undefined,
+						})}
 						className="text-sm font-medium text-white hover:underline truncate flex-1 min-w-0 pr-2"
 					>
 						{currentEvent.title}

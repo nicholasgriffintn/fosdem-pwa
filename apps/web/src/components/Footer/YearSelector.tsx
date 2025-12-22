@@ -5,6 +5,7 @@ import { useRouter, useSearch } from "@tanstack/react-router";
 import { constants } from "~/constants";
 import { toast } from "~/hooks/use-toast";
 import { Select } from "~/components/ui/select";
+import { buildHomeLink } from "~/lib/link-builder";
 
 export function YearSelector() {
 	const router = useRouter();
@@ -12,10 +13,7 @@ export function YearSelector() {
 	const selectedYear = year || constants.DEFAULT_YEAR;
 
 	const handleYearChange = (year: number) => {
-		router.navigate({
-			to: "/",
-			search: { year },
-		});
+		router.navigate(buildHomeLink({ year }));
 
 		toast({
 			title: "Year changed",
