@@ -18,6 +18,7 @@ import {
 	formatRoom,
 } from "~/lib/search";
 import { generateTimeSlots } from "~/lib/fosdem";
+import { buildSearchLink } from "~/lib/link-builder";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { Label } from "~/components/ui/label";
@@ -273,14 +274,13 @@ export default function SearchPage() {
 				: "all";
 
 		navigate({
-			to: "/search",
-			search: {
+			...buildSearchLink({
 				year,
 				q: normalizedQuery,
 				track: nextTrack || undefined,
 				time: nextTime || undefined,
 				type: normalizedType,
-			},
+			}),
 			replace: true,
 		});
 	};

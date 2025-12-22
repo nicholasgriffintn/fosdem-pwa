@@ -11,6 +11,7 @@ import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { SetBookmarksVisability } from "~/components/SetBookmarksVisability";
 import { PushNotifications } from "~/components/PushNotifications";
+import { buildHomeLink } from "~/lib/link-builder";
 
 export const Route = createFileRoute("/profile/")({
 	component: ProfilePage,
@@ -57,8 +58,7 @@ function ProfilePage() {
 	if (!user) {
 		return (
 			<Navigate
-				to="/"
-				search={(prev) => ({ year: prev.year || constants.DEFAULT_YEAR })}
+				{...buildHomeLink()}
 			/>
 		);
 	}

@@ -8,6 +8,7 @@ import { constants } from "~/constants";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useUserBookmarks } from "~/hooks/use-user-bookmarks";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
+import { buildHomeLink } from "~/lib/link-builder";
 
 export const Route = createFileRoute("/profile/$userId/")({
 	component: ProfilePage,
@@ -57,8 +58,7 @@ function ProfilePage() {
 	if (!user) {
 		return (
 			<Navigate
-				to="/"
-				search={(prev) => ({ year: prev.year || constants.DEFAULT_YEAR })}
+				{...buildHomeLink()}
 			/>
 		);
 	}

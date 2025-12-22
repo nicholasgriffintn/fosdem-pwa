@@ -12,6 +12,7 @@ import { Spinner } from "~/components/Spinner";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Card } from "~/components/ui/card";
 import { useIsClient } from "~/hooks/use-is-client";
+import { buildEventLink, buildTrackLink, buildRoomLink, buildSearchLink } from "~/lib/link-builder";
 import {
 	type SearchResult,
 	TRACK_SEARCH_KEYS,
@@ -134,25 +135,20 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 	const handleResultClick = (result: SearchResult) => {
 		switch (result.type) {
 			case "track":
-				navigate({
-					to: "/track/$slug",
-					params: { slug: result.item.id },
-					search: { year, day: undefined, sortFavourites: "false", view: "list" },
-				});
+				navigate(buildTrackLink(result.item.id, {
+					year,
+					view: "list",
+					sortFavourites: "false",
+				}));
 				break;
 			case "event":
-				navigate({
-					to: "/event/$slug",
-					params: { slug: result.item.id },
-					search: { year, test: false },
-				});
+				navigate(buildEventLink(result.item.id, { year }));
 				break;
 			case "room":
-				navigate({
-					to: "/rooms/$roomId",
-					params: { roomId: result.item.slug || result.item.id },
-					search: { year, day: undefined, sortFavourites: "false" },
-				});
+				navigate(buildRoomLink(result.item.slug || result.item.id, {
+					year,
+					sortFavourites: "false",
+				}));
 				break;
 		}
 		setSearchResults([]);
@@ -164,10 +160,11 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 		(query: string) => {
 			const trimmed = query.trim();
 			if (!trimmed) return;
-			navigate({
-				to: "/search",
-				search: { year, q: trimmed, track: undefined, time: undefined, type: "all" },
-			});
+			navigate(buildSearchLink({
+				year,
+				q: trimmed,
+				type: "all"
+			}));
 		},
 		[navigate, year],
 	);

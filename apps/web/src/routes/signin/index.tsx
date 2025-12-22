@@ -4,8 +4,8 @@ import { useAuth } from "~/hooks/use-auth";
 import { PageHeader } from "~/components/PageHeader";
 import { Spinner } from "~/components/Spinner";
 import { SignInForm } from "~/components/SignInForm";
-import { constants } from "~/constants";
 import { useIsClient } from "~/hooks/use-is-client";
+import { buildHomeLink } from "~/lib/link-builder";
 
 export const Route = createFileRoute("/signin/")({
 	component: SignInPage,
@@ -26,8 +26,7 @@ function SignInPage() {
 	if (user?.id) {
 		return (
 			<Navigate
-				to="/"
-				search={(prev) => ({ year: prev.year || constants.DEFAULT_YEAR })}
+				{...buildHomeLink()}
 			/>
 		);
 	}

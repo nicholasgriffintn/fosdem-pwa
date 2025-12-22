@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
 import { constants } from "~/constants";
 import { Alert, AlertTitle } from "~/components/ui/alert";
+import { buildHomeLink } from "~/lib/link-builder";
 
 type PageHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
 	heading: string;
@@ -41,7 +42,7 @@ export function PageHeader({
 					<AlertTitle>
 						<span>
 							You are viewing the {year} edition of FOSDEM.{" "}
-							<Link to="/" search={{ year: constants.DEFAULT_YEAR }}>
+							<Link {...buildHomeLink()}>
 								Click here to view the {constants.DEFAULT_YEAR} edition
 							</Link>
 						</span>
