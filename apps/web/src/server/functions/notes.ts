@@ -45,13 +45,15 @@ export const createNote = createServerFn({
 		const { year, eventId, note, time } = ctx.data;
 
 		if (!note) {
-			throw new Error("Note is required");
+			return { success: false, error: "Note content is required" };
 		}
 
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
-			throw new Error("User not found");
+			return {
+				success: false, error: "User not found",
+			}
 		}
 
 		try {
@@ -95,7 +97,7 @@ export const updateNote = createServerFn({
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
-			throw new Error("User not found");
+			return { success: false, error: "User not found" };
 		}
 
 		const existingNote = await db.query.note.findFirst({
@@ -103,7 +105,7 @@ export const updateNote = createServerFn({
 		});
 
 		if (!existingNote) {
-			throw new Error("Note not found");
+			return { success: false, error: "Note not found" };
 		}
 
 		try {
@@ -126,7 +128,7 @@ export const deleteNote = createServerFn({
 		const { user } = await getFullAuthSession();
 
 		if (!user) {
-			throw new Error("User not found");
+			return { success: false, error: "User not found" };
 		}
 
 		const existingNote = await db.query.note.findFirst({
@@ -134,7 +136,7 @@ export const deleteNote = createServerFn({
 		});
 
 		if (!existingNote) {
-			throw new Error("Note not found");
+			return { success: false, error: "Note not found" };
 		}
 
 		try {

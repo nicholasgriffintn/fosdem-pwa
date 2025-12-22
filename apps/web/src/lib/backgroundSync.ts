@@ -28,6 +28,7 @@ import { createNote, updateNote, deleteNote } from "~/server/functions/notes";
 type ServerActionResult = {
 	success: boolean;
 	error?: string;
+	statusCode?: number;
 };
 
 function normalizeServerActionResult(
@@ -39,11 +40,13 @@ function normalizeServerActionResult(
 		return {
 			success: Boolean(result.success),
 			error: result.error ?? (result.success ? undefined : fallbackError),
+			statusCode: result.statusCode,
 		};
 	}
 
 	return { success: false, error: fallbackError };
 }
+
 
 export async function syncBookmarksToServer(): Promise<SyncResult> {
 	const syncQueue = await getSyncQueue();
@@ -73,6 +76,10 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 				if (result.success) {
 					results.push({ success: true, id: item.id });
 					await removeFromSyncQueue(item.id);
+				} else if (result.statusCode === 404) {
+					console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
+					await removeFromSyncQueue(item.id);
+					results.push({ success: true, id: item.id });
 				} else {
 					results.push({
 						success: false,
@@ -113,6 +120,10 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
+					} else if (result.statusCode === 404) {
+						console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
+						await removeFromSyncQueue(item.id);
+						results.push({ success: true, id: item.id });
 					} else {
 						results.push({
 							success: false,
@@ -136,6 +147,10 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
+					} else if (result.statusCode === 404) {
+						console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
+						await removeFromSyncQueue(item.id);
+						results.push({ success: true, id: item.id });
 					} else {
 						results.push({
 							success: false,
@@ -158,6 +173,10 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
 					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
+					} else if (result.statusCode === 404) {
+						console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
+						await removeFromSyncQueue(item.id);
+						results.push({ success: true, id: item.id });
 					} else {
 						results.push({
 							success: false,
@@ -216,6 +235,10 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 				if (result.success) {
 					results.push({ success: true, id: item.id });
 					await removeFromSyncQueue(item.id);
+				} else if (result.statusCode === 404) {
+					console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
+					await removeFromSyncQueue(item.id);
+					results.push({ success: true, id: item.id });
 				} else {
 					results.push({
 						success: false,
@@ -240,6 +263,10 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
+					} else if (result.statusCode === 404) {
+						console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
+						await removeFromSyncQueue(item.id);
+						results.push({ success: true, id: item.id });
 					} else {
 						results.push({
 							success: false,
@@ -262,6 +289,10 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
+					} else if (result.statusCode === 404) {
+						console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
+						await removeFromSyncQueue(item.id);
+						results.push({ success: true, id: item.id });
 					} else {
 						results.push({
 							success: false,
@@ -283,6 +314,10 @@ export async function syncNotesToServer(): Promise<SyncResult> {
 					if (result.success) {
 						results.push({ success: true, id: item.id });
 						await removeFromSyncQueue(item.id);
+					} else if (result.statusCode === 404) {
+						console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
+						await removeFromSyncQueue(item.id);
+						results.push({ success: true, id: item.id });
 					} else {
 						results.push({
 							success: false,

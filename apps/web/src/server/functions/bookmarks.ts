@@ -272,7 +272,11 @@ export const updateBookmark = createServerFn({
 		});
 
 		if (!existingBookmark) {
-			throw new Error("Bookmark not found");
+			return {
+				success: false,
+				statusCode: 404,
+				error: "Bookmark not found",
+			}
 		}
 
 		try {
@@ -347,7 +351,11 @@ export const deleteBookmark = createServerFn({
 		});
 
 		if (!existingBookmark) {
-			throw new Error("Bookmark not found");
+			return {
+				success: false,
+				statusCode: 404,
+				error: "Bookmark not found",
+			};
 		}
 
 		try {
