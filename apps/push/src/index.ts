@@ -3,10 +3,10 @@ import type { ExecutionContext, ExportedHandler } from "@cloudflare/workers-type
 
 import { triggerNotifications, triggerTestNotification } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
-import { bookmarkNotificationsEnabled } from "./services/config";
+import { bookmarkNotificationsEnabled } from "./utils/config";
 import { triggerDailySummary } from "./controllers/daily-summary";
-import { getApplicationKeys, sendNotification } from "./services/notifications";
-import { markNotificationSent } from "./services/bookmarks";
+import { getApplicationKeys, sendNotification } from "./lib/notifications";
+import { markNotificationSent } from "./lib/bookmarks";
 import type { Env, QueueMessage } from "./types";
 
 const REQUIRED_ENV: Array<keyof Env> = [

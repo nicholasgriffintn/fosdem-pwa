@@ -52,7 +52,6 @@ export interface XmlAttachment extends XmlLink {
   };
 }
 
-// Processed data interfaces
 export interface Conference {
   acronym?: string;
   title?: string;
