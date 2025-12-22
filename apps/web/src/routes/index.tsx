@@ -9,6 +9,7 @@ import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { Button } from "~/components/ui/button";
 import { YearSelector } from "~/components/Footer/YearSelector";
 import { Icons } from "../components/Icons";
+import { LoadingState } from "~/components/shared/LoadingState";
 
 export const Route = createFileRoute("/")({
 	component: Home,
@@ -35,7 +36,7 @@ function Home() {
 	const { year } = Route.useSearch();
 
 	if (!fosdem) {
-		return <div>Loading...</div>;
+		return <LoadingState type="spinner" message="Loading conference data..." variant="full" />;
 	}
 
 	return (

@@ -3,6 +3,7 @@
 import clsx from "clsx";
 
 import { useRoomStatus } from "~/hooks/use-room-status";
+import { LoadingState } from "~/components/shared/LoadingState";
 
 type RoomStatusProps = {
 	roomId: string;
@@ -32,7 +33,11 @@ export function RoomStatus({ roomId, className }: RoomStatusProps) {
 			</h2>
 			<div className={statusClassName}>
 				<span className="capitalize">
-					{isLoading ? "Loading..." : status?.state || "Unknown"}
+					{isLoading ? (
+						<LoadingState type="spinner" size="sm" variant="inline" />
+					) : (
+						status?.state || "Unknown"
+					)}
 				</span>
 			</div>
 			{isHallwayTrack && (

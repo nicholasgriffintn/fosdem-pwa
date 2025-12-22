@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import {
+	Wifi,
+	WifiOff,
+	Cloud,
+	CheckCircle,
+	AlertCircle,
+} from "lucide-react";
+
 import { useOnlineStatus } from "~/hooks/use-online-status";
+import { LoadingState } from "~/components/shared/LoadingState";
 import { useAuth } from "~/hooks/use-auth";
 import { getSyncQueue } from "~/lib/localStorage";
 import {
@@ -9,14 +18,6 @@ import {
 	registerBackgroundSync,
 } from "~/lib/backgroundSync";
 import { cn } from "~/lib/utils";
-import {
-	Wifi,
-	WifiOff,
-	RefreshCw,
-	Cloud,
-	CheckCircle,
-	AlertCircle,
-} from "lucide-react";
 
 export function OfflineIndicator() {
 	const [isMounted, setIsMounted] = useState(false);
@@ -141,7 +142,7 @@ export function OfflineIndicator() {
 	const getSyncIcon = () => {
 		switch (syncStatus) {
 			case "syncing":
-				return <RefreshCw className="h-3 w-3 animate-spin" />;
+				return <LoadingState type="spinner" size="sm" variant="inline" />;
 			case "success":
 				return <CheckCircle className="h-3 w-3 text-green-600" />;
 			case "error":

@@ -7,6 +7,7 @@ import { useBookmarks } from "~/hooks/use-bookmarks";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { useAuth } from "~/hooks/use-auth";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
+import { LoadingState } from "~/components/shared/LoadingState";
 import { Button } from "~/components/ui/button";
 import type { Event, Track } from "~/types/fosdem";
 import { isEvent, isTrack } from "~/lib/type-guards";
@@ -229,7 +230,7 @@ function OfflinePage() {
 					</CardHeader>
 					<CardContent>
 						{bookmarksLoading ? (
-							<p className="text-muted-foreground">Loading bookmarks...</p>
+							<LoadingState type="spinner" message="Loading bookmarks..." variant="centered" />
 						) : bookmarks && bookmarks.length > 0 ? (
 							cachedData.fosdemData ? (
 								<BookmarksList

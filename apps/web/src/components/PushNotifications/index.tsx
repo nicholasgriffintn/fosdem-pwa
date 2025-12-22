@@ -10,6 +10,7 @@ import { useMutateSubscriptions } from "~/hooks/use-mutate-subscriptions";
 import { useSubscriptions } from "~/hooks/use-subscriptions";
 import { constants } from "~/constants";
 import { urlBase64ToUint8Array } from "~/lib/base64";
+import { LoadingState } from "~/components/shared/LoadingState";
 
 export function PushNotifications() {
 	const { subscriptions, loading: subscriptionsLoading } = useSubscriptions();
@@ -191,9 +192,7 @@ export function PushNotifications() {
 				</p>
 			)}
 			{subscriptionsLoading ? (
-				<div className="flex items-center justify-center">
-					<Spinner className="h-8 w-8" />
-				</div>
+				<LoadingState type="spinner" message="Loading subscriptions..." variant="centered" />
 			) : (
 				<>
 					{subscriptions && subscriptions.length > 0 ? (
@@ -227,7 +226,7 @@ export function PushNotifications() {
 											disabled={deleteSubscriptionLoading || !pushSupported}
 										>
 											{deleteSubscriptionLoading ? (
-												<Spinner className="h-4 w-4" />
+												<LoadingState type="spinner" size="sm" variant="inline" />
 											) : (
 												"Unsubscribe"
 											)}
@@ -249,7 +248,7 @@ export function PushNotifications() {
 										disabled={createSubscriptionLoading || !pushSupported}
 									>
 										{createSubscriptionLoading ? (
-											<Spinner className="h-4 w-4" />
+												<LoadingState type="spinner" size="sm" variant="inline" />
 										) : (
 											"Subscribe"
 										)}
@@ -274,7 +273,7 @@ export function PushNotifications() {
 								disabled={createSubscriptionLoading || !pushSupported}
 							>
 								{createSubscriptionLoading ? (
-									<Spinner className="h-4 w-4" />
+											<LoadingState type="spinner" size="sm" variant="inline" />
 								) : (
 									"Subscribe"
 								)}
