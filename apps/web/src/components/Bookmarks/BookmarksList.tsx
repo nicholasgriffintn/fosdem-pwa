@@ -1,6 +1,6 @@
+import { LoadingState } from "~/components/shared/LoadingState";
 import { EventList } from "~/components/Event/EventList";
 import { TrackList } from "~/components/Track/TrackList";
-import { Spinner } from "~/components/Spinner";
 import type { Conference, Track, Event } from "~/types/fosdem";
 import { detectEventConflicts } from "~/lib/fosdem";
 import { sortEvents, sortTracks } from "~/lib/sorting";
@@ -186,9 +186,7 @@ export function BookmarksList({
 	return (
 		<>
 			{loading ? (
-				<div className="flex justify-center items-center">
-					<Spinner className="h-8 w-8" />
-				</div>
+				<LoadingState type="spinner" message="Loading bookmarks..." variant="centered" />
 			) : bookmarks?.length ? (
 				<div className="space-y-8">
 					{tracks.length > 0 && (

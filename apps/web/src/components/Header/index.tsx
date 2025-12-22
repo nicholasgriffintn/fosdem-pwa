@@ -17,6 +17,7 @@ import { Spinner } from "~/components/Spinner";
 import { constants } from "~/constants";
 import { cn } from "../../lib/utils";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
+import { LoadingState } from "~/components/shared/LoadingState";
 
 export function Header() {
 	const { year } = useSearch({ strict: false });
@@ -79,7 +80,7 @@ export function Header() {
 										</div>
 									</TooltipTrigger>
 									<TooltipContent>
-										<p>Loading...</p>
+											<LoadingState type="spinner" size="sm" variant="inline" />
 									</TooltipContent>
 								</Tooltip>
 							</TooltipProvider>

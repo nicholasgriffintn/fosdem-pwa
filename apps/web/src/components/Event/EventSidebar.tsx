@@ -2,9 +2,10 @@ import clsx from "clsx";
 
 import type { Event } from "~/types/fosdem";
 import { useAuth } from "~/hooks/use-auth";
-import { Skeleton } from "~/components/ui/skeleton";
 import { EventNotes } from "~/components/Event/EventNotes";
 import { EventNotesMobile } from "~/components/Event/EventNotesMobile";
+import { useLoadingState } from "~/hooks/use-loading-state";
+import { LoadingState as LoadingStateComponent } from "~/components/shared/LoadingState";
 
 type EventSidebarProps = {
 	event: Event;
@@ -18,6 +19,7 @@ export function EventSidebar({
 	year,
 }: EventSidebarProps) {
 	const { loading } = useAuth();
+	const showLoading = useLoadingState(loading);
 
 	const sidebarClassName = clsx("h-full flex flex-col min-h-0", {
 		"p-6": !isMobile,
@@ -36,9 +38,11 @@ export function EventSidebar({
 				</div>
 			</noscript>
 			<div className="js-required flex-1 flex flex-col min-h-0">
-				{loading ? (
-					<Skeleton
-						className={clsx("h-full", {
+				{showLoading ? (
+					<LoadingStateComponent
+						type="skeleton"
+						variant="full"
+						className={clsx({
 							"min-h-[40px] max-h-[40px]": isMobile,
 						})}
 					/>
