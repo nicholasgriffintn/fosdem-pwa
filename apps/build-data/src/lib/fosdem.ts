@@ -242,7 +242,6 @@ async function processScheduleData(
     return result.buildings[id];
   };
 
-  // Initialize types from constants
   for (const type of Object.keys(typeData)) {
     result.types[type] = {
       id: type,
@@ -256,7 +255,6 @@ async function processScheduleData(
     };
   }
 
-  // Initialize buildings
   for (const building of Object.keys(buildings)) {
     result.buildings[building] = {
       name: building,
@@ -268,7 +266,6 @@ async function processScheduleData(
     };
   }
 
-  // Process each day
   for (const day of data.day) {
     const dayIndex = day._attributes.index;
     const dayInfo: MutableDayInfo = {
@@ -288,7 +285,6 @@ async function processScheduleData(
 
     const rooms = Array.isArray(day.room) ? day.room : day.room ? [day.room] : [];
     if (rooms.length > 0) {
-      // Process rooms in each day
       for (const room of rooms) {
         const roomName = getRoomName(room._attributes.name);
         const buildingMatch = roomName.match(/^(AW|[A-Z])/);
@@ -313,7 +309,6 @@ async function processScheduleData(
 
         buildingStats?.rooms.add(roomName);
 
-        // Process events in each room
         const events = Array.isArray(room.event)
           ? room.event
           : room.event
@@ -337,7 +332,6 @@ async function processScheduleData(
               buildingStats.tracks.add(event.trackKey);
             }
 
-            // Update track info
             if (!result.tracks[event.trackKey]) {
               result.tracks[event.trackKey] = {
                 id: event.trackKey,
@@ -354,7 +348,6 @@ async function processScheduleData(
             }
             result.tracks[event.trackKey].eventCount++;
 
-            // Update type stats
             if (result.types[event.type]) {
               result.types[event.type].eventCount++;
               result.types[event.type].rooms.add(roomName);
@@ -363,7 +356,6 @@ async function processScheduleData(
               }
             }
 
-            // Update day stats
             dayInfo.rooms.add(roomName);
             if (buildingId) {
               dayInfo.buildings.add(buildingId);
@@ -374,14 +366,12 @@ async function processScheduleData(
       }
     }
 
-    // Update final day stats
     dayInfo.roomCount = dayInfo.rooms.size;
     dayInfo.buildingCount = dayInfo.buildings.size;
     dayInfo.trackCount = dayInfo.tracks.size;
     result.days[dayIndex] = dayInfo;
 
     if (Object.keys(result.types)?.length > 0) {
-      // Update type stats
       for (const type of Object.values(result.types)) {
         type.roomCount = type.rooms.size;
         type.buildingCount = type.buildings.size;
