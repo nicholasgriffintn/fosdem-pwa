@@ -10,11 +10,11 @@ import {
 	getCookie,
 	setCookie,
 } from "@tanstack/react-start/server";
+import { env } from "cloudflare:workers";
 
 import { createStandardDate } from "~/lib/dateTime";
 import { CacheManager } from "~/server/cache";
 import { db } from "~/server/db";
-import { getCloudflareEnv } from "~/server/config";
 import {
 	session as sessionTable,
 	user as userTable,
@@ -139,11 +139,13 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
 	});
 }
 
-const env = getCloudflareEnv();
+const AUTH_REDIRECT_URL = env.GITHUB_REDIRECT_URI
+	? env.GITHUB_REDIRECT_URI
+	: `${env.CF_PAGES_URL}/api/auth/callback/github`;
 export const github = new GitHub(
 	env.GITHUB_CLIENT_ID as string,
 	env.GITHUB_CLIENT_SECRET as string,
-	env.GITHUB_REDIRECT_URI || null,
+	AUTH_REDIRECT_URL,
 );
 
 /**

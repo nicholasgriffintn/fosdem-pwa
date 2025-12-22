@@ -1,16 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateState } from "arctic";
 import { setCookie } from "@tanstack/react-start/server";
+import { env } from "cloudflare:workers";
 
 import { github } from "~/server/auth";
-import { getCloudflareEnv } from "~/server/config";
 
 export const Route = createFileRoute("/api/auth/upgrade-github")({
 	server: {
 		handlers: {
 			GET: async () => {
 				try {
-					const env = getCloudflareEnv();
 					const state = generateState();
 
 					const url = github.createAuthorizationURL(state, ["user:email"]);

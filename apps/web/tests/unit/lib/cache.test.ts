@@ -1,137 +1,163 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-const redisMocks = vi.hoisted(() => {
-	const redisFns = {
+const { mockKV, mockEnv } = vi.hoisted(() => {
+	const mockKV = {
 		get: vi.fn(),
-		set: vi.fn(),
-		del: vi.fn(),
+		put: vi.fn(),
+		delete: vi.fn(),
 	};
-	const RedisMock = vi.fn(function RedisMock() {
-		return redisFns;
-	});
-	return { redisFns, Redis: RedisMock };
+	const mockEnv: {
+		KV: typeof mockKV | null;
+		KV_CACHING_ENABLED: string;
+	} = {
+		KV: mockKV,
+		KV_CACHING_ENABLED: "false",
+	};
+	return { mockKV, mockEnv };
 });
 
-vi.mock("@upstash/redis", () => redisMocks);
-
-const { redisFns, Redis: RedisMock } = redisMocks;
-
-const mockEnv: Record<string, string | undefined> = {};
-
-vi.mock("~/server/config", () => ({
-	getCloudflareEnv: () => mockEnv,
+vi.mock("cloudflare:workers", () => ({
+	env: mockEnv,
 }));
 
 import { CacheManager } from "~/server/cache";
-import { Redis } from "@upstash/redis";
 
 describe("CacheManager", () => {
 	beforeEach(() => {
-		Object.keys(mockEnv).forEach((key) => {
-			delete mockEnv[key];
-		});
-		redisFns.get.mockReset();
-		redisFns.set.mockReset();
-		redisFns.del.mockReset();
-		RedisMock.mockClear();
+		mockEnv.KV_CACHING_ENABLED = "false";
+		mockKV.get.mockReset();
+		mockKV.put.mockReset();
+		mockKV.delete.mockReset();
 		vi.clearAllMocks();
 	});
 
-	it("operates in no-op mode when redis env vars are missing", async () => {
-		mockEnv.REDIS_ENABLED = "false";
+	it("uses memory cache when KV caching is disabled", async () => {
+		mockEnv.KV_CACHING_ENABLED = "false";
+		vi.useFakeTimers();
 
 		const manager = new CacheManager();
 
-		expect(Redis).not.toHaveBeenCalled();
-		expect(await manager.get("key")).toBeNull();
-		await manager.set("key", { test: true });
-		await manager.invalidate("key");
+		expect(await manager.get("mem-key")).toBeNull();
 
-		expect(redisFns.get).not.toHaveBeenCalled();
-		expect(redisFns.set).not.toHaveBeenCalled();
-		expect(redisFns.del).not.toHaveBeenCalled();
+		await manager.set("mem-key", { local: true });
+
+		expect(await manager.get("mem-key")).toEqual({ local: true });
+
+		expect(mockKV.get).not.toHaveBeenCalled();
+		expect(mockKV.put).not.toHaveBeenCalled();
+
+		await manager.invalidate("mem-key");
+		expect(await manager.get("mem-key")).toBeNull();
+
+		vi.useRealTimers();
 	});
 
-	it("creates a redis client when env vars are present", async () => {
-		mockEnv.REDIS_ENABLED = "true";
-		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
-		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+	it("respects TTL in memory cache", async () => {
+		mockEnv.KV_CACHING_ENABLED = "false";
+		vi.useFakeTimers();
 
 		const manager = new CacheManager();
-		expect(Redis).toHaveBeenCalledWith({
-			url: "https://example.com",
-			token: "token",
-		});
 
-		redisFns.get.mockResolvedValueOnce('{"value":42}');
+		await manager.set("ttl-key", { data: "fresh" }, 10);
+
+		expect(await manager.get("ttl-key")).toEqual({ data: "fresh" });
+
+		vi.advanceTimersByTime(11000);
+
+		expect(await manager.get("ttl-key")).toBeNull();
+
+		vi.useRealTimers();
+	});
+
+	it("updates memory cache even when KV is enabled", async () => {
+		mockEnv.KV_CACHING_ENABLED = "true";
+		vi.useFakeTimers();
+
+		const manager = new CacheManager();
+
+		await manager.set("dual-key", { dual: true });
+
+		expect(mockKV.put).toHaveBeenCalledWith("fosdem:dual-key", '{"dual":true}', expect.anything());
+
+		mockEnv.KV_CACHING_ENABLED = "false";
+
+		const mapSpy = vi.spyOn(Map.prototype, 'set');
+		await manager.set("spy-key", { checked: true });
+
+		expect(mapSpy).toHaveBeenCalledWith("fosdem:spy-key", expect.objectContaining({ data: { checked: true } }));
+
+		mapSpy.mockRestore();
+		vi.useRealTimers();
+	});
+
+	it("uses KV when enabled", async () => {
+		mockEnv.KV_CACHING_ENABLED = "true";
+
+		const manager = new CacheManager();
+
+		mockKV.get.mockResolvedValueOnce(JSON.stringify({ value: 42 }));
 		const cached = await manager.get("rooms");
-		expect(redisFns.get).toHaveBeenCalledWith("fosdem:rooms");
+		expect(mockKV.get).toHaveBeenCalledWith("fosdem:rooms");
 		expect(cached).toEqual({ value: 42 });
 
 		await manager.set("rooms", { value: 1 }, 30);
-		expect(redisFns.set).toHaveBeenCalledWith("fosdem:rooms", '{"value":1}', {
-			ex: 30,
+		expect(mockKV.put).toHaveBeenCalledWith("fosdem:rooms", '{"value":1}', {
+			expirationTtl: 30,
 		});
 
 		await manager.invalidate("rooms");
-		expect(redisFns.del).toHaveBeenCalledWith("fosdem:rooms");
+		expect(mockKV.delete).toHaveBeenCalledWith("fosdem:rooms");
 	});
 
-	it("handles redis get() network errors gracefully", async () => {
-		mockEnv.REDIS_ENABLED = "true";
-		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
-		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+	it("handles KV get() network errors gracefully", async () => {
+		mockEnv.KV_CACHING_ENABLED = "true";
 
 		const manager = new CacheManager();
-		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => { });
 
-		redisFns.get.mockRejectedValueOnce(new Error("Network error"));
+		mockKV.get.mockRejectedValueOnce(new Error("Network error"));
 
 		const result = await manager.get("test-key");
 
 		expect(result).toBeNull();
 		expect(consoleErrorSpy).toHaveBeenCalledWith(
-			"Redis get error for key test-key:",
+			"KV get error for key test-key:",
 			expect.any(Error)
 		);
 
 		consoleErrorSpy.mockRestore();
 	});
 
-	it("handles redis set() network errors gracefully", async () => {
-		mockEnv.REDIS_ENABLED = "true";
-		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
-		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+	it("handles KV put() network errors gracefully", async () => {
+		mockEnv.KV_CACHING_ENABLED = "true";
 
 		const manager = new CacheManager();
-		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => { });
 
-		redisFns.set.mockRejectedValueOnce(new Error("Network error"));
+		mockKV.put.mockRejectedValueOnce(new Error("Network error"));
 
 		await manager.set("test-key", { data: "test" });
 
 		expect(consoleErrorSpy).toHaveBeenCalledWith(
-			"Redis set error for key test-key:",
+			"KV set error for key test-key:",
 			expect.any(Error)
 		);
 
 		consoleErrorSpy.mockRestore();
 	});
 
-	it("handles redis invalidate() network errors gracefully", async () => {
-		mockEnv.REDIS_ENABLED = "true";
-		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
-		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+	it("handles KV delete() network errors gracefully", async () => {
+		mockEnv.KV_CACHING_ENABLED = "true";
 
 		const manager = new CacheManager();
-		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => { });
 
-		redisFns.del.mockRejectedValueOnce(new Error("Network error"));
+		mockKV.delete.mockRejectedValueOnce(new Error("Network error"));
 
 		await manager.invalidate("test-key");
 
 		expect(consoleErrorSpy).toHaveBeenCalledWith(
-			"Redis invalidate error for key test-key:",
+			"KV invalidate error for key test-key:",
 			expect.any(Error)
 		);
 
@@ -139,36 +165,14 @@ describe("CacheManager", () => {
 	});
 
 	it("handles JSON parse errors when getting cached data", async () => {
-		mockEnv.REDIS_ENABLED = "true";
-		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
-		mockEnv.UPSTASH_REDIS_TOKEN = "token";
+		mockEnv.KV_CACHING_ENABLED = "true";
 
 		const manager = new CacheManager();
 
-		redisFns.get.mockResolvedValueOnce("invalid json{");
+		mockKV.get.mockResolvedValueOnce("invalid json{");
 
 		const result = await manager.get("test-key");
 
 		expect(result).toBe("invalid json{");
-	});
-
-	it("handles connection timeouts without crashing", async () => {
-		mockEnv.REDIS_ENABLED = "true";
-		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
-		mockEnv.UPSTASH_REDIS_TOKEN = "token";
-
-		const manager = new CacheManager();
-		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-		const timeoutError = new Error("Request timeout");
-		timeoutError.name = "TimeoutError";
-		redisFns.get.mockRejectedValueOnce(timeoutError);
-
-		const result = await manager.get("test-key");
-
-		expect(result).toBeNull();
-		expect(consoleErrorSpy).toHaveBeenCalled();
-
-		consoleErrorSpy.mockRestore();
 	});
 });
