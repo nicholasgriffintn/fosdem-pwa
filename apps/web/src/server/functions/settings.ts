@@ -36,6 +36,9 @@ export const changeBookmarksVisibility = createServerFn({
 		} catch (error) {
 			console.error(error);
 
-			throw new Error("Failed to update bookmarks visibility");
+			return {
+				success: false,
+				error: "Failed to update visibility",
+			};
 		}
 	});

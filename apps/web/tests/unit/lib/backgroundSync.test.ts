@@ -101,6 +101,31 @@ describe("background sync helpers", () => {
 		expect(removeFromSyncQueue).not.toHaveBeenCalled();
 	});
 
+	it("removes bookmark from queue when server returns 404", async () => {
+		getSyncQueue.mockResolvedValue([
+			{
+				id: "2026_network",
+				type: "bookmark",
+				action: "delete",
+				data: { serverId: "server-id" },
+			},
+		]);
+
+		deleteBookmark.mockResolvedValue({
+			success: false,
+			statusCode: 404,
+			error: "Bookmark not found"
+		});
+
+		const result = await backgroundSync.syncBookmarksToServer();
+
+		expect(result.success).toBe(true);
+		expect(result.syncedCount).toBe(1);
+		expect(result.errors).toEqual([]);
+		expect(removeFromSyncQueue).toHaveBeenCalledWith("2026_network");
+	});
+
+
 	it("synchronizes notes covering create, update, and delete", async () => {
 		getSyncQueue.mockResolvedValue([
 			{
