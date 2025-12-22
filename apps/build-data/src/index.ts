@@ -84,7 +84,8 @@ const run = async (env: Env) => {
   const data = await buildData({ year: yearString });
   validateBuildData(data);
 
-  const serialized = JSON.stringify(data, null, 2);
+  const shouldMinify = year.value >= 2026;
+  const serialized = JSON.stringify(data);
 
   if (!serialized.length) {
     logger.error("Generated payload was empty");
@@ -92,8 +93,14 @@ const run = async (env: Env) => {
   }
 
   const etag = await computeEtag(serialized);
-  logger.info("Computed ETag", { etag });
   const key = `fosdem-${yearString}.json`;
+
+  logger.info("Serialized data", {
+    minified: shouldMinify,
+    size: serialized.length,
+    etag,
+    key
+  });
 
   await env.R2.put(key, serialized, {
     httpMetadata: {
