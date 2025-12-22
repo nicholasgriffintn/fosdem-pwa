@@ -113,6 +113,12 @@ export function SharedVideoElement({
 		? `/api/proxy/subtitles?url=${encodeURIComponent(subtitleTrack.href)}`
 		: null;
 
+	const sortedSources = [...resolvedSources].sort((a, b) => {
+		if (a.type.includes("mp4")) return -1;
+		if (b.type.includes("mp4")) return 1;
+		return 0;
+	});
+
 	return (
 		<video
 			key={event?.id ?? streamUrl ?? "shared-video"}
@@ -124,7 +130,7 @@ export function SharedVideoElement({
 			webkit-playsinline="true"
 			preload="metadata"
 		>
-			{!isLive && resolvedSources.map((source) => (
+			{!isLive && sortedSources.map((source) => (
 				<source key={source.href} src={source.href} type={source.type} />
 			))}
 			{proxiedSubtitleUrl && (
