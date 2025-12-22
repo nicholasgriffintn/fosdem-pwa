@@ -2,10 +2,16 @@ import { Redis } from "@upstash/redis";
 
 import { getCloudflareEnv } from "~/server/config";
 
+interface InMemoryCacheEntry {
+	data: unknown;
+	expiresAt: number;
+}
+
 export class CacheManager {
 	private redis: Redis | null;
+	private memoryCache: Map<string, InMemoryCacheEntry>;
 	private readonly PREFIX = "fosdem:";
-	private readonly TTL = 60 * 60 * 24; // 24 hours in seconds
+	private readonly TTL = 60 * 60 * 24;
 
 	constructor() {
 		const env = getCloudflareEnv();
@@ -19,8 +25,10 @@ export class CacheManager {
 				url: env.UPSTASH_REDIS_URL,
 				token: env.UPSTASH_REDIS_TOKEN,
 			});
+			this.memoryCache = new Map();
 		} else {
 			this.redis = null;
+			this.memoryCache = new Map();
 		}
 	}
 
@@ -29,51 +37,70 @@ export class CacheManager {
 	}
 
 	async get(key: string) {
-		if (!this.redis) {
+		const prefixedKey = this.getKey(key);
+
+		if (this.redis) {
+			try {
+				const data = await this.redis.get(prefixedKey);
+				if (data === null || data === undefined) {
+					return null;
+				}
+				if (typeof data === "string") {
+					try {
+						return JSON.parse(data);
+					} catch (error) {
+						return data;
+					}
+				}
+				return data;
+			} catch (error) {
+				console.error(`Redis get error for key ${key}:`, error);
+			}
+		}
+
+		const entry = this.memoryCache.get(prefixedKey);
+		if (!entry) {
 			return null;
 		}
 
-		try {
-			const data = await this.redis.get(this.getKey(key));
-			if (data === null || data === undefined) {
-				return null;
-			}
-			if (typeof data === "string") {
-				try {
-					return JSON.parse(data);
-				} catch (error) {
-					return data;
-				}
-			}
-			return data;
-		} catch (error) {
-			console.error(`Redis get error for key ${key}:`, error);
+		if (Date.now() > entry.expiresAt) {
+			this.memoryCache.delete(prefixedKey);
 			return null;
 		}
+
+		return entry.data;
 	}
 
 	async set(key: string, data: unknown, ttl?: number) {
-		if (!this.redis) {
-			return;
+		const prefixedKey = this.getKey(key);
+		const effectiveTtl = ttl || this.TTL;
+
+		if (this.redis) {
+			try {
+				const stringData = typeof data === "string" ? data : JSON.stringify(data);
+				await this.redis.set(prefixedKey, stringData, { ex: effectiveTtl });
+			} catch (error) {
+				console.error(`Redis set error for key ${key}:`, error);
+			}
 		}
 
-		try {
-			const stringData = typeof data === "string" ? data : JSON.stringify(data);
-			await this.redis.set(this.getKey(key), stringData, { ex: ttl || this.TTL });
-		} catch (error) {
-			console.error(`Redis set error for key ${key}:`, error);
-		}
+		this.memoryCache.set(prefixedKey, {
+			data,
+			expiresAt: Date.now() + effectiveTtl * 1000,
+		});
 	}
 
 	async invalidate(key: string) {
-		if (!this.redis) {
-			return;
+		const prefixedKey = this.getKey(key);
+
+		if (this.redis) {
+			try {
+				await this.redis.del(prefixedKey);
+			} catch (error) {
+				console.error(`Redis invalidate error for key ${key}:`, error);
+			}
 		}
 
-		try {
-			await this.redis.del(this.getKey(key));
-		} catch (error) {
-			console.error(`Redis invalidate error for key ${key}:`, error);
-		}
+		this.memoryCache.delete(prefixedKey);
 	}
 }

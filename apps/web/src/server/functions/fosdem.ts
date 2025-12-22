@@ -1,14 +1,29 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { constants } from "~/constants";
+import { CacheManager } from "~/lib/cache";
 import type { Conference } from "~/types/fosdem";
 
 const FETCH_TIMEOUT_MS = 8000;
 const SPLIT_FILES_YEAR = 2026;
+const CURRENT_YEAR_TTL = 60 * 5;
+const PAST_YEAR_TTL = 60 * 60 * 24;
+
+const cache = new CacheManager();
+
+const getCacheTTL = (year: number): number => {
+	return year === constants.DEFAULT_YEAR ? CURRENT_YEAR_TTL : PAST_YEAR_TTL;
+};
 
 const getFullData = async (year: number): Promise<Conference> => {
 	if (!Number.isInteger(year) || year < 2000 || year > 2100) {
 		throw new Error("Invalid year; expected YYYY between 2000-2100");
+	}
+
+	const cacheKey = `full-data:${year}`;
+	const cached = await cache.get(cacheKey);
+	if (cached) {
+		return cached as Conference;
 	}
 
 	const url = constants.DATA_LINK.replace("${YEAR}", year.toString());
@@ -44,10 +59,22 @@ const getFullData = async (year: number): Promise<Conference> => {
 		throw new Error(`Invalid conference data format: ${JSON.stringify(json)}`);
 	}
 
-	return json as Conference;
+	const data = json as Conference;
+	await cache.set(cacheKey, data, getCacheTTL(year));
+
+	return data;
 };
 
-const fetchJsonWithTimeout = async (url: string): Promise<unknown> => {
+const fetchJsonWithTimeout = async (
+	url: string,
+	cacheKey: string,
+	ttl: number,
+): Promise<unknown> => {
+	const cached = await cache.get(cacheKey);
+	if (cached) {
+		return cached;
+	}
+
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
@@ -63,7 +90,10 @@ const fetchJsonWithTimeout = async (url: string): Promise<unknown> => {
 			);
 		}
 
-		return response.json();
+		const data = await response.json();
+		await cache.set(cacheKey, data, ttl);
+
+		return data;
 	} catch (error) {
 		if ((error as Error)?.name === "AbortError") {
 			throw new Error("Fetching conference data timed out");
@@ -95,7 +125,9 @@ export const getCoreData = createServerFn({
 
 		if (year >= SPLIT_FILES_YEAR) {
 			const data = await fetchJsonWithTimeout(
-				`https://r2.fosdempwa.com/fosdem-${year}-core.json`
+				`https://r2.fosdempwa.com/fosdem-${year}-core.json`,
+				`core-data:${year}`,
+				getCacheTTL(year),
 			);
 			return data as Pick<Conference, "conference" | "days" | "types" | "buildings">;
 		}
@@ -118,7 +150,9 @@ export const getTracksData = createServerFn({
 
 		if (year >= SPLIT_FILES_YEAR) {
 			const data = await fetchJsonWithTimeout(
-				`https://r2.fosdempwa.com/fosdem-${year}-tracks.json`
+				`https://r2.fosdempwa.com/fosdem-${year}-tracks.json`,
+				`tracks-data:${year}`,
+				getCacheTTL(year),
 			);
 			return data as Pick<Conference, "tracks" | "rooms">;
 		}
@@ -139,7 +173,9 @@ export const getEventsData = createServerFn({
 
 		if (year >= SPLIT_FILES_YEAR) {
 			const data = await fetchJsonWithTimeout(
-				`https://r2.fosdempwa.com/fosdem-${year}-events.json`
+				`https://r2.fosdempwa.com/fosdem-${year}-events.json`,
+				`events-data:${year}`,
+				getCacheTTL(year),
 			);
 			return data as Pick<Conference, "events">;
 		}
@@ -159,7 +195,9 @@ export const getPersonsData = createServerFn({
 
 		if (year >= SPLIT_FILES_YEAR) {
 			const data = await fetchJsonWithTimeout(
-				`https://r2.fosdempwa.com/fosdem-${year}-persons.json`
+				`https://r2.fosdempwa.com/fosdem-${year}-persons.json`,
+				`persons-data:${year}`,
+				getCacheTTL(year),
 			).catch(() => ({}));
 			return data as Pick<Conference, "persons">;
 		}

@@ -37,15 +37,20 @@ describe("CacheManager", () => {
 		vi.clearAllMocks();
 	});
 
-	it("operates in no-op mode when redis env vars are missing", async () => {
+	it("uses in-memory cache when redis env vars are missing", async () => {
 		mockEnv.REDIS_ENABLED = "false";
 
 		const manager = new CacheManager();
 
 		expect(Redis).not.toHaveBeenCalled();
 		expect(await manager.get("key")).toBeNull();
-		await manager.set("key", { test: true });
+
+		await manager.set("key", { test: true }, 60);
+		const result = await manager.get("key");
+		expect(result).toEqual({ test: true });
+
 		await manager.invalidate("key");
+		expect(await manager.get("key")).toBeNull();
 
 		expect(redisFns.get).not.toHaveBeenCalled();
 		expect(redisFns.set).not.toHaveBeenCalled();
@@ -77,7 +82,7 @@ describe("CacheManager", () => {
 		expect(redisFns.del).toHaveBeenCalledWith("fosdem:rooms");
 	});
 
-	it("handles redis get() network errors gracefully", async () => {
+	it("handles redis get() network errors gracefully and falls back to memory cache", async () => {
 		mockEnv.REDIS_ENABLED = "true";
 		mockEnv.UPSTASH_REDIS_URL = "https://example.com";
 		mockEnv.UPSTASH_REDIS_TOKEN = "token";
@@ -85,11 +90,13 @@ describe("CacheManager", () => {
 		const manager = new CacheManager();
 		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
+		await manager.set("test-key", { value: "cached" }, 60);
+
 		redisFns.get.mockRejectedValueOnce(new Error("Network error"));
 
 		const result = await manager.get("test-key");
 
-		expect(result).toBeNull();
+		expect(result).toEqual({ value: "cached" });
 		expect(consoleErrorSpy).toHaveBeenCalledWith(
 			"Redis get error for key test-key:",
 			expect.any(Error)
@@ -170,5 +177,24 @@ describe("CacheManager", () => {
 		expect(consoleErrorSpy).toHaveBeenCalled();
 
 		consoleErrorSpy.mockRestore();
+	});
+
+	it("expires in-memory cache entries after TTL", async () => {
+		mockEnv.REDIS_ENABLED = "false";
+		vi.useFakeTimers();
+
+		const manager = new CacheManager();
+
+		await manager.set("test-key", { value: "data" }, 1);
+
+		let result = await manager.get("test-key");
+		expect(result).toEqual({ value: "data" });
+
+		vi.advanceTimersByTime(1500);
+
+		result = await manager.get("test-key");
+		expect(result).toBeNull();
+
+		vi.useRealTimers();
 	});
 });
