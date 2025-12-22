@@ -104,7 +104,7 @@ export function SharedVideoElement({
 				hlsRef.current = null;
 			}
 		};
-	}, [streamUrl, isLive]);
+	}, [streamUrl]);
 
 	if (!event && (!resolvedSources || resolvedSources.length === 0)) return null;
 
