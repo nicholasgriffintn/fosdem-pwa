@@ -29,7 +29,7 @@
       "database_id": "a9e2ef23-b95b-49e4-b1aa-5abc2bd26152",
       "preview_database_id": "2ec973b1-6e46-49a8-825b-1928ec34cd22",
       "migrations_dir": "migrations",
-      "remote": true
+      "remote": false
     }
   ],
   "kv_namespaces": [
@@ -37,7 +37,7 @@
       "binding": "KV",
       "id": "eaa0ebf8ad2e4c9da021aeffc43f74b4",
       "preview_id": "ed965a930c33427a9ffb985634f8febb",
-      "remote": true
+      "remote": false
     }
   ]
 }
