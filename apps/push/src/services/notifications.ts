@@ -12,7 +12,7 @@ import type {
 	Env,
 	ScheduleSnapshot,
 } from "../types";
-import { trackPushNotificationSuccess, trackPushNotificationFailure } from "./analytics";
+import { trackPushNotificationSuccess, trackPushNotificationFailure } from "../lib/analytics";
 
 const PUSH_TTL_SECONDS = 60;
 const FETCH_TIMEOUT_MS = 8000;

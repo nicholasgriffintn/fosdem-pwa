@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fosdempwa",
+  "main": "@tanstack/react-start/server-entry",
+  "compatibility_date": "2025-09-02",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true
+  },
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "eaa0ebf8ad2e4c9da021aeffc43f74b4",
+      "preview_id": "ed965a930c33427a9ffb985634f8febb"
+    }
+  ]
+}
