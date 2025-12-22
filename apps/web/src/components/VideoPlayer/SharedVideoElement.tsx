@@ -42,12 +42,19 @@ export function SharedVideoElement({
 		)?.href
 		: null;
 
+	const resetVideo = (video: HTMLVideoElement) => {
+		video.pause();
+		video.removeAttribute("src");
+		video.load();
+	};
+
 	useEffect(() => {
 		if (!videoRef.current || !streamUrl) {
 			return;
 		}
 
 		const video = videoRef.current;
+		resetVideo(video);
 
 		if (video.canPlayType("application/vnd.apple.mpegurl")) {
 			video.src = streamUrl;
