@@ -48,7 +48,7 @@ function SignInPage() {
 							and only enables syncing across devices and sharing your schedule.
 						</p>
 						<p className="text-sm text-muted-foreground">
-							Continuing as a guest creates a local-only account that won't sync
+							Continuing as a guest creates a device specific account that won't sync
 							across devices, but it will still save bookmarks and notes if you
 							need something more persistent or the device doesn't support
 							JavaScript (although support for non JS interactions is limited).
