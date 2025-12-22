@@ -1,10 +1,12 @@
 import { useState, useMemo, useDeferredValue, useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
+
 import type { Person } from "~/types/fosdem";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent } from "~/components/ui/card";
 import { useIsClient } from "~/hooks/use-is-client";
+import { EmptyStateCard } from "~/components/EmptyStateCard";
 
 type SpeakerListProps = {
     persons: Person[];
@@ -168,9 +170,11 @@ function SpeakerListClient({
                     </div>
                 </div>
             ) : (
-                <p className="text-muted-foreground py-10 text-center border-2 border-dashed rounded-lg">
-                    No speakers found matching your search.
-                </p>
+                    <EmptyStateCard
+                        title="No speakers found"
+                        description="Adjust filters or pick another day to see more items."
+                        className="my-4"
+                    />
             )}
         </div>
     );
@@ -236,9 +240,11 @@ function SpeakerListStatic({
                     </div>
                 </div>
             ) : (
-                <p className="text-muted-foreground py-10 text-center border-2 border-dashed rounded-lg">
-                    No speakers found matching your search.
-                </p>
+                    <EmptyStateCard
+                        title="No speakers found"
+                        description="Adjust filters or pick another day to see more items."
+                        className="my-4"
+                    />
             )}
         </div>
     );
