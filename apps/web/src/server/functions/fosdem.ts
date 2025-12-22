@@ -5,9 +5,6 @@ import type { Conference } from "~/types/fosdem";
 
 const FETCH_TIMEOUT_MS = 8000;
 
-/**
- * Fetches and validates conference data for a given year
- */
 const getFullData = async (year: number): Promise<Conference> => {
 	if (!Number.isInteger(year) || year < 2000 || year > 2100) {
 		throw new Error("Invalid year; expected YYYY between 2000-2100");
