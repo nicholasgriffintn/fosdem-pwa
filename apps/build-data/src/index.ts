@@ -84,7 +84,7 @@ const run = async (env: Env) => {
   const data = await buildData({ year: yearString });
   validateBuildData(data);
 
-  const serializedFull = JSON.stringify(data);
+  const serializedFull = JSON.stringify(data, null, 2);
 
   if (!serializedFull.length) {
     logger.error("Generated payload was empty");
