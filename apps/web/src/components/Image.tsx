@@ -1,5 +1,7 @@
 import { Source, Image as UnpicImage } from "@unpic/react";
 
+import { getResizedImageSrc } from "~/utils/image-resize";
+
 type ImageProps = {
 	src: string;
 	alt: string;
@@ -22,7 +24,8 @@ export function Image({
 }: ImageProps) {
 	const canUseWebP = useWebP && /\.(jpe?g)$/i.test(src);
 
-	const webpSource = canUseWebP ? src.replace(/\.(jpe?g)$/i, ".webp") : null;
+	const resizedSrc = getResizedImageSrc(src, width, height);
+	const webpSource = canUseWebP ? getResizedImageSrc(src.replace(/\.(jpe?g)$/i, ".webp"), width, height) : null;
 
 	return (
 		<div className={className}>
@@ -31,7 +34,7 @@ export function Image({
 					<Source src={webpSource} type="image/webp" layout="fullWidth" />
 				)}
 				<UnpicImage
-					src={src}
+					src={resizedSrc}
 					alt={alt}
 					layout="fullWidth"
 					loading={loading}

@@ -53,9 +53,11 @@ export function RoomPlayer({
 		<div className={containerClassName}>
 			{(!isPlaying || !isOnline) && (
 				<Image
-					src="/images/fosdem/full/fallback.png"
+					src="/fosdem/images/fosdem/full/fallback.png"
 					alt="The FOSDEM logo"
 					className="w-full h-full absolute top-0 left-0 z-0 object-cover"
+					width={1920}
+					height={1080}
 				/>
 			)}
 
@@ -112,7 +114,7 @@ export function RoomPlayer({
 				<div className="no-js-only w-full h-full">
 					<NoJsVideoFallback
 						openUrl={streamUrl}
-						backgroundImageUrl="/images/fosdem/full/fallback.png"
+						backgroundImageUrl="/fosdem/images/fosdem/full/fallback.png"
 						sources={[{ href: streamUrl, type: "application/vnd.apple.mpegurl" }]}
 					/>
 				</div>

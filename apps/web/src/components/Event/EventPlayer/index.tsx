@@ -180,7 +180,7 @@ export function EventPlayer({
 							{streamUrl ? (
 								<NoJsVideoFallback
 									openUrl={streamUrl}
-									backgroundImageUrl="/images/fosdem/full/fallback.png"
+									backgroundImageUrl="/fosdem/images/fosdem/full/fallback.png"
 									subtitleUrl={proxiedSubtitleUrl}
 									sources={[
 										...(eventIsLive

@@ -41,9 +41,11 @@ export function MapPageView({ year }: { year: number }) {
 				/>
 				<div className="w-full">
 					<Image
-						src="/images/map.png"
+						src="/fosdem/images/map.png"
 						alt="Map of the ULB Solbosch Campus, the location of the FOSDEM event"
 						loading="eager"
+						width={1200}
+						height={800}
 					/>
 					<p className="text-sm text-muted-foreground mt-4">
 						Get directions in{" "}

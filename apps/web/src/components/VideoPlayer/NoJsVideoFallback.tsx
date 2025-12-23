@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { getResizedImageSrc } from "~/utils/image-resize";
 
 import { Icons } from "~/components/Icons";
 
@@ -21,11 +22,13 @@ export function NoJsVideoFallback({
   sources,
   openUrl,
   subtitleUrl,
-  backgroundImageUrl = "/images/fosdem/full/fallback.png",
+  backgroundImageUrl = "/fosdem/images/fosdem/full/fallback.png",
   className,
   videoClassName,
   preload = "none",
 }: NoJsVideoFallbackProps) {
+  const resizedBackgroundImageUrl = getResizedImageSrc(backgroundImageUrl, 1920, 1080);
+
   return (
     <div
       className={clsx(
@@ -34,7 +37,9 @@ export function NoJsVideoFallback({
         className
       )}
       style={{
-        backgroundImage: backgroundImageUrl ? `url(${backgroundImageUrl})` : undefined,
+        backgroundImage: backgroundImageUrl
+          ? `url(${resizedBackgroundImageUrl})`
+          : undefined,
       }}
     >
       <video
@@ -42,7 +47,7 @@ export function NoJsVideoFallback({
         controls
         playsInline
         preload={preload}
-        poster={backgroundImageUrl}
+        poster={resizedBackgroundImageUrl}
       >
         {sources.map((source) => (
           <source key={source.href} src={source.href} type={source.type} />
