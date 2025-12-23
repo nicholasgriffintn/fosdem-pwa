@@ -176,8 +176,6 @@ export default function SearchPage() {
 	}, [fuseIndexes, query, fosdemData]);
 
 	const {
-		tracks: rawTracks,
-		events: rawEvents,
 		rooms: rawRooms,
 		tracksWithScores,
 		eventsWithScores,
@@ -306,23 +304,6 @@ export default function SearchPage() {
 		});
 	};
 
-	const handleTypeChange = (value: "all" | "events" | "tracks" | "rooms") => {
-		updateSearchParams({
-			nextType: value,
-			nextQuery: localQuery,
-		});
-	};
-
-	const handleClearSearch = () => {
-		setLocalQuery("");
-		updateSearchParams({
-			nextQuery: "",
-			nextTrack: "",
-			nextTime: "",
-			nextType: "all",
-		});
-	};
-
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		updateSearchParams({
@@ -399,28 +380,31 @@ export default function SearchPage() {
 
 			<div className="flex flex-wrap gap-4 items-end mb-6">
 				<form
-					className="flex flex-wrap items-end gap-4"
 					method="GET"
 					action="/search"
 					onSubmit={handleSubmit}
+					className="w-full"
 				>
-					<input type="hidden" name="year" value={year} />
-					<div className="flex flex-col gap-1 min-w-[220px] max-w-sm">
-						<Label htmlFor="search-query">Search the schedule</Label>
-						<div className="flex gap-2">
-							<Input
-								id="search-query"
-								name="q"
-								placeholder="Events, tracks, rooms"
-								value={localQuery}
-								onChange={(e) => setLocalQuery(e.target.value)}
-							/>
-							<Button type="submit" size="sm">
-								Search
-							</Button>
+					<div className="w-full">
+						<input type="hidden" name="year" value={year} />
+						<div className="flex flex-col gap-1 w-full">
+							<Label htmlFor="search-query">Search the schedule</Label>
+							<div className="flex gap-2 mt-2">
+								<Input
+									id="search-query"
+									name="q"
+									placeholder="Events, tracks, rooms"
+									value={localQuery}
+									onChange={(e) => setLocalQuery(e.target.value)}
+									className="w-full"
+								/>
+							</div>
 						</div>
 					</div>
 
+					<div
+						className="flex flex-wrap items-end gap-4 mt-3"
+					>
 					<div className="flex flex-col gap-1 min-w-[180px]">
 						<Label htmlFor="track-filter">Track</Label>
 						<Select
@@ -430,7 +414,7 @@ export default function SearchPage() {
 							onValueChange={handleTrackChange}
 							disabled={!fosdemData}
 							options={trackSelectOptions}
-							className="min-w-[180px]"
+								className="min-w-[180px] mt-2"
 						/>
 					</div>
 
@@ -443,15 +427,31 @@ export default function SearchPage() {
 							onValueChange={handleTimeChange}
 							disabled={!fosdemData}
 							options={timeSelectOptions}
-							className="min-w-[160px]"
-						/>
+								className="min-w-[160px] mt-2"
+							/>
+						</div>
+
+						{hasActiveFilters && (
+							<Link
+								to="."
+								search={{ year }}
+								className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 no-underline hover:underline"
+								aria-label="Clear search and filters"
+							>
+								<Icons.close className="h-4 w-4" />
+								Clear
+							</Link>
+						)}
+						<Button type="submit" size="sm">
+							Search
+						</Button>
 					</div>
 				</form>
 			</div>
 			<div className="flex flex-wrap gap-4 items-end mb-6">
 				<div className="flex flex-col gap-1">
 					<Label>Show</Label>
-					<div className="flex flex-wrap gap-2 items-center">
+					<div className="flex flex-wrap gap-2 items-center mt-2">
 						{typeFilters.map((filter) => (
 							<Link
 								key={filter.value}
@@ -469,17 +469,6 @@ export default function SearchPage() {
 								{filter.label}
 							</Link>
 						))}
-						{hasActiveFilters && (
-							<Link
-								to="."
-								search={{ year }}
-								className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 no-underline hover:underline"
-								aria-label="Clear search and filters"
-							>
-								<Icons.close className="h-4 w-4" />
-								Clear
-							</Link>
-						)}
 					</div>
 				</div>
 			</div>
