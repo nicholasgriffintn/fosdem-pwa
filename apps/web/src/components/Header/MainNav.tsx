@@ -41,7 +41,7 @@ export function MainNav({ title, items }: MainNavProps) {
 				className="items-center space-x-2 flex logo-link shrink-0"
 			>
 				<Icons.logo className="h-7 w-7" width="28" height="28" />
-				<span className="hidden font-bold sm:inline-block">{title}</span>
+				<span className="sr-only font-bold sm:not-sr-only sm:inline-block">{title}</span>
 			</Link>
 			{items?.length ? (
 				<nav className="hidden gap-2 xl:flex shrink-0" aria-label="Primary">
