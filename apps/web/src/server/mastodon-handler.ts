@@ -62,7 +62,8 @@ export class MastodonOAuthHandler {
       );
     }
 
-    const email = `mastodon-${mastodonUser.id}@noreply.fosdempwa.com`;
+    const baseUrlId = this.baseUrl.replace("https://", "").replace("http://", "");
+    const email = `${baseUrlId}-${mastodonUser.id}@noreply.fosdempwa.com`;
 
     return {
       id: mastodonUser.id,
