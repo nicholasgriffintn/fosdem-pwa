@@ -15,6 +15,7 @@ import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
 
 export const Route = createFileRoute("/rooms/$roomId")({
 	component: RoomPage,
@@ -104,96 +105,92 @@ function RoomPage() {
 
 	if (!roomInfo) {
 		return (
-			<div className="min-h-screen">
-				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Room not found" />
-					<EmptyStateCard
-						title="Whoops!"
-						description="We couldn't find this room. It may have changed or the link is incorrect."
-					/>
-				</div>
-			</div>
+			<PageShell>
+				<PageHeader heading="Room not found" />
+				<EmptyStateCard
+					title="Whoops!"
+					description="We couldn't find this room. It may have changed or the link is incorrect."
+				/>
+			</PageShell>
 		);
 	}
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader
-					heading={`Room ${roomInfo.name || roomInfo.slug}`}
-					metadata={[
-						{
-							text: `Building ${roomInfo.buildingId || roomInfo.building?.id}`,
-						},
-						{
-							text: `${roomInfo.eventCount} events`,
-						},
-					]}
-					breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
-					year={year}
-				/>
+		<PageShell>
+			<PageHeader
+				heading={`Room ${roomInfo.name || roomInfo.slug}`}
+				metadata={[
+					{
+						text: `Building ${roomInfo.buildingId || roomInfo.building?.id}`,
+					},
+					{
+						text: `${roomInfo.eventCount} events`,
+					},
+				]}
+				breadcrumbs={[{ title: "Rooms", href: "/rooms" }]}
+				year={year}
+			/>
 
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-					<div className="md:col-span-2">
-						<RoomPlayer roomId={roomInfo.slug} videoRef={videoRef} />
-					</div>
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+				<div className="md:col-span-2">
+					<RoomPlayer roomId={roomInfo.slug} videoRef={videoRef} />
+				</div>
 
-					<div className="space-y-6">
-						{isConferenceRunning && (
-							<div>
-								<RoomStatus roomId={roomInfo.name} />
-							</div>
-						)}
-
+				<div className="space-y-6">
+					{isConferenceRunning && (
 						<div>
-							<h2 className="text-xl font-semibold mb-2 text-foreground">
-								Quick Links
-							</h2>
-							<div className="flex flex-col space-y-2">
-								<a
-									href={constants.CHAT_LINK.replace(
-										"${ROOM_ID}",
-										roomInfo.slug,
-									)}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									Join Chat
-								</a>
-								<a
-									href={constants.NAVIGATE_TO_LOCATION_LINK.replace(
-										"${LOCATION_ID}",
-										roomInfo.slug,
-									)}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									Navigate to Room
-								</a>
-							</div>
+							<RoomStatus roomId={roomInfo.name} />
+						</div>
+					)}
+
+					<div>
+						<h2 className="text-xl font-semibold mb-2 text-foreground">
+							Quick Links
+						</h2>
+						<div className="flex flex-col space-y-2">
+							<a
+								href={constants.CHAT_LINK.replace(
+									"${ROOM_ID}",
+									roomInfo.slug,
+								)}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Join Chat
+							</a>
+							<a
+								href={constants.NAVIGATE_TO_LOCATION_LINK.replace(
+									"${LOCATION_ID}",
+									roomInfo.slug,
+								)}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Navigate to Room
+							</a>
 						</div>
 					</div>
 				</div>
-
-				<div>
-					<EventList
-						events={roomEvents}
-						year={year}
-						title={`Events in ${roomInfo?.name || roomInfo.slug}`}
-						defaultViewMode="list"
-						displayViewMode={false}
-						groupByDay={true}
-						days={days}
-						day={day}
-						sortFavourites={sortFavourites}
-						onSortFavouritesChange={handleSortFavouritesChange}
-						user={user}
-						onCreateBookmark={onCreateBookmark}
-						displaySortByFavourites={true}
-						serverBookmarks={serverBookmarks}
-					/>
-				</div>
 			</div>
-		</div>
+
+			<div>
+				<EventList
+					events={roomEvents}
+					year={year}
+					title={`Events in ${roomInfo?.name || roomInfo.slug}`}
+					defaultViewMode="list"
+					displayViewMode={false}
+					groupByDay={true}
+					days={days}
+					day={day}
+					sortFavourites={sortFavourites}
+					onSortFavouritesChange={handleSortFavouritesChange}
+					user={user}
+					onCreateBookmark={onCreateBookmark}
+					displaySortByFavourites={true}
+					serverBookmarks={serverBookmarks}
+				/>
+			</div>
+		</PageShell>
 	);
 }

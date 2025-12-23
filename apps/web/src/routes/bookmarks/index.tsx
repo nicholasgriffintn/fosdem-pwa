@@ -7,7 +7,6 @@ import { constants } from "~/constants";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useAuth } from "~/hooks/use-auth";
-import { Spinner } from "~/components/shared/Spinner";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { useIsClient } from "~/hooks/use-is-client";
 import { getAllData } from "~/server/functions/fosdem";
@@ -16,6 +15,8 @@ import { getBookmarks } from "~/server/functions/bookmarks";
 import { Button } from "~/components/ui/button";
 import { UpgradeNotice } from "~/components/shared/UpgradeNotice";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
+import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
@@ -90,60 +91,59 @@ function BookmarksHome() {
 	};
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader heading="Bookmarks" year={year} />
-				{resolvedUser?.is_guest && (
-					<div className="mb-6">
-						<UpgradeNotice user={resolvedUser} />
-					</div>
-				)}
-				{isClient && (authLoading || loading) && !hasServerSnapshot && (
-					<div className="flex justify-center items-center py-8">
-						<Spinner className="h-8 w-8" />
-					</div>
-				)}
-				{!resolvedAuthLoading &&
+		<PageShell>
+			<PageHeader heading="Bookmarks" year={year} />
+			{resolvedUser?.is_guest && (
+				<div className="mb-6">
+					<UpgradeNotice user={resolvedUser} />
+				</div>
+			)}
+			{isClient && (authLoading || loading) && !hasServerSnapshot && (
+				<RouteLoadingState message="Loading bookmarks..." />
+			)}
+			{!resolvedAuthLoading &&
 				!resolvedLoading &&
 				(!resolvedBookmarks || resolvedBookmarks.length === 0) ? (
-					<EmptyStateCard
-						title="No bookmarks yet"
-						description={
-							<div className="space-y-2">
-								<p>Start bookmarking events to see them here.</p>
-								{!resolvedUser?.id && (
-									<p className="text-sm">
-										If you have JavaScript enabled, your bookmarks will be
-										saved locally in your browser.{" "} Sign in to sync across
-										devices or to bookmark without JavaScript.
-									</p>
-								)}
-							</div>
-						}
-						actions={
-							!resolvedUser?.id ? (
-								<Button asChild variant="secondary">
-									<Link to="/signin" className="text-primary no-underline hover:underline cursor-pointer">
-										Sign in
-									</Link>
-								</Button>
-							) : undefined
-						}
-					/>
-				) : (
-					<BookmarksList
-						bookmarks={resolvedBookmarks}
-						fosdemData={resolvedFosdemData}
-						year={year}
-						loading={resolvedLoading}
-						day={day}
-						view={view}
-						onUpdateBookmark={onUpdateBookmark}
-						user={resolvedUser}
-						onCreateBookmark={onCreateBookmark}
-					/>
-				)}
-			</div>
-		</div>
+				<EmptyStateCard
+					title="No bookmarks yet"
+					description={
+						<div className="space-y-2">
+							<p>Start bookmarking events to see them here.</p>
+							{!resolvedUser?.id && (
+								<p className="text-sm">
+									If you have JavaScript enabled, your bookmarks will be
+									saved locally in your browser.{" "} Sign in to sync across
+									devices or to bookmark without JavaScript.
+								</p>
+							)}
+						</div>
+					}
+					actions={
+						!resolvedUser?.id ? (
+							<Button asChild variant="secondary">
+								<Link
+									to="/signin"
+									className="text-primary no-underline hover:underline cursor-pointer"
+								>
+									Sign in
+								</Link>
+							</Button>
+						) : undefined
+					}
+				/>
+			) : (
+				<BookmarksList
+					bookmarks={resolvedBookmarks}
+					fosdemData={resolvedFosdemData}
+					year={year}
+					loading={resolvedLoading}
+					day={day}
+					view={view}
+					onUpdateBookmark={onUpdateBookmark}
+					user={resolvedUser}
+					onCreateBookmark={onCreateBookmark}
+				/>
+			)}
+		</PageShell>
 	);
 }

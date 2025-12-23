@@ -11,6 +11,7 @@ import { Button } from "~/components/ui/button";
 import { constants } from "~/constants";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { PageHeader } from "~/components/shared/PageHeader";
+import { PageShell } from "~/components/shared/PageShell";
 
 export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 	const router = useRouter();
@@ -32,52 +33,50 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 		"An unexpected error occurred. Please try again.";
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader heading="Something went wrong" />
-				<EmptyStateCard
-					title="Whoops!"
-					description={
-						<p className="text-sm text-muted-foreground break-words">
-							{message}
-						</p>
-					}
-					actions={
-						<>
+		<PageShell maxWidth="none">
+			<PageHeader heading="Something went wrong" />
+			<EmptyStateCard
+				title="Whoops!"
+				description={
+					<p className="text-sm text-muted-foreground break-words">
+						{message}
+					</p>
+				}
+				actions={
+					<>
+						<Button
+							type="button"
+							onClick={() => {
+								router.invalidate();
+							}}
+						>
+							Try Again
+						</Button>
+						{isRoot ? (
+							<Button asChild variant="secondary">
+								<Link
+									to="/"
+									search={(prev) => ({
+										year: prev.year || constants.DEFAULT_YEAR,
+									})}
+								>
+									Home
+								</Link>
+							</Button>
+						) : (
 							<Button
+								variant="secondary"
 								type="button"
 								onClick={() => {
-									router.invalidate();
+									window.history.back();
 								}}
 							>
-								Try Again
+								Go Back
 							</Button>
-							{isRoot ? (
-								<Button asChild variant="secondary">
-									<Link
-										to="/"
-										search={(prev) => ({
-											year: prev.year || constants.DEFAULT_YEAR,
-										})}
-									>
-										Home
-									</Link>
-								</Button>
-							) : (
-								<Button
-									variant="secondary"
-									type="button"
-									onClick={() => {
-										window.history.back();
-									}}
-								>
-									Go Back
-								</Button>
-							)}
-						</>
-					}
-				/>
-			</div>
-		</div>
+						)}
+					</>
+				}
+			/>
+		</PageShell>
 	);
 }

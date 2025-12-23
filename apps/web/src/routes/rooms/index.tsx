@@ -6,6 +6,7 @@ import { constants } from "~/constants";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { RoomList } from "~/components/Room/RoomList";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
 
 export const Route = createFileRoute("/rooms/")({
 	component: RoomsPage,
@@ -42,13 +43,9 @@ function RoomsPage() {
 	}));
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader heading="Rooms" year={year} />
-				<div className="mt-6">
-					<RoomList rooms={rooms} year={year} groupByBuilding />
-				</div>
-			</div>
-		</div>
+		<PageShell>
+			<PageHeader heading="Rooms" year={year} />
+			<RoomList rooms={rooms} year={year} groupByBuilding />
+		</PageShell>
 	);
 }

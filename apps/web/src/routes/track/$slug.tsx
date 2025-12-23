@@ -11,6 +11,7 @@ import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
 
 export const Route = createFileRoute("/track/$slug")({
 	component: TrackPage,
@@ -72,66 +73,62 @@ function TrackPage() {
 
 	if (!fosdem.track) {
 		return (
-			<div className="min-h-screen">
-				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Track not found" year={year} />
-					<EmptyStateCard
-						title="Whoops!"
-						description="We couldn't find this track. It may have moved or the link might be outdated."
-					/>
-				</div>
-			</div>
+			<PageShell>
+				<PageHeader heading="Track not found" year={year} />
+				<EmptyStateCard
+					title="Whoops!"
+					description="We couldn't find this track. It may have moved or the link might be outdated."
+				/>
+			</PageShell>
 		);
 	}
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader
-					heading={fosdem.track.name}
+		<PageShell>
+			<PageHeader
+				heading={fosdem.track.name}
+				year={year}
+				breadcrumbs={
+					fosdem.type
+						? [{ title: fosdem.type.name, href: `/type/${fosdem.type.id}` }]
+						: []
+				}
+				metadata={[
+					{
+						text: `${fosdem.track.room}`,
+						href: `/rooms/${fosdem.track.room}`,
+					},
+					{
+						text: `Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(" and ") : fosdem.track.day}`,
+					},
+					{
+						text: `${fosdem.track.eventCount} events`,
+					},
+				]}
+			/>
+			{fosdem.eventData?.length > 0 ? (
+				<EventList
+					events={fosdem.eventData}
 					year={year}
-					breadcrumbs={
-						fosdem.type
-							? [{ title: fosdem.type.name, href: `/type/${fosdem.type.id}` }]
-							: []
-					}
-					metadata={[
-						{
-							text: `${fosdem.track.room}`,
-							href: `/rooms/${fosdem.track.room}`,
-						},
-						{
-							text: `Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(" and ") : fosdem.track.day}`,
-						},
-						{
-							text: `${fosdem.track.eventCount} events`,
-						},
-					]}
+					groupByDay={true}
+					days={fosdem.days}
+					defaultViewMode="list"
+					displayViewMode={false}
+					day={day}
+					view={view}
+					sortFavourites={sortFavourites}
+					onSortFavouritesChange={handleSortFavouritesChange}
+					user={user}
+					onCreateBookmark={onCreateBookmark}
+					displaySortByFavourites={true}
+					serverBookmarks={serverBookmarks}
 				/>
-				{fosdem.eventData?.length > 0 ? (
-					<EventList
-						events={fosdem.eventData}
-						year={year}
-						groupByDay={true}
-						days={fosdem.days}
-						defaultViewMode="list"
-						displayViewMode={false}
-						day={day}
-						view={view}
-						sortFavourites={sortFavourites}
-						onSortFavouritesChange={handleSortFavouritesChange}
-						user={user}
-						onCreateBookmark={onCreateBookmark}
-						displaySortByFavourites={true}
-						serverBookmarks={serverBookmarks}
-					/>
-				) : (
-					<EmptyStateCard
-						title="No sessions in this track"
-						description="There are no events scheduled here yet. Try another day or browse a different track."
-					/>
-				)}
-			</div>
-		</div>
+			) : (
+				<EmptyStateCard
+					title="No sessions in this track"
+					description="There are no events scheduled here yet. Try another day or browse a different track."
+				/>
+			)}
+		</PageShell>
 	);
 }

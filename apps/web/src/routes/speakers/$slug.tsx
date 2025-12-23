@@ -11,6 +11,7 @@ import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
 
 export const Route = createFileRoute("/speakers/$slug")({
     component: SpeakerPage,
@@ -78,58 +79,54 @@ function SpeakerPage() {
 
     if (!person) {
         return (
-            <div className="min-h-screen">
-                <div className="relative py-6 lg:py-10">
-                    <PageHeader heading="Speaker not found" />
-                    <EmptyStateCard
-                        title="Whoops!"
-                        description="We couldn't find this speaker profile."
-                    />
-                </div>
-            </div>
+            <PageShell maxWidth="none">
+                <PageHeader heading="Speaker not found" />
+                <EmptyStateCard
+                    title="Whoops!"
+                    description="We couldn't find this speaker profile."
+                />
+            </PageShell>
         );
     }
 
     return (
-        <div className="min-h-screen">
-            <div className="relative py-6 lg:py-10">
-                <PageHeader
-                    heading={person.name}
-                    breadcrumbs={[{ title: "Speakers", href: "/speakers" }]}
-                    year={year}
-                />
+        <PageShell maxWidth="none">
+            <PageHeader
+                heading={person.name}
+                breadcrumbs={[{ title: "Speakers", href: "/speakers" }]}
+                year={year}
+            />
 
-                {person.biography && (
-                    <div className="mt-8 prose prose-lg prose-indigo text-foreground">
-                        <h2 className="text-xl font-semibold shrink-0">Biography</h2>
-                        <div
-                            className="mt-2"
-                            dangerouslySetInnerHTML={{
-                                __html: person.extended_biography || person.biography,
-                            }}
-                        />
-                    </div>
-                )}
-
-                <div className="mt-8">
-                    <EventList
-                        events={personEvents}
-                        year={year}
-                        title={`Sessions by ${person.name}`}
-                        defaultViewMode="list"
-                        displayViewMode={false}
-                        groupByDay={true}
-                        days={days}
-                        day={day}
-                        sortFavourites={sortFavourites}
-                        onSortFavouritesChange={handleSortFavouritesChange}
-                        user={user}
-                        onCreateBookmark={onCreateBookmark}
-                        displaySortByFavourites={true}
-                        serverBookmarks={serverBookmarks}
+            {person.biography && (
+                <div className="mt-8 prose prose-lg prose-indigo text-foreground">
+                    <h2 className="text-xl font-semibold shrink-0">Biography</h2>
+                    <div
+                        className="mt-2"
+                        dangerouslySetInnerHTML={{
+                            __html: person.extended_biography || person.biography,
+                        }}
                     />
                 </div>
+            )}
+
+            <div className="mt-8">
+                <EventList
+                    events={personEvents}
+                    year={year}
+                    title={`Sessions by ${person.name}`}
+                    defaultViewMode="list"
+                    displayViewMode={false}
+                    groupByDay={true}
+                    days={days}
+                    day={day}
+                    sortFavourites={sortFavourites}
+                    onSortFavouritesChange={handleSortFavouritesChange}
+                    user={user}
+                    onCreateBookmark={onCreateBookmark}
+                    displaySortByFavourites={true}
+                    serverBookmarks={serverBookmarks}
+                />
             </div>
-        </div>
+        </PageShell>
     );
 }

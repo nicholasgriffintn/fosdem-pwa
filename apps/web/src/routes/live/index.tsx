@@ -13,6 +13,8 @@ import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
+import { SectionStack } from "~/components/shared/SectionStack";
 
 export const Route = createFileRoute("/live/")({
 	component: LivePage,
@@ -72,15 +74,14 @@ function LivePage() {
 	};
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader
-					heading="Live & Upcoming"
-					text="All events that are currently live or starting soon"
-					year={year}
-				/>
-				<div className="w-full space-y-8">
-					<section>
+		<PageShell>
+			<PageHeader
+				heading="Live & Upcoming"
+				text="All events that are currently live or starting soon"
+				year={year}
+			/>
+			<SectionStack>
+				<section>
 					<EventList
 						events={liveEvents}
 						year={year}
@@ -92,9 +93,9 @@ function LivePage() {
 						emptyStateMessage="Come back later to see live events"
 						serverBookmarks={serverBookmarks}
 					/>
-					</section>
+				</section>
 
-					<section>
+				<section>
 					<EventList
 						events={upcomingEvents}
 						year={year}
@@ -106,9 +107,8 @@ function LivePage() {
 						emptyStateMessage="Come back later to see upcoming events"
 						serverBookmarks={serverBookmarks}
 					/>
-					</section>
-				</div>
-			</div>
-		</div>
+				</section>
+			</SectionStack>
+		</PageShell>
 	);
 }

@@ -6,6 +6,7 @@ import { constants } from "~/constants";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { SpeakerList } from "~/components/Speaker/SpeakerList";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
 
 export const Route = createFileRoute("/speakers/")({
     component: SpeakersPage,
@@ -43,17 +44,13 @@ function SpeakersPage() {
     const { persons, year, query } = Route.useLoaderData();
 
     return (
-        <div className="min-h-screen">
-            <div className="relative py-6 lg:py-10">
+        <PageShell>
                 <PageHeader
                     heading="Speakers"
                     subtitle={`There are ${persons.length} speakers at this year's FOSDEM!`}
                     year={year}
-                />
-                <div className="mt-6">
-                    <SpeakerList persons={persons} year={year} initialQuery={query} />
-                </div>
-            </div>
-        </div>
+            />
+            <SpeakerList persons={persons} year={year} initialQuery={query} />
+        </PageShell>
     );
 }

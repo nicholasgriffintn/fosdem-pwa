@@ -3,13 +3,14 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useUserId } from "~/hooks/use-user-id";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { ConferenceBadge } from "~/components/Profile/ConferenceBadge";
-import { Spinner } from "~/components/shared/Spinner";
 import { constants } from "~/constants";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useUserBookmarks } from "~/hooks/use-user-bookmarks";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { buildHomeLink } from "~/lib/link-builder";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
+import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
 
 export const Route = createFileRoute("/profile/$userId/")({
   component: ProfilePage,
@@ -48,9 +49,7 @@ function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner className="h-8 w-8" />
-      </div>
+      <RouteLoadingState message="Loading profile..." />
     );
   }
 
@@ -59,43 +58,41 @@ function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="relative py-6 lg:py-10">
-        <PageHeader heading="Profile" displayHeading={false} year={year} />
-        <div className="space-y-8">
-          <div className="flex flex-col lg:flex-row items-start gap-8">
-            <div className="w-full lg:w-auto lg:max-w-md">
-              <ConferenceBadge user={user} conferenceYear={year} />
-            </div>
-
-            {user.bookmarks_visibility === "public" ? (
-              <div className="w-full lg:flex-1 space-y-8">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-foreground">Shared Bookmarks</h2>
-                  <BookmarksList
-                    bookmarks={bookmarks}
-                    fosdemData={fosdemData}
-                    year={year}
-                    loading={bookmarksLoading}
-                    showConflicts={true}
-                    defaultViewMode="schedule"
-                    showViewMode={false}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 space-y-8">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-foreground">Shared Bookmarks</h2>
-                  <p className="text-sm text-muted-foreground">
-                    This user has not shared their bookmarks with you.
-                  </p>
-                </div>
-              </div>
-            )}
+    <PageShell>
+      <PageHeader heading="Profile" displayHeading={false} year={year} />
+      <div className="space-y-8">
+        <div className="flex flex-col lg:flex-row items-start gap-8">
+          <div className="w-full lg:w-auto lg:max-w-md">
+            <ConferenceBadge user={user} conferenceYear={year} />
           </div>
+
+          {user.bookmarks_visibility === "public" ? (
+            <div className="w-full lg:flex-1 space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground">Shared Bookmarks</h2>
+                <BookmarksList
+                  bookmarks={bookmarks}
+                  fosdemData={fosdemData}
+                  year={year}
+                  loading={bookmarksLoading}
+                  showConflicts={true}
+                  defaultViewMode="schedule"
+                  showViewMode={false}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground">Shared Bookmarks</h2>
+                <p className="text-sm text-muted-foreground">
+                  This user has not shared their bookmarks with you.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
