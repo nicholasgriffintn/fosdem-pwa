@@ -95,7 +95,7 @@ export function RoomPlayer({
 					{!isOnline && (
 						<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
 							<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
-								<p className="text-sm md:text-base font-medium">
+								<p className="text-sm md:text-base font-medium text-foreground">
 									You are offline. Live streams are unavailable.
 								</p>
 								<a

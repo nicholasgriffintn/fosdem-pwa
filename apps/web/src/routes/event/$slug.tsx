@@ -117,8 +117,9 @@ function EventPage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
+					<PageHeader heading="Event not found" />
 					<EmptyStateCard
-						title="Event not found"
+						title="Whoops!"
 						description="We couldn't find this event. It may have been removed or the link is incorrect."
 					/>
 				</div>

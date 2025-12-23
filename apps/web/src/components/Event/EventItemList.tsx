@@ -140,7 +140,7 @@ export function EventListItem({
 				{hasStatusBadges && (
 					<div className="flex flex-wrap items-start gap-2">
 						{event.isLive && (
-							<Badge variant="default" className="bg-red-500 hover:bg-red-500">
+							<Badge variant="destructive" className="bg-red-600 hover:bg-red-600 text-white">
 								Live
 							</Badge>
 						)}
@@ -150,7 +150,7 @@ export function EventListItem({
 				)}
 				<div className={layoutClass}>
 					<div className="flex-1 space-y-2 min-w-0">
-						<h3 className="font-semibold leading-tight text-base">
+						<div className="font-semibold leading-tight text-base">
 							<Link
 								{...buildEventLink(event.id, {
 									year: Number.isFinite(year) ? year : undefined
@@ -159,7 +159,7 @@ export function EventListItem({
 							>
 								{event.title}
 							</Link>
-						</h3>
+						</div>
 						<div
 							className={clsx(
 								"flex flex-wrap gap-2",
@@ -244,9 +244,9 @@ export function EventItemList({
 				<li>
 						<div className="flex justify-between px-3 py-4">
 							<div className="flex flex-col space-y-1.5">
-							<h3 className="font-semibold leading-none tracking-tight">
+								<div className="font-semibold leading-none tracking-tight">
 								No events found
-							</h3>
+								</div>
 								<p className="text-muted-foreground text-sm">
 									Try adjusting filters or search terms.
 								</p>

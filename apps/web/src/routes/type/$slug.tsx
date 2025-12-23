@@ -74,8 +74,9 @@ function TypePage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
+					<PageHeader heading="Type not found" />
 					<EmptyStateCard
-						title="Type not found"
+						title="Whoops!"
 						description="We couldn't find this type of content. Please check the link and try again."
 					/>
 				</div>

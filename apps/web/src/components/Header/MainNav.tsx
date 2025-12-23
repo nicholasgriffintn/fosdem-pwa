@@ -76,7 +76,7 @@ export function MainNav({ title, items }: MainNavProps) {
 				id="mobile-menu-toggle"
 				ref={menuCheckboxRef}
 				className="peer/menu sr-only"
-				aria-hidden="true"
+				aria-label="Toggle mobile menu"
 				onChange={(event) => setIsMenuOpen(event.currentTarget.checked)}
 			/>
 			<label

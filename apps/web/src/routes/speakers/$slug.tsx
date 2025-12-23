@@ -79,8 +79,9 @@ function SpeakerPage() {
         return (
             <div className="min-h-screen">
                 <div className="relative py-6 lg:py-10">
+                    <PageHeader heading="Speaker not found" />
                     <EmptyStateCard
-                        title="Speaker not found"
+                        title="Whoops!"
                         description="We couldn't find this speaker profile."
                     />
                 </div>
@@ -99,7 +100,7 @@ function SpeakerPage() {
 
                 {person.biography && (
                     <div className="mt-8 prose prose-lg prose-indigo text-foreground">
-                        <h2 className="text-2xl font-bold mb-4 text-foreground">Biography</h2>
+                        <h2 className="text-xl font-semibold shrink-0">Biography</h2>
                         <div
                             className="mt-2"
                             // biome-ignore lint/security/noDangerouslySetInnerHtml: Biography is HTML from FOSDEM
@@ -110,7 +111,7 @@ function SpeakerPage() {
                     </div>
                 )}
 
-                <div className="mt-12 border-t pt-12">
+                <div className="mt-8">
                     <EventList
                         events={personEvents}
                         year={year}

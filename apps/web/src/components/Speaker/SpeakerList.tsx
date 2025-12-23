@@ -144,9 +144,9 @@ function SpeakerListClient({ persons, year, initialQuery }: Required<SpeakerList
                     <Card className="transition-all duration-200 group-hover:border-primary/50 group-hover:shadow-md bg-card/40 backdrop-blur-sm">
                       <CardContent className="p-4 flex items-center gap-4 text-foreground">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                          <div className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                             {person.name}
-                          </h3>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -208,9 +208,9 @@ function SpeakerListStatic({ persons, year, initialQuery }: Required<SpeakerList
                 <Card className="transition-all duration-200 group-hover:border-primary/50 group-hover:shadow-md bg-card/40 backdrop-blur-sm">
                   <CardContent className="p-4 flex items-center gap-4 text-foreground">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                      <div className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                         {person.name}
-                      </h3>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

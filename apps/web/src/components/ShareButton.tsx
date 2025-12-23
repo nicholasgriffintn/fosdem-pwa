@@ -56,6 +56,7 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
 						"cursor-pointer list-none [&::-webkit-details-marker]:hidden",
 					)}
 					title="Share"
+					aria-label={`Share ${title}`}
 				>
 					<Icons.share className="h-4 w-4" />
 				</summary>
@@ -70,7 +71,12 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
 					/>
 				</div>
 			</details>
-			<Button variant="outline" onClick={handleShare} className="js-only">
+			<Button
+				variant="outline"
+				onClick={handleShare}
+				className="js-only"
+				aria-label={`Share ${title}`}
+			>
 				<Icons.share className="h-4 w-4" />
 			</Button>
 		</>

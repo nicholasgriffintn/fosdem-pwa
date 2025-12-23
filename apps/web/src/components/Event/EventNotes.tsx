@@ -141,7 +141,12 @@ export function EventNotes({
 					value={note}
 					onChange={handleNoteChange}
 				/>
-				<Button onClick={handleSave} className="w-full" disabled={!note.trim()}>
+				<Button
+					onClick={handleSave}
+					className="w-full"
+					disabled={!note.trim()}
+					aria-label={`Save note for ${event.title}`}
+				>
 					Save
 				</Button>
 			</div>
