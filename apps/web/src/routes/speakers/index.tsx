@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getAllData } from "~/server/functions/fosdem";
 import type { Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
-import { PageHeader } from "~/components/PageHeader";
+import { PageHeader } from "~/components/shared/PageHeader";
 import { SpeakerList } from "~/components/Speaker/SpeakerList";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 

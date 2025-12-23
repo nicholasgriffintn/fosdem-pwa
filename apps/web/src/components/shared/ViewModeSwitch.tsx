@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { cn } from "~/lib/utils";
 
 export function ViewModeSwitch({

@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { getAllData } from "~/server/functions/fosdem";
-import { PageHeader } from "~/components/PageHeader";
+import { PageHeader } from "~/components/shared/PageHeader";
 import { EventList } from "~/components/Event/EventList";
 import type { Event, Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";

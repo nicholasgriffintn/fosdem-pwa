@@ -7,7 +7,7 @@ import { sortEvents, sortTracks } from "~/lib/sorting";
 import type { User } from "~/server/db/schema";
 import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
-import { EmptyStateCard } from "../EmptyStateCard";
+import { EmptyStateCard } from "../shared/EmptyStateCard";
 import { doesEventMatchTrack } from "~/lib/tracks";
 import { isEvent, isTrack } from "~/lib/type-guards";
 

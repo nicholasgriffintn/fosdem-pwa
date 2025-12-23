@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { toast } from "~/hooks/use-toast";
-import { Spinner } from "~/components/Spinner";
+import { Spinner } from "~/components/shared/Spinner";
 import { useIsClient } from "~/hooks/use-is-client";
 import { createBookmarkFromForm } from "~/server/functions/bookmarks";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";

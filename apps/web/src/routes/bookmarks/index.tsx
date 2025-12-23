@@ -1,20 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { PageHeader } from "~/components/PageHeader";
+import { PageHeader } from "~/components/shared/PageHeader";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { constants } from "~/constants";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useAuth } from "~/hooks/use-auth";
-import { Spinner } from "~/components/Spinner";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { Spinner } from "~/components/shared/Spinner";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { useIsClient } from "~/hooks/use-is-client";
 import { getAllData } from "~/server/functions/fosdem";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { Button } from "~/components/ui/button";
-import { UpgradeNotice } from "~/components/UpgradeNotice";
+import { UpgradeNotice } from "~/components/shared/UpgradeNotice";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/bookmarks/")({

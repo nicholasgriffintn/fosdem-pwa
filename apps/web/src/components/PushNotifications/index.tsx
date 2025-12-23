@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
-import { Spinner } from "~/components/Spinner";
+import { Spinner } from "~/components/shared/Spinner";
 import { toast } from "~/hooks/use-toast";
 import { useMutateSubscriptions } from "~/hooks/use-mutate-subscriptions";
 import { useSubscriptions } from "~/hooks/use-subscriptions";

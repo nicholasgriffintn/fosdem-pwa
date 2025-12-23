@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import Hls from "hls.js";
 
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import type { Event } from "~/types/fosdem";
 
 export function EventPlayerStarted({

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { PageHeader } from "~/components/PageHeader";
+import { PageHeader } from "~/components/shared/PageHeader";
 import { EventList } from "~/components/Event/EventList";
 import { getAllData } from "~/server/functions/fosdem";
 import { testLiveEvents, testConferenceData } from "~/data/test-data";

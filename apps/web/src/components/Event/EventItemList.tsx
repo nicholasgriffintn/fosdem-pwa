@@ -5,12 +5,12 @@ import { Link } from "@tanstack/react-router";
 import type { Event } from "~/types/fosdem";
 import type { EventConflict } from "~/lib/fosdem";
 import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
-import { ItemActions } from "~/components/ItemActions";
+import { ItemActions } from "~/components/shared/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime } from "~/lib/dateTime";
 import type { User } from "~/server/db/schema";
 import { Badge } from "~/components/ui/badge";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { buildEventLink } from "~/lib/link-builder";
 
 type EventListProps = {

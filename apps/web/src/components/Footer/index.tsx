@@ -1,4 +1,4 @@
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { YearSelector } from "~/components/Footer/YearSelector";
 
 export function Footer() {

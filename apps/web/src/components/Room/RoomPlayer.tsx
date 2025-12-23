@@ -3,9 +3,9 @@
 import clsx from "clsx";
 import { useState } from "react";
 
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { constants } from "~/constants";
-import { Image } from "~/components/Image";
+import { Image } from "~/components/shared/Image";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { SharedVideoElement } from "~/components/VideoPlayer/SharedVideoElement";
 import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";

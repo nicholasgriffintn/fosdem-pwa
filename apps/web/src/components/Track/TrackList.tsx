@@ -1,10 +1,10 @@
 import type { Track } from "~/types/fosdem";
-import { ItemActions } from "~/components/ItemActions";
+import { ItemActions } from "~/components/shared/ItemActions";
 import { useTrackList } from "~/hooks/use-item-list";
 import { groupTracksByDay } from "~/lib/grouping";
 import type { User } from "~/server/db/schema";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
-import { Icons } from "~/components/Icons";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
+import { Icons } from "~/components/shared/Icons";
 import { Link } from "@tanstack/react-router";
 import { buildTrackLink } from "~/lib/link-builder";
 import { ItemListContainer } from "~/components/shared/ItemListContainer";

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { FavouriteButton } from "~/components/FavouriteButton";
+import { FavouriteButton } from "~/components/shared/FavouriteButton";
 
 const routerMocks = vi.hoisted(() => ({
 	useRouterState: ({

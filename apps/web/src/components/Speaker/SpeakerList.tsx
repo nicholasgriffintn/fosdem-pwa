@@ -6,7 +6,7 @@ import type { Person } from "~/types/fosdem";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent } from "~/components/ui/card";
 import { LoadingState } from "~/components/shared/LoadingState";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { useIsClient } from "~/hooks/use-is-client";
 
 type SpeakerListProps = {

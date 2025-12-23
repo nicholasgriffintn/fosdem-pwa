@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it, beforeEach, vi, afterEach } from "vitest";
 
-import { ShareButton } from "~/components/ShareButton";
+import { ShareButton } from "~/components/shared/ShareButton";
 
 const supportMocks = vi.hoisted(() => ({
 	shareSupported: vi.fn(),

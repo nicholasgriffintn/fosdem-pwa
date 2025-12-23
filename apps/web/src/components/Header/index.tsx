@@ -1,7 +1,7 @@
 import { Link, useSearch } from "@tanstack/react-router";
 import { useIsClient } from "~/hooks/use-is-client";
 
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { MainNav } from "~/components/Header/MainNav";
 import { NavSearch } from "~/components/Header/NavSearch";
 import { Button } from "~/components/ui/button";
@@ -13,7 +13,7 @@ import {
 	TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { useAuth } from "~/hooks/use-auth";
-import { Spinner } from "~/components/Spinner";
+import { Spinner } from "~/components/shared/Spinner";
 import { constants } from "~/constants";
 import { cn } from "../../lib/utils";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
