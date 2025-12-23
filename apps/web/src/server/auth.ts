@@ -3,7 +3,7 @@ import {
 	encodeBase32LowerCaseNoPadding,
 	encodeHexLowerCase,
 } from "@oslojs/encoding";
-import { GitHub, Discord, Mastodon } from "arctic";
+import { GitHub, Discord } from "arctic";
 import { and, eq } from "drizzle-orm";
 import {
 	deleteCookie,
@@ -12,6 +12,7 @@ import {
 } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
 
+import { Mastodon } from "~/server/lib/mastodon-arctic";
 import { createStandardDate } from "~/lib/dateTime";
 import { CacheManager } from "~/server/cache";
 import { db } from "~/server/db";

@@ -3,7 +3,6 @@ import { getCookies } from "@tanstack/react-start/server";
 
 import { MastodonOAuthHandler } from "~/server/mastodon-handler";
 import { handleOAuthCallback } from "~/server/oauth-providers";
-import { env } from "cloudflare:workers";
 
 export const Route = createFileRoute("/api/auth/callback/mastodon")({
   server: {
