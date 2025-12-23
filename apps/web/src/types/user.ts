@@ -21,6 +21,29 @@ export interface DiscordUser {
 	verified: boolean;
 }
 
+export interface MastodonUser {
+	id: string;
+	username: string;
+	acct: string;
+	display_name: string;
+	avatar: string;
+	avatar_static: string;
+	url: string;
+	locked: boolean;
+	created_at: string;
+	last_status_at: string | null;
+	followers_count: number;
+	following_count: number;
+	statuses_count: number;
+	source?: {
+		note: string;
+		fields: any[];
+		privacy: string;
+		sensitive: boolean;
+		language: string;
+	};
+}
+
 export interface OAuthProvider {
 	id: string;
 	name: string;
@@ -40,4 +63,6 @@ export interface OAuthUser {
 	bio?: string | null;
 	twitter_username?: string | null;
 	discriminator?: string;
+	acct?: string;
+	url?: string;
 }

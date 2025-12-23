@@ -30,11 +30,13 @@ import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId
 import { Route as ApiProxySubtitlesRouteImport } from './routes/api/proxy/subtitles'
 import { Route as ApiAuthUpgradeGithubRouteImport } from './routes/api/auth/upgrade-github'
 import { Route as ApiAuthUpgradeDiscordRouteImport } from './routes/api/auth/upgrade-discord'
+import { Route as ApiAuthMastodonRouteImport } from './routes/api/auth/mastodon'
 import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
 import { Route as ApiAuthGuestRouteImport } from './routes/api/auth/guest'
 import { Route as ApiAuthGithubRouteImport } from './routes/api/auth/github'
 import { Route as ApiAuthDiscordRouteImport } from './routes/api/auth/discord'
 import { Route as ApiProxyRoomsStatusRouteImport } from './routes/api/proxy/rooms/status'
+import { Route as ApiAuthCallbackMastodonRouteImport } from './routes/api/auth/callback.mastodon'
 import { Route as ApiAuthCallbackGithubRouteImport } from './routes/api/auth/callback.github'
 import { Route as ApiAuthCallbackDiscordRouteImport } from './routes/api/auth/callback.discord'
 
@@ -143,6 +145,11 @@ const ApiAuthUpgradeDiscordRoute = ApiAuthUpgradeDiscordRouteImport.update({
   path: '/api/auth/upgrade-discord',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthMastodonRoute = ApiAuthMastodonRouteImport.update({
+  id: '/api/auth/mastodon',
+  path: '/api/auth/mastodon',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
   id: '/api/auth/logout',
   path: '/api/auth/logout',
@@ -166,6 +173,11 @@ const ApiAuthDiscordRoute = ApiAuthDiscordRouteImport.update({
 const ApiProxyRoomsStatusRoute = ApiProxyRoomsStatusRouteImport.update({
   id: '/api/proxy/rooms/status',
   path: '/api/proxy/rooms/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthCallbackMastodonRoute = ApiAuthCallbackMastodonRouteImport.update({
+  id: '/api/auth/callback/mastodon',
+  path: '/api/auth/callback/mastodon',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthCallbackGithubRoute = ApiAuthCallbackGithubRouteImport.update({
@@ -201,12 +213,14 @@ export interface FileRoutesByFullPath {
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/mastodon': typeof ApiAuthMastodonRoute
   '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
+  '/api/auth/callback/mastodon': typeof ApiAuthCallbackMastodonRoute
   '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
 export interface FileRoutesByTo {
@@ -231,12 +245,14 @@ export interface FileRoutesByTo {
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/mastodon': typeof ApiAuthMastodonRoute
   '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
+  '/api/auth/callback/mastodon': typeof ApiAuthCallbackMastodonRoute
   '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
 export interface FileRoutesById {
@@ -262,12 +278,14 @@ export interface FileRoutesById {
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/mastodon': typeof ApiAuthMastodonRoute
   '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId/': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
+  '/api/auth/callback/mastodon': typeof ApiAuthCallbackMastodonRoute
   '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
 export interface FileRouteTypes {
@@ -294,12 +312,14 @@ export interface FileRouteTypes {
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
+    | '/api/auth/mastodon'
     | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/proxy/subtitles'
     | '/profile/$userId'
     | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
+    | '/api/auth/callback/mastodon'
     | '/api/proxy/rooms/status'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -324,12 +344,14 @@ export interface FileRouteTypes {
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
+    | '/api/auth/mastodon'
     | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/proxy/subtitles'
     | '/profile/$userId'
     | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
+    | '/api/auth/callback/mastodon'
     | '/api/proxy/rooms/status'
   id:
     | '__root__'
@@ -354,12 +376,14 @@ export interface FileRouteTypes {
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
+    | '/api/auth/mastodon'
     | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/proxy/subtitles'
     | '/profile/$userId/'
     | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
+    | '/api/auth/callback/mastodon'
     | '/api/proxy/rooms/status'
   fileRoutesById: FileRoutesById
 }
@@ -385,12 +409,14 @@ export interface RootRouteChildren {
   ApiAuthGithubRoute: typeof ApiAuthGithubRoute
   ApiAuthGuestRoute: typeof ApiAuthGuestRoute
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthMastodonRoute: typeof ApiAuthMastodonRoute
   ApiAuthUpgradeDiscordRoute: typeof ApiAuthUpgradeDiscordRoute
   ApiAuthUpgradeGithubRoute: typeof ApiAuthUpgradeGithubRoute
   ApiProxySubtitlesRoute: typeof ApiProxySubtitlesRoute
   ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
   ApiAuthCallbackDiscordRoute: typeof ApiAuthCallbackDiscordRoute
   ApiAuthCallbackGithubRoute: typeof ApiAuthCallbackGithubRoute
+  ApiAuthCallbackMastodonRoute: typeof ApiAuthCallbackMastodonRoute
   ApiProxyRoomsStatusRoute: typeof ApiProxyRoomsStatusRoute
 }
 
@@ -543,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthUpgradeDiscordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/mastodon': {
+      id: '/api/auth/mastodon'
+      path: '/api/auth/mastodon'
+      fullPath: '/api/auth/mastodon'
+      preLoaderRoute: typeof ApiAuthMastodonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/logout': {
       id: '/api/auth/logout'
       path: '/api/auth/logout'
@@ -576,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/api/proxy/rooms/status'
       fullPath: '/api/proxy/rooms/status'
       preLoaderRoute: typeof ApiProxyRoomsStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/callback/mastodon': {
+      id: '/api/auth/callback/mastodon'
+      path: '/api/auth/callback/mastodon'
+      fullPath: '/api/auth/callback/mastodon'
+      preLoaderRoute: typeof ApiAuthCallbackMastodonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/callback/github': {
@@ -617,12 +657,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthGithubRoute: ApiAuthGithubRoute,
   ApiAuthGuestRoute: ApiAuthGuestRoute,
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthMastodonRoute: ApiAuthMastodonRoute,
   ApiAuthUpgradeDiscordRoute: ApiAuthUpgradeDiscordRoute,
   ApiAuthUpgradeGithubRoute: ApiAuthUpgradeGithubRoute,
   ApiProxySubtitlesRoute: ApiProxySubtitlesRoute,
   ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
   ApiAuthCallbackDiscordRoute: ApiAuthCallbackDiscordRoute,
   ApiAuthCallbackGithubRoute: ApiAuthCallbackGithubRoute,
+  ApiAuthCallbackMastodonRoute: ApiAuthCallbackMastodonRoute,
   ApiProxyRoomsStatusRoute: ApiProxyRoomsStatusRoute,
 }
 export const routeTree = rootRouteImport

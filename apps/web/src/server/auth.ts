@@ -12,6 +12,7 @@ import {
 } from "@tanstack/react-start/server";
 import { env } from "cloudflare:workers";
 
+import { Mastodon } from "~/server/lib/mastodon-arctic";
 import { createStandardDate } from "~/lib/dateTime";
 import { CacheManager } from "~/server/cache";
 import { db } from "~/server/db";
@@ -157,6 +158,37 @@ export const discord = new Discord(
 	env.DISCORD_CLIENT_SECRET,
 	DISCORD_REDIRECT_URL,
 );
+
+export const MASTODON_INSTANCES = [
+	{
+		name: "mastodon.social",
+		baseUrl: "https://mastodon.social",
+		clientId: env.MASTODON_MASTODON_SOCIAL_CLIENT_ID,
+		clientSecret: env.MASTODON_MASTODON_SOCIAL_CLIENT_SECRET,
+	},
+];
+
+export function createMastodonInstance(baseUrl: string) {
+	const redirectUrl = env.MASTODON_REDIRECT_URI
+		? env.MASTODON_REDIRECT_URI
+		: `${env.CF_PAGES_URL}/api/auth/callback/mastodon`;
+
+	const instance = MASTODON_INSTANCES.find(inst => inst.baseUrl === baseUrl);
+	if (!instance) {
+		throw new Error(`Unsupported Mastodon instance: ${baseUrl}`);
+	}
+
+	if (!instance.clientId || !instance.clientSecret) {
+		throw new Error(`Missing credentials for Mastodon instance: ${instance.name}`);
+	}
+
+	return new Mastodon(
+		baseUrl,
+		instance.clientId,
+		instance.clientSecret,
+		redirectUrl,
+	);
+}
 
 /**
  * Retrieves the session and user data if valid.

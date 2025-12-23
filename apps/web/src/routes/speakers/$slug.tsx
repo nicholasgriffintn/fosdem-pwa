@@ -104,7 +104,6 @@ function SpeakerPage() {
                         <h2 className="text-xl font-semibold shrink-0">Biography</h2>
                         <div
                             className="mt-2"
-                            // biome-ignore lint/security/noDangerouslySetInnerHtml: Biography is HTML from FOSDEM
                             dangerouslySetInnerHTML={{
                                 __html: person.extended_biography || person.biography,
                             }}
