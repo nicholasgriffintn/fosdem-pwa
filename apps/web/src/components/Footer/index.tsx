@@ -3,7 +3,7 @@ import { YearSelector } from "~/components/Footer/YearSelector";
 
 export function Footer() {
 	return (
-		<footer className="border-t pb-16 md:pb-0">
+		<footer className="md:border-t pb-16 lg:pb-0">
 			<div className="container">
 				<div className="flex flex-col gap-6 py-6 md:gap-0">
 					<div className="flex flex-col items-center justify-between md:flex-row">
@@ -12,12 +12,12 @@ export function Footer() {
 							<span className="font-medium">FOSDEM PWA</span>
 						</div>
 
-						<div className="scale-90">
+						<div className="scale-90 pt-4 md:pt-0">
 							<YearSelector id="footer-year-select" />
 						</div>
 					</div>
 
-					<div className="flex flex-wrap md:mt-4 items-center justify-center md:items-start md:justify-start gap-x-2 text-sm text-muted-foreground">
+					<div className="flex flex-wrap md:mt-4 items-center justify-center md:items-start md:justify-start gap-x-2 gap-y-4 md:gap-y-0 text-sm text-muted-foreground">
 						<span>Using data from</span>
 						<a
 							href="https://fosdem.org/"
