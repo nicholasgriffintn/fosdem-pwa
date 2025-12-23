@@ -447,9 +447,11 @@ export default function SearchPage() {
 						/>
 					</div>
 				</form>
+			</div>
+			<div className="flex flex-wrap gap-4 items-end mb-6">
 				<div className="flex flex-col gap-1">
 					<Label>Show</Label>
-					<div className="flex flex-wrap gap-2">
+					<div className="flex flex-wrap gap-2 items-center">
 						{typeFilters.map((filter) => (
 							<Link
 								key={filter.value}
@@ -467,19 +469,19 @@ export default function SearchPage() {
 								{filter.label}
 							</Link>
 						))}
+						{hasActiveFilters && (
+							<Link
+								to="."
+								search={{ year }}
+								className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 no-underline hover:underline"
+								aria-label="Clear search and filters"
+							>
+								<Icons.close className="h-4 w-4" />
+								Clear
+							</Link>
+						)}
 					</div>
 				</div>
-				{hasActiveFilters && (
-					<Link
-						to="."
-						search={{ year }}
-						className="h-10 px-3 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-accent transition-colors"
-						aria-label="Clear search and filters"
-					>
-						<Icons.close className="h-4 w-4" />
-						Clear
-					</Link>
-				)}
 			</div>
 
 			{!fosdemData ? (
