@@ -31,7 +31,8 @@ import {
   Download,
   Users,
   ExternalLink,
-  Gitlab
+  Gitlab,
+  Search
 } from "lucide-react";
 
 export const Icons = {
@@ -147,6 +148,7 @@ export const Icons = {
   clock: Clock,
   download: Download,
   users: Users,
+  search: Search,
   externalLink: ExternalLink,
   x: X,
 };

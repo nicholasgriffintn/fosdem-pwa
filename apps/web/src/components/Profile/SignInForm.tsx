@@ -30,7 +30,7 @@ export function SignInForm() {
 					type="submit"
 					variant="outline"
 					size="lg"
-					className="w-full cursor-pointer bg-[#FC6D26] text-white hover:bg-[#E24329] border-[#E24329]"
+					className="w-full cursor-pointer bg-[#C2410C] text-white hover:bg-[#9A3412] border-[#9A3412]"
 					disabled={isSubmitting || isGuestSubmitting}
 				>
 					{isSubmitting && <Spinner className="w-4 h-4 mr-2" />}
