@@ -42,7 +42,11 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 				<PageHeader heading="Something went wrong" />
 				<EmptyStateCard
 					title="Whoops!"
-					description={<p className="text-sm text-muted-foreground">{message}</p>}
+					description={
+						<p className="text-sm text-muted-foreground break-words">
+							{message}
+						</p>
+					}
 					actions={
 						<>
 							<Button
