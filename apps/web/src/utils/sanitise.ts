@@ -3,5 +3,6 @@ export function removeHTMLTags(input: string) {
 }
 
 export function sanitiseString(input: string) {
+  if (!input) return "";
   return removeHTMLTags(input);
 }
