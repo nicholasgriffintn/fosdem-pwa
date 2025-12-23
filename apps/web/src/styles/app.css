@@ -163,3 +163,8 @@ html.js-enabled .no-js-only {
 html:not(.js-enabled) .js-required {
 	display: none !important;
 }
+
+.TanStackRouterDevtools button,
+.tsqd-open-btn-container {
+	bottom: 80px !important;
+}
