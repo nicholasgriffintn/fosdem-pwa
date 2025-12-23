@@ -8,7 +8,7 @@ import { constants } from "~/constants";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { Button } from "~/components/ui/button";
 import { YearSelector } from "~/components/Footer/YearSelector";
-import { Icons } from "../components/shared/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { LoadingState } from "~/components/shared/LoadingState";
 
 export const Route = createFileRoute("/")({
