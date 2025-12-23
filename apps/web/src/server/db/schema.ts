@@ -47,9 +47,6 @@ export const user = sqliteTable(
 			twitterUsernameIdx: uniqueIndex("twitter_username_idx").on(
 				table.twitter_username,
 			),
-			mastodonUsernameIdx: uniqueIndex("mastodon_username_idx").on(
-				table.mastodon_username,
-			),
 			gitlabUsernameIdx: uniqueIndex("gitlab_username_idx").on(
 				table.gitlab_username,
 			),

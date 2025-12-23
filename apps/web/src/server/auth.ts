@@ -176,6 +176,12 @@ export const MASTODON_INSTANCES = [
 		clientId: env.MASTODON_MASTODON_SOCIAL_CLIENT_ID,
 		clientSecret: env.MASTODON_MASTODON_SOCIAL_CLIENT_SECRET,
 	},
+	{
+		name: "mastodon.online",
+		baseUrl: "https://mastodon.online",
+		clientId: env.MASTODON_MASTODON_ONLINE_CLIENT_ID,
+		clientSecret: env.MASTODON_MASTODON_ONLINE_CLIENT_SECRET,
+	},
 ];
 
 export function createMastodonInstance(baseUrl: string) {

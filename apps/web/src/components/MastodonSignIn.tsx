@@ -8,6 +8,7 @@ import { Icons } from "~/components/Icons";
 
 const MASTODON_INSTANCES = [
   { name: "mastodon.social", baseUrl: "https://mastodon.social" },
+  { name: "mastodon.online", baseUrl: "https://mastodon.online" },
 ];
 
 interface MastodonSignInProps {

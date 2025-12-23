@@ -46,17 +46,17 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 				</Avatar>
 			</label>
 			<div className="hidden peer-checked/avatar:block absolute right-0 mt-2 w-56 rounded-md border bg-popover text-popover-foreground shadow-md z-50 p-1">
-				<div className="flex items-center justify-start gap-2 p-2">
-					<div className="flex flex-col space-y-1">
-						<div className="flex items-center gap-2">
-							<p className="text-sm font-medium leading-none">{user.name}</p>
+				<div className="flex items-center justify-start gap-2 p-2 min-w-0">
+					<div className="flex flex-col space-y-1 min-w-0 flex-1">
+						<div className="flex items-center gap-2 min-w-0">
+							<p className="text-sm font-medium leading-none truncate">{user.name}</p>
 							{user.is_guest && (
 								<Badge variant="secondary" className="text-xs">
 									Guest
 								</Badge>
 							)}
 						</div>
-						<p className="text-xs leading-none text-muted-foreground">
+						<p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]">
 							{user.email}
 						</p>
 					</div>

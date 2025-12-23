@@ -1,0 +1,1 @@
+DROP INDEX `mastodon_username_idx`;
