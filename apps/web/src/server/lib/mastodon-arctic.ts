@@ -1,3 +1,5 @@
+// TODO: Remove this if/when arctic merges this: https://github.com/pilcrowonpaper/arctic/pull/323
+
 import { OAuth2Client, CodeChallengeMethod } from "arctic";
 import type { OAuth2Tokens } from "arctic";
 
