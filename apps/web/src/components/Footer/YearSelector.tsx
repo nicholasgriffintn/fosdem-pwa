@@ -7,7 +7,7 @@ import { toast } from "~/hooks/use-toast";
 import { Select } from "~/components/ui/select";
 import { buildHomeLink } from "~/lib/link-builder";
 
-export function YearSelector() {
+export function YearSelector({ id = "year-select" }: { id?: string }) {
 	const router = useRouter();
 	const { year } = useSearch({ strict: false });
 	const selectedYear = year || constants.DEFAULT_YEAR;
@@ -28,11 +28,11 @@ export function YearSelector() {
 
 	return (
 		<div className="flex items-center gap-2">
-			<label htmlFor="year-select">Year</label>
+			<label htmlFor={id}>Year</label>
 			<form method="GET" action="/" className="flex items-center gap-2">
 				<Select
 					name="year"
-					id="year-select"
+					id={id}
 					value={selectedYear.toString()}
 					onValueChange={(value) => handleYearChange(Number(value))}
 					options={yearOptions}

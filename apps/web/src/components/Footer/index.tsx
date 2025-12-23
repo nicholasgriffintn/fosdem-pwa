@@ -13,7 +13,7 @@ export function Footer() {
 						</div>
 
 						<div className="scale-90">
-							<YearSelector />
+							<YearSelector id="footer-year-select" />
 						</div>
 					</div>
 

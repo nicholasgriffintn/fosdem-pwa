@@ -47,7 +47,7 @@ function Home() {
 					text={`${fosdem.conference.city} / ${fosdem.conference.start} - ${fosdem.conference.end}`}
 					year={year}
 				>
-					<YearSelector />
+					<YearSelector id="header-year-select" />
 				</PageHeader>
 
 				{!fosdem.types || Object.keys(fosdem.types).length === 0 ? (
