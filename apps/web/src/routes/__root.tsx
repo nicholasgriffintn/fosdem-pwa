@@ -26,6 +26,8 @@ import { FloatingPlayer } from "~/components/FloatingPlayer";
 import { VideoPortal } from "~/components/VideoPlayer/VideoPortal";
 import { getSession } from "~/server/functions/session";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { BottomTabNav } from "~/components/BottomTabNav";
+import { navItems } from "~/components/shared/NavItems";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
@@ -142,6 +144,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 						{children}
 						<Toaster />
 					</div>
+					<BottomTabNav items={navItems} />
 					<Footer />
 					<ReactQueryDevtools buttonPosition="bottom-left" />
 					<Suspense>
