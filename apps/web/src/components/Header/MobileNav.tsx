@@ -70,18 +70,12 @@ export function MobileNav({
 		>
 			<label
 				htmlFor="mobile-menu-toggle"
-				className={cn(
-					"absolute inset-0 bg-black/50 backdrop-blur-sm",
-					"opacity-0 transition-opacity duration-200",
-					"peer-checked/menu:opacity-100",
-				)}
+				className="absolute inset-0 bg-black/50 backdrop-blur-sm"
 				aria-label="Close menu"
 			/>
 			<div
 				className={cn(
 					"relative flex h-[100svh] w-full flex-col bg-background",
-					"translate-y-2 transition-transform duration-200",
-					"peer-checked/menu:translate-y-0",
 				)}
 			>
 				<div className="flex h-16 items-center justify-between gap-3 border-b px-4">
@@ -98,7 +92,7 @@ export function MobileNav({
 					</label>
 				</div>
 
-				<div className="flex-1 overflow-y-auto px-4 py-4">
+				<div className="flex-1 overflow-y-auto px-4 py-4 pb-[calc(5rem+env(safe-area-inset-bottom))]">
 					<nav className="grid gap-1 text-base" aria-label="Primary">
 						{items.map((item, index) => (
 							<Link
