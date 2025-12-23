@@ -73,8 +73,9 @@ function TrackPage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
+					<PageHeader heading="Track not found" year={year} />
 					<EmptyStateCard
-						title="Track not found"
+						title="Whoops!"
 						description="We couldn't find this track. It may have moved or the link might be outdated."
 					/>
 				</div>

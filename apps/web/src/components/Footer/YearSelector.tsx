@@ -28,10 +28,11 @@ export function YearSelector() {
 
 	return (
 		<div className="flex items-center gap-2">
-			<span>Year</span>
+			<label htmlFor="year-select">Year</label>
 			<form method="GET" action="/" className="flex items-center gap-2">
 				<Select
 					name="year"
+					id="year-select"
 					value={selectedYear.toString()}
 					onValueChange={(value) => handleYearChange(Number(value))}
 					options={yearOptions}
@@ -40,6 +41,7 @@ export function YearSelector() {
 				<button
 					type="submit"
 					className="no-js-only h-9 rounded-md border border-input bg-background px-3 text-sm hover:bg-accent"
+					aria-label="Navigate to selected year"
 				>
 					Go
 				</button>

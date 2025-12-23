@@ -34,9 +34,9 @@ function RoomListItem({ year, room, index, isLast }: RoomListItemProps) {
 					}}
 					className="no-underline"
 				>
-					<h3 className="font-semibold leading-none tracking-tight">
+					<div className="font-semibold leading-none tracking-tight">
 						{room.name}
-					</h3>
+					</div>
 				</Link>
 				<p className="text-muted-foreground">
 					Building {room.buildingId || room.building?.id} | {room.eventCount}{" "}
@@ -87,12 +87,12 @@ export function RoomList({
 
 						return (
 							<div key={buildingId} className="space-y-2">
-								<h3 className="text-2xl font-bold text-foreground">
+								<div className="text-2xl font-bold text-foreground">
 									Building {buildingId}
 									<span className="text-sm font-normal text-muted-foreground ml-2">
 										({buildingRooms.length} rooms)
 									</span>
-								</h3>
+								</div>
 								<ul className="room-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
 									{buildingRooms.map((room, index) => (
 										<li key={room.slug}>

@@ -78,7 +78,7 @@ export function EventPlayerNotStarted({
 								Stream opens at {startTimeLabel} ({constants.TIME_ZONE})
 							</p>
 							{timeUntilStartLabel && (
-								<p className="text-xs md:text-sm text-muted-foreground">
+									<p className="text-xs md:text-sm text-foreground">
 									Starts in about {timeUntilStartLabel}. Come back later to
 									watch the stream.
 								</p>

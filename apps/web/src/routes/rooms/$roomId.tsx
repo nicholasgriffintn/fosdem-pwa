@@ -105,8 +105,9 @@ function RoomPage() {
 		return (
 			<div className="min-h-screen">
 				<div className="relative py-6 lg:py-10">
+					<PageHeader heading="Room not found" />
 					<EmptyStateCard
-						title="Room not found"
+						title="Whoops!"
 						description="We couldn't find this room. It may have changed or the link is incorrect."
 					/>
 				</div>

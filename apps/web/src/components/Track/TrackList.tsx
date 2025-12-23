@@ -86,7 +86,7 @@ function TrackListItem({
 		<div className="relative py-4 px-3 sm:px-4 hover:bg-muted/40 transition-colors">
 			<div className={layoutClass}>
 				<div className="flex flex-1 flex-col gap-2 min-w-0">
-					<h3 className="font-semibold leading-tight text-base">
+					<div className="font-semibold leading-tight text-base">
 						<Link
 							{...buildTrackLink(track.id, {
 								year: Number.isFinite(year) ? year : undefined,
@@ -95,7 +95,7 @@ function TrackListItem({
 						>
 							{track.name}
 						</Link>
-					</h3>
+					</div>
 					<div className="flex flex-wrap gap-2">
 						{metaBadges.map((meta) => (
 							<div

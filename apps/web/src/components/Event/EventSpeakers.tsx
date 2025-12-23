@@ -26,9 +26,9 @@ export function EventSpeakers({ event, year, persons }: EventSpeakersProps) {
           const content = (
             <div className="flex items-start gap-4 p-4 rounded-lg border bg-card/40 backdrop-blur-sm transition-colors hover:border-primary/50">
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-foreground mb-1 truncate">
+                <div className="font-semibold text-foreground mb-1 truncate">
                   {personName}
-                </h3>
+                </div>
                 {person && (person.biography || person.extended_biography) && (
                   <div
                     className="text-sm text-muted-foreground line-clamp-3 prose-sm prose-indigo"

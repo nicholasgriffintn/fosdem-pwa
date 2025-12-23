@@ -68,7 +68,7 @@ function EventScheduleListItem({
 		<div className="relative">
 			<div className="bg-card border rounded-lg p-4 mb-2">
 				<div className="flex flex-col space-y-2">
-					<h3 className="font-semibold">{event.title}</h3>
+					<div className="font-semibold">{event.title}</div>
 					<p className="text-sm text-muted-foreground">
 						{event.room} | {event.startTime} -{" "}
 						{calculateEndTime(event.startTime, event.duration)}

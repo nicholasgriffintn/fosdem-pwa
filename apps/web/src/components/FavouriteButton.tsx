@@ -154,6 +154,11 @@ export function FavouriteButton({
 			variant="outline"
 			onClick={handleFavourite}
 			disabled={currentStatus === "loading" || isProcessing}
+			aria-label={
+				currentStatus === "favourited"
+					? "Remove from bookmarks"
+					: "Add to bookmarks"
+			}
 		>
 			{currentStatus === "loading" || isProcessing ? (
 				<Spinner />
