@@ -102,7 +102,8 @@ export async function handleOAuthCallback(
     }
 
     let existingUserEmail = null;
-    if (providerUser.email) {
+    // Skip email-based linking for Mastodon as it uses fabricated emails
+    if (providerUser.email && provider.id !== 'mastodon') {
       existingUserEmail = await db.query.user.findFirst({
         where: eq(user.email, providerUser.email),
       });
@@ -160,6 +161,10 @@ async function createNewUser(providerUser: OAuthUser, providerId: string): Promi
     userData.github_username = (providerUser as any).login;
   } else if (providerId === 'discord') {
     userData.discord_username = (providerUser as any).username;
+  } else if (providerId === 'mastodon') {
+    userData.mastodon_username = providerUser.username;
+    userData.mastodon_acct = providerUser.acct;
+    userData.mastodon_url = providerUser.url;
   }
 
   const userId = await db
@@ -185,7 +190,7 @@ async function upgradeGuestUser(userId: number, providerUser: OAuthUser, provide
   };
 
   if (providerId === 'github') {
-    const githubUser = providerUser as any;
+    const githubUser = providerUser;
     userData.github_username = githubUser.login;
     userData.company = githubUser.company;
     userData.site = githubUser.blog;
@@ -193,7 +198,11 @@ async function upgradeGuestUser(userId: number, providerUser: OAuthUser, provide
     userData.bio = githubUser.bio;
     userData.twitter_username = githubUser.twitter_username;
   } else if (providerId === 'discord') {
-    userData.discord_username = (providerUser as any).username;
+    userData.discord_username = providerUser.username;
+  } else if (providerId === 'mastodon') {
+    userData.mastodon_username = providerUser.username;
+    userData.mastodon_acct = providerUser.acct;
+    userData.mastodon_url = providerUser.url;
   }
 
   await db

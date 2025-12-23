@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Spinner } from "~/components/Spinner";
 import { Icons } from "~/components/Icons";
+import { MastodonSignIn } from "~/components/MastodonSignIn";
 import { constants } from "~/constants";
 
 export function SignInForm() {
@@ -50,6 +51,8 @@ export function SignInForm() {
 					Sign in with Discord
 				</Button>
 			</form>
+
+			<MastodonSignIn disabled={isSubmitting || isGuestSubmitting} />
 
 			<div className="relative">
 				<div className="absolute inset-0 flex items-center">

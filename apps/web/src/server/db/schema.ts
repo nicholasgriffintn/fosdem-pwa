@@ -17,6 +17,9 @@ export const user = sqliteTable(
 		email: text().unique().notNull(),
 		github_username: text(),
 		discord_username: text(),
+		mastodon_username: text(),
+		mastodon_acct: text(),
+		mastodon_url: text(),
 		company: text(),
 		site: text(),
 		location: text(),
@@ -42,6 +45,9 @@ export const user = sqliteTable(
 			),
 			twitterUsernameIdx: uniqueIndex("twitter_username_idx").on(
 				table.twitter_username,
+			),
+			mastodonUsernameIdx: uniqueIndex("mastodon_username_idx").on(
+				table.mastodon_username,
 			),
 		};
 	},
