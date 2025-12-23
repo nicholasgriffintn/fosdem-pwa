@@ -29,11 +29,14 @@ import { Route as EventSlugRouteImport } from './routes/event/$slug'
 import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
 import { Route as ApiProxySubtitlesRouteImport } from './routes/api/proxy/subtitles'
 import { Route as ApiAuthUpgradeGithubRouteImport } from './routes/api/auth/upgrade-github'
+import { Route as ApiAuthUpgradeDiscordRouteImport } from './routes/api/auth/upgrade-discord'
 import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
 import { Route as ApiAuthGuestRouteImport } from './routes/api/auth/guest'
 import { Route as ApiAuthGithubRouteImport } from './routes/api/auth/github'
+import { Route as ApiAuthDiscordRouteImport } from './routes/api/auth/discord'
 import { Route as ApiProxyRoomsStatusRouteImport } from './routes/api/proxy/rooms/status'
 import { Route as ApiAuthCallbackGithubRouteImport } from './routes/api/auth/callback.github'
+import { Route as ApiAuthCallbackDiscordRouteImport } from './routes/api/auth/callback.discord'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -135,6 +138,11 @@ const ApiAuthUpgradeGithubRoute = ApiAuthUpgradeGithubRouteImport.update({
   path: '/api/auth/upgrade-github',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthUpgradeDiscordRoute = ApiAuthUpgradeDiscordRouteImport.update({
+  id: '/api/auth/upgrade-discord',
+  path: '/api/auth/upgrade-discord',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
   id: '/api/auth/logout',
   path: '/api/auth/logout',
@@ -150,6 +158,11 @@ const ApiAuthGithubRoute = ApiAuthGithubRouteImport.update({
   path: '/api/auth/github',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthDiscordRoute = ApiAuthDiscordRouteImport.update({
+  id: '/api/auth/discord',
+  path: '/api/auth/discord',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProxyRoomsStatusRoute = ApiProxyRoomsStatusRouteImport.update({
   id: '/api/proxy/rooms/status',
   path: '/api/proxy/rooms/status',
@@ -158,6 +171,11 @@ const ApiProxyRoomsStatusRoute = ApiProxyRoomsStatusRouteImport.update({
 const ApiAuthCallbackGithubRoute = ApiAuthCallbackGithubRouteImport.update({
   id: '/api/auth/callback/github',
   path: '/api/auth/callback/github',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthCallbackDiscordRoute = ApiAuthCallbackDiscordRouteImport.update({
+  id: '/api/auth/callback/discord',
+  path: '/api/auth/callback/discord',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -179,12 +197,15 @@ export interface FileRoutesByFullPath {
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
+  '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
+  '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
   '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
@@ -206,12 +227,15 @@ export interface FileRoutesByTo {
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
+  '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
+  '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
   '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
@@ -234,12 +258,15 @@ export interface FileRoutesById {
   '/signin/': typeof SigninIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
   '/terms/': typeof TermsIndexRoute
+  '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId/': typeof ProfileUserIdIndexRoute
+  '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
   '/api/proxy/rooms/status': typeof ApiProxyRoomsStatusRoute
 }
@@ -263,12 +290,15 @@ export interface FileRouteTypes {
     | '/signin'
     | '/speakers'
     | '/terms'
+    | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
+    | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/proxy/subtitles'
     | '/profile/$userId'
+    | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
     | '/api/proxy/rooms/status'
   fileRoutesByTo: FileRoutesByTo
@@ -290,12 +320,15 @@ export interface FileRouteTypes {
     | '/signin'
     | '/speakers'
     | '/terms'
+    | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
+    | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/proxy/subtitles'
     | '/profile/$userId'
+    | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
     | '/api/proxy/rooms/status'
   id:
@@ -317,12 +350,15 @@ export interface FileRouteTypes {
     | '/signin/'
     | '/speakers/'
     | '/terms/'
+    | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/guest'
     | '/api/auth/logout'
+    | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/proxy/subtitles'
     | '/profile/$userId/'
+    | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
     | '/api/proxy/rooms/status'
   fileRoutesById: FileRoutesById
@@ -345,12 +381,15 @@ export interface RootRouteChildren {
   SigninIndexRoute: typeof SigninIndexRoute
   SpeakersIndexRoute: typeof SpeakersIndexRoute
   TermsIndexRoute: typeof TermsIndexRoute
+  ApiAuthDiscordRoute: typeof ApiAuthDiscordRoute
   ApiAuthGithubRoute: typeof ApiAuthGithubRoute
   ApiAuthGuestRoute: typeof ApiAuthGuestRoute
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthUpgradeDiscordRoute: typeof ApiAuthUpgradeDiscordRoute
   ApiAuthUpgradeGithubRoute: typeof ApiAuthUpgradeGithubRoute
   ApiProxySubtitlesRoute: typeof ApiProxySubtitlesRoute
   ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
+  ApiAuthCallbackDiscordRoute: typeof ApiAuthCallbackDiscordRoute
   ApiAuthCallbackGithubRoute: typeof ApiAuthCallbackGithubRoute
   ApiProxyRoomsStatusRoute: typeof ApiProxyRoomsStatusRoute
 }
@@ -497,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthUpgradeGithubRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/upgrade-discord': {
+      id: '/api/auth/upgrade-discord'
+      path: '/api/auth/upgrade-discord'
+      fullPath: '/api/auth/upgrade-discord'
+      preLoaderRoute: typeof ApiAuthUpgradeDiscordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/logout': {
       id: '/api/auth/logout'
       path: '/api/auth/logout'
@@ -518,6 +564,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthGithubRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/discord': {
+      id: '/api/auth/discord'
+      path: '/api/auth/discord'
+      fullPath: '/api/auth/discord'
+      preLoaderRoute: typeof ApiAuthDiscordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/proxy/rooms/status': {
       id: '/api/proxy/rooms/status'
       path: '/api/proxy/rooms/status'
@@ -530,6 +583,13 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/callback/github'
       fullPath: '/api/auth/callback/github'
       preLoaderRoute: typeof ApiAuthCallbackGithubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/callback/discord': {
+      id: '/api/auth/callback/discord'
+      path: '/api/auth/callback/discord'
+      fullPath: '/api/auth/callback/discord'
+      preLoaderRoute: typeof ApiAuthCallbackDiscordRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -553,12 +613,15 @@ const rootRouteChildren: RootRouteChildren = {
   SigninIndexRoute: SigninIndexRoute,
   SpeakersIndexRoute: SpeakersIndexRoute,
   TermsIndexRoute: TermsIndexRoute,
+  ApiAuthDiscordRoute: ApiAuthDiscordRoute,
   ApiAuthGithubRoute: ApiAuthGithubRoute,
   ApiAuthGuestRoute: ApiAuthGuestRoute,
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthUpgradeDiscordRoute: ApiAuthUpgradeDiscordRoute,
   ApiAuthUpgradeGithubRoute: ApiAuthUpgradeGithubRoute,
   ApiProxySubtitlesRoute: ApiProxySubtitlesRoute,
   ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
+  ApiAuthCallbackDiscordRoute: ApiAuthCallbackDiscordRoute,
   ApiAuthCallbackGithubRoute: ApiAuthCallbackGithubRoute,
   ApiProxyRoomsStatusRoute: ApiProxyRoomsStatusRoute,
 }

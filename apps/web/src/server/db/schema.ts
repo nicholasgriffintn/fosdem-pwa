@@ -16,6 +16,7 @@ export const user = sqliteTable(
 		avatar_url: text(),
 		email: text().unique().notNull(),
 		github_username: text(),
+		discord_username: text(),
 		company: text(),
 		site: text(),
 		location: text(),
@@ -35,6 +36,9 @@ export const user = sqliteTable(
 			emailIdx: uniqueIndex("email_idx").on(table.email),
 			githubUsernameIdx: uniqueIndex("github_username_idx").on(
 				table.github_username,
+			),
+			discordUsernameIdx: uniqueIndex("discord_username_idx").on(
+				table.discord_username,
 			),
 			twitterUsernameIdx: uniqueIndex("twitter_username_idx").on(
 				table.twitter_username,

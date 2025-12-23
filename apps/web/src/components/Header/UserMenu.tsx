@@ -64,13 +64,16 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 				<div className="border-t my-1" />
 				{user.is_guest && (
 					<>
-						<a
-							href="/api/auth/upgrade-github"
-							className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline"
+						<Link
+							to="/profile"
+							search={(prev) => ({
+								year: prev.year || constants.DEFAULT_YEAR,
+							})}
+							className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
 						>
-							<Icons.gitHub className="h-4 w-4" />
-							Upgrade with GitHub
-						</a>
+							<Icons.user className="h-4 w-4" />
+							Upgrade Account
+						</Link>
 						<p className="px-2 py-1.5 text-xs text-muted-foreground">
 							Upgrade to persist your data.
 						</p>

@@ -18,7 +18,6 @@ import { Footer } from "~/components/Footer";
 import { Toaster } from "~/components/ui/toaster";
 import { OfflineIndicator } from "~/components/OfflineIndicator";
 import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
-import { GuestBanner } from "~/components/GuestBanner";
 import { AuthSnapshotProvider } from "~/contexts/AuthSnapshotContext";
 // import { AppNotice } from "~/components/AppNotice";
 import { siteMeta } from "~/constants/site";
@@ -139,7 +138,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 				<main id="main-content" className="flex min-h-screen flex-col">
 					<Header />
 					{/* <AppNotice /> */}
-					<GuestBanner />
 					<div className="container flex-1">
 						{children}
 						<Toaster />
