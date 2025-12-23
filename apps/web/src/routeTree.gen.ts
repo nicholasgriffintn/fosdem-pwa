@@ -28,6 +28,7 @@ import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
 import { Route as EventSlugRouteImport } from './routes/event/$slug'
 import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
 import { Route as ApiProxySubtitlesRouteImport } from './routes/api/proxy/subtitles'
+import { Route as ApiAuthUpgradeMastodonRouteImport } from './routes/api/auth/upgrade-mastodon'
 import { Route as ApiAuthUpgradeGitlabRouteImport } from './routes/api/auth/upgrade-gitlab'
 import { Route as ApiAuthUpgradeGithubRouteImport } from './routes/api/auth/upgrade-github'
 import { Route as ApiAuthUpgradeDiscordRouteImport } from './routes/api/auth/upgrade-discord'
@@ -138,6 +139,11 @@ const ApiProxySubtitlesRoute = ApiProxySubtitlesRouteImport.update({
   path: '/api/proxy/subtitles',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthUpgradeMastodonRoute = ApiAuthUpgradeMastodonRouteImport.update({
+  id: '/api/auth/upgrade-mastodon',
+  path: '/api/auth/upgrade-mastodon',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthUpgradeGitlabRoute = ApiAuthUpgradeGitlabRouteImport.update({
   id: '/api/auth/upgrade-gitlab',
   path: '/api/auth/upgrade-gitlab',
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/auth/upgrade-gitlab': typeof ApiAuthUpgradeGitlabRoute
+  '/api/auth/upgrade-mastodon': typeof ApiAuthUpgradeMastodonRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
@@ -271,6 +278,7 @@ export interface FileRoutesByTo {
   '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/auth/upgrade-gitlab': typeof ApiAuthUpgradeGitlabRoute
+  '/api/auth/upgrade-mastodon': typeof ApiAuthUpgradeMastodonRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
@@ -307,6 +315,7 @@ export interface FileRoutesById {
   '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
   '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
   '/api/auth/upgrade-gitlab': typeof ApiAuthUpgradeGitlabRoute
+  '/api/auth/upgrade-mastodon': typeof ApiAuthUpgradeMastodonRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
   '/profile/$userId/': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
@@ -344,6 +353,7 @@ export interface FileRouteTypes {
     | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/auth/upgrade-gitlab'
+    | '/api/auth/upgrade-mastodon'
     | '/api/proxy/subtitles'
     | '/profile/$userId'
     | '/api/auth/callback/discord'
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/auth/upgrade-gitlab'
+    | '/api/auth/upgrade-mastodon'
     | '/api/proxy/subtitles'
     | '/profile/$userId'
     | '/api/auth/callback/discord'
@@ -414,6 +425,7 @@ export interface FileRouteTypes {
     | '/api/auth/upgrade-discord'
     | '/api/auth/upgrade-github'
     | '/api/auth/upgrade-gitlab'
+    | '/api/auth/upgrade-mastodon'
     | '/api/proxy/subtitles'
     | '/profile/$userId/'
     | '/api/auth/callback/discord'
@@ -450,6 +462,7 @@ export interface RootRouteChildren {
   ApiAuthUpgradeDiscordRoute: typeof ApiAuthUpgradeDiscordRoute
   ApiAuthUpgradeGithubRoute: typeof ApiAuthUpgradeGithubRoute
   ApiAuthUpgradeGitlabRoute: typeof ApiAuthUpgradeGitlabRoute
+  ApiAuthUpgradeMastodonRoute: typeof ApiAuthUpgradeMastodonRoute
   ApiProxySubtitlesRoute: typeof ApiProxySubtitlesRoute
   ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
   ApiAuthCallbackDiscordRoute: typeof ApiAuthCallbackDiscordRoute
@@ -594,6 +607,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProxySubtitlesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/upgrade-mastodon': {
+      id: '/api/auth/upgrade-mastodon'
+      path: '/api/auth/upgrade-mastodon'
+      fullPath: '/api/auth/upgrade-mastodon'
+      preLoaderRoute: typeof ApiAuthUpgradeMastodonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/upgrade-gitlab': {
       id: '/api/auth/upgrade-gitlab'
       path: '/api/auth/upgrade-gitlab'
@@ -722,6 +742,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthUpgradeDiscordRoute: ApiAuthUpgradeDiscordRoute,
   ApiAuthUpgradeGithubRoute: ApiAuthUpgradeGithubRoute,
   ApiAuthUpgradeGitlabRoute: ApiAuthUpgradeGitlabRoute,
+  ApiAuthUpgradeMastodonRoute: ApiAuthUpgradeMastodonRoute,
   ApiProxySubtitlesRoute: ApiProxySubtitlesRoute,
   ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
   ApiAuthCallbackDiscordRoute: ApiAuthCallbackDiscordRoute,
