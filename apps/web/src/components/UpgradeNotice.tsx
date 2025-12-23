@@ -1,6 +1,7 @@
 "use client";
 
 import { Icons } from "~/components/Icons";
+import { MastodonSignIn } from "~/components/MastodonSignIn";
 
 interface UpgradeNoticeProps {
   user: {
@@ -45,6 +46,8 @@ export function UpgradeNotice({ user }: UpgradeNoticeProps) {
             <Icons.gitlab className="h-4 w-4" />
             GitLab
           </a>
+
+          <MastodonSignIn disabled={false} isUpgrade={true} />
         </div>
       </div>
     </div>
