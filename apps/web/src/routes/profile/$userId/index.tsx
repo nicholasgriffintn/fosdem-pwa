@@ -16,7 +16,31 @@ export const Route = createFileRoute("/profile/$userId/")({
     meta: [
       {
         title: "Profile | FOSDEM PWA",
-        description: "Profile page",
+        description: "View FOSDEM conference schedule and bookmarks.",
+      },
+      {
+        property: "og:title",
+        content: "FOSDEM Profile",
+      },
+      {
+        property: "og:description",
+        content: "View FOSDEM conference schedule",
+      },
+      {
+        property: "og:type",
+        content: "profile",
+      },
+      {
+        name: "twitter:card",
+        content: "summary",
+      },
+      {
+        name: "twitter:title",
+        content: "FOSDEM Profile",
+      },
+      {
+        name: "twitter:description",
+        content: "View FOSDEM conference schedule",
       },
     ],
   }),

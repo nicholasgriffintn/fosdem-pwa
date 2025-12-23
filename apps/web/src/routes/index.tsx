@@ -28,6 +28,26 @@ export const Route = createFileRoute("/")({
 			},
 		};
 	},
+	head: ({ loaderData }) => ({
+		meta: [
+			{
+				title: `${loaderData?.fosdem.conference?.title || 'FOSDEM'} | Schedule & Events`,
+				description: `${loaderData?.fosdem.conference?.title || 'FOSDEM'} - ${loaderData?.fosdem.conference?.city || 'Brussels'} conference schedule. Browse tracks, events, and speakers.`,
+			},
+			{
+				property: "og:title",
+				content: `${loaderData?.fosdem.conference?.title || 'FOSDEM'} Schedule`,
+			},
+			{
+				property: "og:description",
+				content: `${loaderData?.fosdem.conference?.title || 'FOSDEM'} - ${loaderData?.fosdem.conference?.city || 'Brussels'} conference schedule and events`,
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+		],
+	}),
 	staleTime: 10_000,
 });
 

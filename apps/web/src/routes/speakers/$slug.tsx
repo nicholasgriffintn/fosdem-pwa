@@ -48,8 +48,32 @@ export const Route = createFileRoute("/speakers/$slug")({
     head: ({ loaderData }) => ({
         meta: [
             {
-                title: `${loaderData?.fosdem.person?.name} | Speakers | FOSDEM PWA`,
-                description: `Speaker profile for ${loaderData?.fosdem.person?.name} at FOSDEM`,
+                title: `${loaderData?.fosdem.person?.name} | Speakers | FOSDEM ${loaderData?.year}`,
+                description: `Speaker profile for ${loaderData?.fosdem.person?.name} at FOSDEM ${loaderData?.year}. ${loaderData?.fosdem.person?.biography ? loaderData.fosdem.person.biography.substring(0, 160) + '...' : 'View sessions and biography.'}`,
+            },
+            {
+                property: "og:title",
+                content: `${loaderData?.fosdem.person?.name} | FOSDEM ${loaderData?.year}`,
+            },
+            {
+                property: "og:description",
+                content: `Speaker profile for ${loaderData?.fosdem.person?.name} at FOSDEM ${loaderData?.year}`,
+            },
+            {
+                property: "og:type",
+                content: "profile",
+            },
+            {
+                name: "twitter:card",
+                content: "summary",
+            },
+            {
+                name: "twitter:title",
+                content: `${loaderData?.fosdem.person?.name} | FOSDEM ${loaderData?.year}`,
+            },
+            {
+                name: "twitter:description",
+                content: `Speaker profile for ${loaderData?.fosdem.person?.name} at FOSDEM ${loaderData?.year}`,
             },
         ],
     }),

@@ -13,7 +13,31 @@ export const Route = createFileRoute("/signin/")({
 		meta: [
 			{
 				title: "Sign In | FOSDEM PWA",
-				description: "Sign in to FOSDEM PWA",
+				description: "Sign in to FOSDEM PWA to sync bookmarks across devices and share your conference schedule.",
+			},
+			{
+				property: "og:title",
+				content: "Sign In - FOSDEM PWA",
+			},
+			{
+				property: "og:description",
+				content: "Sign in to sync bookmarks and share your FOSDEM schedule",
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				name: "twitter:card",
+				content: "summary",
+			},
+			{
+				name: "twitter:title",
+				content: "Sign In - FOSDEM PWA",
+			},
+			{
+				name: "twitter:description",
+				content: "Sign in to sync bookmarks and share your FOSDEM schedule",
 			},
 		],
 	}),
