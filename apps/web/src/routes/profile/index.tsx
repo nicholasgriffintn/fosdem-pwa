@@ -11,6 +11,7 @@ import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { SetBookmarksVisability } from "~/components/SetBookmarksVisability";
 import { PushNotifications } from "~/components/PushNotifications";
+import { UpgradeNotice } from "~/components/UpgradeNotice";
 import { buildHomeLink } from "~/lib/link-builder";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 
@@ -92,13 +93,17 @@ function ProfilePage() {
           </div>
         </noscript>
         <div className="space-y-8">
+          {user.is_guest && (
+            <UpgradeNotice user={user} />
+          )}
+
           <div className="flex flex-col lg:flex-row items-start gap-8">
             <div className="w-full lg:w-auto lg:max-w-md">
               <ConferenceBadge user={user} conferenceYear={year} />
             </div>
 
             <div className="w-full lg:flex-1 space-y-8">
-              <PushNotifications />
+              {!user.is_guest && <PushNotifications />}
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-foreground">Your Bookmarks</h2>
                 {user?.github_username && (

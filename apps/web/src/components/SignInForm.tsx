@@ -27,12 +27,27 @@ export function SignInForm() {
 					type="submit"
 					variant="outline"
 					size="lg"
-					className="w-full cursor-pointer"
+					className="w-full cursor-pointer bg-gray-900 text-white hover:bg-gray-800 border-gray-700"
 					disabled={isSubmitting || isGuestSubmitting}
 				>
 					{isSubmitting && <Spinner className="w-4 h-4 mr-2" />}
 					{!isSubmitting && <Icons.gitHub className="w-4 h-4 mr-2" />}
 					Sign in with GitHub
+				</Button>
+			</form>
+
+			<form method="GET" onSubmit={handleSubmit}>
+				<Button
+					formAction="/api/auth/discord"
+					type="submit"
+					variant="outline"
+					size="lg"
+					className="w-full cursor-pointer bg-[#5865F2] text-white hover:bg-[#4752C4] border-[#4752C4]"
+					disabled={isSubmitting || isGuestSubmitting}
+				>
+					{isSubmitting && <Spinner className="w-4 h-4 mr-2" />}
+					{!isSubmitting && <Icons.discord className="w-4 h-4 mr-2" />}
+					Sign in with Discord
 				</Button>
 			</form>
 

@@ -14,6 +14,7 @@ import { getAllData } from "~/server/functions/fosdem";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { Button } from "~/components/ui/button";
+import { UpgradeNotice } from "~/components/UpgradeNotice";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/bookmarks/")({
@@ -92,6 +93,11 @@ function BookmarksHome() {
 		<div className="min-h-screen">
 			<div className="relative py-6 lg:py-10">
 				<PageHeader heading="Bookmarks" year={year} />
+				{resolvedUser?.is_guest && (
+					<div className="mb-6">
+						<UpgradeNotice user={resolvedUser} />
+					</div>
+				)}
 				{isClient && (authLoading || loading) && !hasServerSnapshot && (
 					<div className="flex justify-center items-center py-8">
 						<Spinner className="h-8 w-8" />

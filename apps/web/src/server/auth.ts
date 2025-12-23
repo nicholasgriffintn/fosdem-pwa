@@ -3,7 +3,7 @@ import {
 	encodeBase32LowerCaseNoPadding,
 	encodeHexLowerCase,
 } from "@oslojs/encoding";
-import { GitHub } from "arctic";
+import { GitHub, Discord } from "arctic";
 import { and, eq } from "drizzle-orm";
 import {
 	deleteCookie,
@@ -62,6 +62,7 @@ export async function validateSessionToken(token: string) {
 	const results = await db
 		.select({
 			session: {
+				id: sessionTable.id,
 				user_id: sessionTable.user_id,
 				expires_at: sessionTable.expires_at,
 				last_extended_at: sessionTable.last_extended_at,
@@ -139,13 +140,22 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
 	});
 }
 
-const AUTH_REDIRECT_URL = env.GITHUB_REDIRECT_URI
+const GITHUB_REDIRECT_URL = env.GITHUB_REDIRECT_URI
 	? env.GITHUB_REDIRECT_URI
 	: `${env.CF_PAGES_URL}/api/auth/callback/github`;
 export const github = new GitHub(
-	env.GITHUB_CLIENT_ID as string,
-	env.GITHUB_CLIENT_SECRET as string,
-	AUTH_REDIRECT_URL,
+	env.GITHUB_CLIENT_ID,
+	env.GITHUB_CLIENT_SECRET,
+	GITHUB_REDIRECT_URL,
+);
+
+const DISCORD_REDIRECT_URL = env.DISCORD_REDIRECT_URI
+	? env.DISCORD_REDIRECT_URI
+	: `${env.CF_PAGES_URL}/api/auth/callback/discord`;
+export const discord = new Discord(
+	env.DISCORD_CLIENT_ID,
+	env.DISCORD_CLIENT_SECRET,
+	DISCORD_REDIRECT_URL,
 );
 
 /**
