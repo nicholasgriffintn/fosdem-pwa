@@ -24,9 +24,12 @@ import {
 
 type NavSearchProps = {
 	year: number;
+	inputRef?: React.RefObject<HTMLInputElement | null>;
+	resetKey?: number;
+	fullWidth?: boolean;
 } & React.HTMLAttributes<HTMLFormElement>;
 
-export function NavSearch({ year, className, ...props }: NavSearchProps) {
+export function NavSearch({ year, className, inputRef, resetKey, fullWidth, ...props }: NavSearchProps) {
 	const { fosdemData, loading } = useFosdemData({ year });
 
 	const isClient = useIsClient();
@@ -39,6 +42,12 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const resultsRef = useRef<(HTMLButtonElement | null)[]>([]);
 	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		setSearchResults([]);
+		setFocusedIndex(-1);
+		setInputValue("");
+	}, [resetKey]);
 
 	useEffect(() => {
 		resultsRef.current = resultsRef.current.slice(0, searchResults.length);
@@ -351,17 +360,23 @@ export function NavSearch({ year, className, ...props }: NavSearchProps) {
 				<input type="hidden" name="type" value="all" />
 				<Input
 					id="search"
-					ref={searchInputRef}
+					ref={(el) => {
+						searchInputRef.current = el;
+						if (inputRef) inputRef.current = el;
+					}}
 					name="q"
 					type="search"
 					value={inputValue}
 					placeholder="Search events..."
 					aria-label="Search events"
-					className="h-8 w-full sm:w-64 sm:pr-12"
+					className={cn(
+						"h-8 w-full",
+						fullWidth ? "pr-12" : "sm:w-64 sm:pr-12",
+					)}
 					onChange={(e) => handleSearch(e.target.value)}
 					onKeyDown={handleKeyDown}
 				/>
-				<kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
+				<kbd className="js-only pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
 					{(isClient && (loading || isSearching)) && <Spinner className="h-3 w-3" />}
 					<span className="text-xs">⌘</span>K
 				</kbd>

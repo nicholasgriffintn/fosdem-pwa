@@ -1,6 +1,6 @@
 import { Link, useSearch } from "@tanstack/react-router";
-import { useIsClient } from "~/hooks/use-is-client";
 
+import { useIsClient } from "~/hooks/use-is-client";
 import { Icons } from "~/components/shared/Icons";
 import { MainNav } from "~/components/Header/MainNav";
 import { Button } from "~/components/ui/button";
@@ -35,8 +35,8 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
       <div className="container flex h-16 items-center justify-between gap-4">
         <MainNav title="FOSDEM PWA" items={navItems} />
-        <div className="flex items-center justify-end gap-3">
-          <nav className="hidden lg:flex items-center gap-2 shrink-0">
+        <div className="flex flex-1 min-w-0 items-center justify-end gap-3">
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
             {resolvedUser?.id ? (
               <AvatarMenu user={resolvedUser} />
             ) : resolvedLoading ? (
@@ -81,7 +81,7 @@ export function Header() {
                 </Tooltip>
               </TooltipProvider>
             )}
-          </nav>
+          </div>
           <HeaderSearch year={selectedYear} />
         </div>
       </div>

@@ -78,7 +78,8 @@ export function MobileNav({
 					"relative flex h-[100svh] w-full flex-col bg-background",
 				)}
 			>
-				<div className="flex h-16 items-center justify-between gap-3 border-b px-4">
+				<div className="border-b">
+					<div className="container flex h-16 items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
 						<Icons.logo className="h-7 w-7" width="28" height="28" />
 						<span className="font-bold">Menu</span>
@@ -91,8 +92,9 @@ export function MobileNav({
 						<Icons.close className="h-4 w-4" />
 					</label>
 				</div>
+				</div>
 
-				<div className="flex-1 overflow-y-auto px-4 py-4 pb-[calc(5rem+env(safe-area-inset-bottom))]">
+				<div className="container flex-1 overflow-y-auto py-4 pb-[calc(5rem+env(safe-area-inset-bottom))]">
 					<nav className="grid gap-1 text-base" aria-label="Primary">
 						{items.map((item, index) => (
 							<Link

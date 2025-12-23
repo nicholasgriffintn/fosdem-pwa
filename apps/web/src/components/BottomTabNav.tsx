@@ -21,7 +21,7 @@ export function BottomTabNav({ items }: BottomTabNavProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 border-t md:hidden transition-all duration-300 ease-in-out"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 border-t lg:hidden transition-all duration-300 ease-in-out"
       aria-label="Mobile navigation"
     >
       <div className="grid grid-cols-4 h-16 max-w-md mx-auto">
