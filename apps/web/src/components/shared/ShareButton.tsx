@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, buttonVariants } from "~/components/ui/button";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { toast } from "~/hooks/use-toast";
 import { shareSupported, clipboardSupported } from "~/lib/browserSupport";
 import { cn } from "~/lib/utils";

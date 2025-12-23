@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "@tanstack/react-router";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { usePlayer } from "~/contexts/PlayerContext";
 import { buildEventLink } from "~/lib/link-builder";
 import clsx from "clsx";

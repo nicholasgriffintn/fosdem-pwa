@@ -4,7 +4,7 @@ import { useState } from "react";
 import clsx from "clsx";
 
 import { fosdemImageDetails } from "~/data/fosdem-image-details";
-import { Image } from "~/components/Image";
+import { Image } from "~/components/shared/Image";
 import type { TypeIds } from "~/types/fosdem";
 
 type FeaturedFosdemImageProps = {

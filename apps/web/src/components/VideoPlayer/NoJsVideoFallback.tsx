@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { getResizedImageSrc } from "~/utils/image-resize";
 
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 
 type MediaSource = {
   href: string;

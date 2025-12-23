@@ -1,9 +1,9 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 import { useUserId } from "~/hooks/use-user-id";
-import { PageHeader } from "~/components/PageHeader";
-import { ConferenceBadge } from "~/components/ConferenceBadge";
-import { Spinner } from "~/components/Spinner";
+import { PageHeader } from "~/components/shared/PageHeader";
+import { ConferenceBadge } from "~/components/Profile/ConferenceBadge";
+import { Spinner } from "~/components/shared/Spinner";
 import { constants } from "~/constants";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useUserBookmarks } from "~/hooks/use-user-bookmarks";

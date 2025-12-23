@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { PageHeader } from "~/components/PageHeader";
-import { FavouriteButton } from "~/components/FavouriteButton";
-import { ShareButton } from "~/components/ShareButton";
+import { PageHeader } from "~/components/shared/PageHeader";
+import { FavouriteButton } from "~/components/shared/FavouriteButton";
+import { ShareButton } from "~/components/shared/ShareButton";
 import { testLiveEvent, testConferenceData } from "~/data/test-data";
 import { getAllData } from "~/server/functions/fosdem";
 import { EventMain } from "~/components/Event/EventMain";
@@ -10,7 +10,7 @@ import { constants } from "~/constants";
 import { calculateEndTime } from "~/lib/dateTime";
 import { useBookmark } from "~/hooks/use-bookmark";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { useIsClient } from "~/hooks/use-is-client";
 import { getEventBookmark } from "~/server/functions/bookmarks";
 import { generateCommonSEOTags } from "~/utils/seo-generator";

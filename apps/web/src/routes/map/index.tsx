@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { PageHeader } from "~/components/PageHeader";
-import { Image } from "~/components/Image";
+import { PageHeader } from "~/components/shared/PageHeader";
+import { Image } from "~/components/shared/Image";
 import { constants } from "~/constants";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 

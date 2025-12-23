@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 
 import type { ConferenceData, Event } from "~/types/fosdem";
-import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
+import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
 import type { TypeIds } from "~/types/fosdem";
 import { isEventLive } from "~/lib/dateTime";
 import { EventPlayerNotStarted } from "./components/NotStarted";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { usePlayer } from "~/contexts/PlayerContext";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
 
 type EventPlayerProps = {

@@ -1,7 +1,7 @@
 import { cn } from "~/lib/utils";
 import type { Event } from "~/types/fosdem";
 import type { EventConflict } from "~/lib/fosdem";
-import { ItemActions } from "~/components/ItemActions";
+import { ItemActions } from "~/components/shared/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime, calculateTransitionTime } from "~/lib/dateTime";
 import { sortScheduleEvents } from "~/lib/sorting";

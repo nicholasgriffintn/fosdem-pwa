@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
-import { FavouriteButton } from "~/components/FavouriteButton";
-import { ShareButton } from "~/components/ShareButton";
+import { FavouriteButton } from "~/components/shared/FavouriteButton";
+import { ShareButton } from "~/components/shared/ShareButton";
 import { constants } from "~/constants";
 import type { Event, Track } from "~/types/fosdem";
 
@@ -47,11 +47,11 @@ export function ItemActions({
 	const linkSearch = isEvent
 		? { year: resolvedYear, test: false }
 		: {
-				year: resolvedYear,
-				day: undefined,
-				view: undefined,
-				sortFavourites: undefined,
-			};
+			year: resolvedYear,
+			day: undefined,
+			view: undefined,
+			sortFavourites: undefined,
+		};
 
 	return (
 		<div className={`flex items-center gap-2 ${className}`}>

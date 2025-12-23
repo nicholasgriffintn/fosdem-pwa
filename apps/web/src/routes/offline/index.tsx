@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 
-import { PageHeader } from "~/components/PageHeader";
+import { PageHeader } from "~/components/shared/PageHeader";
 import { TypesList } from "~/components/Type/TypesList";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import { useFosdemData } from "~/hooks/use-fosdem-data";

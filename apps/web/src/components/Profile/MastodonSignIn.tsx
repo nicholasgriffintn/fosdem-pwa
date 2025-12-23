@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Select } from "~/components/ui/select";
-import { Spinner } from "~/components/Spinner";
-import { Icons } from "~/components/Icons";
+import { Spinner } from "~/components/shared/Spinner";
+import { Icons } from "~/components/shared/Icons";
 
 const MASTODON_INSTANCES = [
   { name: "mastodon.social", baseUrl: "https://mastodon.social" },

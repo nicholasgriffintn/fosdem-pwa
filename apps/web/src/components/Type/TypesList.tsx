@@ -9,7 +9,7 @@ import {
 	CardTitle,
 } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { FeaturedFosdemImage } from "~/components/FeaturedFosdemImage";
+import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
 import { constants } from "~/constants";
 import type { TypeIds } from "~/types/fosdem";
 import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";

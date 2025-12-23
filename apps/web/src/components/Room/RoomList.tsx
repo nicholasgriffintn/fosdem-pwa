@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router";
 import type { RoomData } from "~/types/fosdem";
 import { sortRooms } from "~/lib/sorting";
 import { constants } from "../../constants";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 
 type RoomListProps = {
 	rooms: RoomData[];

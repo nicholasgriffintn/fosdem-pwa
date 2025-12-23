@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { MobileNav } from "~/components/Header/MobileNav";
 import { constants } from "~/constants";
 import { isNumber } from "~/lib/type-guards";

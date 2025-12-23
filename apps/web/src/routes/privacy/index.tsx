@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { generateCommonSEOTags } from "~/utils/seo-generator";
-import { PageHeader } from "~/components/PageHeader";
+import { PageHeader } from "~/components/shared/PageHeader";
 
 export const Route = createFileRoute("/privacy/")({
 	component: PrivacyPolicyPage,

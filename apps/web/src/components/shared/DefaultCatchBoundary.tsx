@@ -9,8 +9,8 @@ import { useEffect } from "react";
 
 import { Button } from "~/components/ui/button";
 import { constants } from "~/constants";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
-import { PageHeader } from "~/components/PageHeader";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
+import { PageHeader } from "~/components/shared/PageHeader";
 
 export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 	const router = useRouter();

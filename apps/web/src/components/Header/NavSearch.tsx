@@ -8,7 +8,7 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
-import { Spinner } from "~/components/Spinner";
+import { Spinner } from "~/components/shared/Spinner";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Card } from "~/components/ui/card";
 import { useIsClient } from "~/hooks/use-is-client";

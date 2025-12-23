@@ -1,9 +1,9 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 
 import { useAuth } from "~/hooks/use-auth";
-import { PageHeader } from "~/components/PageHeader";
-import { Spinner } from "~/components/Spinner";
-import { SignInForm } from "~/components/SignInForm";
+import { PageHeader } from "~/components/shared/PageHeader";
+import { Spinner } from "~/components/shared/Spinner";
+import { SignInForm } from "~/components/Profile/SignInForm";
 import { useIsClient } from "~/hooks/use-is-client";
 import { buildHomeLink } from "~/lib/link-builder";
 import { generateCommonSEOTags } from "~/utils/seo-generator";

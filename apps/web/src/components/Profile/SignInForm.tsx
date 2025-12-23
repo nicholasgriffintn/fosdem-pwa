@@ -3,9 +3,9 @@
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
-import { Spinner } from "~/components/Spinner";
-import { Icons } from "~/components/Icons";
-import { MastodonSignIn } from "~/components/MastodonSignIn";
+import { Spinner } from "~/components/shared/Spinner";
+import { Icons } from "~/components/shared/Icons";
+import { MastodonSignIn } from "~/components/Profile/MastodonSignIn";
 import { constants } from "~/constants";
 
 export function SignInForm() {

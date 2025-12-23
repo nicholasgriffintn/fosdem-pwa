@@ -2,9 +2,9 @@
 
 import { useId } from "react";
 
-import { EmptyStateCard } from "~/components/EmptyStateCard";
-import { DaySwitcher } from "~/components/DaySwitcher";
-import { SortFavouritesSwitch } from "~/components/SortFavouritesSwitch";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
+import { DaySwitcher } from "~/components/shared/DaySwitcher";
+import { SortFavouritesSwitch } from "~/components/shared/SortFavouritesSwitch";
 
 export interface ItemListContainerProps<T> {
   items: T[];

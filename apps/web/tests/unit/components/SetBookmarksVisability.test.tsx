@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { SetBookmarksVisability } from "~/components/SetBookmarksVisability";
+import { SetBookmarksVisability } from "~/components/Profile/SetBookmarksVisability";
 
 const userSettingsModule = vi.hoisted(() => ({
 	useUserSettings: vi.fn(),

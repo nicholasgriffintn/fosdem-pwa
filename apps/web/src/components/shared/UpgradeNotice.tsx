@@ -1,7 +1,7 @@
 "use client";
 
-import { Icons } from "~/components/Icons";
-import { MastodonSignIn } from "~/components/MastodonSignIn";
+import { Icons } from "~/components/shared/Icons";
+import { MastodonSignIn } from "~/components/Profile/MastodonSignIn";
 
 interface UpgradeNoticeProps {
   user: {

@@ -1,5 +1,5 @@
 import { constants } from "~/constants";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import {
 	isEventFinished,
 	createStandardDate,

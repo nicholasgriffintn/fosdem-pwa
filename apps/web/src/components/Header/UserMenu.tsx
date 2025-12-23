@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import type { SessionUser } from "~/server/auth";
 import { constants } from "~/constants";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 
 type AvatarMenuProps = {
 	user: SessionUser;

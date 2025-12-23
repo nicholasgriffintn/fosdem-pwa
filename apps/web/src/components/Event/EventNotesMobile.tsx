@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "~/components/ui/button";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { EventNotes } from "~/components/Event/EventNotes";
 import {
 	Sheet,

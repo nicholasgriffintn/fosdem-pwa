@@ -1,7 +1,7 @@
 import { render, fireEvent } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi, afterEach } from "vitest";
 
-import { ServiceWorkerUpdater } from "~/components/ServiceWorkerUpdater";
+import { ServiceWorkerUpdater } from "~/components/shared/ServiceWorkerUpdater";
 
 const toastMock = vi.fn();
 

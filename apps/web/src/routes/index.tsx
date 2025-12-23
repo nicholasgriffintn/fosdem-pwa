@@ -2,13 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { TypesList } from "~/components/Type/TypesList";
 import { getAllData } from "~/server/functions/fosdem";
-import { PageHeader } from "~/components/PageHeader";
-import { ConferenceScheduleNotice } from "~/components/ConferenceScheduleNotice";
+import { PageHeader } from "~/components/shared/PageHeader";
+import { ConferenceScheduleNotice } from "~/components/shared/ConferenceScheduleNotice";
 import { constants } from "~/constants";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { Button } from "~/components/ui/button";
 import { YearSelector } from "~/components/Footer/YearSelector";
-import { Icons } from "../components/Icons";
+import { Icons } from "../components/shared/Icons";
 import { LoadingState } from "~/components/shared/LoadingState";
 
 export const Route = createFileRoute("/")({

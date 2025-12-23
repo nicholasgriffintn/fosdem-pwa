@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { SignInForm } from "~/components/SignInForm";
+import { SignInForm } from "~/components/Profile/SignInForm";
 
 describe("SignInForm", () => {
 	it("submits guest sign-in requests", async () => {

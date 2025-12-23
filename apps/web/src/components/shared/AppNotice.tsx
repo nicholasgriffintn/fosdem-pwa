@@ -1,6 +1,6 @@
 "use client";
 
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 
 export function AppNotice() {
 	return (

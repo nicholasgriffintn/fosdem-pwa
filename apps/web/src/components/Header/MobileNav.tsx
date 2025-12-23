@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
 import { useLockBody } from "~/hooks/use-lock-body";
 import { useAuth } from "~/hooks/use-auth";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { constants } from "~/constants";

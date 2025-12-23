@@ -2,8 +2,8 @@ import { Link } from "@tanstack/react-router";
 
 import { constants } from "~/constants";
 import { Button } from "~/components/ui/button";
-import { EmptyStateCard } from "~/components/EmptyStateCard";
-import { PageHeader } from "~/components/PageHeader";
+import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
+import { PageHeader } from "~/components/shared/PageHeader";
 
 export function NotFound() {
 	return (

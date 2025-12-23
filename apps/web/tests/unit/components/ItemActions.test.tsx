@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ItemActions } from "~/components/ItemActions";
+import { ItemActions } from "~/components/shared/ItemActions";
 import type { Event } from "~/types/fosdem";
 
 const routerMocks = vi.hoisted(() => ({

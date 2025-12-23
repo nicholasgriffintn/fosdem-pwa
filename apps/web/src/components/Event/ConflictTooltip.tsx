@@ -8,7 +8,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { Icons } from "~/components/Icons";
+import { Icons } from "~/components/shared/Icons";
 import type { EventConflict } from "~/lib/fosdem";
 import type { Event } from "~/types/fosdem";
 import { Button } from "~/components/ui/button";
