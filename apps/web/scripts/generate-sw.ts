@@ -8,7 +8,7 @@ async function generateServiceWorker(outputDir = 'dist') {
 
   try {
     manifest = JSON.parse(
-      readFileSync('dist/server/.vite/manifest.json', 'utf-8')
+      readFileSync(`${outputDir}/server/.vite/manifest.json`, 'utf-8')
     )
   } catch (error: any) {
     throw new Error('Error reading Vite manifest: ' + error.message)
@@ -18,7 +18,7 @@ async function generateServiceWorker(outputDir = 'dist') {
     throw new Error('Vite manifest is empty or invalid.')
   }
 
-  const serverAssetsDir = 'dist/server/assets';
+  const serverAssetsDir = `${outputDir}/server/assets`;
   let fosdemFunctionId: string | undefined;
 
   try {
@@ -212,26 +212,6 @@ workbox.precaching.precacheAndRoute(
 );
 
 registerRoute(
-  ({ url }) => url.hostname === 'r2.fosdempwa.com',
-  new StaleWhileRevalidate({
-    cacheName: 'fosdem-data',
-    plugins: [
-      new CacheableResponsePlugin({
-        statuses: [0, 200]
-      }),
-      new ExpirationPlugin({
-        maxEntries: 50,
-        maxAgeSeconds: 1 * 60 * 60 // 1 hour
-      }),
-      new BroadcastUpdatePlugin({
-        channelName: 'fosdem-data-updates',
-        headersToCheck: ['etag', 'last-modified']
-      })
-    ]
-  })
-);
-
-registerRoute(
   ({ url }) => url.pathname.includes('/api/user'),
   new NetworkFirst({
     cacheName: 'user-data',
@@ -250,6 +230,22 @@ registerRoute(
       }),
       new ExpirationPlugin({
         maxEntries: 100,
+        maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
+      })
+    ]
+  })
+);
+
+registerRoute(
+  ({ url }) => url.hostname === 'images.s3rve.co.uk',
+  new CacheFirst({
+    cacheName: 'resized-images',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200]
+      }),
+      new ExpirationPlugin({
+        maxEntries: 200,
         maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
       })
     ]
@@ -289,13 +285,16 @@ registerRoute(
           const url = new URL(request.url);
           if (url.pathname.includes('/_serverFn/') && url.searchParams.get('payload')) {
             try {
-              const payload = JSON.parse(decodeURIComponent(url.searchParams.get('payload')!));
-              if (payload.t?.p?.v?.[1]?.p?.k?.includes('slug')) {
-                // Return empty state for offline mode - a bit of a hack but it will hopefully work?
-                return new Response(JSON.stringify(null), {
-                  status: 200,
-                  headers: { 'Content-Type': 'application/json' }
-                });
+              const payloadParam = url.searchParams.get('payload');
+              if (payloadParam) {
+                const payload = JSON.parse(decodeURIComponent(payloadParam));
+                if (payload.t?.p?.v?.[1]?.p?.k?.includes('slug')) {
+                  // Return empty state for offline mode
+                  return new Response(JSON.stringify(null), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                }
               }
             } catch (e) {
               // If parsing fails, continue to default error handling
@@ -314,11 +313,24 @@ setDefaultHandler(
     plugins: [
       {
         handlerDidError: async ({ request }) => {
-          const cache = await caches.open('fosdem-data');
-          const cachedResponse = await cache.match(request);
-          if (cachedResponse) return cachedResponse;
-
-          return caches.match('/offline');
+          const url = new URL(request.url);
+          
+          if (url.pathname.startsWith('/_serverFn')) {
+            return new Response('', {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+          
+          // For anything else, serve the offline page
+          try {
+            return await caches.match('/offline');
+          } catch (e) {
+            return new Response('Offline - No network connection', {
+              status: 503,
+              headers: { 'Content-Type': 'text/plain' }
+            });
+          }
         }
       }
     ]
@@ -335,6 +347,7 @@ self.addEventListener('activate', (event) => {
             if (!cacheName.startsWith('workbox-') &&
                 cacheName !== 'fosdem-data' &&
                 cacheName !== 'github-avatars' &&
+                cacheName !== 'resized-images' &&
                 cacheName !== 'navigations' &&
                 cacheName !== 'user-data' &&
                 cacheName !== 'default') {
