@@ -12,6 +12,7 @@ type PageHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   className?: string;
   children?: React.ReactNode;
   displayHeading?: boolean;
+  additionalHeadingPaddingClass?: string;
   breadcrumbs?: {
     title: string;
     href: string;
@@ -31,6 +32,7 @@ export function PageHeader({
   className,
   children,
   displayHeading = true,
+  additionalHeadingPaddingClass = "my-4",
   breadcrumbs,
   metadata,
   year = constants.DEFAULT_YEAR,
@@ -107,7 +109,7 @@ export function PageHeader({
         </div>
         {children && <div className="flex justify-end">{children}</div>}
       </div>
-      {displayHeading && <div className="my-4" />}
+      {displayHeading && <div className={additionalHeadingPaddingClass} />}
     </>
   );
 }
