@@ -11,6 +11,7 @@ export type SelectOption = {
 type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
 	options: SelectOption[];
 	onValueChange?: (value: string) => void;
+	placeholder?: string;
 };
 
 export function Select({
@@ -18,12 +19,21 @@ export function Select({
 	className,
 	onValueChange,
 	onChange,
+	placeholder,
+	value,
+	defaultValue,
 	...props
 }: SelectProps) {
+	const selectValueProps =
+		value !== undefined
+			? { value }
+			: { defaultValue: defaultValue ?? (placeholder ? "" : undefined) };
+
 	return (
 		<div className="relative">
 			<select
 				{...props}
+				{...selectValueProps}
 				onChange={(event) => {
 					onChange?.(event);
 					onValueChange?.(event.currentTarget.value);
@@ -33,6 +43,11 @@ export function Select({
 					className,
 				)}
 			>
+				{placeholder && (
+					<option value="" disabled hidden>
+						{placeholder}
+					</option>
+				)}
 				{options.map((option) => (
 					<option
 						key={option.value}
