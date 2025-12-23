@@ -3,7 +3,7 @@ import {
 	encodeBase32LowerCaseNoPadding,
 	encodeHexLowerCase,
 } from "@oslojs/encoding";
-import { GitHub, Discord } from "arctic";
+import { GitHub, Discord, GitLab } from "arctic";
 import { and, eq } from "drizzle-orm";
 import {
 	deleteCookie,
@@ -157,6 +157,16 @@ export const discord = new Discord(
 	env.DISCORD_CLIENT_ID,
 	env.DISCORD_CLIENT_SECRET,
 	DISCORD_REDIRECT_URL,
+);
+
+const GITLAB_REDIRECT_URL = env.GITLAB_REDIRECT_URI
+	? env.GITLAB_REDIRECT_URI
+	: `${env.CF_PAGES_URL}/api/auth/callback/gitlab`;
+export const gitlab = new GitLab(
+	"https://gitlab.com",
+	env.GITLAB_CLIENT_ID,
+	env.GITLAB_CLIENT_SECRET,
+	GITLAB_REDIRECT_URL,
 );
 
 export const MASTODON_INSTANCES = [

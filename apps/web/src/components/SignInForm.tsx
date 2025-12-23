@@ -22,6 +22,23 @@ export function SignInForm() {
 
 	return (
 		<div className="flex flex-col gap-4">
+			<MastodonSignIn disabled={isSubmitting || isGuestSubmitting} />
+
+			<form method="GET" onSubmit={handleSubmit}>
+				<Button
+					formAction="/api/auth/gitlab"
+					type="submit"
+					variant="outline"
+					size="lg"
+					className="w-full cursor-pointer bg-[#FC6D26] text-white hover:bg-[#E24329] border-[#E24329]"
+					disabled={isSubmitting || isGuestSubmitting}
+				>
+					{isSubmitting && <Spinner className="w-4 h-4 mr-2" />}
+					{!isSubmitting && <Icons.gitlab className="w-4 h-4 mr-2" />}
+					Sign in with GitLab
+				</Button>
+			</form>
+
 			<form method="GET" onSubmit={handleSubmit}>
 				<Button
 					formAction="/api/auth/github"
@@ -51,8 +68,6 @@ export function SignInForm() {
 					Sign in with Discord
 				</Button>
 			</form>
-
-			<MastodonSignIn disabled={isSubmitting || isGuestSubmitting} />
 
 			<div className="relative">
 				<div className="absolute inset-0 flex items-center">

@@ -37,6 +37,14 @@ export function UpgradeNotice({ user }: UpgradeNoticeProps) {
             <Icons.discord className="h-4 w-4" />
             Discord
           </a>
+
+          <a
+            href="/api/auth/upgrade-gitlab"
+            className="inline-flex items-center gap-2 rounded-md border border-[#E24329] bg-[#FC6D26] text-white px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[#E24329] no-underline"
+          >
+            <Icons.gitlab className="h-4 w-4" />
+            GitLab
+          </a>
         </div>
       </div>
     </div>

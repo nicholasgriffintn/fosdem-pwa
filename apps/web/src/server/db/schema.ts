@@ -20,6 +20,7 @@ export const user = sqliteTable(
 		mastodon_username: text(),
 		mastodon_acct: text(),
 		mastodon_url: text(),
+		gitlab_username: text(),
 		company: text(),
 		site: text(),
 		location: text(),
@@ -48,6 +49,9 @@ export const user = sqliteTable(
 			),
 			mastodonUsernameIdx: uniqueIndex("mastodon_username_idx").on(
 				table.mastodon_username,
+			),
+			gitlabUsernameIdx: uniqueIndex("gitlab_username_idx").on(
+				table.gitlab_username,
 			),
 		};
 	},

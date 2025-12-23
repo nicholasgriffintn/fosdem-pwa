@@ -165,6 +165,8 @@ async function createNewUser(providerUser: OAuthUser, providerId: string): Promi
     userData.mastodon_username = providerUser.username;
     userData.mastodon_acct = providerUser.acct;
     userData.mastodon_url = providerUser.url;
+  } else if (providerId === 'gitlab') {
+    userData.gitlab_username = providerUser.username;
   }
 
   const userId = await db
@@ -203,6 +205,11 @@ async function upgradeGuestUser(userId: number, providerUser: OAuthUser, provide
     userData.mastodon_username = providerUser.username;
     userData.mastodon_acct = providerUser.acct;
     userData.mastodon_url = providerUser.url;
+  } else if (providerId === 'gitlab') {
+    userData.gitlab_username = providerUser.username;
+    userData.bio = providerUser.bio;
+    userData.location = providerUser.location;
+    userData.site = providerUser.blog;
   }
 
   await db
