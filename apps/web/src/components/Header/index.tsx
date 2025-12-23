@@ -15,7 +15,7 @@ import {
 import { useAuth } from "~/hooks/use-auth";
 import { Spinner } from "~/components/shared/Spinner";
 import { constants } from "~/constants";
-import { cn } from "../../lib/utils";
+import { cn } from "~/lib/utils";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { LoadingState } from "~/components/shared/LoadingState";
 

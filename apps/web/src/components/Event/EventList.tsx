@@ -7,7 +7,7 @@ import { EventCalendarList } from "~/components/Event/EventCalendarList";
 import { groupEventsByDay } from "~/lib/grouping";
 import { EventScheduleList } from "~/components/Event/EventScheduleList";
 import type { User } from "~/server/db/schema";
-import { ViewModeSwitch } from "../shared/ViewModeSwitch";
+import { ViewModeSwitch } from "~/components/shared/ViewModeSwitch";
 import { ItemListContainer } from "~/components/shared/ItemListContainer";
 
 type EventListViewModes = "list" | "calendar" | "schedule";
