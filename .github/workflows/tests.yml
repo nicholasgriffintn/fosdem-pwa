@@ -23,6 +23,9 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      
+      - name: NPM Audit
+        run: npx audit-ci@7.1.0
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
