@@ -212,15 +212,6 @@ workbox.precaching.precacheAndRoute(
 );
 
 registerRoute(
-  ({ url }) => url.pathname.includes('/api/user'),
-  new NetworkFirst({
-    cacheName: 'user-data',
-    plugins: [],
-    networkTimeoutSeconds: 3
-  })
-);
-
-registerRoute(
   ({ url }) => url.hostname === 'avatars.githubusercontent.com',
   new CacheFirst({
     cacheName: 'github-avatars',
@@ -345,12 +336,10 @@ self.addEventListener('activate', (event) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (!cacheName.startsWith('workbox-') &&
-                cacheName !== 'fosdem-data' &&
                 cacheName !== 'github-avatars' &&
                 cacheName !== 'resized-images' &&
                 cacheName !== 'navigations' &&
-                cacheName !== 'user-data' &&
-                cacheName !== 'default') {
+                cacheName !== 'server-functions') {
               return caches.delete(cacheName);
             }
           })
