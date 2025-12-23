@@ -181,7 +181,6 @@ function useToast() {
 				toastTimeouts.clear();
 			}
 		};
-		// Empty dependency array - listener should only be added once on mount
 	}, []);
 
 	return {

@@ -21,7 +21,6 @@ const useEffectOnce = (effect: EffectCallback) => {
 				cleanupRef.current = undefined;
 			}
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 };
 

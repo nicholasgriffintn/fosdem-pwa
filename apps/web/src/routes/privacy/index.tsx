@@ -59,7 +59,12 @@ function PrivacyPolicyPage() {
 								Session data to keep you signed in if you choose to sign in
 								(cookies), these include:
 								<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-									<li>"github_oauth_state" - The state used for GitHub OAuth authentication (not used for guest accounts)</li>
+									<li>
+										"[provider]_oauth_state" - The state used for OAuth authentication (only when used), replace [provider] with the provider name (e.g. github, discord, mastodon)
+										<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+											<li>Note: For Mastodon, we also store "mastodon_code_verifier" and "mastodon_instance" cookies</li>
+										</ul>
+									</li>
 									<li>"session" - An identifier to hold your signed in session</li>
 								</ul>
 							</li>
