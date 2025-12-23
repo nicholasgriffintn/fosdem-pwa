@@ -97,7 +97,7 @@ function PrivacyPolicyPage() {
 						</p>
 						<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
 							<li>
-								Account profile information from GitHub (name, email,
+								Account profile information from the provider you use to sign in (name, email,
 								username, avatar, and optional profile fields).
 							</li>
 							<li>Your bookmarks, notes, and sync status.</li>
@@ -134,6 +134,7 @@ function PrivacyPolicyPage() {
 							for analytics.
 						</p>
 					</section>
+
 					<section className="space-y-3">
 						<h2 className="text-2xl font-semibold text-foreground">
 							External services and proxies
