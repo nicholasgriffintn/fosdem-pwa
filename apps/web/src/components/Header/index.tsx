@@ -3,7 +3,6 @@ import { useIsClient } from "~/hooks/use-is-client";
 
 import { Icons } from "~/components/shared/Icons";
 import { MainNav } from "~/components/Header/MainNav";
-import { NavSearch } from "~/components/Header/NavSearch";
 import { Button } from "~/components/ui/button";
 import { AvatarMenu } from "~/components/Header/UserMenu";
 import {
@@ -19,6 +18,7 @@ import { cn } from "~/lib/utils";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { LoadingState } from "~/components/shared/LoadingState";
 import { navItems } from "~/components/shared/NavItems";
+import { HeaderSearch } from "~/components/Header/HeaderSearch";
 
 export function Header() {
   const { year } = useSearch({ strict: false });
@@ -82,7 +82,7 @@ export function Header() {
               </TooltipProvider>
             )}
           </nav>
-          <NavSearch year={selectedYear} />
+          <HeaderSearch year={selectedYear} />
         </div>
       </div>
     </header>

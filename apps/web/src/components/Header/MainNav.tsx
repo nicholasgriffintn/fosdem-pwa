@@ -13,7 +13,8 @@ type MainNavProps = {
     title: string;
     href: string;
     icon?: React.ReactNode;
-    disabled?: boolean;
+		disabled?: boolean;
+		mobileOnly?: boolean;
   }[];
 };
 
@@ -45,7 +46,7 @@ export function MainNav({ title, items }: MainNavProps) {
       </Link>
       {items?.length ? (
         <nav className="hidden gap-2 lg:flex shrink-0" aria-label="Primary">
-          {items?.map((item) => (
+					{items.filter((item) => !item.mobileOnly).map((item) => (
             <Link
               key={item.href}
               to={item.disabled ? "#" : item.href}
@@ -81,21 +82,23 @@ export function MainNav({ title, items }: MainNavProps) {
       />
       <label
         htmlFor="mobile-menu-toggle"
-        className="flex items-center gap-1 rounded-md border px-2 py-1 text-sm font-medium lg:hidden shrink-0 cursor-pointer"
+				className={cn(
+					"lg:hidden inline-flex h-9 items-center gap-2 rounded-md border bg-background px-3 text-sm font-medium",
+					"text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+					"shrink-0 cursor-pointer",
+				)}
       >
-        <Icons.list width="18" height="18" className="peer-checked/menu:hidden" />
-        <Icons.close width="18" height="18" className="hidden peer-checked/menu:inline" />
+				<Icons.list className="h-4 w-4 peer-checked/menu:hidden" />
+				<Icons.close className="hidden h-4 w-4 peer-checked/menu:inline" />
         <span>Menu</span>
       </label>
-      {items && (
-        <div className="hidden peer-checked/menu:block">
-          <MobileNav
-            items={items}
-            menuCheckboxRef={menuCheckboxRef}
-            isOpen={isMenuOpen}
-            onClose={() => setIsMenuOpen(false)}
-          />
-        </div>
+			{items && (
+				<MobileNav
+					items={items}
+					menuCheckboxRef={menuCheckboxRef}
+					isOpen={isMenuOpen}
+					onClose={() => setIsMenuOpen(false)}
+				/>
       )}
     </div>
   );
