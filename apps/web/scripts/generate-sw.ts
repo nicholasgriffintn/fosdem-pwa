@@ -274,22 +274,12 @@ registerRoute(
       {
         handlerDidError: async ({ request }) => {
           const url = new URL(request.url);
-          if (url.pathname.includes('/_serverFn/') && url.searchParams.get('payload')) {
-            try {
-              const payloadParam = url.searchParams.get('payload');
-              if (payloadParam) {
-                const payload = JSON.parse(decodeURIComponent(payloadParam));
-                if (payload.t?.p?.v?.[1]?.p?.k?.includes('slug')) {
-                  // Return empty state for offline mode
-                  return new Response(JSON.stringify(null), {
-                    status: 200,
-                    headers: { 'Content-Type': 'application/json' }
-                  });
-                }
-              }
-            } catch (e) {
-              // If parsing fails, continue to default error handling
-            }
+          if (url.pathname.includes('/_serverFn/')) {
+            // For ALL server function requests, return empty response when offline
+            return new Response('', {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
           }
           return null;
         }
