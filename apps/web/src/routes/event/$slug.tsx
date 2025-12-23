@@ -66,9 +66,16 @@ export const Route = createFileRoute("/event/$slug")({
 		}
 
 		const fosdem = await getAllData({ data: { year } });
-		const serverBookmark = await getEventBookmark({
-			data: { year, slug: params.slug },
-		});
+
+		let serverBookmark = null;
+		try {
+			serverBookmark = await getEventBookmark({
+				data: { year, slug: params.slug },
+			});
+		} catch (error) {
+			console.warn('Failed to load bookmark:', error);
+		}
+
 		return {
 			fosdem: {
 				event: fosdem.events[params.slug],
