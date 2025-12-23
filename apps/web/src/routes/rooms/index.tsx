@@ -25,7 +25,31 @@ export const Route = createFileRoute("/rooms/")({
 		meta: [
 			{
 				title: "Rooms | FOSDEM PWA",
-				description: "All rooms at FOSDEM",
+				description: "All rooms and venues at FOSDEM conference. Browse events by room and location.",
+			},
+			{
+				property: "og:title",
+				content: "FOSDEM Rooms & Venues",
+			},
+			{
+				property: "og:description",
+				content: "All rooms and venues at FOSDEM conference",
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				name: "twitter:card",
+				content: "summary",
+			},
+			{
+				name: "twitter:title",
+				content: "FOSDEM Rooms & Venues",
+			},
+			{
+				name: "twitter:description",
+				content: "All rooms and venues at FOSDEM conference",
 			},
 		],
 	}),

@@ -63,8 +63,32 @@ export const Route = createFileRoute("/rooms/$roomId")({
 	head: ({ loaderData }) => ({
 		meta: [
 			{
-				title: `${loaderData?.fosdem.room?.name} | FOSDEM PWA`,
-				description: `Events in ${loaderData?.fosdem.room?.name}`,
+				title: `${loaderData?.fosdem.room?.name} | Room | FOSDEM ${loaderData?.year}`,
+				description: `Events in ${loaderData?.fosdem.room?.name} at FOSDEM ${loaderData?.year}. Building ${loaderData?.fosdem.room?.buildingId || loaderData?.fosdem.room?.building?.id}.`,
+			},
+			{
+				property: "og:title",
+				content: `${loaderData?.fosdem.room?.name} | FOSDEM ${loaderData?.year}`,
+			},
+			{
+				property: "og:description",
+				content: `Events in ${loaderData?.fosdem.room?.name} at FOSDEM ${loaderData?.year}`,
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				name: "twitter:card",
+				content: "summary",
+			},
+			{
+				name: "twitter:title",
+				content: `${loaderData?.fosdem.room?.name} | FOSDEM ${loaderData?.year}`,
+			},
+			{
+				name: "twitter:description",
+				content: `Events in ${loaderData?.fosdem.room?.name} at FOSDEM ${loaderData?.year}`,
 			},
 		],
 	}),

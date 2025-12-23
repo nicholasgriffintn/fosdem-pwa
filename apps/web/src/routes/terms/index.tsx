@@ -11,6 +11,30 @@ export const Route = createFileRoute("/terms/")({
 				description:
 					"Terms for using FOSDEM PWA, including account responsibilities and service limitations.",
 			},
+			{
+				property: "og:title",
+				content: "Terms of Service - FOSDEM PWA",
+			},
+			{
+				property: "og:description",
+				content: "Terms and conditions for using FOSDEM PWA",
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				name: "twitter:card",
+				content: "summary",
+			},
+			{
+				name: "twitter:title",
+				content: "Terms of Service - FOSDEM PWA",
+			},
+			{
+				name: "twitter:description",
+				content: "Terms and conditions for using FOSDEM PWA",
+			},
 		],
 	}),
 });

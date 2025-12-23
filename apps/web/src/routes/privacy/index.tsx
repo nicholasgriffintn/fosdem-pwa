@@ -11,6 +11,30 @@ export const Route = createFileRoute("/privacy/")({
 				description:
 					"Learn how FOSDEM PWA stores data locally, syncs signed-in content, and handles error reporting.",
 			},
+			{
+				property: "og:title",
+				content: "Privacy Policy - FOSDEM PWA",
+			},
+			{
+				property: "og:description",
+				content: "How FOSDEM PWA handles your data and privacy",
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				name: "twitter:card",
+				content: "summary",
+			},
+			{
+				name: "twitter:title",
+				content: "Privacy Policy - FOSDEM PWA",
+			},
+			{
+				name: "twitter:description",
+				content: "How FOSDEM PWA handles your data and privacy",
+			},
 		],
 	}),
 });

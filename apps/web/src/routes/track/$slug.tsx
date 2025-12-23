@@ -42,8 +42,32 @@ export const Route = createFileRoute("/track/$slug")({
 	head: ({ loaderData }) => ({
 		meta: [
 			{
-				title: `${loaderData?.fosdem.track?.name} | FOSDEM PWA`,
-				description: loaderData?.fosdem.track?.description,
+				title: `${loaderData?.fosdem.track?.name} | Track | FOSDEM ${loaderData?.year}`,
+				description: loaderData?.fosdem.track?.description || `${loaderData?.fosdem.track?.name} track at FOSDEM ${loaderData?.year}. ${loaderData?.fosdem.track?.eventCount} events.`,
+			},
+			{
+				property: "og:title",
+				content: `${loaderData?.fosdem.track?.name} | FOSDEM ${loaderData?.year}`,
+			},
+			{
+				property: "og:description",
+				content: loaderData?.fosdem.track?.description || `${loaderData?.fosdem.track?.name} track at FOSDEM ${loaderData?.year}`,
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				name: "twitter:card",
+				content: "summary",
+			},
+			{
+				name: "twitter:title",
+				content: `${loaderData?.fosdem.track?.name} | FOSDEM ${loaderData?.year}`,
+			},
+			{
+				name: "twitter:description",
+				content: loaderData?.fosdem.track?.description || `${loaderData?.fosdem.track?.name} track at FOSDEM ${loaderData?.year}`,
 			},
 		],
 	}),

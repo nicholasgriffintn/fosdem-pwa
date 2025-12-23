@@ -86,10 +86,61 @@ export const Route = createFileRoute("/event/$slug")({
 	head: ({ loaderData }) => ({
 		meta: [
 			{
-				title: `${loaderData?.fosdem.event?.title} | FOSDEM PWA`,
-				description: loaderData?.fosdem.event?.description,
+				title: `${loaderData?.fosdem.event?.title} | FOSDEM ${loaderData?.year}`,
+				description: loaderData?.fosdem.event?.description || `Event at FOSDEM ${loaderData?.year} in ${loaderData?.fosdem.event?.room}`,
+			},
+			{
+				property: "og:title",
+				content: `${loaderData?.fosdem.event?.title} | FOSDEM ${loaderData?.year}`,
+			},
+			{
+				property: "og:description",
+				content: loaderData?.fosdem.event?.description || `Event at FOSDEM ${loaderData?.year} in ${loaderData?.fosdem.event?.room}`,
+			},
+			{
+				property: "og:type",
+				content: "article",
+			},
+			{
+				name: "twitter:card",
+				content: "summary_large_image",
+			},
+			{
+				name: "twitter:title",
+				content: `${loaderData?.fosdem.event?.title} | FOSDEM ${loaderData?.year}`,
+			},
+			{
+				name: "twitter:description",
+				content: loaderData?.fosdem.event?.description || `Event at FOSDEM ${loaderData?.year} in ${loaderData?.fosdem.event?.room}`,
 			},
 		],
+		scripts: loaderData?.fosdem.event ? [
+			{
+				type: "application/ld+json",
+				children: JSON.stringify({
+					"@context": "https://schema.org",
+					"@type": "Event",
+					"name": loaderData.fosdem.event.title,
+					"description": loaderData.fosdem.event.description || "",
+					"startDate": `${loaderData.fosdem.conference?.start}T${loaderData.fosdem.event.startTime}:00`,
+					"endDate": `${loaderData.fosdem.conference?.start}T${loaderData.fosdem.event.startTime}:00`,
+					"location": {
+						"@type": "Place",
+						"name": loaderData.fosdem.event.room,
+					},
+					"organizer": {
+						"@type": "Organization",
+						"name": "FOSDEM",
+						"url": "https://fosdem.org",
+					},
+					"url": `https://fosdempwa.com/event/${loaderData.fosdem.event.id}?year=${loaderData.year}`,
+					"attendee": loaderData.fosdem.event.persons?.map((person: string) => ({
+						"@type": "Person",
+						"name": person,
+					})),
+				}),
+			},
+		] : [],
 	}),
 	staleTime: 10_000,
 });

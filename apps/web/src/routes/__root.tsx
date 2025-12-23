@@ -56,6 +56,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 					content: siteMeta.themeColor,
 				},
 				{
+					name: "description",
+					content: siteMeta.description,
+				},
+				{
 					property: "og:title",
 					content: siteMeta.title,
 				},
@@ -67,10 +71,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 					property: "og:locale",
 					content: siteMeta.locale,
 				},
+				{
+					property: "og:type",
+					content: "website",
+				},
+				{
+					property: "og:site_name",
+					content: siteMeta.title,
+				},
+				{
+					name: "twitter:card",
+					content: "summary_large_image",
+				},
+				{
+					name: "twitter:title",
+					content: siteMeta.title,
+				},
+				{
+					name: "twitter:description",
+					content: siteMeta.description,
+				},
 			],
 			links: [
 				{ rel: "stylesheet", href: appCss },
 				{ rel: "manifest", href: "/manifest.webmanifest" },
+				{ rel: "icon", href: "/favicon.ico" },
+				{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
 			],
 		}),
 		loader: async () => {
