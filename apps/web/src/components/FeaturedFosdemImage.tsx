@@ -28,6 +28,19 @@ export function FeaturedFosdemImage({
 	const [isHovered, setIsHovered] = useState(false);
 	const imageDetails = fosdemImageDetails[type];
 
+	const getDimensions = (size: string) => {
+		switch (size) {
+			case "full":
+				return { width: 1920, height: 1080 };
+			case "featured":
+				return { width: 400, height: 225 };
+			default:
+				return { width: 800, height: 600 };
+		}
+	};
+
+	const dimensions = getDimensions(size);
+
 	if (!imageDetails) {
 		return null;
 	}
@@ -35,9 +48,11 @@ export function FeaturedFosdemImage({
 	if (!displayCaption) {
 		return (
 			<Image
-				src={`/images/fosdem/${size}/${type}.png`}
+				src={`/fosdem/images/fosdem/${size}/${type}.png`}
 				alt={imageDetails.alt}
 				loading={loading}
+				width={dimensions.width}
+				height={dimensions.height}
 				className={className}
 				{...props}
 			/>
@@ -51,9 +66,11 @@ export function FeaturedFosdemImage({
 			onMouseLeave={() => setIsHovered(false)}
 		>
 			<Image
-				src={`/images/fosdem/${size}/${type}.png`}
+				src={`/fosdem/images/fosdem/${size}/${type}.png`}
 				alt={imageDetails.alt}
 				loading={loading}
+				width={dimensions.width}
+				height={dimensions.height}
 				className="w-full h-full"
 				{...props}
 			/>
