@@ -25,11 +25,6 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 			stack: (error as Error)?.stack,
 			error,
 		});
-
-		// TODO: Send error to monitoring service (e.g., Sentry)
-		// if (typeof window !== "undefined" && window.Sentry) {
-		//   window.Sentry.captureException(error);
-		// }
 	}, [error]);
 
 	const message =
