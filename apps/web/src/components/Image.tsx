@@ -28,8 +28,8 @@ export function Image({
 	const webpSource = canUseWebP ? getResizedImageSrc(src.replace(/\.(jpe?g)$/i, ".webp"), width, height) : null;
 
 	return (
-		<div className={className}>
-			<picture>
+		<div className={className} style={{ aspectRatio: width && height ? `${width}/${height}` : undefined }}>
+			<picture className="w-full h-full">
 				{webpSource && (
 					<Source src={webpSource} type="image/webp" layout="fullWidth" />
 				)}
@@ -38,6 +38,7 @@ export function Image({
 					alt={alt}
 					layout="fullWidth"
 					loading={loading}
+					className="w-full h-full object-cover"
 					{...props}
 				/>
 			</picture>
