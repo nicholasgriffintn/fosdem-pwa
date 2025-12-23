@@ -36,10 +36,6 @@ export const Route = createFileRoute("/api/auth/mastodon")({
           const codeVerifier = generateCodeVerifier();
 
           const mastodon = createMastodonInstance(instance.baseUrl);
-          console.log(mastodon);
-          console.log(state);
-          console.log(codeVerifier);
-          console.log(instance.baseUrl);
           const authUrl = mastodon.createAuthorizationURL(state, codeVerifier, ["read"]);
 
           setCookie("mastodon_oauth_state", state, {

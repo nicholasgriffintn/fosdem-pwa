@@ -134,7 +134,7 @@ export function setSessionTokenCookie(token: string, expiresAt: Date) {
 	setCookie(SESSION_COOKIE_NAME, token, {
 		httpOnly: true,
 		sameSite: "lax",
-		secure: process.env.NODE_ENV !== "development",
+		secure: env.NODE_ENV === "production",
 		expires: expiresAt,
 		maxAge: TTL,
 		path: "/",
