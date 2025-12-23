@@ -56,9 +56,10 @@ export function MastodonSignIn({ disabled = false }: MastodonSignInProps) {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl border border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Choose your Mastodon server</h2>
             <p className="text-sm text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-              Mastodon is a decentralized social network. Select the server where your account is hosted.
-              If your server isn't listed, you will either need to sign up with that server or use a different method.
-              I can only support servers that I am a member of, feel free to raise an issue if you would like to see support for a new server added.
+              Mastodon accounts are hosted on different servers. Choose the one you signed up with.
+            </p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+              Only listed servers are currently supported. Don’t see yours? Use another sign-in method or request it to be added.
             </p>
 
             <div className="mb-6">
