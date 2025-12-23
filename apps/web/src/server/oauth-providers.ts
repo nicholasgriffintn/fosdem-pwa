@@ -102,7 +102,8 @@ export async function handleOAuthCallback(
     }
 
     let existingUserEmail = null;
-    if (providerUser.email) {
+    // Skip email-based linking for Mastodon as it uses fabricated emails
+    if (providerUser.email && provider.id !== 'mastodon') {
       existingUserEmail = await db.query.user.findFirst({
         where: eq(user.email, providerUser.email),
       });
