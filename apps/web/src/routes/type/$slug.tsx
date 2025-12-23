@@ -12,6 +12,7 @@ import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isTrack } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -73,56 +74,52 @@ function TypePage() {
 
 	if (!fosdem.type) {
 		return (
-			<div className="min-h-screen">
-				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Type not found" />
-					<EmptyStateCard
-						title="Whoops!"
-						description="We couldn't find this type of content. Please check the link and try again."
-					/>
-				</div>
-			</div>
+			<PageShell>
+				<PageHeader heading="Type not found" />
+				<EmptyStateCard
+					title="Whoops!"
+					description="We couldn't find this type of content. Please check the link and try again."
+				/>
+			</PageShell>
 		);
 	}
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader
-					heading={fosdem.type.name}
+		<PageShell>
+			<PageHeader
+				heading={fosdem.type.name}
+				year={year}
+				text={
+					fosdemTypeDescriptions[
+					fosdem.type.id as keyof typeof fosdemTypeDescriptions
+					]
+				}
+				metadata={[
+					{
+						text: `${fosdem.type.trackCount} tracks`,
+					},
+				]}
+			/>
+			{fosdem.trackData?.length > 0 ? (
+				<TrackList
+					tracks={fosdem.trackData}
 					year={year}
-					text={
-						fosdemTypeDescriptions[
-							fosdem.type.id as keyof typeof fosdemTypeDescriptions
-						]
-					}
-					metadata={[
-						{
-							text: `${fosdem.type.trackCount} tracks`,
-						},
-					]}
+					groupByDay={true}
+					days={fosdem.days}
+					day={day}
+					sortFavourites={sortFavourites}
+					onSortFavouritesChange={handleSortFavouritesChange}
+					user={user}
+					onCreateBookmark={onCreateBookmark}
+					displaySortByFavourites={true}
+					serverBookmarks={serverBookmarks}
 				/>
-				{fosdem.trackData?.length > 0 ? (
-					<TrackList
-						tracks={fosdem.trackData}
-						year={year}
-						groupByDay={true}
-						days={fosdem.days}
-						day={day}
-						sortFavourites={sortFavourites}
-						onSortFavouritesChange={handleSortFavouritesChange}
-						user={user}
-						onCreateBookmark={onCreateBookmark}
-						displaySortByFavourites={true}
-						serverBookmarks={serverBookmarks}
-					/>
-				) : (
-					<EmptyStateCard
-						title="No tracks for this type"
-						description="We don’t have tracks for this content type yet. Check another type or return later."
-					/>
-				)}
-			</div>
-		</div>
+			) : (
+				<EmptyStateCard
+					title="No tracks for this type"
+					description="We don’t have tracks for this content type yet. Check another type or return later."
+				/>
+			)}
+		</PageShell>
 	);
 }

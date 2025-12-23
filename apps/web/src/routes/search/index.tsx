@@ -26,6 +26,8 @@ import { Icons } from "~/components/shared/Icons";
 import { Button } from "~/components/ui/button";
 import { Select } from "~/components/ui/select";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
+import { PageShell } from "~/components/shared/PageShell";
+import { SectionStack } from "~/components/shared/SectionStack";
 import { Input } from "~/components/ui/input";
 import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
@@ -388,120 +390,118 @@ export default function SearchPage() {
 	);
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader
-					heading="Search"
-					subtitle={`Results for "${query || "…"}"`}
-					year={year}
-				/>
+		<PageShell>
+			<PageHeader
+				heading="Search"
+				subtitle={`Results for "${query || "…"}"`}
+				year={year}
+			/>
 
-				<div className="flex flex-wrap gap-4 items-end mb-6">
-					<form
-						className="flex flex-wrap items-end gap-4"
-						method="GET"
-						action="/search"
-						onSubmit={handleSubmit}
-					>
-						<input type="hidden" name="year" value={year} />
-						<div className="flex flex-col gap-1 min-w-[220px] max-w-sm">
-							<Label htmlFor="search-query">Search the schedule</Label>
-							<div className="flex gap-2">
-								<Input
-									id="search-query"
-									name="q"
-									placeholder="Events, tracks, rooms"
-									value={localQuery}
-									onChange={(e) => setLocalQuery(e.target.value)}
-								/>
-								<Button type="submit" size="sm">
-									Search
-								</Button>
-							</div>
-						</div>
-
-						<div className="flex flex-col gap-1 min-w-[180px]">
-							<Label htmlFor="track-filter">Track</Label>
-							<Select
-								id="track-filter"
-								name="track"
-								value={selectedTrack || "all"}
-								onValueChange={handleTrackChange}
-								disabled={!fosdemData}
-								options={trackSelectOptions}
-								className="min-w-[180px]"
+			<div className="flex flex-wrap gap-4 items-end mb-6">
+				<form
+					className="flex flex-wrap items-end gap-4"
+					method="GET"
+					action="/search"
+					onSubmit={handleSubmit}
+				>
+					<input type="hidden" name="year" value={year} />
+					<div className="flex flex-col gap-1 min-w-[220px] max-w-sm">
+						<Label htmlFor="search-query">Search the schedule</Label>
+						<div className="flex gap-2">
+							<Input
+								id="search-query"
+								name="q"
+								placeholder="Events, tracks, rooms"
+								value={localQuery}
+								onChange={(e) => setLocalQuery(e.target.value)}
 							/>
-						</div>
-
-						<div className="flex flex-col gap-1 min-w-[160px]">
-							<Label htmlFor="time-filter">Time slot</Label>
-							<Select
-								id="time-filter"
-								name="time"
-								value={selectedTime || "all"}
-								onValueChange={handleTimeChange}
-								disabled={!fosdemData}
-								options={timeSelectOptions}
-								className="min-w-[160px]"
-							/>
-						</div>
-					</form>
-					<div className="flex flex-col gap-1">
-						<Label>Show</Label>
-						<div className="flex flex-wrap gap-2">
-							{typeFilters.map((filter) => (
-								<Link
-									key={filter.value}
-									to="."
-									search={(prev) => ({ ...prev, type: filter.value })}
-									className={cn(
-										"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2",
-										"no-underline hover:underline",
-										selectedType === filter.value
-											? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-											: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-									)}
-									aria-current={selectedType === filter.value ? "page" : undefined}
-								>
-									{filter.label}
-								</Link>
-							))}
+							<Button type="submit" size="sm">
+								Search
+							</Button>
 						</div>
 					</div>
-					{hasActiveFilters && (
-						<Link
-							to="."
-							search={{ year }}
-							className="h-10 px-3 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-accent transition-colors"
-							aria-label="Clear search and filters"
-						>
-							<Icons.close className="h-4 w-4" />
-							Clear
-						</Link>
-					)}
+
+					<div className="flex flex-col gap-1 min-w-[180px]">
+						<Label htmlFor="track-filter">Track</Label>
+						<Select
+							id="track-filter"
+							name="track"
+							value={selectedTrack || "all"}
+							onValueChange={handleTrackChange}
+							disabled={!fosdemData}
+							options={trackSelectOptions}
+							className="min-w-[180px]"
+						/>
+					</div>
+
+					<div className="flex flex-col gap-1 min-w-[160px]">
+						<Label htmlFor="time-filter">Time slot</Label>
+						<Select
+							id="time-filter"
+							name="time"
+							value={selectedTime || "all"}
+							onValueChange={handleTimeChange}
+							disabled={!fosdemData}
+							options={timeSelectOptions}
+							className="min-w-[160px]"
+						/>
+					</div>
+				</form>
+				<div className="flex flex-col gap-1">
+					<Label>Show</Label>
+					<div className="flex flex-wrap gap-2">
+						{typeFilters.map((filter) => (
+							<Link
+								key={filter.value}
+								to="."
+								search={(prev) => ({ ...prev, type: filter.value })}
+								className={cn(
+									"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2",
+									"no-underline hover:underline",
+									selectedType === filter.value
+										? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+										: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+								)}
+								aria-current={selectedType === filter.value ? "page" : undefined}
+							>
+								{filter.label}
+							</Link>
+						))}
+					</div>
 				</div>
-
-				{!fosdemData ? (
-					<EmptyStateCard
-						title="Search unavailable"
-						description="The schedule data is still loading. Please try again in a moment."
-					/>
-				) : !query ? (
-					<EmptyStateCard
-						title="Search the schedule"
-						description="Enter a search term to see results. You can also filter by track, type, or time."
-					/>
-				) : !hasVisibleResults ? (
-					<EmptyStateCard
-						title="No results found"
-						description="No results match this search with the selected filters. Try adjusting your search or clearing filters."
-					/>
-				) : (
-					<div className="space-y-8">
-						{visibleSections.map((section) => section.component())}
-					</div>
+				{hasActiveFilters && (
+					<Link
+						to="."
+						search={{ year }}
+						className="h-10 px-3 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-accent transition-colors"
+						aria-label="Clear search and filters"
+					>
+						<Icons.close className="h-4 w-4" />
+						Clear
+					</Link>
 				)}
 			</div>
-		</div>
+
+			{!fosdemData ? (
+				<EmptyStateCard
+					title="Search unavailable"
+					description="The schedule data is still loading. Please try again in a moment."
+				/>
+			) : !query ? (
+				<EmptyStateCard
+					title="Search the schedule"
+					description="Enter a search term to see results. You can also filter by track, type, or time."
+				/>
+			) : !hasVisibleResults ? (
+				<EmptyStateCard
+					title="No results found"
+					description="No results match this search with the selected filters. Try adjusting your search or clearing filters."
+				/>
+			) : (
+							<SectionStack>
+								{visibleSections.map((section) => section.component())}
+				</SectionStack>
+			)}
+		</PageShell>
 	);
 }

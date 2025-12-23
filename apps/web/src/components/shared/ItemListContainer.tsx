@@ -67,28 +67,30 @@ export function ItemListContainer<T>({
     return (
       <section>
         <div className="flex flex-col space-y-4">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
-            <div className="flex flex-col md:flex-row md:items-center gap-4">
-              {title && (
-                <h2 className="text-xl font-semibold shrink-0">{title}</h2>
-              )}
-              <div className="flex gap-2 justify-start flex-wrap">
-                <DaySwitcher
-                  days={days}
-                  dayId={dayId}
-                  datSplitByDay={itemsSplitByDay}
-                />
+          <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:static md:z-auto md:mx-0 md:px-0 md:py-0 md:bg-transparent md:backdrop-blur-none md:border-0">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-3">
+              <div className="flex flex-col md:flex-row md:items-center gap-3">
+                {title && (
+                  <h2 className="text-xl font-semibold shrink-0">{title}</h2>
+                )}
+                <div className="flex gap-2 justify-start flex-wrap">
+                  <DaySwitcher
+                    days={days}
+                    dayId={dayId}
+                    datSplitByDay={itemsSplitByDay}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
-              {displaySortByFavourites && (
-                <SortFavouritesSwitch
-                  sortSwitchId={sortSwitchId}
-                  sortByFavourites={sortByFavourites}
-                  onToggle={onSortChange}
-                />
-              )}
-              {renderViewModeSwitch?.()}
+              <div className="flex flex-row flex-wrap items-center justify-start md:justify-end gap-3 shrink-0">
+                {displaySortByFavourites && (
+                  <SortFavouritesSwitch
+                    sortSwitchId={sortSwitchId}
+                    sortByFavourites={sortByFavourites}
+                    onToggle={onSortChange}
+                  />
+                )}
+                {renderViewModeSwitch?.()}
+              </div>
             </div>
           </div>
           {typeof dayId === "string" && itemsSplitByDay[dayId] ? (
@@ -106,7 +108,7 @@ export function ItemListContainer<T>({
             <EmptyStateCard
               title="No items for this day"
               description="Try switching to another day or come back later for updates."
-              className="my-4"
+                className="my-6"
             />
           )}
         </div>
@@ -116,21 +118,23 @@ export function ItemListContainer<T>({
 
   return (
     <section>
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
-        {title && (
-          <h2 className="text-xl font-semibold shrink-0 text-foreground">
-            {title}
-          </h2>
-        )}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
-          {displaySortByFavourites && (
-            <SortFavouritesSwitch
-              sortSwitchId={sortSwitchId}
-              sortByFavourites={sortByFavourites}
-              onToggle={onSortChange}
-            />
+      <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:static md:z-auto md:mx-0 md:px-0 md:py-0 md:bg-transparent md:backdrop-blur-none md:border-0">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-3">
+          {title && (
+            <h2 className="text-xl font-semibold shrink-0 text-foreground">
+              {title}
+            </h2>
           )}
-          {renderViewModeSwitch?.()}
+          <div className="flex flex-row flex-wrap items-center justify-start md:justify-end gap-3 shrink-0">
+            {displaySortByFavourites && (
+              <SortFavouritesSwitch
+                sortSwitchId={sortSwitchId}
+                sortByFavourites={sortByFavourites}
+                onToggle={onSortChange}
+              />
+            )}
+            {renderViewModeSwitch?.()}
+          </div>
         </div>
       </div>
       {items.length > 0 ? (
@@ -145,7 +149,7 @@ export function ItemListContainer<T>({
         <EmptyStateCard
           title="No items found"
           description="Adjust filters or pick another day to see more items."
-          className="my-4"
+            className="my-6"
         />
       )}
     </section>

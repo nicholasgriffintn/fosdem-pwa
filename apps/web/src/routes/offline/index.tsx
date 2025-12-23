@@ -21,6 +21,8 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { constants } from "~/constants";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
+import { SectionStack } from "~/components/shared/SectionStack";
 
 export const Route = createFileRoute("/offline/")({
 	component: OfflinePage,
@@ -123,8 +125,8 @@ function OfflinePage() {
 	};
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
+		<PageShell>
+			<SectionStack>
 				<PageHeader
 					heading={isOnline ? "Connection Restored" : "You're Offline"}
 					text={
@@ -135,7 +137,7 @@ function OfflinePage() {
 					year={year}
 				/>
 
-				<Card className="mb-6">
+				<Card>
 					<CardHeader>
 						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 							<CardTitle className="flex items-center gap-2">
@@ -166,7 +168,7 @@ function OfflinePage() {
 				</Card>
 
 				{cachedData.fosdemData && (
-					<Card className="mb-6">
+					<Card>
 						<CardHeader>
 							<CardTitle>FOSDEM {year} Schedule</CardTitle>
 							<CardDescription>
@@ -319,7 +321,7 @@ function OfflinePage() {
 						)}
 					</CardContent>
 				</Card>
-			</div>
-		</div>
+			</SectionStack>
+		</PageShell>
 	);
 }

@@ -14,6 +14,7 @@ import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { useIsClient } from "~/hooks/use-is-client";
 import { getEventBookmark } from "~/server/functions/bookmarks";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+import { PageShell } from "~/components/shared/PageShell";
 
 type BookmarkLike = {
 	status?: string;
@@ -158,75 +159,71 @@ function EventPage() {
 
 	if (!fosdem.event?.title || !fosdem.conference) {
 		return (
-			<div className="min-h-screen">
-				<div className="relative py-6 lg:py-10">
-					<PageHeader heading="Event not found" />
-					<EmptyStateCard
-						title="Whoops!"
-						description="We couldn't find this event. It may have been removed or the link is incorrect."
-					/>
-				</div>
-			</div>
+			<PageShell maxWidth="none">
+				<PageHeader heading="Event not found" />
+				<EmptyStateCard
+					title="Whoops!"
+					description="We couldn't find this event. It may have been removed or the link is incorrect."
+				/>
+			</PageShell>
 		);
 	}
 
 	return (
-		<div className="min-h-screen">
-			<div className="relative py-6 lg:py-10">
-				<PageHeader
-					heading={fosdem.event.title}
-					year={year}
-					breadcrumbs={[
-						{ title: fosdem.type?.name, href: `/type/${fosdem.type?.id}` },
-						{
-							title: fosdem.track?.name,
-							href: fosdem.track?.id
-								? `/track/${encodeURIComponent(fosdem.track.id)}`
-								: "#",
-						},
-					]}
-					subtitle={fosdem.event.subtitle}
-					metadata={[
-						{
-							text: `${fosdem.event.room}`,
-							href: `/rooms/${fosdem.event.room}`,
-						},
-						{
-							text: `Day ${fosdem.event.day}`,
-						},
-						{
-							text: `${fosdem.event.startTime} - ${calculateEndTime(fosdem.event.startTime, fosdem.event.duration)}`,
-						},
-						{
-							text: `Speakers: ${fosdem.event.persons?.join(", ")}`,
-						},
-					]}
-				>
-					<div className="flex items-center md:pl-6 md:pr-3 gap-2">
-						<FavouriteButton
-							year={year}
-							type="event"
-							slug={fosdem?.event?.id}
-							status={favouriteStatus}
-							onCreateBookmark={onCreateBookmark}
-						/>
-						<ShareButton
-							title={fosdem?.event?.title}
-							text={`Check out ${fosdem?.event?.title} at FOSDEM`}
-							url={`https://fosdempwa.com/event/${fosdem?.event?.id}?year=${year}`}
-						/>
-					</div>
-				</PageHeader>
-				<div className="w-full">
-					<EventMain
-						event={fosdem.event}
-						conference={fosdem.conference}
+		<PageShell maxWidth="none">
+			<PageHeader
+				heading={fosdem.event.title}
+				year={year}
+				breadcrumbs={[
+					{ title: fosdem.type?.name, href: `/type/${fosdem.type?.id}` },
+					{
+						title: fosdem.track?.name,
+						href: fosdem.track?.id
+							? `/track/${encodeURIComponent(fosdem.track.id)}`
+							: "#",
+					},
+				]}
+				subtitle={fosdem.event.subtitle}
+				metadata={[
+					{
+						text: `${fosdem.event.room}`,
+						href: `/rooms/${fosdem.event.room}`,
+					},
+					{
+						text: `Day ${fosdem.event.day}`,
+					},
+					{
+						text: `${fosdem.event.startTime} - ${calculateEndTime(fosdem.event.startTime, fosdem.event.duration)}`,
+					},
+					{
+						text: `Speakers: ${fosdem.event.persons?.join(", ")}`,
+					},
+				]}
+			>
+				<div className="flex items-center md:pl-6 md:pr-3 gap-2">
+					<FavouriteButton
 						year={year}
-						isTest={isTest}
-						persons={fosdem.persons}
+						type="event"
+						slug={fosdem?.event?.id}
+						status={favouriteStatus}
+						onCreateBookmark={onCreateBookmark}
+					/>
+					<ShareButton
+						title={fosdem?.event?.title}
+						text={`Check out ${fosdem?.event?.title} at FOSDEM`}
+						url={`https://fosdempwa.com/event/${fosdem?.event?.id}?year=${year}`}
 					/>
 				</div>
+			</PageHeader>
+			<div className="w-full">
+				<EventMain
+					event={fosdem.event}
+					conference={fosdem.conference}
+					year={year}
+					isTest={isTest}
+					persons={fosdem.persons}
+				/>
 			</div>
-		</div>
+		</PageShell>
 	);
 }
