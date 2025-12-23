@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "~/components/PageHeader";
 import { Image } from "~/components/Image";
 import { constants } from "~/constants";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/map/")({
 	component: MapPage,
@@ -13,11 +14,10 @@ export const Route = createFileRoute("/map/")({
 	}),
 	head: () => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: "Map | FOSDEM PWA",
-				description:
-					"Map of the ULB Solbosch Campus, the location of the FOSDEM event",
-			},
+				description: "Map of the ULB Solbosch Campus, the location of the FOSDEM event",
+			}),
 		],
 	}),
 	staleTime: 10_000,

@@ -5,6 +5,7 @@ import type { Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { PageHeader } from "~/components/PageHeader";
 import { SpeakerList } from "~/components/Speaker/SpeakerList";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/speakers/")({
     component: SpeakersPage,
@@ -29,10 +30,10 @@ export const Route = createFileRoute("/speakers/")({
     },
     head: () => ({
         meta: [
-            {
+            ...generateCommonSEOTags({
                 title: "Speakers | FOSDEM PWA",
                 description: "All speakers at FOSDEM",
-            },
+            })
         ],
     }),
     staleTime: 10_000,

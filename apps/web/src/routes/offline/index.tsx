@@ -20,6 +20,7 @@ import {
 } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { constants } from "~/constants";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/offline/")({
 	component: OfflinePage,
@@ -30,34 +31,10 @@ export const Route = createFileRoute("/offline/")({
 	}),
 	head: () => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: "Offline | FOSDEM PWA",
 				description: "You're currently offline. Browse cached content and your local bookmarks from FOSDEM conference.",
-			},
-			{
-				property: "og:title",
-				content: "FOSDEM Offline Mode",
-			},
-			{
-				property: "og:description",
-				content: "Browse cached FOSDEM content when offline",
-			},
-			{
-				property: "og:type",
-				content: "website",
-			},
-			{
-				name: "twitter:card",
-				content: "summary",
-			},
-			{
-				name: "twitter:title",
-				content: "FOSDEM Offline Mode",
-			},
-			{
-				name: "twitter:description",
-				content: "Browse cached FOSDEM content when offline",
-			},
+			}),
 		],
 	}),
 });

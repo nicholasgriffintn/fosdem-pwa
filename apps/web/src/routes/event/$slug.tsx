@@ -13,6 +13,7 @@ import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { useIsClient } from "~/hooks/use-is-client";
 import { getEventBookmark } from "~/server/functions/bookmarks";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 type BookmarkLike = {
 	status?: string;
@@ -85,18 +86,10 @@ export const Route = createFileRoute("/event/$slug")({
 	},
 	head: ({ loaderData }) => ({
 		meta: [
-			{
-				title: `${loaderData?.fosdem.event?.title} | FOSDEM ${loaderData?.year}`,
-				description: loaderData?.fosdem.event?.description || `Event at FOSDEM ${loaderData?.year} in ${loaderData?.fosdem.event?.room}`,
-			},
-			{
-				property: "og:title",
-				content: `${loaderData?.fosdem.event?.title} | FOSDEM ${loaderData?.year}`,
-			},
-			{
-				property: "og:description",
-				content: loaderData?.fosdem.event?.description || `Event at FOSDEM ${loaderData?.year} in ${loaderData?.fosdem.event?.room}`,
-			},
+			...generateCommonSEOTags({
+				title: loaderData?.fosdem.event?.title || "Event at FOSDEM",
+				description: loaderData?.fosdem.event?.description || loaderData?.fosdem.event?.abstract || `Event at FOSDEM ${loaderData?.year} in ${loaderData?.fosdem.event?.room}`,
+			}),
 			{
 				property: "og:type",
 				content: "article",
@@ -104,14 +97,6 @@ export const Route = createFileRoute("/event/$slug")({
 			{
 				name: "twitter:card",
 				content: "summary_large_image",
-			},
-			{
-				name: "twitter:title",
-				content: `${loaderData?.fosdem.event?.title} | FOSDEM ${loaderData?.year}`,
-			},
-			{
-				name: "twitter:description",
-				content: loaderData?.fosdem.event?.description || `Event at FOSDEM ${loaderData?.year} in ${loaderData?.fosdem.event?.room}`,
 			},
 		],
 		scripts: loaderData?.fosdem.event ? [
@@ -121,7 +106,7 @@ export const Route = createFileRoute("/event/$slug")({
 					"@context": "https://schema.org",
 					"@type": "Event",
 					"name": loaderData.fosdem.event.title,
-					"description": loaderData.fosdem.event.description || "",
+					"description": loaderData.fosdem.event.description || loaderData.fosdem.event.abstract || "",
 					"startDate": `${loaderData.fosdem.conference?.start}T${loaderData.fosdem.event.startTime}:00`,
 					"endDate": `${loaderData.fosdem.conference?.start}T${loaderData.fosdem.event.startTime}:00`,
 					"location": {

@@ -6,39 +6,16 @@ import { Spinner } from "~/components/Spinner";
 import { SignInForm } from "~/components/SignInForm";
 import { useIsClient } from "~/hooks/use-is-client";
 import { buildHomeLink } from "~/lib/link-builder";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/signin/")({
 	component: SignInPage,
 	head: () => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: "Sign In | FOSDEM PWA",
 				description: "Sign in to FOSDEM PWA to sync bookmarks across devices and share your conference schedule.",
-			},
-			{
-				property: "og:title",
-				content: "Sign In - FOSDEM PWA",
-			},
-			{
-				property: "og:description",
-				content: "Sign in to sync bookmarks and share your FOSDEM schedule",
-			},
-			{
-				property: "og:type",
-				content: "website",
-			},
-			{
-				name: "twitter:card",
-				content: "summary",
-			},
-			{
-				name: "twitter:title",
-				content: "Sign In - FOSDEM PWA",
-			},
-			{
-				name: "twitter:description",
-				content: "Sign in to sync bookmarks and share your FOSDEM schedule",
-			},
+			})
 		],
 	}),
 });

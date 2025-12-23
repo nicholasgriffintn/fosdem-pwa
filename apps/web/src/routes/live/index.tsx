@@ -12,6 +12,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/live/")({
 	component: LivePage,
@@ -52,10 +53,10 @@ export const Route = createFileRoute("/live/")({
 	},
 	head: () => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: "Live | FOSDEM PWA",
 				description: "All events that are currently live or starting soon",
-			},
+			}),
 		],
 	}),
 	staleTime: 10_000,

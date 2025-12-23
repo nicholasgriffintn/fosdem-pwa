@@ -12,15 +12,16 @@ import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { SetBookmarksVisability } from "~/components/SetBookmarksVisability";
 import { PushNotifications } from "~/components/PushNotifications";
 import { buildHomeLink } from "~/lib/link-builder";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/profile/")({
   component: ProfilePage,
   head: () => ({
     meta: [
-      {
+      ...generateCommonSEOTags({
         title: "Profile | FOSDEM PWA",
         description: "Profile page",
-      },
+      })
     ],
   }),
   validateSearch: ({ year }: { year: number }) => ({

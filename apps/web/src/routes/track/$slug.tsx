@@ -10,6 +10,7 @@ import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/track/$slug")({
 	component: TrackPage,
@@ -41,34 +42,10 @@ export const Route = createFileRoute("/track/$slug")({
 	},
 	head: ({ loaderData }) => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: `${loaderData?.fosdem.track?.name} | Track | FOSDEM ${loaderData?.year}`,
 				description: loaderData?.fosdem.track?.description || `${loaderData?.fosdem.track?.name} track at FOSDEM ${loaderData?.year}. ${loaderData?.fosdem.track?.eventCount} events.`,
-			},
-			{
-				property: "og:title",
-				content: `${loaderData?.fosdem.track?.name} | FOSDEM ${loaderData?.year}`,
-			},
-			{
-				property: "og:description",
-				content: loaderData?.fosdem.track?.description || `${loaderData?.fosdem.track?.name} track at FOSDEM ${loaderData?.year}`,
-			},
-			{
-				property: "og:type",
-				content: "website",
-			},
-			{
-				name: "twitter:card",
-				content: "summary",
-			},
-			{
-				name: "twitter:title",
-				content: `${loaderData?.fosdem.track?.name} | FOSDEM ${loaderData?.year}`,
-			},
-			{
-				name: "twitter:description",
-				content: loaderData?.fosdem.track?.description || `${loaderData?.fosdem.track?.name} track at FOSDEM ${loaderData?.year}`,
-			},
+			})
 		],
 	}),
 	staleTime: 10_000,
