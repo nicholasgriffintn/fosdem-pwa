@@ -283,7 +283,27 @@ registerRoute(
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200]
-      })
+      }),
+      {
+        handlerDidError: async ({ request }) => {
+          const url = new URL(request.url);
+          if (url.pathname.includes('/_serverFn/') && url.searchParams.get('payload')) {
+            try {
+              const payload = JSON.parse(decodeURIComponent(url.searchParams.get('payload')!));
+              if (payload.t?.p?.v?.[1]?.p?.k?.includes('slug')) {
+                // Return empty state for offline mode - a bit of a hack but it will hopefully work?
+                return new Response(JSON.stringify(null), {
+                  status: 200,
+                  headers: { 'Content-Type': 'application/json' }
+                });
+              }
+            } catch (e) {
+              // If parsing fails, continue to default error handling
+            }
+          }
+          return null;
+        }
+      }
     ],
     networkTimeoutSeconds: 6
   })
