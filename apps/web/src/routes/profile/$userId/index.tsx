@@ -9,39 +9,16 @@ import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { useUserBookmarks } from "~/hooks/use-user-bookmarks";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { buildHomeLink } from "~/lib/link-builder";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/profile/$userId/")({
   component: ProfilePage,
   head: () => ({
     meta: [
-      {
+      ...generateCommonSEOTags({
         title: "Profile | FOSDEM PWA",
         description: "View FOSDEM conference schedule and bookmarks.",
-      },
-      {
-        property: "og:title",
-        content: "FOSDEM Profile",
-      },
-      {
-        property: "og:description",
-        content: "View FOSDEM conference schedule",
-      },
-      {
-        property: "og:type",
-        content: "profile",
-      },
-      {
-        name: "twitter:card",
-        content: "summary",
-      },
-      {
-        name: "twitter:title",
-        content: "FOSDEM Profile",
-      },
-      {
-        name: "twitter:description",
-        content: "View FOSDEM conference schedule",
-      },
+     })
     ],
   }),
   validateSearch: ({ year }: { year: number }) => ({

@@ -32,7 +32,10 @@ export const Route = createFileRoute("/")({
 		meta: [
 			{
 				title: `${loaderData?.fosdem.conference?.title || 'FOSDEM'} | Schedule & Events`,
-				description: `${loaderData?.fosdem.conference?.title || 'FOSDEM'} - ${loaderData?.fosdem.conference?.city || 'Brussels'} conference schedule. Browse tracks, events, and speakers.`,
+			},
+			{
+				name: "description",
+				content: `${loaderData?.fosdem.conference?.title || 'FOSDEM'} - ${loaderData?.fosdem.conference?.city || 'Brussels'} conference schedule. Browse tracks, events, and speakers.`,
 			},
 			{
 				property: "og:title",

@@ -10,6 +10,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/speakers/$slug")({
     component: SpeakerPage,
@@ -47,34 +48,10 @@ export const Route = createFileRoute("/speakers/$slug")({
     },
     head: ({ loaderData }) => ({
         meta: [
-            {
+            ...generateCommonSEOTags({
                 title: `${loaderData?.fosdem.person?.name} | Speakers | FOSDEM ${loaderData?.year}`,
                 description: `Speaker profile for ${loaderData?.fosdem.person?.name} at FOSDEM ${loaderData?.year}. ${loaderData?.fosdem.person?.biography ? loaderData.fosdem.person.biography.substring(0, 160) + '...' : 'View sessions and biography.'}`,
-            },
-            {
-                property: "og:title",
-                content: `${loaderData?.fosdem.person?.name} | FOSDEM ${loaderData?.year}`,
-            },
-            {
-                property: "og:description",
-                content: `Speaker profile for ${loaderData?.fosdem.person?.name} at FOSDEM ${loaderData?.year}`,
-            },
-            {
-                property: "og:type",
-                content: "profile",
-            },
-            {
-                name: "twitter:card",
-                content: "summary",
-            },
-            {
-                name: "twitter:title",
-                content: `${loaderData?.fosdem.person?.name} | FOSDEM ${loaderData?.year}`,
-            },
-            {
-                name: "twitter:description",
-                content: `Speaker profile for ${loaderData?.fosdem.person?.name} at FOSDEM ${loaderData?.year}`,
-            },
+            })
         ],
     }),
     staleTime: 10_000,

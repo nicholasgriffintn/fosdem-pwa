@@ -31,15 +31,16 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
 import { getAllData } from "~/server/functions/fosdem";
 import { getBookmarks } from "~/server/functions/bookmarks";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
 	head: () => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: "Search | FOSDEM PWA",
 				description: "Search for events, tracks and rooms at FOSDEM PWA",
-			},
+			})
 		],
 	}),
 	validateSearch: ({

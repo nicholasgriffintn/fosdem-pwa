@@ -11,6 +11,7 @@ import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/EmptyStateCard";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { isTrack } from "~/lib/type-guards";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -39,13 +40,13 @@ export const Route = createFileRoute("/type/$slug")({
 	},
 	head: ({ loaderData }) => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: `${loaderData?.fosdem.type?.name} | FOSDEM PWA`,
 				description:
 					fosdemTypeDescriptions[
 						loaderData?.fosdem.type?.id as keyof typeof fosdemTypeDescriptions
 					],
-			},
+			})
 		],
 	}),
 	staleTime: 10_000,

@@ -5,6 +5,7 @@ import type { Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { PageHeader } from "~/components/PageHeader";
 import { RoomList } from "~/components/Room/RoomList";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/rooms/")({
 	component: RoomsPage,
@@ -23,34 +24,10 @@ export const Route = createFileRoute("/rooms/")({
 	},
 	head: () => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: "Rooms | FOSDEM PWA",
 				description: "All rooms and venues at FOSDEM conference. Browse events by room and location.",
-			},
-			{
-				property: "og:title",
-				content: "FOSDEM Rooms & Venues",
-			},
-			{
-				property: "og:description",
-				content: "All rooms and venues at FOSDEM conference",
-			},
-			{
-				property: "og:type",
-				content: "website",
-			},
-			{
-				name: "twitter:card",
-				content: "summary",
-			},
-			{
-				name: "twitter:title",
-				content: "FOSDEM Rooms & Venues",
-			},
-			{
-				name: "twitter:description",
-				content: "All rooms and venues at FOSDEM conference",
-			},
+			})
 		],
 	}),
 	staleTime: 10_000,

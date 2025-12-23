@@ -14,6 +14,7 @@ import { getAllData } from "~/server/functions/fosdem";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { Button } from "~/components/ui/button";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
@@ -47,10 +48,10 @@ export const Route = createFileRoute("/bookmarks/")({
 	},
 	head: () => ({
 		meta: [
-			{
+			...generateCommonSEOTags({
 				title: "Bookmarks | FOSDEM PWA",
 				description: "Bookmarks from FOSDEM",
-			},
+			}),
 		],
 	}),
 });

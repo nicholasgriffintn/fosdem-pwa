@@ -26,86 +26,69 @@ import { PlayerProvider } from "~/contexts/PlayerContext";
 import { FloatingPlayer } from "~/components/FloatingPlayer";
 import { VideoPortal } from "~/components/VideoPlayer/VideoPortal";
 import { getSession } from "~/server/functions/session";
+import { generateCommonSEOTags } from "~/utils/seo-generator";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
 		? () => null
 		: lazy(() =>
-				import("@tanstack/react-router-devtools").then((res) => ({
-					default: res.TanStackRouterDevtools,
-				})),
-			);
+			import("@tanstack/react-router-devtools").then((res) => ({
+				default: res.TanStackRouterDevtools,
+			}))
+		);
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
-	{
-		head: () => ({
-			meta: [
-				{
-					charSet: "utf-8",
-				},
-				{
-					name: "viewport",
-					content: "width=device-width, initial-scale=1",
-				},
-				{
-					title: siteMeta.title,
-					description: siteMeta.description,
-				},
-				{
-					name: "theme-color",
-					content: siteMeta.themeColor,
-				},
-				{
-					name: "description",
-					content: siteMeta.description,
-				},
-				{
-					property: "og:title",
-					content: siteMeta.title,
-				},
-				{
-					property: "og:description",
-					content: siteMeta.description,
-				},
-				{
-					property: "og:locale",
-					content: siteMeta.locale,
-				},
-				{
-					property: "og:type",
-					content: "website",
-				},
-				{
-					property: "og:site_name",
-					content: siteMeta.title,
-				},
-				{
-					name: "twitter:card",
-					content: "summary_large_image",
-				},
-				{
-					name: "twitter:title",
-					content: siteMeta.title,
-				},
-				{
-					name: "twitter:description",
-					content: siteMeta.description,
-				},
-			],
-			links: [
-				{ rel: "stylesheet", href: appCss },
-				{ rel: "manifest", href: "/manifest.webmanifest" },
-				{ rel: "icon", href: "/favicon.ico" },
-				{ rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
-			],
-		}),
-		loader: async () => {
-			const user = await getSession();
-			return { user };
-		},
-		component: RootComponent,
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+	head: () => ({
+		meta: [
+			{
+				charSet: "utf-8",
+			},
+			{
+				name: "viewport",
+				content: "width=device-width, initial-scale=1",
+			},
+			...generateCommonSEOTags({
+				title: siteMeta.title,
+				description: siteMeta.description,
+			}),
+			{
+				name: "theme-color",
+				content: siteMeta.themeColor,
+			},
+			{
+				property: "og:locale",
+				content: siteMeta.locale,
+			},
+			{
+				property: "og:type",
+				content: "website",
+			},
+			{
+				property: "og:site_name",
+				content: siteMeta.title,
+			},
+			{
+				property: "og:image",
+				content: "/og-image.png",
+			},
+			{
+				name: "twitter:card",
+				content: "summary_large_image",
+			},
+		],
+		links: [
+			{ rel: "stylesheet", href: appCss },
+			{ rel: "manifest", href: "/manifest.webmanifest" },
+			{ rel: "icon", href: "/favicon.ico" },
+			{ rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
+		],
+	}),
+	loader: async () => {
+		const user = await getSession();
+		return { user };
 	},
-);
+	component: RootComponent,
+});
 
 function RootComponent() {
 	const { queryClient } = Route.useRouteContext();
@@ -144,7 +127,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 				className={cn(
 					"min-h-screen bg-background font-sans antialiased",
 					"--font-sans",
-					"--font-heading",
+					"--font-heading"
 				)}
 			>
 				<a
