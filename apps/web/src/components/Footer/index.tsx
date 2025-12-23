@@ -3,7 +3,7 @@ import { YearSelector } from "~/components/Footer/YearSelector";
 
 export function Footer() {
 	return (
-		<footer className="md:border-t pb-16 lg:pb-0">
+		<footer className="md:border-t pb-16 lg:pb-0 [padding-bottom:calc(4rem+constant(safe-area-inset-bottom))] [padding-bottom:calc(4rem+env(safe-area-inset-bottom))] lg:[padding-bottom:0px]">
 			<div className="container">
 				<div className="flex flex-col gap-6 py-6 md:gap-0">
 					<div className="flex flex-col items-center justify-between md:flex-row">
