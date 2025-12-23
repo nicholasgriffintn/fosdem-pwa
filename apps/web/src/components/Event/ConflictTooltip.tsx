@@ -62,7 +62,6 @@ export function ConflictTooltip({
 
 		onSetPriority?.(event.id, { priority: 1 });
 
-		// biome-ignore lint/complexity/noForEach: <explanation>
 		eventConflicts.forEach((conflict) => {
 			const otherEvent =
 				conflict.event1.id === event.id ? conflict.event2 : conflict.event1;

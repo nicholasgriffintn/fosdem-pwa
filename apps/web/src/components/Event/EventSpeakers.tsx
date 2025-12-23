@@ -32,7 +32,6 @@ export function EventSpeakers({ event, year, persons }: EventSpeakersProps) {
                 {person && (person.biography || person.extended_biography) && (
                   <div
                     className="text-sm text-muted-foreground line-clamp-3 prose-sm prose-indigo"
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Biography is HTML from FOSDEM
                     dangerouslySetInnerHTML={{
                       __html: person.biography || person.extended_biography || "",
                     }}
