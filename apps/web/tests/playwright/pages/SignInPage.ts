@@ -13,6 +13,6 @@ export class SignInPage extends BasePage {
 		await expect(
 			this.page.getByRole("button", { name: /Continue as Guest/i }),
 		).toBeVisible();
-		await expect(this.page.getByText("What you'll be able to do")).toBeVisible();
+		await expect(this.page.getByText("Signing in lets you:")).toBeVisible();
 	}
 }

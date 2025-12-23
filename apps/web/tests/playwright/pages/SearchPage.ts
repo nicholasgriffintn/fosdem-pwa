@@ -133,39 +133,35 @@ export class SearchPage extends BasePage {
 	async selectFirstTrackOption() {
 		const trigger = this.trackFilter();
 		await expect(trigger).toBeEnabled();
-		await trigger.click();
 
-		const options = this.page.getByRole("option");
-		await expect(options.first()).toBeVisible();
+		const options = trigger.locator("option");
 		expect(await options.count()).toBeGreaterThan(1);
 
 		const option = options.nth(1);
-		const dataValue = await option.getAttribute("data-value");
+		const value = await option.getAttribute("value");
 		const textContent = (await option.textContent()) || "";
-		const value = (dataValue || textContent).trim();
+		const selectedValue = (value || textContent).trim();
 
-		await option.click();
+		await trigger.selectOption({ index: 1 });
 
-		return value;
+		return selectedValue;
 	}
 
 	async selectFirstTimeOption() {
 		const trigger = this.timeFilter();
 		await expect(trigger).toBeEnabled();
-		await trigger.click();
 
-		const options = this.page.getByRole("option");
-		await expect(options.first()).toBeVisible();
+		const options = trigger.locator("option");
 		expect(await options.count()).toBeGreaterThan(1);
 
 		const option = options.nth(1);
-		const dataValue = await option.getAttribute("data-value");
+		const value = await option.getAttribute("value");
 		const textContent = (await option.textContent()) || "";
-		const value = (dataValue || textContent).trim();
+		const selectedValue = (value || textContent).trim();
 
-		await option.click();
+		await trigger.selectOption({ index: 1 });
 
-		return value;
+		return selectedValue;
 	}
 
 	async expectSearchParam(key: string, value: string) {
