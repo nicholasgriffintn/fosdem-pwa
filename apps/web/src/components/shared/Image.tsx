@@ -8,6 +8,8 @@ type ImageProps = {
 	className?: string;
 	useWebP?: boolean;
 	loading?: "lazy" | "eager";
+	fetchPriority?: "high" | "low" | "auto";
+	decoding?: "async" | "sync" | "auto";
 	width?: number;
 	height?: number;
 };
@@ -18,6 +20,8 @@ export function Image({
 	className,
 	useWebP = true,
 	loading = "lazy",
+	fetchPriority,
+	decoding,
 	width,
 	height,
 	...props
@@ -38,6 +42,8 @@ export function Image({
 					alt={alt}
 					layout="fullWidth"
 					loading={loading}
+					fetchPriority={fetchPriority}
+					decoding={decoding}
 					className="w-full h-full object-cover"
 					{...props}
 				/>

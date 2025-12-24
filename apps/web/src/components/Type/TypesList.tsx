@@ -29,7 +29,8 @@ export function TypesList({ types }: TypesListProps) {
 
 	return (
 		<ul className="flex flex-wrap -mx-1 lg:-mx-4">
-			{typeKeys.map((typeKey: string) => {
+			{typeKeys.map((typeKey: string, index: number) => {
+				const isLikelyLcpImage = index === 0;
 				return (
 					<li
 						key={types[typeKey].id}
@@ -65,7 +66,9 @@ export function TypesList({ types }: TypesListProps) {
 										type={types[typeKey].id}
 										size="featured"
 										className="w-full rounded-md"
-										loading="lazy"
+										loading={isLikelyLcpImage ? "eager" : "lazy"}
+										fetchPriority={isLikelyLcpImage ? "high" : "auto"}
+										decoding="async"
 										showCaptionOnHover
 									/>
 								</div>
