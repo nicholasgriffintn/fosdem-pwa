@@ -46,6 +46,8 @@ export function NavSearch({
 
   const isClient = useIsClient();
 
+  const [FuseImpl, setFuseImpl] = useState<any>(null);
+
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
@@ -54,6 +56,14 @@ export function NavSearch({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const ensureFuseLoaded = useCallback(async () => {
+    if (FuseImpl) return FuseImpl;
+    const mod = await import("fuse.js");
+    const impl = mod.default;
+    setFuseImpl(() => impl);
+    return impl;
+  }, [FuseImpl]);
 
   useEffect(() => {
     setSearchResults([]);
@@ -90,25 +100,33 @@ export function NavSearch({
   }, []);
 
   const tracksIndex = useMemo(() => {
-    if (!fosdemData) return null;
-    return createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS);
-  }, [fosdemData]);
+    if (!fosdemData || !FuseImpl) return null;
+    return createSearchIndex(FuseImpl, Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS);
+  }, [fosdemData, FuseImpl]);
 
   const eventsIndex = useMemo(() => {
-    if (!fosdemData) return null;
-    return createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS);
-  }, [fosdemData]);
+    if (!fosdemData || !FuseImpl) return null;
+    return createSearchIndex(FuseImpl, Object.values(fosdemData.events), EVENT_SEARCH_KEYS);
+  }, [fosdemData, FuseImpl]);
 
   const roomsIndex = useMemo(() => {
-    if (!fosdemData) return null;
-    return createSearchIndex(Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS);
-  }, [fosdemData]);
+    if (!fosdemData || !FuseImpl) return null;
+    return createSearchIndex(FuseImpl, Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS);
+  }, [fosdemData, FuseImpl]);
 
   const handleSearch = useCallback(
-    (query: string) => {
+    async (query: string) => {
       setInputValue(query);
-      if (!query.trim() || !tracksIndex || !eventsIndex || !roomsIndex) {
+
+      if (!query.trim()) {
         setSearchResults([]);
+        return;
+      }
+
+      if (!tracksIndex || !eventsIndex || !roomsIndex) {
+        setIsSearching(true);
+        await ensureFuseLoaded();
+        setIsSearching(false);
         return;
       }
 
@@ -126,7 +144,7 @@ export function NavSearch({
       setSearchResults(groupedResults);
       setIsSearching(false);
     },
-    [tracksIndex, eventsIndex, roomsIndex]
+    [tracksIndex, eventsIndex, roomsIndex, ensureFuseLoaded]
   );
 
   const handleResultClick = (result: SearchResult) => {

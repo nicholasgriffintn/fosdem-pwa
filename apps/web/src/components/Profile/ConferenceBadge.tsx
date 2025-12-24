@@ -1,12 +1,18 @@
 "use client";
 
-import { QRCodeSVG } from "qrcode.react";
+import { lazy, Suspense } from "react";
 
 import { Card } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/shared/Icons";
 import type { User } from "~/server/db/schema";
+
+const QRCodeSVG = lazy(() =>
+	import("qrcode.react").then((mod) => ({
+		default: mod.QRCodeSVG,
+	})),
+);
 
 type ConferenceBadgeProps = {
 	user?: User | null;
@@ -117,11 +123,13 @@ export function ConferenceBadge({
 				{user.github_username && (
 					<div className="mt-6 flex justify-center">
 						<div className="p-3 bg-white rounded-lg">
-							<QRCodeSVG
-								value={`https://fosdempwa.com/profile/${user.github_username}`}
-								size={100}
-								level="L"
-							/>
+							<Suspense fallback={null}>
+								<QRCodeSVG
+									value={`https://fosdempwa.com/profile/${user.github_username}`}
+									size={100}
+									level="L"
+								/>
+							</Suspense>
 						</div>
 					</div>
 				)}
