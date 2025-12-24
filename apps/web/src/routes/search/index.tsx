@@ -396,7 +396,7 @@ export default function SearchPage() {
 									placeholder="Events, tracks, rooms"
 									value={localQuery}
 									onChange={(e) => setLocalQuery(e.target.value)}
-									className="w-full"
+									className="w-full h-10"
 								/>
 							</div>
 						</div>
@@ -427,7 +427,7 @@ export default function SearchPage() {
 							onValueChange={handleTimeChange}
 							disabled={!fosdemData}
 							options={timeSelectOptions}
-								className="min-w-[160px] mt-2"
+								className="min-w-[160px] h-10 mt-2"
 							/>
 						</div>
 
@@ -435,14 +435,14 @@ export default function SearchPage() {
 							<Link
 								to="."
 								search={{ year }}
-								className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 no-underline hover:underline"
+								className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 no-underline"
 								aria-label="Clear search and filters"
 							>
 								<Icons.close className="h-4 w-4" />
 								Clear
 							</Link>
 						)}
-						<Button type="submit" size="sm">
+						<Button type="submit" size="sm" className="h-10">
 							Search
 						</Button>
 					</div>
@@ -458,17 +458,17 @@ export default function SearchPage() {
 								to="."
 								search={(prev) => ({ ...prev, type: filter.value })}
 								className={cn(
-									"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-9 px-4 py-2",
-									"no-underline hover:underline",
-									selectedType === filter.value
-										? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-										: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-								)}
-								aria-current={selectedType === filter.value ? "page" : undefined}
-							>
-								{filter.label}
-							</Link>
-						))}
+											"inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md px-4 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+											"no-underline",
+											selectedType === filter.value
+												? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+												: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+										)}
+										aria-current={selectedType === filter.value ? "page" : undefined}
+									>
+										{filter.label}
+									</Link>
+								))}
 					</div>
 				</div>
 			</div>

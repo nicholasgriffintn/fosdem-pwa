@@ -358,11 +358,11 @@ export function NavSearch({
           value={inputValue}
           placeholder="Search events..."
           aria-label="Search events"
-          className={cn("h-8 w-full", fullWidth ? "pr-12" : "sm:w-64 sm:pr-12")}
+          className={cn("w-full", fullWidth ? "pr-12" : "sm:w-64 sm:pr-12")}
           onChange={(e) => handleSearch(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <kbd className="js-only pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
+        <kbd className="js-only pointer-events-none absolute right-2.5 top-2.5 hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
           {isClient && (loading || isSearching) && <Spinner className="h-3 w-3" />}
           <span className="text-xs">⌘</span>K
         </kbd>

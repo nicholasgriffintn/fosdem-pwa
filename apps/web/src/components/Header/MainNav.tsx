@@ -34,6 +34,26 @@ export function MainNav({ title, items }: MainNavProps) {
 
   return (
     <div className="flex items-center gap-4 md:gap-6 lg:gap-10 shrink-0">
+      <input
+        type="checkbox"
+        id="mobile-menu-toggle"
+        ref={menuCheckboxRef}
+        className="peer/menu sr-only"
+        aria-label="Toggle mobile menu"
+        onChange={(event) => setIsMenuOpen(event.currentTarget.checked)}
+      />
+      <label
+        htmlFor="mobile-menu-toggle"
+        className={cn(
+          "lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md border bg-background",
+          "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+          "shrink-0 cursor-pointer",
+        )}
+      >
+        <Icons.list className="h-4 w-4 peer-checked/menu:hidden" />
+        <Icons.close className="hidden h-4 w-4 peer-checked/menu:inline" />
+        <span className="sr-only">Menu</span>
+      </label>
       <Link
         to="/"
         search={(prev: Record<string, unknown>) => ({
@@ -72,28 +92,9 @@ export function MainNav({ title, items }: MainNavProps) {
           ))}
         </nav>
       ) : null}
-      <input
-        type="checkbox"
-        id="mobile-menu-toggle"
-        ref={menuCheckboxRef}
-        className="peer/menu sr-only"
-        aria-label="Toggle mobile menu"
-        onChange={(event) => setIsMenuOpen(event.currentTarget.checked)}
-      />
-      <label
-        htmlFor="mobile-menu-toggle"
-				className={cn(
-					"lg:hidden inline-flex h-9 items-center gap-2 rounded-md border bg-background px-3 text-sm font-medium",
-					"text-foreground/80 hover:bg-muted/60 hover:text-foreground",
-					"shrink-0 cursor-pointer",
-				)}
-      >
-				<Icons.list className="h-4 w-4 peer-checked/menu:hidden" />
-				<Icons.close className="hidden h-4 w-4 peer-checked/menu:inline" />
-        <span>Menu</span>
-      </label>
 			{items && (
 				<MobileNav
+          title={title}
 					items={items}
 					menuCheckboxRef={menuCheckboxRef}
 					isOpen={isMenuOpen}

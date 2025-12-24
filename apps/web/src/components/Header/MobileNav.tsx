@@ -12,6 +12,7 @@ import { constants } from "~/constants";
 import { isNumber } from "~/lib/type-guards";
 
 type MobileNavProps = {
+	title: string;
 	items: {
 		title: string;
 		href: string;
@@ -25,6 +26,7 @@ type MobileNavProps = {
 };
 
 export function MobileNav({
+	title,
 	items,
 	menuCheckboxRef,
 	isOpen,
@@ -80,18 +82,30 @@ export function MobileNav({
 			>
 				<div className="border-b">
 					<div className="container flex h-16 items-center justify-between gap-3">
-					<div className="flex items-center gap-2">
-						<Icons.logo className="h-7 w-7" width="28" height="28" />
-						<span className="font-bold">Menu</span>
+						<div className="flex items-center gap-4 shrink-0">
+							<label
+								htmlFor="mobile-menu-toggle"
+								className={cn(
+									"inline-flex h-10 w-10 items-center justify-center rounded-md border bg-background",
+									"text-foreground/80 hover:bg-muted/60 hover:text-foreground cursor-pointer",
+								)}
+								aria-label="Close menu"
+							>
+								<Icons.close className="h-4 w-4" />
+								<span className="sr-only">Close menu</span>
+							</label>
+							<Link
+								to="/"
+								search={(prev: Record<string, unknown>) => ({
+									year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
+								})}
+								className="items-center space-x-2 flex logo-link shrink-0"
+							>
+								<Icons.logo className="h-7 w-7" width="28" height="28" />
+								<span className="font-bold">{title}</span>
+							</Link>
+						</div>
 					</div>
-					<label
-						htmlFor="mobile-menu-toggle"
-						className="inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background text-foreground/80 hover:bg-muted/60 hover:text-foreground cursor-pointer"
-						aria-label="Close menu"
-					>
-						<Icons.close className="h-4 w-4" />
-					</label>
-				</div>
 				</div>
 
 				<div className="container flex-1 overflow-y-auto py-4 pb-[calc(5rem+env(safe-area-inset-bottom))]">
