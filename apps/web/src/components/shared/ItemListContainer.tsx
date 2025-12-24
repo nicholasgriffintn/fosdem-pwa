@@ -62,7 +62,16 @@ export function ItemListContainer<T>({
 
   if (groupByDay && days && groupItemsByDay && getDayId) {
     const itemsSplitByDay = groupItemsByDay(items);
-    const dayId = currentDay || days[0]?.id;
+    const firstDayWithItems = days.find(
+      (day) => (itemsSplitByDay[day.id]?.length ?? 0) > 0
+    )?.id;
+
+    const dayId =
+      (currentDay && (itemsSplitByDay[currentDay]?.length ?? 0) > 0
+        ? currentDay
+        : undefined) ||
+      firstDayWithItems ||
+      days[0]?.id;
 
     return (
       <section>
@@ -93,7 +102,7 @@ export function ItemListContainer<T>({
               </div>
             </div>
           </div>
-          {typeof dayId === "string" && itemsSplitByDay[dayId] ? (
+          {typeof dayId === "string" && (itemsSplitByDay[dayId]?.length ?? 0) > 0 ? (
             <div>
               {renderList
                 ? renderList(itemsSplitByDay[dayId], { sortByFavourites })

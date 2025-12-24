@@ -14,7 +14,7 @@ export function DaySwitcher({
   return (
     <>
       {days.map((dayItem) => {
-        const hasEvents = Boolean(datSplitByDay[dayItem.id]);
+        const hasEvents = (datSplitByDay[dayItem.id]?.length ?? 0) > 0;
         const isActive = dayId === dayItem.id;
 
         return (
