@@ -1,21 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq } from "drizzle-orm";
 
 import { getAllData } from "~/server/functions/fosdem";
-import { db } from "~/server/db";
-import { bookmark as bookmarkTable } from "~/server/db/schema";
-import { getFullAuthSession } from "~/server/auth";
+import { getAuthUser } from "~/server/lib/auth-middleware";
 import {
   validateYear,
-  upsertBookmark,
   buildIdToSlugMaps,
-  generateBookmarkId,
 } from "~/server/lib/bookmark-utils";
 import {
   csvEscape,
   parseBookmarkImportCsv,
   buildCsvHeader,
 } from "~/server/lib/csv-utils";
+import {
+  findBookmarksByUserAndStatus,
+  upsertBookmark,
+  updateBookmark,
+  generateBookmarkId,
+} from "~/server/repositories/bookmark-repository";
 
 export const exportBookmarksCsv = createServerFn({
   method: "GET",
@@ -24,20 +25,14 @@ export const exportBookmarksCsv = createServerFn({
   .handler(async (ctx) => {
     const yearNum = validateYear(ctx.data.year);
 
-    const { user } = await getFullAuthSession();
+    const user = await getAuthUser();
     if (!user) {
       return { filename: `bookmarks_${yearNum}.csv`, csv: "type,id\n" };
     }
 
     const [fosdemData, bookmarks] = await Promise.all([
       getAllData({ data: { year: yearNum } }),
-      db.query.bookmark.findMany({
-        where: and(
-          eq(bookmarkTable.user_id, user.id),
-          eq(bookmarkTable.year, yearNum),
-          eq(bookmarkTable.status, "favourited"),
-        ),
-      }),
+      findBookmarksByUserAndStatus(user.id, yearNum, "favourited"),
     ]);
 
     const lines: string[] = [buildCsvHeader()];
@@ -100,7 +95,7 @@ export const importBookmarksCsv = createServerFn({
       throw new Error("CSV data is required");
     }
 
-    const { user } = await getFullAuthSession();
+    const user = await getAuthUser();
     if (!user) {
       throw new Error("You must be signed in to import bookmarks");
     }
@@ -124,20 +119,9 @@ export const importBookmarksCsv = createServerFn({
           notFound.push({ type: "event", id });
           continue;
         }
-        await upsertBookmark(
-          {
-            year: yearNum,
-            type: "event",
-            slug,
-            status: "favourited",
-          },
-          user.id,
-        );
+        await upsertBookmark(user.id, yearNum, "event", slug, "favourited");
         if (priority !== null) {
-          await db
-            .update(bookmarkTable)
-            .set({ priority })
-            .where(eq(bookmarkTable.id, generateBookmarkId(user.id, yearNum, slug)));
+          await updateBookmark(generateBookmarkId(user.id, yearNum, slug), { priority });
         }
         importedEvents++;
         continue;
@@ -149,30 +133,16 @@ export const importBookmarksCsv = createServerFn({
           notFound.push({ type: "track", id });
           continue;
         }
-        await upsertBookmark(
-          { year: yearNum, type: "track", slug, status: "favourited" },
-          user.id,
-        );
+        await upsertBookmark(user.id, yearNum, "track", slug, "favourited");
         importedTracks++;
         continue;
       }
 
       const eventSlug = eventIdToSlug.get(id);
       if (eventSlug) {
-        await upsertBookmark(
-          {
-            year: yearNum,
-            type: "event",
-            slug: eventSlug,
-            status: "favourited",
-          },
-          user.id,
-        );
+        await upsertBookmark(user.id, yearNum, "event", eventSlug, "favourited");
         if (priority !== null) {
-          await db
-            .update(bookmarkTable)
-            .set({ priority })
-            .where(eq(bookmarkTable.id, generateBookmarkId(user.id, yearNum, eventSlug)));
+          await updateBookmark(generateBookmarkId(user.id, yearNum, eventSlug), { priority });
         }
         importedEvents++;
         continue;
@@ -180,10 +150,7 @@ export const importBookmarksCsv = createServerFn({
 
       const trackSlug = trackIdToSlug.get(id);
       if (trackSlug) {
-        await upsertBookmark(
-          { year: yearNum, type: "track", slug: trackSlug, status: "favourited" },
-          user.id,
-        );
+        await upsertBookmark(user.id, yearNum, "track", trackSlug, "favourited");
         importedTracks++;
         continue;
       }

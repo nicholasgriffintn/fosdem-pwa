@@ -12,7 +12,16 @@ import {
   setSessionTokenCookie,
   getAuthSession,
 } from "~/server/auth";
-import type { OAuthProvider, OAuthUser } from "~/types/user";
+import type { OAuthUser } from "~/types/user";
+import type { OAuthHandler } from "~/server/lib/oauth-handler-base";
+import {
+  buildNewUserData,
+  buildUpgradeUserData,
+} from "~/server/lib/provider-mapping";
+import {
+  findUserByEmail,
+  upgradeGuestUser as upgradeGuestUserRepo,
+} from "~/server/repositories/user-repository";
 
 export interface ProviderConfig {
   id: string;
@@ -23,10 +32,7 @@ export interface ProviderConfig {
   stateCookieName: string;
 }
 
-export interface OAuthHandler {
-  createAuthUrl(): Promise<URL>;
-  handleCallback(code: string, state: string): Promise<OAuthUser>;
-}
+export type { OAuthHandler } from "~/server/lib/oauth-handler-base";
 
 export async function createOAuthRedirect(provider: ProviderConfig) {
   const state = generateState();
@@ -104,9 +110,7 @@ export async function handleOAuthCallback(
     let existingUserEmail = null;
     // Skip email-based linking for Mastodon as it uses fabricated emails
     if (providerUser.email && provider.id !== 'mastodon') {
-      existingUserEmail = await db.query.user.findFirst({
-        where: eq(user.email, providerUser.email),
-      });
+      existingUserEmail = await findUserByEmail(providerUser.email);
     }
 
     if (existingUserEmail?.id) {
@@ -151,27 +155,16 @@ export async function handleOAuthCallback(
 }
 
 async function createNewUser(providerUser: OAuthUser, providerId: string): Promise<number> {
-  const userData: any = {
-    email: providerUser.email,
-    name: providerUser.name || providerUser.email.split('@')[0],
-    avatar_url: providerUser.avatar_url,
-  };
-
-  if (providerId === 'github') {
-    userData.github_username = (providerUser as any).login;
-  } else if (providerId === 'discord') {
-    userData.discord_username = (providerUser as any).username;
-  } else if (providerId === 'mastodon') {
-    userData.mastodon_username = providerUser.username;
-    userData.mastodon_acct = providerUser.acct;
-    userData.mastodon_url = providerUser.url;
-  } else if (providerId === 'gitlab') {
-    userData.gitlab_username = providerUser.username;
-  }
+  const providerFields = buildNewUserData(providerId, providerUser);
 
   const userId = await db
     .insert(user)
-    .values(userData)
+    .values({
+      email: providerUser.email,
+      name: providerUser.name || providerUser.email.split("@")[0],
+      avatar_url: providerUser.avatar_url,
+      ...providerFields,
+    })
     .returning({ id: user.id });
 
   await db.insert(oauthAccount).values({
@@ -184,36 +177,6 @@ async function createNewUser(providerUser: OAuthUser, providerId: string): Promi
 }
 
 async function upgradeGuestUser(userId: number, providerUser: OAuthUser, providerId: string) {
-  const userData: any = {
-    email: providerUser.email,
-    name: providerUser.name || providerUser.email.split('@')[0],
-    avatar_url: providerUser.avatar_url,
-    is_guest: false,
-  };
-
-  if (providerId === 'github') {
-    const githubUser = providerUser;
-    userData.github_username = githubUser.login;
-    userData.company = githubUser.company;
-    userData.site = githubUser.blog;
-    userData.location = githubUser.location;
-    userData.bio = githubUser.bio;
-    userData.twitter_username = githubUser.twitter_username;
-  } else if (providerId === 'discord') {
-    userData.discord_username = providerUser.username;
-  } else if (providerId === 'mastodon') {
-    userData.mastodon_username = providerUser.username;
-    userData.mastodon_acct = providerUser.acct;
-    userData.mastodon_url = providerUser.url;
-  } else if (providerId === 'gitlab') {
-    userData.gitlab_username = providerUser.username;
-    userData.bio = providerUser.bio;
-    userData.location = providerUser.location;
-    userData.site = providerUser.blog;
-  }
-
-  await db
-    .update(user)
-    .set(userData)
-    .where(and(eq(user.id, userId), eq(user.is_guest, true)));
+  const userData = buildUpgradeUserData(providerId, providerUser);
+  await upgradeGuestUserRepo(userId, userData);
 }

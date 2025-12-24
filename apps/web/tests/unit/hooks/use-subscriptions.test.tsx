@@ -43,8 +43,8 @@ describe("subscriptions hooks", () => {
 				updated_at: null,
 			},
 		]);
-		createSubscriptionMock.mockResolvedValue({ success: true, id: 1 });
-		deleteSubscriptionMock.mockResolvedValue({ success: true });
+		createSubscriptionMock.mockResolvedValue({ success: true, data: 1 });
+		deleteSubscriptionMock.mockResolvedValue({ success: true, data: true });
 	});
 
 	it("fetches subscriptions via useSubscriptions", async () => {

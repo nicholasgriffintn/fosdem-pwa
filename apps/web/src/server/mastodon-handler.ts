@@ -1,9 +1,18 @@
 import { generateCodeVerifier, generateState } from "arctic";
 import type { MastodonUser, OAuthUser } from "~/types/user";
 import { createMastodonInstance } from "~/server/auth";
+import { Mastodon } from "~/server/lib/mastodon-arctic";
+import {
+  type OAuthHandler,
+  fetchOAuthUserData,
+  validateAccessToken,
+  validateUserId,
+} from "~/server/lib/oauth-handler-base";
 
-export class MastodonOAuthHandler {
-  private mastodon: any;
+const PROVIDER_NAME = "Mastodon";
+
+export class MastodonOAuthHandler implements OAuthHandler {
+  private mastodon: Mastodon;
   private baseUrl: string;
 
   constructor(baseUrl: string) {
@@ -19,48 +28,21 @@ export class MastodonOAuthHandler {
     return this.mastodon.createAuthorizationURL(state, codeVerifier, scopes);
   }
 
-  async handleCallback(code: string, codeVerifier?: string): Promise<OAuthUser> {
+  async handleCallback(code: string, _state: string, codeVerifier?: string): Promise<OAuthUser> {
     if (!codeVerifier) {
       throw new Error("Mastodon Callback: Missing code verifier");
     }
     const tokens = await this.mastodon.validateAuthorizationCode(code, codeVerifier);
+    const accessToken = validateAccessToken(PROVIDER_NAME, tokens);
 
-    if (!tokens.accessToken()) {
-      throw new Error("Mastodon Callback: No access token found");
-    }
-
-    const mastodonUserResponse = await fetch(
-      `${this.baseUrl}/api/v1/accounts/verify_credentials`,
-      {
-        headers: {
-          Authorization: `Bearer ${tokens.accessToken()}`,
-          Accept: "application/json",
-        },
-      },
+    const apiUrl = `${this.baseUrl}/api/v1/accounts/verify_credentials`;
+    const mastodonUser = await fetchOAuthUserData<MastodonUser>(
+      PROVIDER_NAME,
+      apiUrl,
+      accessToken,
     );
 
-    if (!mastodonUserResponse.ok) {
-      const errorText = await mastodonUserResponse.text();
-
-      console.error("Mastodon Callback: API Error:", {
-        status: mastodonUserResponse.status,
-        statusText: mastodonUserResponse.statusText,
-        body: errorText,
-        baseUrl: this.baseUrl,
-      });
-
-      throw new Error(
-        `Mastodon Callback: API Error: ${mastodonUserResponse.status} ${mastodonUserResponse.statusText}`,
-      );
-    }
-
-    const mastodonUser: MastodonUser = await mastodonUserResponse.json();
-
-    if (!mastodonUser.id) {
-      throw new Error(
-        "Mastodon Callback: No user ID found in Mastodon response",
-      );
-    }
+    validateUserId(PROVIDER_NAME, mastodonUser.id);
 
     const baseUrlId = this.baseUrl.replace("https://", "").replace("http://", "");
     const email = `${baseUrlId}-${mastodonUser.id}@noreply.fosdempwa.com`;

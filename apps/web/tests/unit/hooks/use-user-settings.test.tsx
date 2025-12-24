@@ -21,7 +21,7 @@ const changeBookmarksVisibilityMock = vi.mocked(changeBookmarksVisibility);
 describe("useUserSettings", () => {
 	beforeEach(() => {
 		changeBookmarksVisibilityMock.mockReset();
-		changeBookmarksVisibilityMock.mockResolvedValue({ success: true });
+		changeBookmarksVisibilityMock.mockResolvedValue({ success: true, data: true });
 	});
 
 	it("updates bookmarks visibility on the server", async () => {

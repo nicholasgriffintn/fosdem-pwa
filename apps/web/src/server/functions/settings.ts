@@ -1,9 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
 
-import { db } from "~/server/db";
-import { user as userTable } from "~/server/db/schema";
-import { getFullAuthSession } from "~/server/auth";
+import { getAuthUser } from "~/server/lib/auth-middleware";
+import { ok, err, type Result } from "~/server/lib/result";
+import { updateUser } from "~/server/repositories/user-repository";
 
 export const changeBookmarksVisibility = createServerFn({
 	method: "POST",
@@ -15,30 +14,19 @@ export const changeBookmarksVisibility = createServerFn({
 
 		return data;
 	})
-	.handler(async (ctx: any) => {
-		const { user } = await getFullAuthSession();
-
+	.handler(async (ctx): Promise<Result<boolean> | null> => {
+		const user = await getAuthUser();
 		if (!user) {
 			return null;
 		}
 
 		try {
-			await db
-				.update(userTable)
-				.set({
-					bookmarks_visibility: ctx.data.visibility,
-				})
-				.where(eq(userTable.id, user.id));
-
-			return {
-				success: true,
-			};
+			await updateUser(user.id, {
+				bookmarks_visibility: ctx.data.visibility,
+			});
+			return ok(true);
 		} catch (error) {
 			console.error(error);
-
-			return {
-				success: false,
-				error: "Failed to update visibility",
-			};
+			return err("Failed to update visibility");
 		}
 	});

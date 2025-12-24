@@ -1,7 +1,16 @@
 import { github } from "~/server/auth";
 import type { GitHubUser, OAuthUser } from "~/types/user";
+import {
+	type OAuthHandler,
+	fetchOAuthUserData,
+	validateAccessToken,
+	validateUserId,
+} from "~/server/lib/oauth-handler-base";
 
-export class GitHubOAuthHandler {
+const PROVIDER_NAME = "GitHub";
+const API_URL = "https://api.github.com/user";
+
+export class GitHubOAuthHandler implements OAuthHandler {
 	async createAuthUrl(): Promise<URL> {
 		const state = crypto.randomUUID();
 		return github.createAuthorizationURL(state, ["user:email"]);
@@ -9,43 +18,16 @@ export class GitHubOAuthHandler {
 
 	async handleCallback(code: string, _state: string): Promise<OAuthUser> {
 		const tokens = await github.validateAuthorizationCode(code);
+		const accessToken = validateAccessToken(PROVIDER_NAME, tokens);
 
-		if (!tokens.accessToken()) {
-			throw new Error("GitHub Callback: No access token found");
-		}
-
-		const githubUserResponse = await fetch(
-			"https://api.github.com/user",
-			{
-				headers: {
-					Authorization: `Bearer ${tokens.accessToken()}`,
-					Accept: "application/json",
-					"User-Agent": "Fosdem PWA",
-				},
-			},
+		const githubUser = await fetchOAuthUserData<GitHubUser>(
+			PROVIDER_NAME,
+			API_URL,
+			accessToken,
+			{ "User-Agent": "Fosdem PWA" },
 		);
 
-		if (!githubUserResponse.ok) {
-			const errorText = await githubUserResponse.text();
-
-			console.error("GitHub Callback: API Error:", {
-				status: githubUserResponse.status,
-				statusText: githubUserResponse.statusText,
-				body: errorText,
-			});
-
-			throw new Error(
-				`GitHub Callback: API Error: ${githubUserResponse.status} ${githubUserResponse.statusText}`,
-			);
-		}
-
-		const githubUser: GitHubUser = await githubUserResponse.json();
-
-		if (!githubUser.id) {
-			throw new Error(
-				"GitHub Callback: No user ID found in GitHub response",
-			);
-		}
+		validateUserId(PROVIDER_NAME, githubUser.id);
 
 		return {
 			id: githubUser.id,
