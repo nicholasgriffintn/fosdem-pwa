@@ -54,6 +54,7 @@ type BookmarksListProps = {
 	day?: string;
 	view?: string;
 	tab?: "events" | "tracks" | "all";
+	headerActions?: React.ReactNode;
 	onUpdateBookmark?: (params: {
 		id: string;
 		serverId?: string;
@@ -84,6 +85,7 @@ export function BookmarksList({
 	day,
 	view,
 	tab = "events",
+	headerActions,
 	onUpdateBookmark,
 	showConflicts = true,
 	defaultViewMode = "calendar",
@@ -229,6 +231,11 @@ export function BookmarksList({
 									Tracks
 								</Link>
 							</div>
+							{headerActions ? (
+								<div className="flex w-full justify-end md:w-auto">
+									{headerActions}
+								</div>
+							) : null}
 						</div>
 
 						<div>

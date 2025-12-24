@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 
 import { PageHeader } from "~/components/shared/PageHeader";
 import { useBookmarks } from "~/hooks/use-bookmarks";
@@ -12,11 +14,18 @@ import { useIsClient } from "~/hooks/use-is-client";
 import { getAllData } from "~/server/functions/fosdem";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { getBookmarks } from "~/server/functions/bookmarks";
+import {
+	exportBookmarksCsv,
+	importBookmarksCsv,
+} from "~/server/functions/export";
 import { Button } from "~/components/ui/button";
 import { UpgradeNotice } from "~/components/shared/UpgradeNotice";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
 import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
+import { Icons } from "~/components/shared/Icons";
+import { ImportBookmarksSheet } from "~/components/Bookmarks/ImportBookmarksSheet";
+import { downloadFile } from "~/utils/file-download";
 
 export const Route = createFileRoute("/bookmarks/")({
 	component: BookmarksHome,
@@ -81,8 +90,38 @@ function BookmarksHome() {
 	const resolvedAuthLoading = useServerSnapshot ? false : authLoading;
 	const resolvedFosdemData = useServerSnapshot ? serverFosdemData : fosdemData;
 	const resolvedUser = useServerSnapshot ? serverUser : user;
+	const [csvBusy, setCsvBusy] = useState(false);
+	const [importOpen, setImportOpen] = useState(false);
 
-	const onCreateBookmark = async (bookmark: any) => {
+	const exportCsv = useServerFn(exportBookmarksCsv);
+	const importCsv = useServerFn(importBookmarksCsv);
+
+	const handleExport = async () => {
+		try {
+			setCsvBusy(true);
+			const result = await exportCsv({ data: { year } });
+			downloadFile(result.csv, result.filename);
+		} finally {
+			setCsvBusy(false);
+		}
+	};
+
+	const handleImport = async (file: File) => {
+		const csv = await file.text();
+		setCsvBusy(true);
+		try {
+			const result = await importCsv({ data: { year, csv } });
+			window.alert(
+				`Imported ${result.importedEvents} events and ${result.importedTracks} tracks. Not found: ${result.notFoundCount}.`,
+			);
+			setImportOpen(false);
+			window.location.reload();
+		} finally {
+			setCsvBusy(false);
+		}
+	};
+
+	const handleCreateBookmark = async (bookmark: any) => {
 		await create({
 			year,
 			slug: bookmark.slug,
@@ -91,13 +130,20 @@ function BookmarksHome() {
 		});
 	};
 
-	const onUpdateBookmark = (bookmark: any) => {
+	const handleUpdateBookmark = (bookmark: any) => {
 		update(bookmark.id, { status: bookmark.status }, bookmark.serverId);
 	};
 
 	return (
 		<PageShell>
 			<PageHeader heading="Bookmarks" year={year} />
+			<ImportBookmarksSheet
+				open={importOpen}
+				onOpenChange={setImportOpen}
+				onImport={handleImport}
+				disabled={!resolvedUser?.id}
+				busy={csvBusy}
+			/>
 			{resolvedUser?.is_guest && (
 				<div className="mb-6">
 					<UpgradeNotice user={resolvedUser} />
@@ -143,7 +189,12 @@ function BookmarksHome() {
 										Sign in
 									</Link>
 								</Button>
-							) : null}
+							) : (
+								<ImportButton
+									disabled={!isClient || csvBusy}
+									onClick={() => setImportOpen(true)}
+								/>
+							)}
 						</>
 					}
 				/>
@@ -156,11 +207,76 @@ function BookmarksHome() {
 					day={day}
 					view={view}
 						tab={tab}
-					onUpdateBookmark={onUpdateBookmark}
-					user={resolvedUser}
-					onCreateBookmark={onCreateBookmark}
+						headerActions={
+							<BookmarkActions
+								onExport={handleExport}
+								onImport={() => setImportOpen(true)}
+								exportDisabled={!isClient || csvBusy}
+								importDisabled={!isClient || csvBusy || !resolvedUser?.id}
+								showImportTitle={!resolvedUser?.id}
+							/>
+						}
+						onUpdateBookmark={handleUpdateBookmark}
+						user={resolvedUser}
+						onCreateBookmark={handleCreateBookmark}
 				/>
 			)}
 		</PageShell>
+	);
+}
+
+type BookmarkActionsProps = {
+	onExport: () => void;
+	onImport: () => void;
+	exportDisabled?: boolean;
+	importDisabled?: boolean;
+	showImportTitle?: boolean;
+};
+
+function BookmarkActions({
+	onExport,
+	onImport,
+	exportDisabled,
+	importDisabled,
+	showImportTitle,
+}: BookmarkActionsProps) {
+	return (
+		<div className="flex items-center gap-2">
+			<Button
+				variant="outline"
+				disabled={exportDisabled}
+				onClick={onExport}
+				className="border-emerald-600/30 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/50 dark:hover:text-emerald-200"
+			>
+				<Icons.download className="h-4 w-4" />
+				Export
+			</Button>
+			<ImportButton
+				disabled={importDisabled}
+				onClick={onImport}
+				showTitle={showImportTitle}
+			/>
+		</div>
+	);
+}
+
+type ImportButtonProps = {
+	disabled?: boolean;
+	onClick: () => void;
+	showTitle?: boolean;
+};
+
+function ImportButton({ disabled, onClick, showTitle }: ImportButtonProps) {
+	return (
+		<Button
+			variant="outline"
+			disabled={disabled}
+			onClick={onClick}
+			title={showTitle ? "Sign in to import" : undefined}
+			className="border-sky-600/30 text-sky-700 hover:bg-sky-100 hover:text-sky-800 dark:text-sky-300 dark:hover:bg-sky-900/50 dark:hover:text-sky-200"
+		>
+			<Icons.upload className="h-4 w-4" />
+			Import
+		</Button>
 	);
 }

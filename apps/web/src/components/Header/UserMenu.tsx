@@ -6,8 +6,8 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import type { SessionUser } from "~/server/auth";
-import { constants } from "~/constants";
 import { Icons } from "~/components/shared/Icons";
+import { buildProfileLink } from "~/lib/link-builder";
 
 type AvatarMenuProps = {
 	user: SessionUser;
@@ -65,10 +65,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 				{user.is_guest && (
 					<>
 						<Link
-							to="/profile"
-							search={(prev) => ({
-								year: prev.year || constants.DEFAULT_YEAR,
-							})}
+							{...buildProfileLink()}
 							className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
 						>
 							<Icons.user className="h-4 w-4" />
@@ -80,10 +77,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 					</>
 				)}
 				<Link
-					to="/profile"
-					search={(prev) => ({
-						year: prev.year || constants.DEFAULT_YEAR,
-					})}
+					{...buildProfileLink()}
 					className="flex items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
 				>
 					View profile

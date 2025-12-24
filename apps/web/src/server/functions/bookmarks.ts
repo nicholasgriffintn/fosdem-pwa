@@ -3,70 +3,17 @@ import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 
 import { db } from "~/server/db";
-import {
-	bookmark as bookmarkTable,
-	user as userTable,
-} from "~/server/db/schema";
+import { bookmark as bookmarkTable, user as userTable } from "~/server/db/schema";
 import { getFullAuthSession } from "~/server/auth";
-
-type BookmarkPayload = {
-	year: number;
-	type: string;
-	slug: string;
-	status: string;
-};
-
-async function upsertBookmark(payload: BookmarkPayload, userId: number) {
-	const { year, type, slug, status } = payload;
-	const yearNum = Number.parseInt(String(year));
-	if (!Number.isFinite(yearNum) || yearNum < 2000 || yearNum > 2100) {
-		throw new Error("Invalid year parameter");
-	}
-
-	const existingBookmark = await db.query.bookmark.findFirst({
-		where: and(
-			eq(bookmarkTable.user_id, userId),
-			eq(bookmarkTable.year, yearNum),
-			eq(bookmarkTable.slug, slug),
-		),
-	});
-
-	if (existingBookmark) {
-		await db
-			.update(bookmarkTable)
-			.set({ status })
-			.where(eq(bookmarkTable.id, existingBookmark.id));
-	} else {
-		await db
-			.insert(bookmarkTable)
-			.values({
-				id: `${userId}_${yearNum}_${slug}`,
-				slug,
-				type: `bookmark_${type}`,
-				year: yearNum,
-				status,
-				user_id: userId,
-			})
-			.onConflictDoUpdate({
-				target: bookmarkTable.id,
-				set: { status },
-			});
-	}
-}
+import { validateYear, upsertBookmark } from "~/server/lib/bookmark-utils";
 
 export const getBookmarks = createServerFn({
 	method: "GET",
 })
-	.inputValidator(
-		(data: { year: number; status: "favourited" | "unfavourited" }) => data,
-	)
+	.inputValidator((data: { year: number; status: "favourited" | "unfavourited" }) => data)
 	.handler(async (ctx) => {
 		const { year, status } = ctx.data;
-
-		const yearNum = Number.parseInt(String(year));
-		if (!Number.isFinite(yearNum) || yearNum < 2000 || yearNum > 2100) {
-			throw new Error("Invalid year parameter");
-		}
+		const yearNum = validateYear(year);
 
 		const { user } = await getFullAuthSession();
 
@@ -78,7 +25,7 @@ export const getBookmarks = createServerFn({
 			where: and(
 				eq(bookmarkTable.user_id, user.id),
 				eq(bookmarkTable.year, yearNum),
-				eq(bookmarkTable.status, status),
+				eq(bookmarkTable.status, status)
 			),
 		});
 
@@ -95,11 +42,7 @@ export const getEventBookmark = createServerFn({
 	.inputValidator((data: { year: number; slug: string }) => data)
 	.handler(async (ctx) => {
 		const { year, slug } = ctx.data;
-
-		const yearNum = Number.parseInt(String(year));
-		if (!Number.isFinite(yearNum) || yearNum < 2000 || yearNum > 2100) {
-			throw new Error("Invalid year parameter");
-		}
+		const yearNum = validateYear(year);
 
 		const { user } = await getFullAuthSession();
 
@@ -111,7 +54,7 @@ export const getEventBookmark = createServerFn({
 			where: and(
 				eq(bookmarkTable.user_id, user.id),
 				eq(bookmarkTable.year, yearNum),
-				eq(bookmarkTable.slug, slug),
+				eq(bookmarkTable.slug, slug)
 			),
 		});
 
@@ -128,7 +71,7 @@ export const createBookmark = createServerFn({
 			slug: string;
 			status: string;
 			returnTo?: string;
-		}) => data,
+		}) => data
 	)
 	.handler(async (ctx) => {
 		const { year, type, slug, status, returnTo } = ctx.data;
@@ -240,19 +183,16 @@ export const updateBookmark = createServerFn({
 	.handler(async (ctx) => {
 		const { id, updates } = ctx.data;
 
-		const allowedFields = [
-			"status",
-			"priority",
-			"last_notification_sent_at",
-		] as const;
-		const safeUpdates = Object.entries(updates ?? {}).reduce<
-			Record<string, unknown>
-		>((acc, [key, value]) => {
-			if (allowedFields.includes(key as (typeof allowedFields)[number])) {
-				acc[key] = value;
-			}
-			return acc;
-		}, {});
+		const allowedFields = ["status", "priority", "last_notification_sent_at"] as const;
+		const safeUpdates = Object.entries(updates ?? {}).reduce<Record<string, unknown>>(
+			(acc, [key, value]) => {
+				if (allowedFields.includes(key as (typeof allowedFields)[number])) {
+					acc[key] = value;
+				}
+				return acc;
+			},
+			{}
+		);
 
 		if (Object.keys(safeUpdates).length === 0) {
 			return {
@@ -276,14 +216,11 @@ export const updateBookmark = createServerFn({
 				success: false,
 				statusCode: 404,
 				error: "Bookmark not found",
-			}
+			};
 		}
 
 		try {
-			await db
-				.update(bookmarkTable)
-				.set(safeUpdates)
-				.where(eq(bookmarkTable.id, id));
+			await db.update(bookmarkTable).set(safeUpdates).where(eq(bookmarkTable.id, id));
 
 			return {
 				success: true,
@@ -336,10 +273,7 @@ export const getUserBookmarks = createServerFn({
 			.select()
 			.from(bookmarkTable)
 			.where(
-				and(
-					eq(bookmarkTable.user_id, user.id),
-					eq(bookmarkTable.year, Number(year)),
-				),
+				and(eq(bookmarkTable.user_id, user.id), eq(bookmarkTable.year, Number(year)))
 			);
 
 		return bookmarks;
