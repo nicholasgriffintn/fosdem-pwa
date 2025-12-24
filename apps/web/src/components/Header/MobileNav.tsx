@@ -78,20 +78,22 @@ export function MobileNav({
 			<div
 				className={cn(
 					"relative flex h-[100svh] w-full flex-col bg-background",
+					"pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]",
 				)}
 			>
 				<div className="border-b">
-					<div className="container flex h-16 items-center justify-between gap-3">
-						<div className="flex items-center gap-4 shrink-0">
+					<div className="container flex h-14 items-center justify-between gap-3">
+						<div className="flex items-center gap-2 shrink-0">
 							<label
 								htmlFor="mobile-menu-toggle"
 								className={cn(
-									"inline-flex h-10 w-10 items-center justify-center rounded-md border bg-background",
+									"inline-flex h-11 w-11 items-center justify-center rounded-md",
 									"text-foreground/80 hover:bg-muted/60 hover:text-foreground cursor-pointer",
+									"-ml-2",
 								)}
 								aria-label="Close menu"
 							>
-								<Icons.close className="h-4 w-4" />
+								<Icons.close className="h-5 w-5" />
 								<span className="sr-only">Close menu</span>
 							</label>
 							<Link
@@ -99,10 +101,10 @@ export function MobileNav({
 								search={(prev: Record<string, unknown>) => ({
 									year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
 								})}
-								className="items-center space-x-2 flex logo-link shrink-0"
+								className="flex items-center gap-2 logo-link shrink-0"
 							>
 								<Icons.logo className="h-7 w-7" width="28" height="28" />
-								<span className="font-bold">{title}</span>
+								<span className="font-bold leading-none">{title}</span>
 							</Link>
 						</div>
 					</div>
