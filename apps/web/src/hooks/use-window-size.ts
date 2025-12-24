@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import useRefState from "./use-ref-state";
 import { isBrowser, off, on } from "~/lib/utils";
+import useRefState from "./use-ref-state";
 
 export const useWindowSize = (initialWidth = 0, initialHeight = 0) => {
 	const [state, setState] = useRefState<{ width: number; height: number }>({
@@ -29,7 +28,7 @@ export const useWindowSize = (initialWidth = 0, initialHeight = 0) => {
 		return () => {
 			off(window, "resize", handler);
 		};
-	}, []);
+	}, [setState]);
 
 	return { ...state };
 };

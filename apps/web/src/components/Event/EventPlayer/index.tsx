@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-
-import type { ConferenceData, Event } from "~/types/fosdem";
+import { useEffect, useRef, useState } from "react";
 import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
-import type { TypeIds } from "~/types/fosdem";
-import { isEventLive } from "~/lib/dateTime";
-import { EventPlayerNotStarted } from "./components/NotStarted";
-import { useOnlineStatus } from "~/hooks/use-online-status";
-import { usePlayer } from "~/contexts/PlayerContext";
 import { Icons } from "~/components/shared/Icons";
 import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
+import { usePlayer } from "~/contexts/PlayerContext";
+import { useOnlineStatus } from "~/hooks/use-online-status";
+import { isEventLive } from "~/lib/dateTime";
+import type { ConferenceData, Event, TypeIds } from "~/types/fosdem";
+import { EventPlayerNotStarted } from "./components/NotStarted";
 
 type EventPlayerProps = {
 	event: Event;
@@ -28,38 +26,40 @@ export function EventPlayer({
 	const [isMounted, setIsMounted] = useState(false);
 	const isOnline = useOnlineStatus();
 	const player = usePlayer();
-	const lastStateRef = useRef({
+	const lastStateRef = useRef<{
+		isPlaying: boolean;
+		portalTarget: typeof player.portalTarget;
+		currentEventId: string | null;
+		setPortalTarget: typeof player.setPortalTarget;
+	}>({
 		isPlaying: false,
 		portalTarget: player.portalTarget,
 		currentEventId: player.currentEvent?.id ?? null,
+		setPortalTarget: player.setPortalTarget,
 	});
-	const setPortalTargetRef = useRef(player.setPortalTarget);
 
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
 
-	useEffect(() => {
-		lastStateRef.current = {
-			isPlaying: player.isPlaying,
-			portalTarget: player.portalTarget,
-			currentEventId: player.currentEvent?.id ?? null,
-		};
-	}, [player.isPlaying, player.portalTarget, player.currentEvent?.id]);
+	lastStateRef.current = {
+		isPlaying: player.isPlaying,
+		portalTarget: player.portalTarget,
+		currentEventId: player.currentEvent?.id ?? null,
+		setPortalTarget: player.setPortalTarget,
+	};
 
 	useEffect(() => {
-		setPortalTargetRef.current = player.setPortalTarget;
-	}, [player.setPortalTarget]);
-
-	useEffect(() => {
+		const eventId = event.id;
 		return () => {
-			const { isPlaying, portalTarget, currentEventId } = lastStateRef.current;
+			const { isPlaying, portalTarget, currentEventId, setPortalTarget } =
+				lastStateRef.current;
 			if (
 				isPlaying &&
 				portalTarget === "event-page" &&
-				currentEventId === event.id
+				currentEventId === eventId
 			) {
-				setPortalTargetRef.current("floating");
+				setPortalTarget("floating");
 			}
 		};
 	}, [event.id]);
@@ -75,10 +75,12 @@ export function EventPlayer({
 		);
 
 	const streamUrl = eventIsLive
-		? event.streams?.find(
+		? (event.streams?.find(
 				(stream) => stream.type === "application/vnd.apple.mpegurl",
-			)?.href ?? videoRecordings[0]?.href ?? null
-		: videoRecordings[0]?.href ?? null;
+			)?.href ??
+			videoRecordings[0]?.href ??
+			null)
+		: (videoRecordings[0]?.href ?? null);
 
 	const subtitleTrack = event.links?.find((link) => link.href.endsWith(".vtt"));
 	const proxiedSubtitleUrl = subtitleTrack
@@ -86,7 +88,8 @@ export function EventPlayer({
 		: null;
 
 	const isThisEventPlaying =
-		player.currentEvent?.id === event.id && player.portalTarget === "event-page";
+		player.currentEvent?.id === event.id &&
+		player.portalTarget === "event-page";
 	const isThisEventFloating =
 		player.currentEvent?.id === event.id && player.portalTarget === "floating";
 	const hasPlayableMedia =
@@ -184,7 +187,12 @@ export function EventPlayer({
 									subtitleUrl={proxiedSubtitleUrl}
 									sources={[
 										...(eventIsLive
-											? [{ href: streamUrl, type: "application/vnd.apple.mpegurl" }]
+											? [
+													{
+														href: streamUrl,
+														type: "application/vnd.apple.mpegurl",
+													},
+												]
 											: []),
 										...videoRecordings,
 									]}
