@@ -231,7 +231,7 @@ function EventPage() {
             text: `Speakers: ${fosdem.event.persons?.join(", ")}`,
           },
         ]}
-        additionalHeadingPaddingClass="my-0 md:my-4"
+        additionalHeadingPaddingClass="h-0 md:h-6"
       >
         <div className="hidden md:flex items-center md:pl-6 md:pr-3 gap-2">
           <FavouriteButton

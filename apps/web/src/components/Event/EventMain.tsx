@@ -79,7 +79,11 @@ export function EventMain({
 								year={year}
 							/>
 						</div>
-						{event.chat && <ChatAlert chatUrl={event.chat} />}
+						{event.chat && (
+							<div id="chat" className="scroll-mt-32">
+								<ChatAlert chatUrl={event.chat} />
+							</div>
+						)}
 					</div>
 				</ResizablePanel>
 				{!isMobile && <ResizableHandle withHandle />}
