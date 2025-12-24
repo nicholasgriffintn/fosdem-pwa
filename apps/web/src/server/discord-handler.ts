@@ -1,7 +1,16 @@
 import { discord } from "~/server/auth";
 import type { DiscordUser, OAuthUser } from "~/types/user";
+import {
+	type OAuthHandler,
+	fetchOAuthUserData,
+	validateAccessToken,
+	validateUserId,
+} from "~/server/lib/oauth-handler-base";
 
-export class DiscordOAuthHandler {
+const PROVIDER_NAME = "Discord";
+const API_URL = "https://discord.com/api/users/@me";
+
+export class DiscordOAuthHandler implements OAuthHandler {
 	async createAuthUrl(): Promise<URL> {
 		const state = crypto.randomUUID();
 		return discord.createAuthorizationURL(state, null, ["identify", "email"]);
@@ -9,36 +18,15 @@ export class DiscordOAuthHandler {
 
 	async handleCallback(code: string, _state: string): Promise<OAuthUser> {
 		const tokens = await discord.validateAuthorizationCode(code, null);
+		const accessToken = validateAccessToken(PROVIDER_NAME, tokens);
 
-		if (!tokens.accessToken()) {
-			throw new Error("Discord Callback: No access token found");
-		}
+		const discordUser = await fetchOAuthUserData<DiscordUser>(
+			PROVIDER_NAME,
+			API_URL,
+			accessToken,
+		);
 
-		const discordUserResponse = await fetch("https://discord.com/api/users/@me", {
-			headers: {
-				Authorization: `Bearer ${tokens.accessToken()}`,
-			},
-		});
-
-		if (!discordUserResponse.ok) {
-			const errorText = await discordUserResponse.text();
-
-			console.error("Discord Callback: API Error:", {
-				status: discordUserResponse.status,
-				statusText: discordUserResponse.statusText,
-				body: errorText,
-			});
-
-			throw new Error(
-				`Discord Callback: API Error: ${discordUserResponse.status} ${discordUserResponse.statusText}`,
-			);
-		}
-
-		const discordUser: DiscordUser = await discordUserResponse.json();
-
-		if (!discordUser.id) {
-			throw new Error("Discord Callback: No user ID found in Discord response");
-		}
+		validateUserId(PROVIDER_NAME, discordUser.id);
 
 		if (!discordUser.verified) {
 			throw new Error("Discord Callback: User email is not verified");

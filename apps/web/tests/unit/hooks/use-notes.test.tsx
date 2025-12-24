@@ -102,7 +102,7 @@ describe("useNotes", () => {
 		useAuthMock.mockReturnValue({ user: { id: "user-1" }, loading: false, logout: vi.fn() });
 		useLocalNotesMock.mockReturnValue({ notes: [localNote], loading: false });
 		getNotesMock.mockResolvedValue([serverNote]);
-		createNoteMock.mockResolvedValue({ success: true });
+		createNoteMock.mockResolvedValue({ success: true, data: true });
 	});
 
 	it("falls back to local notes when user is not authenticated", async () => {

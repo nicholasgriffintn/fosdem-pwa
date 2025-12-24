@@ -1,37 +1,29 @@
-import { and } from "drizzle-orm";
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
 
-import { db } from "~/server/db";
-import { note as noteTable } from "~/server/db/schema";
-import { getFullAuthSession } from "~/server/auth";
+import { getAuthUser } from "~/server/lib/auth-middleware";
+import { ok, err, type Result } from "~/server/lib/result";
+import {
+	findNotesByUserAndEvent,
+	findNoteById,
+	createNote as createNoteRepo,
+	updateNote as updateNoteRepo,
+	deleteNote as deleteNoteRepo,
+} from "~/server/repositories/note-repository";
+import type { Note } from "~/server/db/schema";
 
 export const getNotes = createServerFn({
 	method: "GET",
 })
 	.inputValidator((data: { year: number; eventId: string }) => data)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Note[]> => {
 		const { year, eventId } = ctx.data;
 
-		const { user } = await getFullAuthSession();
-
+		const user = await getAuthUser();
 		if (!user) {
 			return [];
 		}
 
-		const notes = await db.query.note.findMany({
-			where: and(
-				eq(noteTable.user_id, user.id),
-				eq(noteTable.year, Number(year)),
-				eq(noteTable.slug, eventId),
-			),
-		});
-
-		if (!notes) {
-			return [];
-		}
-
-		return notes;
+		return findNotesByUserAndEvent(user.id, Number(year), eventId);
 	});
 
 export const createNote = createServerFn({
@@ -41,35 +33,24 @@ export const createNote = createServerFn({
 		(data: { year: number; eventId: string; note: string; time?: number }) =>
 			data,
 	)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Result<boolean>> => {
 		const { year, eventId, note, time } = ctx.data;
 
 		if (!note) {
-			return { success: false, error: "Note content is required" };
+			return err("Note content is required");
 		}
 
-		const { user } = await getFullAuthSession();
-
+		const user = await getAuthUser();
 		if (!user) {
-			return {
-				success: false, error: "User not found",
-			}
+			return err("User not found");
 		}
 
 		try {
-			await db.insert(noteTable).values({
-				note,
-				time,
-				year: Number(year),
-				slug: eventId,
-				user_id: user.id,
-			});
-
-			return { success: true };
+			await createNoteRepo(user.id, Number(year), eventId, note, time);
+			return ok(true);
 		} catch (error) {
 			console.error(error);
-
-			return { success: false, error: "Failed to save note" };
+			return err("Failed to save note");
 		}
 	});
 
@@ -77,44 +58,39 @@ export const updateNote = createServerFn({
 	method: "POST",
 })
 	.inputValidator((data: { id: number; updates: Record<string, unknown> }) => data)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Result<boolean>> => {
 		const { id, updates } = ctx.data;
 
 		const allowedFields = ["note", "time"] as const;
-		const safeUpdates = Object.entries(updates ?? {}).reduce<
-			Record<string, unknown>
-		>((acc, [key, value]) => {
-			if (allowedFields.includes(key as (typeof allowedFields)[number])) {
-				acc[key] = value;
+		type AllowedField = (typeof allowedFields)[number];
+		const safeUpdates: Partial<Pick<Note, AllowedField>> = {};
+
+		for (const [key, value] of Object.entries(updates ?? {})) {
+			if (allowedFields.includes(key as AllowedField)) {
+				(safeUpdates as Record<string, unknown>)[key] = value;
 			}
-			return acc;
-		}, {});
+		}
 
 		if (Object.keys(safeUpdates).length === 0) {
-			return { success: false, error: "No valid note fields to update" };
+			return err("No valid note fields to update");
 		}
 
-		const { user } = await getFullAuthSession();
-
+		const user = await getAuthUser();
 		if (!user) {
-			return { success: false, error: "User not found" };
+			return err("User not found");
 		}
 
-		const existingNote = await db.query.note.findFirst({
-			where: and(eq(noteTable.id, id), eq(noteTable.user_id, user.id)),
-		});
-
+		const existingNote = await findNoteById(id, user.id);
 		if (!existingNote) {
-			return { success: false, error: "Note not found" };
+			return err("Note not found");
 		}
 
 		try {
-			await db.update(noteTable).set(safeUpdates).where(eq(noteTable.id, id));
-
-			return { success: true };
+			await updateNoteRepo(id, safeUpdates);
+			return ok(true);
 		} catch (error) {
 			console.error(error);
-			return { success: false, error: "Failed to update note" };
+			return err("Failed to update note");
 		}
 	});
 
@@ -122,29 +98,24 @@ export const deleteNote = createServerFn({
 	method: "POST",
 })
 	.inputValidator((data: { id: number }) => data)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Result<boolean>> => {
 		const { id } = ctx.data;
 
-		const { user } = await getFullAuthSession();
-
+		const user = await getAuthUser();
 		if (!user) {
-			return { success: false, error: "User not found" };
+			return err("User not found");
 		}
 
-		const existingNote = await db.query.note.findFirst({
-			where: and(eq(noteTable.id, id), eq(noteTable.user_id, user.id)),
-		});
-
+		const existingNote = await findNoteById(id, user.id);
 		if (!existingNote) {
-			return { success: false, error: "Note not found" };
+			return err("Note not found");
 		}
 
 		try {
-			await db.delete(noteTable).where(eq(noteTable.id, id));
-
-			return { success: true };
+			await deleteNoteRepo(id);
+			return ok(true);
 		} catch (error) {
 			console.error(error);
-			return { success: false, error: "Failed to delete note" };
+			return err("Failed to delete note");
 		}
 	});

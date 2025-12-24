@@ -1,64 +1,51 @@
-import { and, or, sql } from "drizzle-orm";
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
 
-import { db } from "~/server/db";
-import { bookmark as bookmarkTable, user as userTable } from "~/server/db/schema";
-import { getFullAuthSession } from "~/server/auth";
-import { validateYear, upsertBookmark } from "~/server/lib/bookmark-utils";
+import { getAuthUser } from "~/server/lib/auth-middleware";
+import { validateYear } from "~/server/lib/bookmark-utils";
+import { ok, err, type Result } from "~/server/lib/result";
+import {
+	findBookmarksByUserAndStatus,
+	findBookmarksByUserAndYear,
+	findBookmark,
+	findBookmarkById,
+	upsertBookmark,
+	updateBookmark as updateBookmarkRepo,
+	deleteBookmark as deleteBookmarkRepo,
+} from "~/server/repositories/bookmark-repository";
+import { findUserByUsername } from "~/server/repositories/user-repository";
+import type { Bookmark } from "~/server/db/schema";
 
 export const getBookmarks = createServerFn({
 	method: "GET",
 })
 	.inputValidator((data: { year: number; status: "favourited" | "unfavourited" }) => data)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Bookmark[]> => {
 		const { year, status } = ctx.data;
 		const yearNum = validateYear(year);
 
-		const { user } = await getFullAuthSession();
-
+		const user = await getAuthUser();
 		if (!user) {
 			return [];
 		}
 
-		const bookmarkData = await db.query.bookmark.findMany({
-			where: and(
-				eq(bookmarkTable.user_id, user.id),
-				eq(bookmarkTable.year, yearNum),
-				eq(bookmarkTable.status, status)
-			),
-		});
-
-		if (!bookmarkData) {
-			return [];
-		}
-
-		return bookmarkData;
+		return findBookmarksByUserAndStatus(user.id, yearNum, status);
 	});
 
 export const getEventBookmark = createServerFn({
 	method: "GET",
 })
 	.inputValidator((data: { year: number; slug: string }) => data)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Bookmark | null> => {
 		const { year, slug } = ctx.data;
 		const yearNum = validateYear(year);
 
-		const { user } = await getFullAuthSession();
-
+		const user = await getAuthUser();
 		if (!user) {
 			return null;
 		}
 
-		const existingBookmark = await db.query.bookmark.findFirst({
-			where: and(
-				eq(bookmarkTable.user_id, user.id),
-				eq(bookmarkTable.year, yearNum),
-				eq(bookmarkTable.slug, slug)
-			),
-		});
-
-		return existingBookmark;
+		const bookmark = await findBookmark(user.id, yearNum, slug);
+		return bookmark ?? null;
 	});
 
 export const createBookmark = createServerFn({
@@ -73,15 +60,14 @@ export const createBookmark = createServerFn({
 			returnTo?: string;
 		}) => data
 	)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Result<boolean> | Response | null> => {
 		const { year, type, slug, status, returnTo } = ctx.data;
 
 		if (!type || !slug || !status) {
 			throw new Error("Invalid request");
 		}
 
-		const { user } = await getFullAuthSession();
-
+		const user = await getAuthUser();
 		if (!user) {
 			if (returnTo) {
 				return new Response(null, {
@@ -95,7 +81,8 @@ export const createBookmark = createServerFn({
 		}
 
 		try {
-			await upsertBookmark({ year, type, slug, status }, user.id);
+			const yearNum = validateYear(year);
+			await upsertBookmark(user.id, yearNum, type, slug, status);
 
 			if (returnTo) {
 				return new Response(null, {
@@ -106,7 +93,7 @@ export const createBookmark = createServerFn({
 				});
 			}
 
-			return { success: true };
+			return ok(true);
 		} catch (error) {
 			console.error(error);
 
@@ -119,7 +106,7 @@ export const createBookmark = createServerFn({
 				});
 			}
 
-			return { success: false, error: "Failed to save bookmark" };
+			return err("Failed to save bookmark");
 		}
 	});
 
@@ -149,9 +136,9 @@ export const createBookmarkFromForm = createServerFn({
 			returnTo: returnTo?.toString(),
 		};
 	})
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Response> => {
 		const { year, type, slug, status, returnTo } = ctx.data;
-		const { user } = await getFullAuthSession();
+		const user = await getAuthUser();
 
 		if (!user) {
 			return new Response(null, {
@@ -163,7 +150,8 @@ export const createBookmarkFromForm = createServerFn({
 		}
 
 		try {
-			await upsertBookmark({ year, type, slug, status }, user.id);
+			const yearNum = validateYear(year);
+			await upsertBookmark(user.id, yearNum, type, slug, status);
 		} catch (error) {
 			console.error(error);
 		}
@@ -180,57 +168,39 @@ export const updateBookmark = createServerFn({
 	method: "POST",
 })
 	.inputValidator((data: { id: string; updates: Record<string, unknown> }) => data)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Result<boolean> | null> => {
 		const { id, updates } = ctx.data;
 
 		const allowedFields = ["status", "priority", "last_notification_sent_at"] as const;
-		const safeUpdates = Object.entries(updates ?? {}).reduce<Record<string, unknown>>(
-			(acc, [key, value]) => {
-				if (allowedFields.includes(key as (typeof allowedFields)[number])) {
-					acc[key] = value;
-				}
-				return acc;
-			},
-			{}
-		);
+		type AllowedField = (typeof allowedFields)[number];
+		const safeUpdates: Partial<Pick<Bookmark, AllowedField>> = {};
 
-		if (Object.keys(safeUpdates).length === 0) {
-			return {
-				success: false,
-				error: "No valid bookmark fields to update",
-			};
+		for (const [key, value] of Object.entries(updates ?? {})) {
+			if (allowedFields.includes(key as AllowedField)) {
+				(safeUpdates as Record<string, unknown>)[key] = value;
+			}
 		}
 
-		const { user } = await getFullAuthSession();
+		if (Object.keys(safeUpdates).length === 0) {
+			return err("No valid bookmark fields to update");
+		}
 
+		const user = await getAuthUser();
 		if (!user) {
 			return null;
 		}
 
-		const existingBookmark = await db.query.bookmark.findFirst({
-			where: and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, user.id)),
-		});
-
+		const existingBookmark = await findBookmarkById(id, user.id);
 		if (!existingBookmark) {
-			return {
-				success: false,
-				statusCode: 404,
-				error: "Bookmark not found",
-			};
+			return err("Bookmark not found", 404);
 		}
 
 		try {
-			await db.update(bookmarkTable).set(safeUpdates).where(eq(bookmarkTable.id, id));
-
-			return {
-				success: true,
-			};
+			await updateBookmarkRepo(id, safeUpdates);
+			return ok(true);
 		} catch (error) {
 			console.error(error);
-			return {
-				success: false,
-				error: "Failed to update bookmark",
-			};
+			return err("Failed to update bookmark");
 		}
 	});
 
@@ -238,29 +208,14 @@ export const getUserBookmarks = createServerFn({
 	method: "GET",
 })
 	.inputValidator((data: { year: number; userId: string }) => data)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Bookmark[]> => {
 		const { year, userId } = ctx.data;
 
 		if (!userId) {
 			throw new Error("User ID is required");
 		}
 
-		const rawUserId = String(userId);
-		const normalizedUserId = rawUserId.trim().replace(/^@/, "");
-		const normalizedUserIdLower = normalizedUserId.toLowerCase();
-
-		const conditions = [
-			eq(sql`lower(${userTable.github_username})`, normalizedUserIdLower),
-			eq(sql`lower(${userTable.gitlab_username})`, normalizedUserIdLower),
-			eq(sql`lower(${userTable.discord_username})`, normalizedUserIdLower),
-			eq(sql`lower(${userTable.mastodon_username})`, normalizedUserIdLower),
-			eq(sql`lower(${userTable.mastodon_acct})`, normalizedUserIdLower),
-		];
-
-		const user = await db.query.user.findFirst({
-			where: or(...conditions),
-		});
-
+		const user = await findUserByUsername(userId);
 		if (!user) {
 			throw new Error("User not found");
 		}
@@ -269,52 +224,31 @@ export const getUserBookmarks = createServerFn({
 			throw new Error("User has private bookmarks");
 		}
 
-		const bookmarks = await db
-			.select()
-			.from(bookmarkTable)
-			.where(
-				and(eq(bookmarkTable.user_id, user.id), eq(bookmarkTable.year, Number(year)))
-			);
-
-		return bookmarks;
+		return findBookmarksByUserAndYear(user.id, Number(year));
 	});
 
 export const deleteBookmark = createServerFn({
 	method: "POST",
 })
 	.inputValidator((data: { id: string }) => data)
-	.handler(async (ctx) => {
+	.handler(async (ctx): Promise<Result<boolean> | null> => {
 		const { id } = ctx.data;
 
-		const { user } = await getFullAuthSession();
-
+		const user = await getAuthUser();
 		if (!user) {
 			return null;
 		}
 
-		const existingBookmark = await db.query.bookmark.findFirst({
-			where: and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, user.id)),
-		});
-
+		const existingBookmark = await findBookmarkById(id, user.id);
 		if (!existingBookmark) {
-			return {
-				success: false,
-				statusCode: 404,
-				error: "Bookmark not found",
-			};
+			return err("Bookmark not found", 404);
 		}
 
 		try {
-			await db.delete(bookmarkTable).where(eq(bookmarkTable.id, id));
-
-			return {
-				success: true,
-			};
+			await deleteBookmarkRepo(id);
+			return ok(true);
 		} catch (error) {
 			console.error(error);
-			return {
-				success: false,
-				error: "Failed to delete bookmark",
-			};
+			return err("Failed to delete bookmark");
 		}
 	});

@@ -115,8 +115,8 @@ describe("useMutateBookmark", () => {
 		removeFromSyncQueueMock.mockClear();
 		serverCreateBookmarkMock.mockReset();
 		serverUpdateBookmarkMock.mockReset();
-		serverCreateBookmarkMock.mockResolvedValue({ success: true });
-		serverUpdateBookmarkMock.mockResolvedValue({ success: true });
+		serverCreateBookmarkMock.mockResolvedValue({ success: true, data: true });
+		serverUpdateBookmarkMock.mockResolvedValue({ success: true, data: true });
 		// @ts-ignore - test
 		useAuthMock.mockReturnValue({ user: { id: "user-1" } });
 	});

@@ -15,6 +15,7 @@ import { env } from "cloudflare:workers";
 import { Mastodon } from "~/server/lib/mastodon-arctic";
 import { createStandardDate } from "~/lib/dateTime";
 import { CacheManager } from "~/server/cache";
+import { CacheKeys } from "~/server/lib/cache-keys";
 import { db } from "~/server/db";
 import {
 	session as sessionTable,
@@ -55,7 +56,7 @@ export async function validateSessionToken(token: string) {
 	const sessionId = token;
 	const now = Date.now();
 
-	const cachedSession = await cache.get(`session_${sessionId}`);
+	const cachedSession = await cache.get(CacheKeys.session(sessionId));
 	if (cachedSession) {
 		return cachedSession;
 	}
@@ -83,7 +84,7 @@ export async function validateSessionToken(token: string) {
 
 	if (now >= expiresAt) {
 		await Promise.all([
-			cache.invalidate(`session_${sessionId}`),
+			cache.invalidate(CacheKeys.session(sessionId)),
 			db.delete(sessionTable).where(eq(sessionTable.id, sessionId)),
 		]);
 		return { session: null, user: null };
@@ -102,7 +103,7 @@ export async function validateSessionToken(token: string) {
 			session.last_extended_at = newLastExtendedAt;
 
 			await Promise.all([
-				cache.set(`session_${sessionId}`, { session, user }, TTL),
+				cache.set(CacheKeys.session(sessionId), { session, user }, TTL),
 				db
 					.update(sessionTable)
 					.set({
@@ -115,7 +116,7 @@ export async function validateSessionToken(token: string) {
 	}
 
 	const result = { session, user };
-	await cache.set(`session_${sessionId}`, result, TTL);
+	await cache.set(CacheKeys.session(sessionId), result, TTL);
 	return result;
 }
 
@@ -125,7 +126,7 @@ export type SessionUser = NonNullable<
 
 export async function invalidateSession(sessionId: string): Promise<void> {
 	await Promise.all([
-		cache.invalidate(`session_${sessionId}`),
+		cache.invalidate(CacheKeys.session(sessionId)),
 		db.delete(sessionTable).where(eq(sessionTable.id, sessionId)),
 	]);
 }
@@ -313,7 +314,7 @@ export async function upgradeGuestToGithub(
 		.where(eq(sessionTable.user_id, userId));
 
 	await Promise.all(
-		sessions.map((session) => cache.invalidate(`session_${session.id}`)),
+		sessions.map((session) => cache.invalidate(CacheKeys.session(session.id))),
 	);
 
 	return updatedUser;
