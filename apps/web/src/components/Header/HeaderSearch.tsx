@@ -89,8 +89,9 @@ export function HeaderSearch({ year }: HeaderSearchProps) {
         type="button"
         aria-label={isMobileOpen ? "Close search" : "Open search"}
         className={cn(
-          "lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md border bg-background",
+          "lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-md",
           "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+          "-mr-2",
         )}
         onClick={() => {
           if (isMobileOpen) {
@@ -102,8 +103,8 @@ export function HeaderSearch({ year }: HeaderSearchProps) {
           setIsMobileOpen(true);
         }}
       >
-        <Icons.search className={cn("h-4 w-4", isMobileOpen && "hidden")} />
-        <Icons.close className={cn("h-4 w-4", !isMobileOpen && "hidden")} />
+        <Icons.search className={cn("h-5 w-5", isMobileOpen && "hidden")} />
+        <Icons.close className={cn("h-5 w-5", !isMobileOpen && "hidden")} />
         <span className="sr-only">Search</span>
       </button>
     </div>

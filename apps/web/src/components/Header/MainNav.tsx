@@ -33,7 +33,7 @@ export function MainNav({ title, items }: MainNavProps) {
   }, [locationKey]);
 
   return (
-    <div className="flex items-center gap-4 md:gap-6 lg:gap-10 shrink-0">
+    <div className="flex items-center gap-2 lg:gap-10 shrink-0">
       <input
         type="checkbox"
         id="mobile-menu-toggle"
@@ -45,13 +45,13 @@ export function MainNav({ title, items }: MainNavProps) {
       <label
         htmlFor="mobile-menu-toggle"
         className={cn(
-          "lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md border bg-background",
+          "lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-md",
           "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
-          "shrink-0 cursor-pointer",
+          "-ml-2 shrink-0 cursor-pointer",
         )}
       >
-        <Icons.list className="h-4 w-4 peer-checked/menu:hidden" />
-        <Icons.close className="hidden h-4 w-4 peer-checked/menu:inline" />
+        <Icons.list className="h-5 w-5 peer-checked/menu:hidden" />
+        <Icons.close className="hidden h-5 w-5 peer-checked/menu:inline" />
         <span className="sr-only">Menu</span>
       </label>
       <Link
@@ -59,10 +59,10 @@ export function MainNav({ title, items }: MainNavProps) {
         search={(prev: Record<string, unknown>) => ({
           year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
         })}
-        className="items-center space-x-2 flex logo-link shrink-0"
+        className="flex items-center gap-2 logo-link shrink-0"
       >
         <Icons.logo className="h-7 w-7" width="28" height="28" />
-        <span className="font-bold">{title}</span>
+        <span className="font-bold leading-none">{title}</span>
       </Link>
       {items?.length ? (
         <nav className="hidden gap-2 lg:flex shrink-0" aria-label="Primary">
