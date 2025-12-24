@@ -78,7 +78,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 			},
 		],
 		links: [
+			{ rel: "preload", as: "style", href: appCss },
 			{ rel: "stylesheet", href: appCss },
+			{
+				rel: "preconnect",
+				href: "https://images.s3rve.co.uk",
+				crossOrigin: "anonymous",
+			},
+			{ rel: "dns-prefetch", href: "https://images.s3rve.co.uk" },
 			{ rel: "manifest", href: "/manifest.webmanifest" },
 			{ rel: "icon", href: "/favicon.ico" },
 			{ rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
@@ -112,7 +119,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
-				<HeadContent />
 				<ScriptOnce>
 					{`(() => {
             const root = document.documentElement;
@@ -123,6 +129,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
             root.classList.add('js-enabled');
           })();`}
 				</ScriptOnce>
+				<HeadContent />
 			</head>
 			<body
 				className={cn(
