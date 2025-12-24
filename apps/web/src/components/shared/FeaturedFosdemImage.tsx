@@ -14,7 +14,10 @@ type FeaturedFosdemImageProps = {
 	displayCaption?: boolean;
 	loading?: "lazy" | "eager";
 	className?: string;
-};
+} & Omit<
+	React.ComponentProps<typeof Image>,
+	"src" | "alt" | "width" | "height" | "loading" | "className"
+>;
 
 export function FeaturedFosdemImage({
 	type,
@@ -24,7 +27,7 @@ export function FeaturedFosdemImage({
 	loading = "lazy",
 	className,
 	...props
-}: FeaturedFosdemImageProps & React.HTMLAttributes<HTMLImageElement>) {
+}: FeaturedFosdemImageProps) {
 	const [isHovered, setIsHovered] = useState(false);
 	const imageDetails = fosdemImageDetails[type];
 

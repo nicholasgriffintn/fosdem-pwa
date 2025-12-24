@@ -23,6 +23,7 @@ import { constants } from "~/constants";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
 import { SectionStack } from "~/components/shared/SectionStack";
+import { buildBookmarksLink } from "~/lib/link-builder";
 
 export const Route = createFileRoute("/offline/")({
 	component: OfflinePage,
@@ -221,12 +222,7 @@ function OfflinePage() {
 								</CardDescription>
 							</div>
 							<Button asChild variant="outline" size="sm">
-								<Link
-									to="/bookmarks"
-									search={{ year, day: undefined, view: undefined }}
-								>
-									View all bookmarks
-								</Link>
+								<Link {...buildBookmarksLink()}>View all bookmarks</Link>
 							</Button>
 						</div>
 					</CardHeader>
