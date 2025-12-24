@@ -11,6 +11,11 @@ import { buildHomeLink } from "~/lib/link-builder";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
 import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
+import { NotFound } from "~/components/shared/NotFound";
+import { getAllData } from "~/server/functions/fosdem";
+import { getUserBookmarks } from "~/server/functions/bookmarks";
+import { getUserDetails } from "~/server/functions/user";
+import { useIsClient } from "~/hooks/use-is-client";
 
 export const Route = createFileRoute("/profile/$userId/")({
   component: ProfilePage,
@@ -22,38 +27,97 @@ export const Route = createFileRoute("/profile/$userId/")({
      })
     ],
   }),
-  validateSearch: ({ year }: { year: number }) => ({
-    year: (constants.AVAILABLE_YEARS.includes(year) && year) || constants.DEFAULT_YEAR,
-  }),
-  loaderDeps: ({ search: { year } }) => ({ year }),
-  loader: async ({ deps: { year } }) => {
+  validateSearch: ({
+    year,
+    tab,
+  }: {
+    year: number;
+    tab?: "events" | "tracks" | "all";
+  }) => {
+    const normalizedYear =
+      (constants.AVAILABLE_YEARS.includes(year) && year) || constants.DEFAULT_YEAR;
+    const normalizedTab =
+      tab && ["events", "tracks", "all"].includes(tab) ? tab : undefined;
+
     return {
-      year,
+      year: normalizedYear,
+      ...(normalizedTab ? { tab: normalizedTab } : {}),
     };
+  },
+  loaderDeps: ({ search: { year, tab } }) => ({ year, tab }),
+  loader: async ({ params, deps: { year } }) => {
+    const userId = params.userId;
+    const fosdemData = await getAllData({ data: { year } });
+
+    try {
+      const user = await getUserDetails({ data: { userId } });
+      const serverBookmarks = user?.bookmarks_visibility === "public"
+        ? await getUserBookmarks({ data: { year, userId } })
+        : [];
+
+      return {
+        year,
+        fosdemData,
+        user,
+        serverBookmarks,
+        notFound: false,
+      };
+    } catch {
+      return {
+        year,
+        fosdemData,
+        user: null,
+        serverBookmarks: [],
+        notFound: true,
+      };
+    }
   },
 });
 
 function ProfilePage() {
-  const { year } = Route.useLoaderData();
+  const { year, fosdemData: serverFosdemData, user: serverUser, serverBookmarks, notFound } =
+    Route.useLoaderData();
+  const { tab: tabRaw } = Route.useSearch();
+  const tab = tabRaw ?? "events";
 
-  const { user, loading } = useUserId({
-    userId: Route.useParams().userId,
+  const routeUserId = Route.useParams().userId;
+
+  const { user, loading, error } = useUserId({
+    userId: routeUserId,
   });
 
+  const shouldLoadBookmarks = Boolean(user) && user?.bookmarks_visibility === "public";
   const { bookmarks, loading: bookmarksLoading } = useUserBookmarks({
     year,
-    userId: Route.useParams().userId,
+    userId: routeUserId,
+    enabled: shouldLoadBookmarks,
   });
 
   const { fosdemData } = useFosdemData({ year });
+  const isClient = useIsClient();
+  const hasServerSnapshot = Boolean(serverFosdemData);
+  const useServerSnapshot =
+    !isClient || loading || bookmarksLoading || !fosdemData || !bookmarks;
+  const resolvedUser = useServerSnapshot ? serverUser : user;
+  const resolvedBookmarks = useServerSnapshot ? serverBookmarks : bookmarks;
+  const resolvedBookmarksLoading = useServerSnapshot ? false : bookmarksLoading;
+  const resolvedFosdemData = useServerSnapshot ? serverFosdemData : fosdemData;
 
-  if (loading) {
+  if (notFound) {
+    return <NotFound />;
+  }
+
+  if (isClient && loading && !hasServerSnapshot) {
     return (
       <RouteLoadingState message="Loading profile..." />
     );
   }
 
-  if (!user) {
+  if (error) {
+    return <NotFound />;
+  }
+
+  if (!resolvedUser) {
     return <Navigate {...buildHomeLink()} />;
   }
 
@@ -63,18 +127,19 @@ function ProfilePage() {
       <div className="space-y-8">
         <div className="flex flex-col lg:flex-row items-start gap-8">
           <div className="w-full lg:w-auto lg:max-w-md">
-            <ConferenceBadge user={user} conferenceYear={year} />
+            <ConferenceBadge user={resolvedUser} conferenceYear={year} />
           </div>
 
-          {user.bookmarks_visibility === "public" ? (
+          {resolvedUser.bookmarks_visibility === "public" ? (
             <div className="w-full lg:flex-1 space-y-8">
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-foreground">Shared Bookmarks</h2>
                 <BookmarksList
-                  bookmarks={bookmarks}
-                  fosdemData={fosdemData}
+                  bookmarks={resolvedBookmarks}
+                  fosdemData={resolvedFosdemData}
                   year={year}
-                  loading={bookmarksLoading}
+                  loading={resolvedBookmarksLoading}
+                  tab={tab}
                   showConflicts={true}
                   defaultViewMode="schedule"
                   showViewMode={false}

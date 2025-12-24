@@ -8,8 +8,9 @@ import { getUserDetails } from "~/server/functions/user";
 export function useUserId({ userId }: { userId: string }) {
 	const getUserDetailsFromServer = useServerFn(getUserDetails);
 
-	const { data: user, isLoading } = useQuery({
+	const { data: user, isLoading, isError } = useQuery({
 		queryKey: ["profile", userId],
+		retry: false,
 		queryFn: async () => {
 			const user = await getUserDetailsFromServer({ data: { userId } });
 
@@ -24,5 +25,6 @@ export function useUserId({ userId }: { userId: string }) {
 	return {
 		user,
 		loading: isLoading,
+		error: isError,
 	};
 }

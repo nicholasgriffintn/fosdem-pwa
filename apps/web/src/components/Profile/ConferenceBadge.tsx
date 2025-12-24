@@ -19,6 +19,42 @@ type ConferenceBadgeProps = {
 	conferenceYear: number;
 };
 
+function hashStringToInt(input: string) {
+	let hash = 2166136261;
+	for (let i = 0; i < input.length; i++) {
+		hash ^= input.charCodeAt(i);
+		hash = Math.imul(hash, 16777619);
+	}
+	return hash >>> 0;
+}
+
+function getInitials(name: string) {
+	const parts = name
+		.trim()
+		.split(/\s+/)
+		.filter(Boolean);
+	if (parts.length === 0) return "?";
+	const first = parts[0]?.[0] ?? "?";
+	const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
+	return `${first}${last}`.toUpperCase();
+}
+
+function normalizeSiteUrl(site: string) {
+	if (/^https?:\/\//i.test(site)) return site;
+	return `https://${site}`;
+}
+
+function getPublicProfileId(user: User) {
+	return (
+		user.github_username ||
+		user.gitlab_username ||
+		user.discord_username ||
+		user.mastodon_acct ||
+		user.mastodon_username ||
+		null
+	);
+}
+
 export function ConferenceBadge({
 	user,
 	conferenceYear,
@@ -27,11 +63,55 @@ export function ConferenceBadge({
 		return null;
 	}
 
+	const publicProfileId = getPublicProfileId(user);
+	const displayName =
+		user.name ||
+		publicProfileId ||
+		user.email?.split("@")[0] ||
+		"Anonymous";
+	const avatarAlt = user.name || displayName;
+	const avatarFallback = getInitials(displayName);
+
+	const profileUrl = publicProfileId
+		? `https://fosdempwa.com/profile/${publicProfileId}`
+		: null;
+
+	const seed = `${user.id}_${conferenceYear}`;
+	const hash = hashStringToInt(seed);
+	const themes = [
+		{ header: "#9B3493", accent: "#9B3493", pattern: "rgba(255,255,255,0.12)" },
+		{ header: "#2563EB", accent: "#2563EB", pattern: "rgba(255,255,255,0.14)" },
+		{ header: "#16A34A", accent: "#16A34A", pattern: "rgba(255,255,255,0.12)" },
+		{ header: "#EA580C", accent: "#EA580C", pattern: "rgba(255,255,255,0.14)" },
+		{ header: "#0F766E", accent: "#0F766E", pattern: "rgba(255,255,255,0.12)" },
+	] as const;
+	const theme = themes[hash % themes.length];
+	const patternVariant = (hash >>> 3) % 3;
+	const badgeNumber = (hash % 9000) + 1000;
+
 	return (
 		<Card className="w-full max-w-md mx-auto overflow-hidden">
-			<div className="bg-[#9B3493] p-6 text-white">
+			<div
+				className="relative p-6 text-white"
+				style={{ backgroundColor: theme.header }}
+			>
+				<div
+					className="pointer-events-none absolute inset-0"
+					style={{
+						backgroundImage:
+							patternVariant === 0
+								? `repeating-linear-gradient(135deg, ${theme.pattern} 0 8px, transparent 8px 16px)`
+								: patternVariant === 1
+									? `radial-gradient(circle at 20% 20%, ${theme.pattern} 0 2px, transparent 2px 14px), radial-gradient(circle at 80% 30%, ${theme.pattern} 0 2px, transparent 2px 16px), radial-gradient(circle at 40% 80%, ${theme.pattern} 0 2px, transparent 2px 18px)`
+									: `linear-gradient(90deg, ${theme.pattern} 0 1px, transparent 1px 18px), linear-gradient(0deg, ${theme.pattern} 0 1px, transparent 1px 18px)`,
+						opacity: 0.9,
+					}}
+				/>
 				<div className="flex items-center justify-between">
-					<h1 className="text-2xl font-bold">FOSDEM {conferenceYear}</h1>
+					<div className="flex flex-col">
+						<h1 className="text-2xl font-bold">FOSDEM {conferenceYear}</h1>
+						<p className="text-xs/5 text-white/80">Badge #{badgeNumber}</p>
+					</div>
 					<div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
 						<div className="w-10 h-10 b-white rounded">
 							<Icons.logo className="w-full h-full" />
@@ -42,19 +122,18 @@ export function ConferenceBadge({
 
 			<div className="p-6">
 				<div className="flex items-start gap-4">
-					{user.avatar_url && (
-						<Avatar className="w-24 h-24 border-4 border-[#9B3493]">
-							{user.name && (
-								<>
-									<AvatarImage src={user.avatar_url} alt={user.name || ""} />
-									<AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
-								</>
-							)}
-						</Avatar>
-					)}
+					<Avatar
+						className="w-24 h-24 border-4"
+						style={{ borderColor: theme.accent }}
+					>
+						{user.avatar_url ? (
+							<AvatarImage src={user.avatar_url} alt={avatarAlt} />
+						) : null}
+						<AvatarFallback>{avatarFallback}</AvatarFallback>
+					</Avatar>
 					<div className="flex-1">
-						<h2 className="text-2xl font-bold text-foreground">{user.name}</h2>
-						<p className="text-muted-foreground">{user.email}</p>
+						<h2 className="text-2xl font-bold text-foreground">{displayName}</h2>
+						{user.email && <p className="text-muted-foreground">{user.email}</p>}
 						{user.bio && (
 							<p className="mt-2 text-sm text-muted-foreground line-clamp-2">
 								{user.bio}
@@ -80,10 +159,11 @@ export function ConferenceBadge({
 						<div className="flex items-center gap-2 text-sm">
 							<Icons.globe className="w-4 h-4 text-muted-foreground" />
 							<a
-								href={user.site}
+								href={normalizeSiteUrl(user.site)}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-[#9B3493] hover:underline"
+								className="hover:underline"
+								style={{ color: theme.accent }}
 							>
 								{user.site.replace(/https?:\/\//, "")}
 							</a>
@@ -92,6 +172,12 @@ export function ConferenceBadge({
 				</div>
 
 				<div className="mt-6 flex flex-wrap gap-2">
+					{user.discord_username && (
+						<Badge variant="secondary" className="flex items-center gap-1">
+							<Icons.discord className="w-3 h-3" />
+							<span className="text-white">{user.discord_username}</span>
+						</Badge>
+					)}
 					{user.github_username && (
 						<Badge variant="secondary" className="flex items-center gap-1">
 							<Icons.gitHub className="w-3 h-3" />
@@ -103,6 +189,38 @@ export function ConferenceBadge({
 							>
 								{user.github_username}
 							</a>
+						</Badge>
+					)}
+					{user.gitlab_username && (
+						<Badge variant="secondary" className="flex items-center gap-1">
+							<Icons.gitlab className="w-3 h-3" />
+							<a
+								href={`https://gitlab.com/${user.gitlab_username}`}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-white no-underline hover:underline"
+							>
+								{user.gitlab_username}
+							</a>
+						</Badge>
+					)}
+					{(user.mastodon_acct || user.mastodon_username) && (
+						<Badge variant="secondary" className="flex items-center gap-1">
+							<Icons.mastodon className="w-3 h-3" />
+							{user.mastodon_url ? (
+								<a
+									href={user.mastodon_url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-white no-underline hover:underline"
+								>
+									{user.mastodon_acct || user.mastodon_username}
+								</a>
+							) : (
+								<span className="text-white">
+									{user.mastodon_acct || user.mastodon_username}
+								</span>
+							)}
 						</Badge>
 					)}
 					{user.twitter_username && (
@@ -120,18 +238,24 @@ export function ConferenceBadge({
 					)}
 				</div>
 
-				{user.github_username && (
-					<div className="mt-6 flex justify-center">
-						<div className="p-3 bg-white rounded-lg">
-							<Suspense fallback={null}>
-								<QRCodeSVG
-									value={`https://fosdempwa.com/profile/${user.github_username}`}
-									size={100}
-									level="L"
-								/>
-							</Suspense>
+				{profileUrl && (
+					<>
+						<div className="mt-6 flex justify-center">
+							<div className="p-3 bg-white rounded-lg">
+								<Suspense fallback={null}>
+									<QRCodeSVG value={profileUrl} size={100} level="L" />
+								</Suspense>
+							</div>
 						</div>
-					</div>
+						<div className="mt-3 flex flex-col items-center gap-2">
+							<a
+								href={profileUrl}
+								className="text-xs text-muted-foreground hover:underline break-all text-center"
+							>
+								{profileUrl}
+							</a>
+						</div>
+					</>
 				)}
 			</div>
 

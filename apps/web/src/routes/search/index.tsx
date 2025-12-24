@@ -1,6 +1,7 @@
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import type { FuseResult } from "fuse.js";
 
 import { PageHeader } from "~/components/shared/PageHeader";
 import { EventList } from "~/components/Event/EventList";
@@ -34,6 +35,12 @@ import { cn } from "~/lib/utils";
 import { getAllData } from "~/server/functions/fosdem";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
+
+type ScoredResult<TItem, TType extends string> = {
+	type: TType;
+	item: TItem;
+	score: number;
+};
 
 export const Route = createFileRoute("/search/")({
 	component: SearchPage,
@@ -163,8 +170,9 @@ export default function SearchPage() {
 				roomsWithScores: [],
 			};
 
-		const tracksWithScores = fuseIndexes.tracks
-			.search(query)
+		const trackResults =
+			fuseIndexes.tracks.search(query) as Array<FuseResult<Track>>;
+		const tracksWithScores: Array<ScoredResult<Track, "track">> = trackResults
 			.slice(0, 10)
 			.map((result) => ({
 				type: "track" as const,
@@ -172,8 +180,9 @@ export default function SearchPage() {
 				score: result.score ?? 1,
 			}));
 
-		const eventsWithScores = fuseIndexes.events
-			.search(query)
+		const eventResults =
+			fuseIndexes.events.search(query) as Array<FuseResult<Event>>;
+		const eventsWithScores: Array<ScoredResult<Event, "event">> = eventResults
 			.slice(0, 20)
 			.map((result) => ({
 				type: "event" as const,
@@ -182,8 +191,9 @@ export default function SearchPage() {
 			}))
 			.sort((a, b) => a.score - b.score);
 
-		const roomsWithScores = fuseIndexes.rooms
-			.search(query)
+		const roomResults =
+			fuseIndexes.rooms.search(query) as Array<FuseResult<RoomData>>;
+		const roomsWithScores: Array<ScoredResult<RoomData, "room">> = roomResults
 			.slice(0, 10)
 			.map((result) => ({
 				type: "room" as const,
@@ -431,28 +441,28 @@ export default function SearchPage() {
 					<div
 						className="flex flex-wrap items-end gap-4 mt-3"
 					>
-					<div className="flex flex-col gap-1 min-w-[180px]">
-						<Label htmlFor="track-filter">Track</Label>
-						<Select
-							id="track-filter"
-							name="track"
-							value={selectedTrack || "all"}
-							onValueChange={handleTrackChange}
-							disabled={!fosdemData}
-							options={trackSelectOptions}
+						<div className="flex flex-col gap-1 min-w-[180px]">
+							<Label htmlFor="track-filter">Track</Label>
+							<Select
+								id="track-filter"
+								name="track"
+								value={selectedTrack || "all"}
+								onValueChange={handleTrackChange}
+								disabled={!fosdemData}
+								options={trackSelectOptions}
 								className="min-w-[180px] mt-2"
-						/>
-					</div>
+							/>
+						</div>
 
-					<div className="flex flex-col gap-1 min-w-[160px]">
-						<Label htmlFor="time-filter">Time slot</Label>
-						<Select
-							id="time-filter"
-							name="time"
-							value={selectedTime || "all"}
-							onValueChange={handleTimeChange}
-							disabled={!fosdemData}
-							options={timeSelectOptions}
+						<div className="flex flex-col gap-1 min-w-[160px]">
+							<Label htmlFor="time-filter">Time slot</Label>
+							<Select
+								id="time-filter"
+								name="time"
+								value={selectedTime || "all"}
+								onValueChange={handleTimeChange}
+								disabled={!fosdemData}
+								options={timeSelectOptions}
 								className="min-w-[160px] h-10 mt-2"
 							/>
 						</div>
@@ -484,17 +494,17 @@ export default function SearchPage() {
 								to="."
 								search={(prev) => ({ ...prev, type: filter.value })}
 								className={cn(
-											"inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md px-4 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-											"no-underline",
-											selectedType === filter.value
-												? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-												: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-										)}
-										aria-current={selectedType === filter.value ? "page" : undefined}
-									>
-										{filter.label}
-									</Link>
-								))}
+									"inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md px-4 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+									"no-underline",
+									selectedType === filter.value
+										? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+										: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+								)}
+								aria-current={selectedType === filter.value ? "page" : undefined}
+							>
+								{filter.label}
+							</Link>
+						))}
 					</div>
 				</div>
 			</div>
@@ -515,8 +525,8 @@ export default function SearchPage() {
 					description="No results match this search with the selected filters. Try adjusting your search or clearing filters."
 				/>
 			) : (
-							<SectionStack>
-								{visibleSections.map((section) => section.component())}
+				<SectionStack>
+					{visibleSections.map((section) => section.component())}
 				</SectionStack>
 			)}
 		</PageShell>

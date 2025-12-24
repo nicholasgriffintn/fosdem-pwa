@@ -93,3 +93,13 @@ export function buildBookmarksLink(options: LinkBuilderOptions = {}) {
     },
   };
 }
+
+export function buildProfileLink(options: LinkBuilderOptions = {}) {
+  return {
+    to: "/profile",
+    search: {
+      year: options.year || constants.DEFAULT_YEAR,
+      tab: "events" as const,
+    },
+  };
+}
