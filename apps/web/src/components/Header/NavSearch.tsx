@@ -147,33 +147,36 @@ export function NavSearch({
     [tracksIndex, eventsIndex, roomsIndex, ensureFuseLoaded]
   );
 
-  const handleResultClick = (result: SearchResult) => {
-    switch (result.type) {
-      case "track":
-        navigate(
-          buildTrackLink(result.item.id, {
-            year,
-            view: "list",
-            sortFavourites: "false",
-          })
-        );
-        break;
-      case "event":
-        navigate(buildEventLink(result.item.id, { year }));
-        break;
-      case "room":
-        navigate(
-          buildRoomLink(result.item.slug || result.item.id, {
-            year,
-            sortFavourites: "false",
-          })
-        );
-        break;
-    }
-    setSearchResults([]);
-    setInputValue("");
-    setFocusedIndex(-1);
-  };
+  const handleResultClick = useCallback(
+    (result: SearchResult) => {
+      switch (result.type) {
+        case "track":
+          navigate(
+            buildTrackLink(result.item.id, {
+              year,
+              view: "list",
+              sortFavourites: "false",
+            })
+          );
+          break;
+        case "event":
+          navigate(buildEventLink(result.item.id, { year }));
+          break;
+        case "room":
+          navigate(
+            buildRoomLink(result.item.slug || result.item.id, {
+              year,
+              sortFavourites: "false",
+            })
+          );
+          break;
+      }
+      setSearchResults([]);
+      setInputValue("");
+      setFocusedIndex(-1);
+    },
+    [navigate, year]
+  );
 
   const goToSearchPage = useCallback(
     (query: string) => {
@@ -190,69 +193,72 @@ export function NavSearch({
     [navigate, year]
   );
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!searchResults.length) {
-      if (e.key === "Enter" && inputValue.trim()) {
-        e.preventDefault();
-        setFocusedIndex(-1);
-        goToSearchPage(inputValue);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!searchResults.length) {
+        if (e.key === "Enter" && inputValue.trim()) {
+          e.preventDefault();
+          setFocusedIndex(-1);
+          goToSearchPage(inputValue);
+          return;
+        }
         return;
       }
-      return;
-    }
 
-    if (e.currentTarget === searchInputRef.current && e.key === "ArrowDown") {
-      e.preventDefault();
-      setFocusedIndex(0);
-      resultsRef.current[0]?.focus();
-      return;
-    }
+      if (e.currentTarget === searchInputRef.current && e.key === "ArrowDown") {
+        e.preventDefault();
+        setFocusedIndex(0);
+        resultsRef.current[0]?.focus();
+        return;
+      }
 
-    if (focusedIndex === 0 && e.key === "ArrowUp") {
-      e.preventDefault();
-      setFocusedIndex(-1);
-      searchInputRef.current?.focus();
-      return;
-    }
-
-    switch (e.key) {
-      case "ArrowDown":
+      if (focusedIndex === 0 && e.key === "ArrowUp") {
         e.preventDefault();
-        setFocusedIndex((prev) => {
-          const next = prev + 1 >= searchResults.length ? 0 : prev + 1;
-          resultsRef.current[next]?.focus();
-          return next;
-        });
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setFocusedIndex((prev) => {
-          const next = prev - 1 < 0 ? searchResults.length - 1 : prev - 1;
-          resultsRef.current[next]?.focus();
-          return next;
-        });
-        break;
-      case "Escape":
-        e.preventDefault();
-        setSearchResults([]);
         setFocusedIndex(-1);
-        searchInputRef.current?.blur();
-        break;
-      case "Enter":
-        if (focusedIndex >= 0 && focusedIndex < searchResults.length) {
+        searchInputRef.current?.focus();
+        return;
+      }
+
+      switch (e.key) {
+        case "ArrowDown":
           e.preventDefault();
-          handleResultClick(searchResults[focusedIndex]);
-        } else if (inputValue.trim()) {
+          setFocusedIndex((prev) => {
+            const next = prev + 1 >= searchResults.length ? 0 : prev + 1;
+            resultsRef.current[next]?.focus();
+            return next;
+          });
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setFocusedIndex((prev) => {
+            const next = prev - 1 < 0 ? searchResults.length - 1 : prev - 1;
+            resultsRef.current[next]?.focus();
+            return next;
+          });
+          break;
+        case "Escape":
           e.preventDefault();
           setSearchResults([]);
           setFocusedIndex(-1);
-          goToSearchPage(inputValue);
-        }
-        break;
-    }
-  };
+          searchInputRef.current?.blur();
+          break;
+        case "Enter":
+          if (focusedIndex >= 0 && focusedIndex < searchResults.length) {
+            e.preventDefault();
+            handleResultClick(searchResults[focusedIndex]);
+          } else if (inputValue.trim()) {
+            e.preventDefault();
+            setSearchResults([]);
+            setFocusedIndex(-1);
+            goToSearchPage(inputValue);
+          }
+          break;
+      }
+    },
+    [searchResults, inputValue, focusedIndex, goToSearchPage, handleResultClick]
+  );
 
-  const renderSearchResult = (result: SearchResult, index: number) => {
+  const renderSearchResult = useCallback((result: SearchResult, index: number) => {
     const setRef = (el: HTMLButtonElement | null) => {
       resultsRef.current[index] = el;
     };
@@ -347,7 +353,7 @@ export function NavSearch({
           </button>
         );
     }
-  };
+  }, [focusedIndex, handleResultClick, handleKeyDown]);
 
   return (
     <div ref={containerRef} className={cn("relative w-full", className)}>

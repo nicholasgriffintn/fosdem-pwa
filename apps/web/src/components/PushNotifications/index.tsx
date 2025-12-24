@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
@@ -60,7 +60,7 @@ export function PushNotifications() {
 		};
 	}, [pushSupported]);
 
-	const handleSubscribe = async () => {
+	const handleSubscribe = useCallback(async () => {
 		if (!pushSupported) {
 			toast({
 				title: "Notifications unsupported",
@@ -146,9 +146,9 @@ export function PushNotifications() {
 				variant: "destructive",
 			});
 		}
-	};
+	}, [pushSupported, subscriptions, createSubscription]);
 
-	const handleUnsubscribe = async (
+	const handleUnsubscribe = useCallback(async (
 		subscriptionId: number,
 		endpoint: string,
 	) => {
@@ -180,7 +180,7 @@ export function PushNotifications() {
 				variant: "destructive",
 			});
 		}
-	};
+	}, [pushSupported, currentEndpoint, deleteSubscription]);
 
 	return (
 		<div className="space-y-4">
