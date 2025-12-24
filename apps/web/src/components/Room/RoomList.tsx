@@ -4,6 +4,7 @@ import type { RoomData } from "~/types/fosdem";
 import { sortRooms } from "~/lib/sorting";
 import { constants } from "~/constants";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
+import { ListContainer } from "~/components/shared/ListContainer";
 
 type RoomListProps = {
 	rooms: RoomData[];
@@ -92,7 +93,7 @@ export function RoomList({
 										({buildingRooms.length} rooms)
 									</span>
 								</div>
-								<ul className="room-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
+								<ListContainer className="room-list">
 									{buildingRooms.map((room, index) => (
 										<li key={room.slug}>
 											<RoomListItem
@@ -103,7 +104,7 @@ export function RoomList({
 											/>
 										</li>
 									))}
-								</ul>
+								</ListContainer>
 							</div>
 						);
 					})}
@@ -122,7 +123,7 @@ export function RoomList({
 				</div>
 			)}
 			{sortedRooms?.length > 0 ? (
-				<ul className="room-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
+				<ListContainer className="room-list">
 					{sortedRooms.map((room, index) => (
 						<li key={room.slug}>
 							<RoomListItem
@@ -133,7 +134,7 @@ export function RoomList({
 							/>
 						</li>
 					))}
-				</ul>
+				</ListContainer>
 			) : (
 					<EmptyStateCard
 						title="No rooms found"

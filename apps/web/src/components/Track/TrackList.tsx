@@ -8,6 +8,7 @@ import { Icons } from "~/components/shared/Icons";
 import { Link } from "@tanstack/react-router";
 import { buildTrackLink } from "~/lib/link-builder";
 import { ItemListContainer } from "~/components/shared/ItemListContainer";
+import { ListContainer } from "~/components/shared/ListContainer";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -159,7 +160,7 @@ function TrackListContent({
 	return (
 		<>
 			{sortedTracks?.length > 0 ? (
-				<ul className="track-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
+				<ListContainer className="track-list">
 					{sortedTracks.map((track) => (
 						<li key={track.id}>
 							<TrackListItem
@@ -171,7 +172,7 @@ function TrackListContent({
 							/>
 						</li>
 					))}
-				</ul>
+				</ListContainer>
 			) : (
 					<EmptyStateCard
 						title="No tracks to show"
