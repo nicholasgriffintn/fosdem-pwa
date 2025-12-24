@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 import { LoadingState } from "~/components/shared/LoadingState";
 import { EventList } from "~/components/Event/EventList";
 import { TrackList } from "~/components/Track/TrackList";
@@ -10,6 +12,7 @@ import type { LocalBookmark } from "~/lib/localStorage";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { doesEventMatchTrack } from "~/lib/tracks";
 import { isEvent, isTrack } from "~/lib/type-guards";
+import { cn } from "~/lib/utils";
 
 type BookmarkListItem = (Bookmark | LocalBookmark) & { serverId?: string };
 
@@ -25,10 +28,7 @@ function organizeBookmarks(bookmarks: BookmarkListItem[]) {
 
 			if (bookmark.type === "bookmark_event" || bookmark.type === "event") {
 				acc[bookmark.year].events.push(bookmark);
-			} else if (
-				bookmark.type === "bookmark_track" ||
-				bookmark.type === "track"
-			) {
+			} else if (bookmark.type === "bookmark_track" || bookmark.type === "track") {
 				acc[bookmark.year].tracks.push(bookmark);
 			}
 
@@ -40,7 +40,7 @@ function organizeBookmarks(bookmarks: BookmarkListItem[]) {
 				events: (Bookmark | LocalBookmark)[];
 				tracks: (Bookmark | LocalBookmark)[];
 			}
-		>,
+		>
 	);
 
 	return byYear;
@@ -53,6 +53,7 @@ type BookmarksListProps = {
 	loading: boolean;
 	day?: string;
 	view?: string;
+	tab?: "events" | "tracks" | "all";
 	onUpdateBookmark?: (params: {
 		id: string;
 		serverId?: string;
@@ -82,6 +83,7 @@ export function BookmarksList({
 	loading,
 	day,
 	view,
+	tab = "events",
 	onUpdateBookmark,
 	showConflicts = true,
 	defaultViewMode = "calendar",
@@ -103,10 +105,7 @@ export function BookmarksList({
 
 	const organizedBookmarks = organizeBookmarks(bookmarks);
 
-	const handleSetPriority = (
-		eventId: string,
-		updates: { priority: number | null },
-	) => {
+	const handleSetPriority = (eventId: string, updates: { priority: number | null }) => {
 		const bookmark = bookmarks.find((b) => {
 			const event = fosdemData?.events[b.slug];
 			return event?.id === eventId;
@@ -154,8 +153,8 @@ export function BookmarksList({
 					id: track.id,
 					name: track.name,
 					room: track.room,
-					eventCount: Object.values(fosdemData.events).filter((event) =>
-						isEvent(event) && doesEventMatchTrack(event, track),
+					eventCount: Object.values(fosdemData.events).filter(
+						(event) => isEvent(event) && doesEventMatchTrack(event, track)
 					).length,
 				} as Track;
 			})
@@ -166,6 +165,7 @@ export function BookmarksList({
 	};
 
 	const { tracks, events, conflicts } = getFormattedData();
+
 	const days = fosdemData ? Object.values(fosdemData.days) : [];
 	const bookmarkSnapshot =
 		bookmarks?.map((bookmark) => ({
@@ -188,38 +188,87 @@ export function BookmarksList({
 			{loading ? (
 				<LoadingState type="spinner" message="Loading bookmarks..." variant="centered" />
 			) : bookmarks?.length ? (
-				<div className="space-y-8">
-					{tracks.length > 0 && (
-						<TrackList
-							tracks={tracks}
-							year={year}
-							title="Bookmarked Tracks"
-							day={day}
-							user={user}
-							onCreateBookmark={onCreateBookmark}
-							serverBookmarks={bookmarkSnapshot}
-						/>
-					)}
-					{events.length > 0 && (
-						<EventList
-							events={events}
-							year={year}
-							conflicts={conflicts}
-							title="Bookmarked Events"
-							groupByDay={true}
-							days={days}
-							day={day}
-							view={view}
-							onSetPriority={handleSetPriority}
-							showTrack={true}
-							defaultViewMode={defaultViewMode}
-							displayViewMode={showViewMode}
-							user={user}
-							onCreateBookmark={onCreateBookmark}
-							serverBookmarks={bookmarkSnapshot}
-						/>
-					)}
-				</div>
+					<div className="space-y-6">
+						<div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+							<div className="inline-flex h-10 w-full items-center justify-center rounded-md bg-muted p-1 text-muted-foreground md:w-auto">
+								<Link
+									to="."
+									search={(prev) => ({ ...prev, tab: "all" })}
+									className={cn(
+										"hidden md:inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all",
+										"no-underline hover:underline",
+										tab === "all" ? "bg-background text-foreground shadow-sm" : ""
+									)}
+								>
+									All
+								</Link>
+								<Link
+									to="."
+									search={(prev) => ({ ...prev, tab: "events" })}
+									className={cn(
+										"inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all",
+										"no-underline hover:underline",
+										tab === "events"
+											? "bg-background text-foreground shadow-sm"
+											: ""
+									)}
+								>
+									Events
+								</Link>
+								<Link
+									to="."
+									search={(prev) => ({ ...prev, tab: "tracks" })}
+									className={cn(
+										"inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all",
+										"no-underline hover:underline",
+										tab === "tracks"
+											? "bg-background text-foreground shadow-sm"
+											: ""
+									)}
+								>
+									Tracks
+								</Link>
+							</div>
+						</div>
+
+						<div>
+							{tracks.length > 0 && (
+								<div className={cn(tab === "events" ? "hidden" : "")}>
+									<TrackList
+										tracks={tracks}
+										year={year}
+										title="Saved Tracks"
+										day={day}
+										user={user}
+										onCreateBookmark={onCreateBookmark}
+										serverBookmarks={bookmarkSnapshot}
+									/>
+								</div>
+							)}
+
+							{events.length > 0 && (
+								<div className={cn(tab === "tracks" ? "hidden" : "")}>
+									<EventList
+										events={events}
+										year={year}
+										conflicts={conflicts}
+										title="Saved Events"
+										groupByDay={true}
+										days={days}
+										day={day}
+										view={view}
+										onSetPriority={handleSetPriority}
+										showTrack={true}
+										defaultViewMode={defaultViewMode}
+										displayViewMode={showViewMode}
+										user={user}
+										onCreateBookmark={onCreateBookmark}
+										serverBookmarks={bookmarkSnapshot}
+									/>
+								</div>
+							)}
+						</div>
+					</div>
 			) : (
 				<div className="text-center py-2 mb-4">
 					<p>You haven't bookmarked anything yet!</p>

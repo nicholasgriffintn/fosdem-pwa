@@ -24,16 +24,17 @@ export const Route = createFileRoute("/bookmarks/")({
 		year,
 		day,
 		view,
+		tab,
 	}: {
 		year: number;
 		day?: string;
 		view?: string;
+			tab?: "all" | "tracks" | "events";
 	}) => ({
-		year:
-			(constants.AVAILABLE_YEARS.includes(year) && year) ||
-			constants.DEFAULT_YEAR,
+		year: (constants.AVAILABLE_YEARS.includes(year) && year) || constants.DEFAULT_YEAR,
 		day: day || undefined,
 		view: view || undefined,
+		tab: tab || undefined,
 	}),
 	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
 	loader: async ({ deps: { year, day } }) => {
@@ -59,9 +60,13 @@ export const Route = createFileRoute("/bookmarks/")({
 });
 
 function BookmarksHome() {
-	const { year, day, serverBookmarks, fosdemData: serverFosdemData } =
-		Route.useLoaderData();
-	const { view } = Route.useSearch();
+	const {
+		year,
+		day,
+		serverBookmarks,
+		fosdemData: serverFosdemData,
+	} = Route.useLoaderData();
+	const { view, tab } = Route.useSearch();
 	const { bookmarks, loading } = useBookmarks({ year });
 	const { create, update } = useMutateBookmark({ year });
 	const { fosdemData } = useFosdemData({ year });
@@ -111,24 +116,35 @@ function BookmarksHome() {
 							<p>Start bookmarking events to see them here.</p>
 							{!resolvedUser?.id && (
 								<p className="text-sm">
-									If you have JavaScript enabled, your bookmarks will be
-									saved locally in your browser.{" "} Sign in to sync across
-									devices or to bookmark without JavaScript.
+									If you have JavaScript enabled, your bookmarks will be saved locally in
+									your browser. Sign in to sync across devices or to bookmark without
+									JavaScript.
 								</p>
 							)}
 						</div>
 					}
 					actions={
-						!resolvedUser?.id ? (
-							<Button asChild variant="secondary">
+						<>
+							<Button asChild>
 								<Link
-									to="/signin"
-									className="text-primary no-underline hover:underline cursor-pointer"
+									to="/"
+									search={(prev) => ({ ...prev, year })}
+									className="no-underline hover:underline"
 								>
-									Sign in
+									Browse schedule
 								</Link>
 							</Button>
-						) : undefined
+							{!resolvedUser?.id ? (
+								<Button asChild variant="secondary">
+									<Link
+										to="/signin"
+										className="text-primary no-underline hover:underline cursor-pointer"
+									>
+										Sign in
+									</Link>
+								</Button>
+							) : null}
+						</>
 					}
 				/>
 			) : (
@@ -139,6 +155,7 @@ function BookmarksHome() {
 					loading={resolvedLoading}
 					day={day}
 					view={view}
+						tab={tab}
 					onUpdateBookmark={onUpdateBookmark}
 					user={resolvedUser}
 					onCreateBookmark={onCreateBookmark}

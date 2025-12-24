@@ -105,14 +105,14 @@ export function EventCalendarList({
 	const timeSlots = generateTimeSlots(sortedEvents);
 
 	return (
-		<div className="w-full overflow-x-auto">
-			<div className="min-w-[800px]">
+		<div className="w-full md:overflow-x-auto">
+			<div className="min-w-0 md:min-w-[800px]">
 				{timeSlots.map(({ time, events: slotEvents }) => (
 					<div key={time} className="flex border-t py-2">
 						<div className="w-24 flex-shrink-0 pr-4 font-medium text-muted-foreground">
 							{time}
 						</div>
-						<div className="flex-1 grid grid-cols-3 gap-4">
+						<div className="flex-1 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 							{slotEvents.map((event) => (
 								<EventCalendarListItem
 									key={event.id}
