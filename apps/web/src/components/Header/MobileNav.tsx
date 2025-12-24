@@ -10,6 +10,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { constants } from "~/constants";
 import { isNumber } from "~/lib/type-guards";
+import { buildProfileLink } from "~/lib/link-builder";
 
 type MobileNavProps = {
 	title: string;
@@ -179,43 +180,24 @@ export function MobileNav({
 					<div className="mt-4 grid gap-1">
 						{user?.id ? (
 							<>
-								{!user.is_guest && (
-									<Button
-										variant="ghost"
-										className="h-11 justify-start gap-3 rounded-lg px-3"
-										asChild
+								<Button
+									variant="ghost"
+									className="h-11 justify-start gap-3 rounded-lg px-3"
+									asChild
+								>
+									<Link
+										{...buildProfileLink({})}
+										onClick={() => {
+											if (menuCheckboxRef?.current) {
+												menuCheckboxRef.current.checked = false;
+											}
+											onClose();
+										}}
+										className="no-underline"
 									>
-										<Link
-											search={(prev: Record<string, unknown>) => ({
-												year: isNumber(prev.year)
-													? prev.year
-													: constants.DEFAULT_YEAR,
-											})}
-											to="/profile"
-											onClick={() => {
-												if (menuCheckboxRef?.current) {
-													menuCheckboxRef.current.checked = false;
-												}
-												onClose();
-											}}
-											className="no-underline"
-										>
-											View Profile
-										</Link>
-									</Button>
-								)}
-								{user.is_guest && (
-									<Button
-										variant="ghost"
-										className="h-11 justify-start gap-3 rounded-lg px-3"
-										asChild
-									>
-										<a href="/api/auth/upgrade-github">
-											<Icons.gitHub className="h-5 w-5" />
-											Upgrade with GitHub
-										</a>
-									</Button>
-								)}
+										View Profile
+									</Link>
+								</Button>
 								<Button
 									variant="ghost"
 									className="h-11 justify-start gap-3 rounded-lg px-3"

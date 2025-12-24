@@ -28,7 +28,8 @@ export function EventPlayerStarted({
 		event.links?.filter((link) => link.type?.startsWith("video/")) || [];
 
 	useEffect(() => {
-		if (!videoRef.current || !isPlaying) return;
+		const video = videoRef.current;
+		if (!video || !isPlaying) return;
 
 		if (eventIsLive && event.streams?.length) {
 			const hlsStream = event.streams.find(
@@ -46,7 +47,7 @@ export function EventPlayerStarted({
 
 				const hls = new Hls();
 				hlsRef.current = hls;
-				hls.attachMedia(videoRef.current);
+				hls.attachMedia(video);
 
 				hls.on(Hls.Events.MEDIA_ATTACHED, () => {
 					hls.loadSource(hlsStream.href);

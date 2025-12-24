@@ -16,6 +16,11 @@ import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
 import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
 import { SectionStack } from "~/components/shared/SectionStack";
+import { getAllData } from "~/server/functions/fosdem";
+import { getBookmarks } from "~/server/functions/bookmarks";
+import { getSession } from "~/server/functions/session";
+import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
+import { useIsClient } from "~/hooks/use-is-client";
 
 export const Route = createFileRoute("/profile/")({
   component: ProfilePage,
@@ -27,99 +32,116 @@ export const Route = createFileRoute("/profile/")({
       })
     ],
   }),
-  validateSearch: ({ year }: { year: number }) => ({
-    year: (constants.AVAILABLE_YEARS.includes(year) && year) || constants.DEFAULT_YEAR,
-  }),
-  loaderDeps: ({ search: { year } }) => ({ year }),
+  validateSearch: ({
+    year,
+    tab,
+  }: {
+    year: number;
+    tab?: "events" | "tracks" | "all";
+  }) => {
+    const normalizedYear =
+      (constants.AVAILABLE_YEARS.includes(year) && year) || constants.DEFAULT_YEAR;
+    const normalizedTab =
+      tab && ["events", "tracks", "all"].includes(tab) ? tab : undefined;
+
+    return {
+      year: normalizedYear,
+      ...(normalizedTab ? { tab: normalizedTab } : {}),
+    };
+  },
+  loaderDeps: ({ search: { year, tab } }) => ({ year, tab }),
   loader: async ({ deps: { year } }) => {
+    const fosdemData = await getAllData({ data: { year } });
+    const serverBookmarks = await getBookmarks({
+      data: { year, status: "favourited" },
+    });
+    const user = await getSession();
+
     return {
       year,
+      fosdemData,
+      serverBookmarks,
+      user,
     };
   },
 });
 
 function ProfilePage() {
-  const { year } = Route.useLoaderData();
+  const { year, fosdemData: serverFosdemData, serverBookmarks, user: serverUserFromLoader } =
+    Route.useLoaderData();
+  const { tab: tabRaw } = Route.useSearch();
+  const tab = tabRaw ?? "events";
   const { user, loading } = useProfile();
+  const { user: serverUserFromRoot } = useAuthSnapshot();
+  const resolvedServerUser = serverUserFromLoader ?? serverUserFromRoot;
   const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
   const { create: createBookmark } = useMutateBookmark({ year });
   const { fosdemData } = useFosdemData({ year });
+  const isClient = useIsClient();
+  const hasServerSnapshot = Boolean(serverFosdemData);
+  const useServerSnapshot =
+    !isClient || loading || bookmarksLoading || !fosdemData || !bookmarks;
+  const resolvedUser = useServerSnapshot ? resolvedServerUser : user;
+  const resolvedBookmarks = useServerSnapshot ? serverBookmarks : bookmarks;
+  const resolvedBookmarksLoading = useServerSnapshot ? false : bookmarksLoading;
+  const resolvedFosdemData = useServerSnapshot ? serverFosdemData : fosdemData;
+
+  const profileIdentifier = resolvedUser
+    ? resolvedUser.github_username ||
+    resolvedUser.gitlab_username ||
+    resolvedUser.discord_username ||
+    resolvedUser.mastodon_acct ||
+    resolvedUser.mastodon_username ||
+    "me"
+    : "me";
 
   const onCreateBookmark = async (bookmark: any) => {
     await createBookmark(bookmark);
   };
 
-  if (loading) {
+  if (isClient && loading && !hasServerSnapshot) {
     return (
       <RouteLoadingState message="Loading profile..." />
     );
   }
 
-  if (!user) {
+  if (!resolvedUser) {
     return <Navigate {...buildHomeLink()} />;
   }
 
   return (
     <PageShell>
       <PageHeader heading="Profile" year={year} displayHeading={false} />
-      <noscript>
-        <div className="container py-6">
-          <div className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950 p-6 rounded-lg mb-6">
-            <h2 className="font-semibold text-lg mb-3">
-              JavaScript Required for Profile
-            </h2>
-            <p className="text-sm mb-3">
-              Your profile page requires JavaScript to display your conference badge,
-              bookmarks, and settings.
-            </p>
-            <p className="text-sm text-muted-foreground mb-3">
-              Profile features that require JavaScript:
-            </p>
-            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside mb-3">
-              <li>Conference badge display</li>
-              <li>Viewing and managing bookmarks</li>
-              <li>Push notification settings</li>
-              <li>Profile visibility settings</li>
-            </ul>
-            <p className="text-sm">
-              Please enable JavaScript or{" "}
-              <a href="/" className="text-primary hover:underline font-medium">
-                return to the homepage
-              </a>
-              .
-            </p>
-          </div>
-        </div>
-      </noscript>
       <SectionStack>
-        {user.is_guest && (
-          <UpgradeNotice user={user} />
+        {resolvedUser.is_guest && (
+          <UpgradeNotice user={resolvedUser} />
         )}
 
         <div className="flex flex-col lg:flex-row items-start gap-8">
           <div className="w-full lg:w-auto lg:max-w-md">
-            <ConferenceBadge user={user} conferenceYear={year} />
+            <ConferenceBadge user={resolvedUser} conferenceYear={year} />
           </div>
 
           <div className="w-full lg:flex-1 space-y-8">
-            {!user.is_guest && <PushNotifications />}
+            {!resolvedUser.is_guest && <PushNotifications />}
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-foreground">Your Bookmarks</h2>
-              {user?.github_username && (
+              {!resolvedUser.is_guest && (
                 <SetBookmarksVisability
-                  userId={user.github_username}
-                  bookmarksVisibility={user.bookmarks_visibility}
+                  userId={profileIdentifier}
+                  bookmarksVisibility={resolvedUser.bookmarks_visibility}
                 />
               )}
               <BookmarksList
-                bookmarks={bookmarks}
-                fosdemData={fosdemData}
+                bookmarks={resolvedBookmarks}
+                fosdemData={resolvedFosdemData}
                 year={year}
-                loading={bookmarksLoading}
+                loading={resolvedBookmarksLoading}
+                tab={tab}
                 showConflicts={true}
                 defaultViewMode="schedule"
                 showViewMode={false}
-                user={user}
+                user={resolvedUser}
                 onCreateBookmark={onCreateBookmark}
               />
             </div>

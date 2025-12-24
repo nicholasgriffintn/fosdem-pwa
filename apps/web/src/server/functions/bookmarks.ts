@@ -1,4 +1,4 @@
-import { and } from "drizzle-orm";
+import { and, or, sql } from "drizzle-orm";
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 
@@ -308,8 +308,20 @@ export const getUserBookmarks = createServerFn({
 			throw new Error("User ID is required");
 		}
 
+		const rawUserId = String(userId);
+		const normalizedUserId = rawUserId.trim().replace(/^@/, "");
+		const normalizedUserIdLower = normalizedUserId.toLowerCase();
+
+		const conditions = [
+			eq(sql`lower(${userTable.github_username})`, normalizedUserIdLower),
+			eq(sql`lower(${userTable.gitlab_username})`, normalizedUserIdLower),
+			eq(sql`lower(${userTable.discord_username})`, normalizedUserIdLower),
+			eq(sql`lower(${userTable.mastodon_username})`, normalizedUserIdLower),
+			eq(sql`lower(${userTable.mastodon_acct})`, normalizedUserIdLower),
+		];
+
 		const user = await db.query.user.findFirst({
-			where: eq(userTable.github_username, userId),
+			where: or(...conditions),
 		});
 
 		if (!user) {

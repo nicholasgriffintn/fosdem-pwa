@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import Fuse from "fuse.js";
 import type { Event, Track, RoomData } from "~/types/fosdem";
 
 import {
@@ -16,7 +17,7 @@ describe("search helpers", () => {
 			{ id: "2", name: "Keynotes", description: "", room: "", type: "", day: 1, eventCount: 0 },
 		] as Track[];
 
-		const fuse = createSearchIndex(tracks, [{ name: "name", weight: 1 }]);
+		const fuse = createSearchIndex(Fuse, tracks, [{ name: "name", weight: 1 }]);
 		const results = fuse.search("Devroom");
 
 		expect(results).toHaveLength(1);
