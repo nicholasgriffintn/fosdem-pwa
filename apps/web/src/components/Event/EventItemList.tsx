@@ -12,6 +12,7 @@ import type { User } from "~/server/db/schema";
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/shared/Icons";
 import { buildEventLink } from "~/lib/link-builder";
+import { ListContainer, ListEmptyState } from "~/components/shared/ListContainer";
 
 type EventListProps = {
 	events: Event[];
@@ -224,9 +225,9 @@ export function EventItemList({
 	});
 
 	return (
-		<ul className="event-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
+		<ListContainer className="event-list">
 			{sortedEvents?.length > 0 ? (
-				sortedEvents.map((event, index) => (
+				sortedEvents.map((event) => (
 					<li key={event.id}>
 						<EventListItem
 							year={year}
@@ -241,19 +242,11 @@ export function EventItemList({
 					</li>
 				))
 			) : (
-				<li>
-						<div className="flex justify-between px-3 py-4">
-							<div className="flex flex-col space-y-1.5">
-								<div className="font-semibold leading-none tracking-tight">
-								No events found
-								</div>
-								<p className="text-muted-foreground text-sm">
-									Try adjusting filters or search terms.
-								</p>
-						</div>
-					</div>
-				</li>
+					<ListEmptyState
+						title="No events found"
+						description="Try adjusting filters or search terms."
+					/>
 			)}
-		</ul>
+		</ListContainer>
 	);
 }
