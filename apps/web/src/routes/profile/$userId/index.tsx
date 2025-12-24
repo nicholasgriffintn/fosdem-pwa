@@ -29,9 +29,13 @@ export const Route = createFileRoute("/profile/$userId/")({
   }),
   validateSearch: ({
     year,
+    day,
+    view,
     tab,
   }: {
     year: number;
+      day?: string;
+      view?: string;
     tab?: "events" | "tracks" | "all";
   }) => {
     const normalizedYear =
@@ -41,10 +45,12 @@ export const Route = createFileRoute("/profile/$userId/")({
 
     return {
       year: normalizedYear,
+      day: day || undefined,
+      view: view || undefined,
       ...(normalizedTab ? { tab: normalizedTab } : {}),
     };
   },
-  loaderDeps: ({ search: { year, tab } }) => ({ year, tab }),
+  loaderDeps: ({ search: { year, day, view, tab } }) => ({ year, day, view, tab }),
   loader: async ({ params, deps: { year } }) => {
     const userId = params.userId;
     const fosdemData = await getAllData({ data: { year } });
@@ -77,7 +83,7 @@ export const Route = createFileRoute("/profile/$userId/")({
 function ProfilePage() {
   const { year, fosdemData: serverFosdemData, user: serverUser, serverBookmarks, notFound } =
     Route.useLoaderData();
-  const { tab: tabRaw } = Route.useSearch();
+  const { tab: tabRaw, day, view } = Route.useSearch();
   const tab = tabRaw ?? "events";
 
   const routeUserId = Route.useParams().userId;
@@ -139,6 +145,8 @@ function ProfilePage() {
                   fosdemData={resolvedFosdemData}
                   year={year}
                   loading={resolvedBookmarksLoading}
+                  day={day}
+                  view={view}
                   tab={tab}
                   showConflicts={true}
                   defaultViewMode="schedule"
