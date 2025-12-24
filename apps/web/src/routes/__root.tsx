@@ -153,7 +153,9 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					</div>
 					<BottomTabNav items={navItems} />
 					<Footer />
-					<ReactQueryDevtools buttonPosition="bottom-left" />
+					<Suspense>
+						<ReactQueryDevtools buttonPosition="bottom-left" />
+					</Suspense>
 					<Suspense>
 						<TanStackRouterDevtools position="bottom-right" />
 					</Suspense>

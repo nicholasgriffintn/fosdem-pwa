@@ -35,6 +35,7 @@ export function MobileNav({
 	useLockBody(isOpen);
 	const { user, logout } = useAuth();
 
+	const containerRef = useRef<HTMLDivElement | null>(null);
 	const firstLinkRef = useRef<HTMLAnchorElement | null>(null);
 
 	useEffect(() => {
@@ -57,8 +58,19 @@ export function MobileNav({
 		};
 	}, [isOpen, menuCheckboxRef, onClose]);
 
+	useEffect(() => {
+		const el = containerRef.current;
+		if (!el) return;
+		if (isOpen) {
+			el.removeAttribute("inert");
+			return;
+		}
+		el.setAttribute("inert", "");
+	}, [isOpen]);
+
 	return (
 		<div
+			ref={containerRef}
 			className={cn(
 				"fixed inset-0 z-50 lg:hidden",
 				"opacity-0 pointer-events-none transition-opacity duration-200",
