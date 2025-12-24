@@ -28,7 +28,7 @@ interface SearchLinkOptions extends LinkBuilderOptions {
 
 export function buildRoomLink(roomId: string, options: RoomLinkOptions = {}) {
   return {
-    to: "/rooms/$roomId" as const,
+    to: "/rooms/$roomId",
     params: { roomId },
     search: {
       year: options.year || constants.DEFAULT_YEAR,
@@ -40,7 +40,7 @@ export function buildRoomLink(roomId: string, options: RoomLinkOptions = {}) {
 
 export function buildSearchLink(options: SearchLinkOptions) {
   return {
-    to: "/search" as const,
+    to: "/search",
     search: {
       year: options.year || constants.DEFAULT_YEAR,
       q: options.q || "",
@@ -53,7 +53,7 @@ export function buildSearchLink(options: SearchLinkOptions) {
 
 export function buildEventLink(slug: string, options: EventLinkOptions = {}) {
   return {
-    to: "/event/$slug" as const,
+    to: "/event/$slug",
     params: { slug },
     search: {
       year: options.year || constants.DEFAULT_YEAR,
@@ -64,7 +64,7 @@ export function buildEventLink(slug: string, options: EventLinkOptions = {}) {
 
 export function buildTrackLink(slug: string, options: TrackLinkOptions = {}) {
   return {
-    to: "/track/$slug" as const,
+    to: "/track/$slug",
     params: { slug },
     search: {
       year: options.year || constants.DEFAULT_YEAR,
@@ -77,9 +77,19 @@ export function buildTrackLink(slug: string, options: TrackLinkOptions = {}) {
 
 export function buildHomeLink(options: LinkBuilderOptions = {}) {
   return {
-    to: "/" as const,
+    to: "/",
     search: {
       year: options.year || constants.DEFAULT_YEAR,
+    },
+  };
+}
+
+export function buildBookmarksLink(options: LinkBuilderOptions = {}) {
+  return {
+    to: "/bookmarks",
+    search: {
+      year: options.year || constants.DEFAULT_YEAR,
+      tab: "events" as const,
     },
   };
 }
