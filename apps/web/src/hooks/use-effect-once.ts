@@ -4,23 +4,15 @@ import { type EffectCallback, useEffect, useRef } from "react";
 
 const useEffectOnce = (effect: EffectCallback) => {
 	const hasRun = useRef(false);
-	const cleanupRef = useRef<(() => void) | undefined>(undefined);
+	const effectRef = useRef(effect);
+	effectRef.current = effect;
 
 	useEffect(() => {
 		if (!hasRun.current) {
 			hasRun.current = true;
-			const cleanup = effect();
-			if (cleanup) {
-				cleanupRef.current = cleanup;
-			}
+			const cleanup = effectRef.current();
+			return cleanup;
 		}
-
-		return () => {
-			if (cleanupRef.current) {
-				cleanupRef.current();
-				cleanupRef.current = undefined;
-			}
-		};
 	}, []);
 };
 

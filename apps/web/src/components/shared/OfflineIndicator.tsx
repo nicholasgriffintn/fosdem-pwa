@@ -1,22 +1,15 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import {
-	Wifi,
-	WifiOff,
-	Cloud,
-	CheckCircle,
-	AlertCircle,
-} from "lucide-react";
-
-import { useOnlineStatus } from "~/hooks/use-online-status";
+import { AlertCircle, CheckCircle, Cloud, Wifi, WifiOff } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LoadingState } from "~/components/shared/LoadingState";
 import { useAuth } from "~/hooks/use-auth";
-import { getSyncQueue } from "~/lib/localStorage";
+import { useOnlineStatus } from "~/hooks/use-online-status";
 import {
 	checkAndSyncOnOnline,
 	registerBackgroundSync,
 } from "~/lib/backgroundSync";
+import { getSyncQueue } from "~/lib/localStorage";
 import { cn } from "~/lib/utils";
 
 export function OfflineIndicator() {
@@ -25,18 +18,13 @@ export function OfflineIndicator() {
 	const [syncStatus, setSyncStatus] = useState<
 		"idle" | "syncing" | "success" | "error"
 	>("idle");
-	const [wasOffline, setWasOffline] = useState(false);
-	const wasOfflineRef = useRef(wasOffline);
+	const wasOfflineRef = useRef(false);
 	const isOnline = useOnlineStatus();
 	const { user } = useAuth();
 
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
-
-	useEffect(() => {
-		wasOfflineRef.current = wasOffline;
-	}, [wasOffline]);
 
 	const syncOfflineData = useCallback(async () => {
 		try {
@@ -83,7 +71,6 @@ export function OfflineIndicator() {
 					}, 5000);
 				});
 			}
-			setWasOffline(false);
 			wasOfflineRef.current = false;
 		};
 
@@ -91,7 +78,7 @@ export function OfflineIndicator() {
 			if (isCleanedUp) return;
 			setIsVisible(true);
 			setSyncStatus("idle");
-			setWasOffline(true);
+			wasOfflineRef.current = true;
 		};
 
 		const serviceWorkerMessageHandler = (event: MessageEvent) => {

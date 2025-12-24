@@ -2,21 +2,21 @@
 
 import {
 	createContext,
+	type ReactNode,
+	useCallback,
 	useContext,
-	useRef,
-	useState,
 	useEffect,
 	useMemo,
-	type ReactNode,
+	useRef,
+	useState,
 } from "react";
+import { useIsClient } from "~/hooks/use-is-client";
 import {
 	getPlayerState,
 	savePlayerState,
 	clearPlayerState,
-	type PlayerState,
 } from "~/lib/playerPersistence";
 import type { Event } from "~/types/fosdem";
-import { useIsClient } from "~/hooks/use-is-client";
 
 export type PortalTarget = "floating" | "event-page" | null;
 
@@ -32,7 +32,12 @@ interface PlayerContextValue {
 	isLive: boolean;
 	portalTarget: PortalTarget;
 	streamUrl: string | null;
-	loadEvent: (event: Event, year: number, streamUrl: string, isLive: boolean) => void;
+	loadEvent: (
+		event: Event,
+		year: number,
+		streamUrl: string,
+		isLive: boolean,
+	) => void;
 	play: () => void;
 	pause: () => void;
 	togglePlay: () => void;
@@ -69,7 +74,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 		if (state.eventSlug && state.streamUrl) {
 			if (state.isMinimized && state.isPlaying) {
 				const shouldRestore = window.confirm(
-					`Continue playing "${state.eventTitle || "video"}" in floating player?`
+					`Continue playing "${state.eventTitle || "video"}" in floating player?`,
 				);
 
 				if (!shouldRestore) {
@@ -96,13 +101,27 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 				duration: "",
 				abstract: "",
 				chat: "",
-				links: state.streamUrl && !state.isLive
-					? [{ href: state.streamUrl, title: "Recording", type: "video/webm" }]
-					: [],
+				links:
+					state.streamUrl && !state.isLive
+						? [
+								{
+									href: state.streamUrl,
+									title: "Recording",
+									type: "video/webm",
+								},
+							]
+						: [],
 				attachments: [],
-				streams: state.streamUrl && state.isLive
-					? [{ href: state.streamUrl, title: "Live Stream", type: "application/vnd.apple.mpegurl" }]
-					: [],
+				streams:
+					state.streamUrl && state.isLive
+						? [
+								{
+									href: state.streamUrl,
+									title: "Live Stream",
+									type: "application/vnd.apple.mpegurl",
+								},
+							]
+						: [],
 				day: "",
 				trackKey: "",
 				isLive: state.isLive,
@@ -130,7 +149,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 				if (videoRef.current.readyState >= 2) {
 					playWhenReady();
 				} else {
-					videoRef.current.addEventListener("loadeddata", playWhenReady, { once: true });
+					videoRef.current.addEventListener("loadeddata", playWhenReady, {
+						once: true,
+					});
 				}
 			}
 		}
@@ -215,7 +236,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 		}, 5000);
 
 		return () => clearInterval(interval);
-	}, [currentEvent, year, volume, isPlaying, isMuted, isMinimized, streamUrl, isLive]);
+	}, [
+		currentEvent,
+		year,
+		volume,
+		isPlaying,
+		isMuted,
+		isMinimized,
+		streamUrl,
+		isLive,
+		portalTarget,
+	]);
 
 	useEffect(() => {
 		const video = videoRef.current;
@@ -265,20 +296,18 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 		};
 	}, [currentEvent, year, isMinimized, streamUrl, isLive]);
 
-	const loadEvent = (
-		event: Event,
-		eventYear: number,
-		url: string,
-		live: boolean,
-	) => {
-		setCurrentEvent(event);
-		setYear(eventYear);
-		setStreamUrl(url);
-		setIsLive(live);
-		setIsMinimized(false);
-	};
+	const loadEvent = useCallback(
+		(event: Event, eventYear: number, url: string, live: boolean) => {
+			setCurrentEvent(event);
+			setYear(eventYear);
+			setStreamUrl(url);
+			setIsLive(live);
+			setIsMinimized(false);
+		},
+		[],
+	);
 
-	const play = () => {
+	const play = useCallback(() => {
 		pendingPlayRef.current = true;
 		const video = videoRef.current;
 		if (!video) {
@@ -292,19 +321,25 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 				setIsPlaying(false);
 			});
 		}
-	};
+	}, []);
 
-	const pause = () => {
+	const pause = useCallback(() => {
 		videoRef.current?.pause();
-	};
+	}, []);
 
-	const togglePlay = () => {
-		if (isPlaying) {
-			pause();
+	const togglePlay = useCallback(() => {
+		const video = videoRef.current;
+		if (video?.paused) {
+			pendingPlayRef.current = true;
+			video.play().catch((error) => {
+				console.error("Failed to play video:", error);
+				pendingPlayRef.current = false;
+				setIsPlaying(false);
+			});
 		} else {
-			play();
+			video?.pause();
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		if (!pendingPlayRef.current) return;
@@ -320,43 +355,44 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			});
 		}
 		pendingPlayRef.current = false;
+		// biome-ignore lint/correctness/useExhaustiveDependencies: deps trigger effect when event/stream changes
 	}, [currentEvent, streamUrl, isLive]);
 
-	const setVolume = (vol: number) => {
+	const setVolume = useCallback((vol: number) => {
 		if (videoRef.current) {
 			videoRef.current.volume = vol;
 		}
-	};
+	}, []);
 
-	const setMuted = (muted: boolean) => {
+	const setMuted = useCallback((muted: boolean) => {
 		if (videoRef.current) {
 			videoRef.current.muted = muted;
 		}
-	};
+	}, []);
 
-	const setCurrentTime = (time: number) => {
+	const setCurrentTime = useCallback((time: number) => {
 		if (videoRef.current) {
 			videoRef.current.currentTime = time;
 		}
-	};
+	}, []);
 
-	const minimize = () => {
+	const minimize = useCallback(() => {
 		setIsMinimized(true);
-	};
+	}, []);
 
-	const restore = () => {
+	const restore = useCallback(() => {
 		setIsMinimized(false);
-	};
+	}, []);
 
-	const close = () => {
-		pause();
+	const close = useCallback(() => {
+		videoRef.current?.pause();
 		setCurrentEvent(null);
 		setYear(null);
 		setStreamUrl(null);
 		setIsMinimized(false);
 		setPortalTarget(null);
 		clearPlayerState();
-	};
+	}, []);
 
 	const value: PlayerContextValue = useMemo(
 		() => ({
@@ -394,6 +430,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			isLive,
 			portalTarget,
 			streamUrl,
+			loadEvent,
+			play,
+			pause,
+			togglePlay,
+			setVolume,
+			setMuted,
+			setCurrentTime,
+			minimize,
+			restore,
+			close,
 		],
 	);
 
