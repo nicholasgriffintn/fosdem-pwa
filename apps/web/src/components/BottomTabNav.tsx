@@ -1,17 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
-import { constants } from "~/constants";
-import { isNumber } from "~/lib/type-guards";
+import type { NavItem } from "~/components/shared/types";
+import { preserveYearSearch } from "~/lib/search-params";
 
 type BottomTabNavProps = {
-  items: {
-    title: string;
-    href: string;
-    icon: React.ReactNode;
-    disabled?: boolean;
-    mobile?: boolean;
-  }[];
+  items: NavItem[];
 };
 
 export function BottomTabNav({ items }: BottomTabNavProps) {
@@ -52,9 +46,7 @@ export function BottomTabNav({ items }: BottomTabNavProps) {
                   item.disabled && "cursor-not-allowed opacity-60 hover:scale-100",
                 ),
               }}
-              search={(prev: Record<string, unknown>) => ({
-                year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
-              })}
+              search={preserveYearSearch}
               activeOptions={{ exact: item.href === "/" }}
             >
               <div className={cn(

@@ -86,7 +86,7 @@ export function ItemListContainer<T>({
                   <DaySwitcher
                     days={days}
                     dayId={dayId}
-                    datSplitByDay={itemsSplitByDay}
+                    dataSplitByDay={itemsSplitByDay}
                   />
                 </div>
               </div>

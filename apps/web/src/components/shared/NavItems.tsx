@@ -1,6 +1,7 @@
 import { Icons } from "~/components/shared/Icons";
+import type { NavItem } from "~/components/shared/types";
 
-export const navItems = [
+export const navItems: NavItem[] = [
   {
     title: "Schedule",
     href: "/",
