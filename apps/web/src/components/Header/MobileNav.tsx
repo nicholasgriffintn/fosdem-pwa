@@ -8,18 +8,18 @@ import { useAuth } from "~/hooks/use-auth";
 import { Icons } from "~/components/shared/Icons";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { constants } from "~/constants";
-import { isNumber } from "~/lib/type-guards";
 import { buildProfileLink } from "~/lib/link-builder";
+import type { NavItem } from "~/components/shared/types";
+import { preserveYearSearch } from "~/lib/search-params";
+
+const mobileNavLinkBase = "flex w-full items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors";
+const mobileNavLinkDefault = "text-foreground/90 hover:bg-muted/60 hover:text-foreground no-underline";
+const mobileNavLinkActive = "bg-muted text-foreground";
+const mobileNavLinkDisabled = "cursor-not-allowed opacity-60";
 
 type MobileNavProps = {
 	title: string;
-	items: {
-		title: string;
-		href: string;
-		icon?: React.ReactNode;
-		disabled?: boolean;
-	}[];
+	items: NavItem[];
 	menuCheckboxRef?: React.RefObject<HTMLInputElement | null>;
 	isOpen: boolean;
 	onClose: () => void;
@@ -111,9 +111,7 @@ export function MobileNav({
 							</label>
 							<Link
 								to="/"
-								search={(prev: Record<string, unknown>) => ({
-									year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
-								})}
+								search={preserveYearSearch}
 								className="flex items-center gap-2 logo-link shrink-0"
 							>
 								<Icons.logo className="h-7 w-7" width="28" height="28" />
@@ -130,15 +128,15 @@ export function MobileNav({
 								key={item.href}
 								to={item.disabled ? "#" : item.href}
 								className={cn(
-									"flex w-full items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors",
-									"text-foreground/90 hover:bg-muted/60 hover:text-foreground no-underline",
-									item.disabled && "cursor-not-allowed opacity-60",
+									mobileNavLinkBase,
+									mobileNavLinkDefault,
+									item.disabled && mobileNavLinkDisabled,
 								)}
 								activeProps={{
 									className: cn(
-										"flex w-full items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors",
-										"bg-muted text-foreground",
-										item.disabled && "cursor-not-allowed opacity-60",
+										mobileNavLinkBase,
+										mobileNavLinkActive,
+										item.disabled && mobileNavLinkDisabled,
 									),
 								}}
 								onClick={() => {
@@ -147,9 +145,7 @@ export function MobileNav({
 									}
 									onClose();
 								}}
-								search={(prev: Record<string, unknown>) => ({
-									year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
-								})}
+								search={preserveYearSearch}
 								activeOptions={{ exact: item.href === "/" }}
 								ref={index === 0 ? firstLinkRef : undefined}
 							>

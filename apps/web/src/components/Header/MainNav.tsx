@@ -4,18 +4,17 @@ import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-ro
 import { cn } from "~/lib/utils";
 import { Icons } from "~/components/shared/Icons";
 import { MobileNav } from "~/components/Header/MobileNav";
-import { constants } from "~/constants";
-import { isNumber } from "~/lib/type-guards";
+import type { NavItem } from "~/components/shared/types";
+import { preserveYearSearch } from "~/lib/search-params";
+
+const navLinkBase = "nav-link flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap";
+const navLinkDefault = "text-foreground/70 hover:text-foreground hover:bg-muted/60";
+const navLinkActive = "bg-muted text-foreground";
+const navLinkDisabled = "cursor-not-allowed opacity-80";
 
 type MainNavProps = {
   title: string;
-  items?: {
-    title: string;
-    href: string;
-    icon?: React.ReactNode;
-		disabled?: boolean;
-		mobileOnly?: boolean;
-  }[];
+  items?: NavItem[];
 };
 
 export function MainNav({ title, items }: MainNavProps) {
@@ -57,9 +56,7 @@ export function MainNav({ title, items }: MainNavProps) {
           }
           navigate({
             to: "/",
-            search: (prev: Record<string, unknown>) => ({
-              year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
-            }),
+            search: preserveYearSearch,
           });
         }}
         className={cn(
@@ -89,9 +86,7 @@ export function MainNav({ title, items }: MainNavProps) {
       </label>
       <Link
         to="/"
-        search={(prev: Record<string, unknown>) => ({
-          year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
-        })}
+        search={preserveYearSearch}
         className="flex items-center gap-2 logo-link shrink-0"
       >
         <Icons.logo className="h-7 w-7" width="28" height="28" />
@@ -103,20 +98,11 @@ export function MainNav({ title, items }: MainNavProps) {
             <Link
               key={item.href}
               to={item.disabled ? "#" : item.href}
-              className={cn(
-                "nav-link flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors text-foreground/70 hover:text-foreground hover:bg-muted/60 whitespace-nowrap",
-                item.disabled && "cursor-not-allowed opacity-80"
-              )}
+              className={cn(navLinkBase, navLinkDefault, item.disabled && navLinkDisabled)}
               activeProps={{
-                className: cn(
-                  "nav-link flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap",
-                  "bg-muted text-foreground",
-                  item.disabled && "cursor-not-allowed opacity-80"
-                ),
+                className: cn(navLinkBase, navLinkActive, item.disabled && navLinkDisabled),
               }}
-              search={(prev: Record<string, unknown>) => ({
-                year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
-              })}
+              search={preserveYearSearch}
               activeOptions={{ exact: item.href === "/" }}
             >
               {item.icon}

@@ -14,6 +14,9 @@ import { doesEventMatchTrack } from "~/lib/tracks";
 import { isEvent, isTrack } from "~/lib/type-guards";
 import { cn } from "~/lib/utils";
 
+const tabBaseClass = "inline-flex h-10 items-center justify-center whitespace-nowrap rounded-sm px-3 text-sm font-medium transition-all no-underline";
+const tabActiveClass = "bg-background text-foreground shadow-sm";
+
 type BookmarkListItem = (Bookmark | LocalBookmark) & { serverId?: string };
 
 function organizeBookmarks(bookmarks: BookmarkListItem[]) {
@@ -197,9 +200,9 @@ export function BookmarksList({
 									to="."
 									search={(prev) => ({ ...prev, tab: "all" })}
 									className={cn(
-										"hidden md:inline-flex h-10 items-center justify-center whitespace-nowrap rounded-sm px-3 text-sm font-medium transition-all",
-										"no-underline",
-										tab === "all" ? "bg-background text-foreground shadow-sm" : ""
+										tabBaseClass,
+										"hidden md:inline-flex",
+										tab === "all" && tabActiveClass
 									)}
 								>
 									All
@@ -208,11 +211,9 @@ export function BookmarksList({
 									to="."
 									search={(prev) => ({ ...prev, tab: "events" })}
 									className={cn(
-										"inline-flex h-10 flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 text-sm font-medium transition-all",
-										"no-underline",
-										tab === "events"
-											? "bg-background text-foreground shadow-sm"
-											: ""
+										tabBaseClass,
+										"flex-1",
+										tab === "events" && tabActiveClass
 									)}
 								>
 									Events
@@ -221,11 +222,9 @@ export function BookmarksList({
 									to="."
 									search={(prev) => ({ ...prev, tab: "tracks" })}
 									className={cn(
-										"inline-flex h-10 flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 text-sm font-medium transition-all",
-										"no-underline",
-										tab === "tracks"
-											? "bg-background text-foreground shadow-sm"
-											: ""
+										tabBaseClass,
+										"flex-1",
+										tab === "tracks" && tabActiveClass
 									)}
 								>
 									Tracks
