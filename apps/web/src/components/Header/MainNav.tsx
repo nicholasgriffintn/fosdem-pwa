@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
 import { Icons } from "~/components/shared/Icons";
@@ -21,9 +21,15 @@ type MainNavProps = {
 export function MainNav({ title, items }: MainNavProps) {
   const menuCheckboxRef = useRef<HTMLInputElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
+  const navigate = useNavigate();
   const locationKey = useRouterState({
     select: (state) => state.location.href,
   });
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const isHome = pathname === "/";
 
   useEffect(() => {
     if (menuCheckboxRef.current?.checked) {
@@ -42,12 +48,39 @@ export function MainNav({ title, items }: MainNavProps) {
         aria-label="Toggle mobile menu"
         onChange={(event) => setIsMenuOpen(event.currentTarget.checked)}
       />
+      <button
+        type="button"
+        onClick={() => {
+          if (router.history.length > 1) {
+            router.history.back();
+            return;
+          }
+          navigate({
+            to: "/",
+            search: (prev: Record<string, unknown>) => ({
+              year: isNumber(prev.year) ? prev.year : constants.DEFAULT_YEAR,
+            }),
+          });
+        }}
+        className={cn(
+          "lg:hidden hidden h-11 w-11 items-center justify-center rounded-md",
+          "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+          "-ml-2 shrink-0",
+          "[@media(display-mode:standalone)]:inline-flex",
+          isHome && "[@media(display-mode:standalone)]:hidden",
+        )}
+        aria-label="Go back"
+      >
+        <Icons.arrowLeft className="h-5 w-5" />
+        <span className="sr-only">Go back</span>
+      </button>
       <label
         htmlFor="mobile-menu-toggle"
         className={cn(
           "lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-md",
           "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
           "-ml-2 shrink-0 cursor-pointer",
+          !isHome && "[@media(display-mode:standalone)]:hidden",
         )}
       >
         <Icons.list className="h-5 w-5 peer-checked/menu:hidden" />

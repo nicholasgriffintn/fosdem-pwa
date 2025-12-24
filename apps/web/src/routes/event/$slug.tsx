@@ -249,7 +249,7 @@ function EventPage() {
         </div>
       </PageHeader>
       <div ref={headerSentinelRef} />
-      <div className="sticky top-16 z-12 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:hidden">
+      <div className="sticky top-14 z-12 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:hidden">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <span
