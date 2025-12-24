@@ -34,9 +34,13 @@ export const Route = createFileRoute("/profile/")({
   }),
   validateSearch: ({
     year,
+    day,
+    view,
     tab,
   }: {
     year: number;
+      day?: string;
+      view?: string;
     tab?: "events" | "tracks" | "all";
   }) => {
     const normalizedYear =
@@ -46,10 +50,12 @@ export const Route = createFileRoute("/profile/")({
 
     return {
       year: normalizedYear,
+      day: day || undefined,
+      view: view || undefined,
       ...(normalizedTab ? { tab: normalizedTab } : {}),
     };
   },
-  loaderDeps: ({ search: { year, tab } }) => ({ year, tab }),
+  loaderDeps: ({ search: { year, day, view, tab } }) => ({ year, day, view, tab }),
   loader: async ({ deps: { year } }) => {
     const fosdemData = await getAllData({ data: { year } });
     const serverBookmarks = await getBookmarks({
@@ -69,7 +75,7 @@ export const Route = createFileRoute("/profile/")({
 function ProfilePage() {
   const { year, fosdemData: serverFosdemData, serverBookmarks, user: serverUserFromLoader } =
     Route.useLoaderData();
-  const { tab: tabRaw } = Route.useSearch();
+  const { tab: tabRaw, day, view } = Route.useSearch();
   const tab = tabRaw ?? "events";
   const { user, loading } = useProfile();
   const { user: serverUserFromRoot } = useAuthSnapshot();
@@ -137,6 +143,8 @@ function ProfilePage() {
                 fosdemData={resolvedFosdemData}
                 year={year}
                 loading={resolvedBookmarksLoading}
+                day={day}
+                view={view}
                 tab={tab}
                 showConflicts={true}
                 defaultViewMode="schedule"
