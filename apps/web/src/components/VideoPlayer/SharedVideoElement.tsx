@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Hls from "hls.js";
 import clsx from "clsx";
 import type { Event } from "~/types/fosdem";
 
@@ -24,7 +23,7 @@ export function SharedVideoElement({
 	autoPlay = true,
 	className,
 }: SharedVideoElementProps) {
-	const hlsRef = useRef<Hls | null>(null);
+	const hlsRef = useRef<any>(null);
 
 	const resolvedSources = sources?.length
 		? sources
@@ -61,7 +60,13 @@ export function SharedVideoElement({
 			return;
 		}
 
-		if (Hls.isSupported()) {
+		let cancelled = false;
+		(async () => {
+			const mod = await import("hls.js");
+			if (cancelled) return;
+			const Hls = mod.default;
+			if (!Hls.isSupported()) return;
+
 			if (hlsRef.current) {
 				hlsRef.current.destroy();
 			}
@@ -79,7 +84,7 @@ export function SharedVideoElement({
 				hls.loadSource(streamUrl);
 			});
 
-			hls.on(Hls.Events.ERROR, (_event, data) => {
+			hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
 				if (!data.fatal) return;
 
 				switch (data.type) {
@@ -96,9 +101,10 @@ export function SharedVideoElement({
 						break;
 				}
 			});
-		}
+		})();
 
 		return () => {
+			cancelled = true;
 			if (hlsRef.current) {
 				hlsRef.current.destroy();
 				hlsRef.current = null;

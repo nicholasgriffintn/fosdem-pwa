@@ -1,5 +1,4 @@
 import type { FuseResult, FuseOptionKey } from "fuse.js";
-import Fuse from "fuse.js";
 
 import type { Event, Track, RoomData } from "~/types/fosdem";
 import { doesEventMatchTrack } from "~/lib/tracks";
@@ -22,10 +21,6 @@ const COMMON_FUSE_OPTIONS = {
 	includeScore: true,
 	useExtendedSearch: true,
 	ignoreLocation: true,
-	getFn: (obj: any, path: string | string[]) => {
-		const value = Fuse.config.getFn(obj, path);
-		return value ? String(value) : "";
-	},
 };
 
 export const TRACK_SEARCH_KEYS = [
@@ -50,8 +45,12 @@ export const ROOM_SEARCH_KEYS = [
 	{ name: "buildingId", weight: 0.6 },
 ];
 
-export function createSearchIndex<T>(items: T[], keys: FuseOptionKey<T>[]) {
-	return new Fuse(items, {
+export function createSearchIndex<T>(
+	FuseImpl: any,
+	items: T[],
+	keys: FuseOptionKey<T>[],
+) {
+	return new FuseImpl(items, {
 		...COMMON_FUSE_OPTIONS,
 		keys,
 	});

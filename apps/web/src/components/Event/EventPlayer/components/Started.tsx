@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import Hls from "hls.js";
 
 import { Icons } from "~/components/shared/Icons";
 import type { Event } from "~/types/fosdem";
@@ -17,7 +16,7 @@ export function EventPlayerStarted({
 	setIsPlaying: (value: boolean) => void;
 	eventIsLive: boolean;
 }) {
-	const hlsRef = useRef<Hls | null>(null);
+	const hlsRef = useRef<any>(null);
 	const [streamError, setStreamError] = useState(false);
 
 	const subtitleTrack = event.links?.find((link) => link.href.endsWith(".vtt"));
@@ -36,7 +35,15 @@ export function EventPlayerStarted({
 				(stream) => stream.type === "application/vnd.apple.mpegurl",
 			);
 
-			if (hlsStream && Hls.isSupported()) {
+			if (!hlsStream) return;
+
+			let cancelled = false;
+			(async () => {
+				const mod = await import("hls.js");
+				if (cancelled) return;
+				const Hls = mod.default;
+				if (!Hls.isSupported()) return;
+
 				const hls = new Hls();
 				hlsRef.current = hls;
 				hls.attachMedia(videoRef.current);
@@ -45,12 +52,16 @@ export function EventPlayerStarted({
 					hls.loadSource(hlsStream.href);
 				});
 
-				hls.on(Hls.Events.ERROR, (event, data) => {
+				hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
 					if (data.fatal) {
 						setStreamError(true);
 					}
 				});
-			}
+			})();
+
+			return () => {
+				cancelled = true;
+			};
 		}
 
 		return () => {

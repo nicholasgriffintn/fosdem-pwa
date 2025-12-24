@@ -107,24 +107,50 @@ export default function SearchPage() {
 	const selectedTime = time || "";
 	const selectedType = type || "all";
 	const [localQuery, setLocalQuery] = useState(query);
+	const [FuseImpl, setFuseImpl] = useState<any>(null);
 
 	useEffect(() => {
 		setLocalQuery(query);
 	}, [query]);
+
+	useEffect(() => {
+		if (!query.trim()) return;
+		if (FuseImpl) return;
+		let cancelled = false;
+		import("fuse.js").then((mod) => {
+			if (cancelled) return;
+			setFuseImpl(() => mod.default);
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [query, FuseImpl]);
 
 	const hasActiveFilters = Boolean(
 		query || selectedTrack || selectedTime || selectedType !== "all",
 	);
 
 	const fuseIndexes = useMemo(() => {
-		if (!fosdemData) return null;
+		if (!fosdemData || !FuseImpl) return null;
 
 		return {
-			tracks: createSearchIndex(Object.values(fosdemData.tracks), TRACK_SEARCH_KEYS),
-			events: createSearchIndex(Object.values(fosdemData.events), EVENT_SEARCH_KEYS),
-			rooms: createSearchIndex(Object.values(fosdemData.rooms), ROOM_SEARCH_KEYS),
+			tracks: createSearchIndex(
+				FuseImpl,
+				Object.values(fosdemData.tracks),
+				TRACK_SEARCH_KEYS,
+			),
+			events: createSearchIndex(
+				FuseImpl,
+				Object.values(fosdemData.events),
+				EVENT_SEARCH_KEYS,
+			),
+			rooms: createSearchIndex(
+				FuseImpl,
+				Object.values(fosdemData.rooms),
+				ROOM_SEARCH_KEYS,
+			),
 		};
-	}, [fosdemData]);
+	}, [fosdemData, FuseImpl]);
 
 	const searchResults = useMemo(() => {
 		if (!fosdemData || !query || !fuseIndexes)
