@@ -19,13 +19,20 @@ export function BottomTabNav({ items }: BottomTabNavProps) {
     select: (state) => state.location.pathname,
   });
 
+  const mobileItems = items.filter((item) => item.mobile);
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 border-t lg:hidden transition-all duration-300 ease-in-out [padding-bottom:constant(safe-area-inset-bottom)] [padding-bottom:env(safe-area-inset-bottom)]"
       aria-label="Mobile navigation"
     >
-      <div className="grid grid-cols-4 h-16 max-w-md mx-auto">
-        {items.filter((item) => item.mobile).map((item) => {
+      <div
+        className="grid h-16 max-w-md mx-auto"
+        style={{
+          gridTemplateColumns: `repeat(${Math.max(mobileItems.length, 1)}, minmax(0, 1fr))`,
+        }}
+      >
+        {mobileItems.map((item) => {
           const isActive = locationKey === item.href ||
             (item.href === "/" && locationKey === "/");
 
