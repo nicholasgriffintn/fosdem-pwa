@@ -67,7 +67,7 @@ export function ItemListContainer<T>({
     return (
       <section>
         <div className="flex flex-col space-y-4">
-          <div className="sticky top-16 z-10 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:static md:z-auto md:mx-0 md:px-0 md:py-0 md:bg-transparent md:backdrop-blur-none md:border-0">
+          <div className="sticky top-14 z-10 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:static md:z-auto md:mx-0 md:px-0 md:py-0 md:bg-transparent md:backdrop-blur-none md:border-0">
             <div className="flex flex-row justify-between items-center gap-3">
               <div className="flex flex-col md:flex-row md:items-center gap-3">
                 {title && (
@@ -118,7 +118,7 @@ export function ItemListContainer<T>({
 
   return (
     <section>
-      <div className="sticky top-16 z-10 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:static md:z-auto md:mx-0 md:px-0 md:py-0 md:bg-transparent md:backdrop-blur-none md:border-0">
+      <div className="sticky top-14 z-10 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:static md:z-auto md:mx-0 md:px-0 md:py-0 md:bg-transparent md:backdrop-blur-none md:border-0">
         <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-3">
           {title && (
             <h2 className="text-xl font-semibold shrink-0 text-foreground">
