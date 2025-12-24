@@ -25,6 +25,7 @@ export function getRouter() {
 	const router = createRouter({
 		routeTree,
 		context: { queryClient },
+		scrollToTopSelectors: ['#main-content'],
 		scrollRestoration: true,
 		defaultPreload: false,
 		defaultErrorComponent: DefaultCatchBoundary,
