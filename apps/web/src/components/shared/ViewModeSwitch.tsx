@@ -14,11 +14,11 @@ export function ViewModeSwitch({
         to="."
         search={(prev) => ({ ...prev, view: 'list' })}
         className={cn(
-          "inline-flex items-center gap-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors",
-          "no-underline hover:underline",
+          "inline-flex h-10 items-center gap-1 rounded-md border px-3 text-sm font-medium transition-colors ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "no-underline",
           viewMode === 'list'
-            ? "bg-primary text-primary-foreground border-primary"
-            : "bg-background hover:bg-accent"
+            ? "bg-primary text-primary-foreground border-primary shadow-sm"
+            : "bg-background hover:bg-accent hover:text-accent-foreground"
         )}
       >
         <Icons.list className="h-4 w-4" />
@@ -28,11 +28,11 @@ export function ViewModeSwitch({
         to="."
         search={(prev) => ({ ...prev, view: 'calendar' })}
         className={cn(
-          "inline-flex items-center gap-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors",
-          "no-underline hover:underline",
+          "inline-flex h-10 items-center gap-1 rounded-md border px-3 text-sm font-medium transition-colors ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "no-underline",
           viewMode === 'calendar'
-            ? "bg-primary text-primary-foreground border-primary"
-            : "bg-background hover:bg-accent"
+            ? "bg-primary text-primary-foreground border-primary shadow-sm"
+            : "bg-background hover:bg-accent hover:text-accent-foreground"
         )}
       >
         <Icons.calendar className="h-4 w-4" />
@@ -42,11 +42,11 @@ export function ViewModeSwitch({
         to="."
         search={(prev) => ({ ...prev, view: 'schedule' })}
         className={cn(
-          "inline-flex items-center gap-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors",
-          "no-underline hover:underline",
+          "inline-flex h-10 items-center gap-1 rounded-md border px-3 text-sm font-medium transition-colors ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "no-underline",
           viewMode === 'schedule'
-            ? "bg-primary text-primary-foreground border-primary"
-            : "bg-background hover:bg-accent"
+            ? "bg-primary text-primary-foreground border-primary shadow-sm"
+            : "bg-background hover:bg-accent hover:text-accent-foreground"
         )}
       >
         <Icons.clock className="h-4 w-4" />

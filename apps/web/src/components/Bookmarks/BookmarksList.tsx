@@ -190,13 +190,13 @@ export function BookmarksList({
 			) : bookmarks?.length ? (
 					<div className="space-y-6">
 						<div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-							<div className="inline-flex h-10 w-full items-center justify-center rounded-md bg-muted p-1 text-muted-foreground md:w-auto">
+							<div className="inline-flex h-12 w-full items-center justify-center rounded-md bg-muted p-1 text-muted-foreground md:w-auto">
 								<Link
 									to="."
 									search={(prev) => ({ ...prev, tab: "all" })}
 									className={cn(
-										"hidden md:inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all",
-										"no-underline hover:underline",
+										"hidden md:inline-flex h-10 items-center justify-center whitespace-nowrap rounded-sm px-3 text-sm font-medium transition-all",
+										"no-underline",
 										tab === "all" ? "bg-background text-foreground shadow-sm" : ""
 									)}
 								>
@@ -206,8 +206,8 @@ export function BookmarksList({
 									to="."
 									search={(prev) => ({ ...prev, tab: "events" })}
 									className={cn(
-										"inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all",
-										"no-underline hover:underline",
+										"inline-flex h-10 flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 text-sm font-medium transition-all",
+										"no-underline",
 										tab === "events"
 											? "bg-background text-foreground shadow-sm"
 											: ""
@@ -219,8 +219,8 @@ export function BookmarksList({
 									to="."
 									search={(prev) => ({ ...prev, tab: "tracks" })}
 									className={cn(
-										"inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all",
-										"no-underline hover:underline",
+										"inline-flex h-10 flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 text-sm font-medium transition-all",
+										"no-underline",
 										tab === "tracks"
 											? "bg-background text-foreground shadow-sm"
 											: ""

@@ -2,6 +2,7 @@ import { cn } from "~/lib/utils";
 import type { Event } from "~/types/fosdem";
 import type { EventConflict } from "~/lib/fosdem";
 import { ItemActions } from "~/components/shared/ItemActions";
+import { EventListItem } from "~/components/Event/EventItemList";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime, calculateTransitionTime } from "~/lib/dateTime";
 import { sortScheduleEvents } from "~/lib/sorting";
@@ -37,6 +38,11 @@ type EventScheduleListItemProps = {
 	nextEvent?: Event;
 	year: number;
 	bookmarksLoading: boolean;
+	conflicts?: EventConflict[];
+	onSetPriority?: (
+		eventId: string,
+		updates: { priority: number | null },
+	) => void;
 	showTrack?: boolean;
 	user?: User | null;
 	onCreateBookmark?: ({
@@ -55,6 +61,8 @@ function EventScheduleListItem({
 	nextEvent,
 	year,
 	bookmarksLoading,
+	conflicts,
+	onSetPriority,
 	showTrack,
 	user,
 	onCreateBookmark,
@@ -66,25 +74,18 @@ function EventScheduleListItem({
 
 	return (
 		<div className="relative">
-			<div className="bg-card border rounded-lg p-4 mb-2">
-				<div className="flex flex-col space-y-2">
-					<div className="font-semibold">{event.title}</div>
-					<p className="text-sm text-muted-foreground">
-						{event.room} | {event.startTime} -{" "}
-						{calculateEndTime(event.startTime, event.duration)}
-						{event.persons?.length > 0 && ` | ${event.persons.join(", ")}`}
-						{showTrack && event.trackKey && ` | ${event.trackKey}`}
-					</p>
-					<ItemActions
-						item={event}
-						year={year}
-						type="event"
-						bookmarksLoading={bookmarksLoading}
-						size="sm"
-						onCreateBookmark={onCreateBookmark}
-					/>
-				</div>
-			</div>
+			<EventListItem
+				variant="list"
+				year={year}
+				event={event}
+				bookmarksLoading={bookmarksLoading}
+				conflicts={conflicts}
+				onSetPriority={onSetPriority}
+				showTrack={showTrack}
+				user={user}
+				onCreateBookmark={onCreateBookmark}
+				actionSize="sm"
+			/>
 			{transitionTime !== null && (
 				<div
 					className={cn(
@@ -122,6 +123,7 @@ export function EventScheduleList({
 	events,
 	year,
 	conflicts,
+	onSetPriority,
 	showTrack,
 	user,
 	onCreateBookmark,
@@ -135,19 +137,22 @@ export function EventScheduleList({
 	});
 
 	return (
-		<div className="space-y-2">
+		<ul className="event-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
 			{sortedEvents.map((event, index) => (
-				<EventScheduleListItem
-					key={event?.id}
-					event={event}
-					nextEvent={sortedEvents[index + 1]}
-					year={year}
-					bookmarksLoading={bookmarksLoading}
-					showTrack={showTrack}
-					user={user}
-					onCreateBookmark={onCreateBookmark}
-				/>
+				<li key={event?.id}>
+					<EventScheduleListItem
+						event={event}
+						nextEvent={sortedEvents[index + 1]}
+						year={year}
+						bookmarksLoading={bookmarksLoading}
+						conflicts={conflicts}
+						onSetPriority={onSetPriority}
+						showTrack={showTrack}
+						user={user}
+						onCreateBookmark={onCreateBookmark}
+					/>
+				</li>
 			))}
-		</div>
+		</ul>
 	);
 }
