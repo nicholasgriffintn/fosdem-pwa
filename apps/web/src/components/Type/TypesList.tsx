@@ -11,7 +11,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
 import { constants } from "~/constants";
-import type { TypeIds } from "~/types/fosdem";
+import type { TypeIds, Track } from "~/types/fosdem";
 import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
 
 type TypesListProps = {
@@ -22,10 +22,17 @@ type TypesListProps = {
 			trackCount: number;
 		};
 	};
+	tracks?: Record<string, Track>;
 };
 
-export function TypesList({ types }: TypesListProps) {
+export function TypesList({ types, tracks }: TypesListProps) {
 	const typeKeys = Object.keys(types);
+
+	const getSingleTrackForType = (typeId: string): Track | undefined => {
+		if (!tracks) return undefined;
+		const tracksForType = Object.values(tracks).filter(track => track.type === typeId);
+		return tracksForType.length === 1 ? tracksForType[0] : undefined;
+	};
 
 	return (
 		<ul className="flex flex-wrap -mx-1 lg:-mx-4">
@@ -39,18 +46,36 @@ export function TypesList({ types }: TypesListProps) {
 						<Card className="lg:max-w-md w-full">
 							<CardHeader>
 								<CardTitle>
-									<Link
-										search={(prev: any) => ({
-											...prev,
-											year: prev.year || constants.DEFAULT_YEAR,
-											day: prev.day || undefined,
-										})}
-										to="/type/$slug"
-										params={{ slug: types[typeKey].id }}
-										className="no-underline"
-									>
-										{types[typeKey].name}
-									</Link>
+									{(() => {
+										const singleTrack = getSingleTrackForType(types[typeKey].id);
+										return singleTrack ? (
+											<Link
+												search={(prev: any) => ({
+													...prev,
+													year: prev.year || constants.DEFAULT_YEAR,
+													day: prev.day || undefined,
+												})}
+												to="/track/$slug"
+												params={{ slug: singleTrack.id }}
+												className="no-underline"
+											>
+												{types[typeKey].name}
+											</Link>
+										) : (
+												<Link
+													search={(prev: any) => ({
+														...prev,
+														year: prev.year || constants.DEFAULT_YEAR,
+														day: prev.day || undefined,
+													})}
+													to="/type/$slug"
+													params={{ slug: types[typeKey].id }}
+													className="no-underline"
+												>
+													{types[typeKey].name}
+												</Link>
+										);
+									})()}
 								</CardTitle>
 								<CardDescription>
 									<div className="flex flex-row">
@@ -85,23 +110,28 @@ export function TypesList({ types }: TypesListProps) {
 								)}
 							</CardContent>
 							<CardFooter>
-								<Button
-									variant="secondary"
-									asChild
-									className="w-full no-underline"
-								>
-									<Link
-										search={(prev: any) => ({
-											...prev,
-											year: prev.year || constants.DEFAULT_YEAR,
-											day: prev.day || undefined,
-										})}
-										to="/type/$slug"
-										params={{ slug: types[typeKey].id }}
-									>
-										View {types[typeKey].name ?? "Tracks"}
-									</Link>
-								</Button>
+								{(() => {
+									const singleTrack = getSingleTrackForType(types[typeKey].id);
+									return (
+										<Button
+											variant="secondary"
+											asChild
+											className="w-full no-underline"
+										>
+											<Link
+												search={(prev: any) => ({
+													...prev,
+													year: prev.year || constants.DEFAULT_YEAR,
+													day: prev.day || undefined,
+												})}
+												to={singleTrack ? "/track/$slug" : "/type/$slug"}
+												params={{ slug: singleTrack ? singleTrack.id : types[typeKey].id }}
+											>
+												View {types[typeKey].name ?? "Tracks"}
+											</Link>
+										</Button>
+									);
+								})()}
 							</CardFooter>
 						</Card>
 					</li>
