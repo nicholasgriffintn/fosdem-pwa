@@ -3,6 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 const PORT = process.env.PLAYWRIGHT_PORT ?? "3000";
 const baseURL =
 	process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
+const isLocalhost = baseURL.includes("localhost");
 
 export default defineConfig({
 	testDir: "./tests/playwright/specs",
@@ -14,6 +15,7 @@ export default defineConfig({
 		baseURL,
 		trace: "retain-on-failure",
 		video: "retain-on-failure",
+		serviceWorkers: "allow",
 	},
 	projects: [
 		{
@@ -21,10 +23,12 @@ export default defineConfig({
 			use: { ...devices["Desktop Chrome"] },
 		},
 	],
-	webServer: {
-		command: `pnpm dev`,
-		url: baseURL,
-		reuseExistingServer: !process.env.CI,
-		timeout: 120_000,
-	},
+	webServer: isLocalhost
+		? {
+			command: `pnpm dev`,
+			url: baseURL,
+			reuseExistingServer: !process.env.CI,
+			timeout: 120_000,
+		}
+		: undefined,
 });

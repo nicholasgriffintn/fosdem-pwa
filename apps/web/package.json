@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:live": "PLAYWRIGHT_BASE_URL=https://fosdempwa.com playwright test",
     "lint": "pnpm biome lint ./src",
     "typecheck": "tsc --noEmit",
     "format": "pnpm biome format --write ./src",
