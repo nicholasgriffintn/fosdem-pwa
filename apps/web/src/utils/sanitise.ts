@@ -1,5 +1,6 @@
 export function removeHTMLTags(input: string) {
-  return input.replace(/<[^>]*>/g, "");
+  const withoutTags = input.replace(/<[^>]*>/g, "");
+  return withoutTags.replace(/[<>]/g, "");
 }
 
 export function sanitiseString(input: string) {
