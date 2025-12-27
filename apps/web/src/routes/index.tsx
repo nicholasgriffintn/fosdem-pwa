@@ -27,6 +27,7 @@ export const Route = createFileRoute("/")({
 			fosdem: {
 				conference: data.conference,
 				types: data.types,
+				tracks: data.tracks,
 			},
 		};
 	},
@@ -84,7 +85,7 @@ function Home() {
 							<ConferenceScheduleNotice conference={fosdem.conference} year={year} />
 
 							{fosdem.types ? (
-							<TypesList types={fosdem.types} />
+							<TypesList types={fosdem.types} tracks={fosdem.tracks} />
 							) : (
 								<EmptyStateCard
 									title="No schedule data yet"
