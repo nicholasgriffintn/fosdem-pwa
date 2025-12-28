@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/cloudflare";
 import type { ExecutionContext, ExportedHandler } from "@cloudflare/workers-types";
 
-import { triggerNotifications, triggerTestNotification } from "./controllers/notifications";
+import { triggerNotifications } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
 import { triggerRoomStatusNotifications, pollAndStoreRoomStatus, cleanupOldRoomStatus } from "./controllers/room-status";
 import { triggerRecordingNotifications } from "./controllers/recording-notifications";
@@ -53,15 +53,9 @@ export default Sentry.withSentry(
 
 			try {
 				const url = new URL(request.url);
-				const isTestMode = url.searchParams.has("test");
 				const isDailySummary = url.searchParams.has("daily-summary");
 				const isEveningSummary = url.searchParams.has("evening-summary");
 				const isScheduleChange = url.searchParams.has("schedule-changes");
-
-				if (isTestMode) {
-					await triggerTestNotification(env, ctx);
-					return new Response("Test notification sent");
-				}
 
 				if (isDailySummary) {
 					await triggerDailySummary({ cron: "fetch" }, env, ctx, true, false);
@@ -94,6 +88,38 @@ export default Sentry.withSentry(
 				if (isRecordings) {
 					await triggerRecordingNotifications({ cron: "fetch" }, env, ctx, true);
 					return new Response("Recording notifications queued");
+				}
+
+				const isTest = url.searchParams.has("test");
+				if (isTest) {
+					const type = url.searchParams.get("type");
+
+					if (!type) {
+						return new Response("Missing type parameter", { status: 400 });
+					}
+
+					switch (type) {
+						case "event-reminder":
+							await triggerNotifications({ cron: "test" }, env, ctx, true);
+							return new Response("Event reminder notifications triggered");
+						case "daily-summary-morning":
+							await triggerDailySummary({ cron: "test" }, env, ctx, true, false);
+							return new Response("Morning summary notifications triggered");
+						case "daily-summary-evening":
+							await triggerDailySummary({ cron: "test" }, env, ctx, true, true);
+							return new Response("Evening summary notifications triggered");
+						case "schedule-change":
+							await triggerScheduleChangeNotifications({ cron: "test" }, env, ctx, true);
+							return new Response("Schedule change notifications triggered");
+						case "room-status":
+							await triggerRoomStatusNotifications({ cron: "test" }, env, ctx, true);
+							return new Response("Room status notifications triggered");
+						case "recording-available":
+							await triggerRecordingNotifications({ cron: "test" }, env, ctx, true);
+							return new Response("Recording notifications triggered");
+						default:
+							return new Response(`Unknown notification type: ${type}`, { status: 400 });
+					}
 				}
 
 				await triggerNotifications({ cron: "fetch" }, env, ctx, true);

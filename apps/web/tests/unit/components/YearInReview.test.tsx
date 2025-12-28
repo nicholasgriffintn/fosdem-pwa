@@ -56,7 +56,7 @@ describe("YearInReview", () => {
     render(<YearInReview stats={null} user={createUser()} year={2024} />);
 
     expect(screen.getByText(/Your FOSDEM 2024 Year in Review/i)).toBeInTheDocument();
-    expect(screen.getByText(/Start attending events/i)).toBeInTheDocument();
+    expect(screen.getByText(/Mark events as attended or watch recordings to build your year in review/i)).toBeInTheDocument();
   });
 
   it("renders year in review with stats", () => {

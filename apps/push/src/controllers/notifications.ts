@@ -50,49 +50,6 @@ async function processUserNotifications(
 	}
 }
 
-export async function triggerTestNotification(env: Env, ctx: ExecutionContext) {
-	if (!bookmarkNotificationsEnabled(env)) {
-		console.log("Bookmark notifications disabled; skipping test send");
-		return;
-	}
-
-	const keys = await getApplicationKeys(env);
-
-	const testSubscriptions = await env.DB.prepare(
-		"SELECT user_id, endpoint, auth, p256dh FROM subscription WHERE user_id = ?",
-	)
-		.bind("1")
-		.run();
-
-	if (!testSubscriptions.success || !testSubscriptions.results?.length) {
-		throw new Error("No test subscriptions found");
-	}
-
-	const subscriptions: Subscription[] = testSubscriptions.results.map(sub => ({
-		user_id: sub.user_id as string,
-		endpoint: sub.endpoint as string,
-		auth: sub.auth as string,
-		p256dh: sub.p256dh as string,
-	}));
-
-	const fosdemData = await getFosdemData();
-	const bookmarks = await getUserBookmarks(subscriptions[0].user_id, env, {
-		includeSent: true,
-	});
-	const enrichedBookmarks = enrichBookmarks(bookmarks, fosdemData.events);
-	const dayOneBookmarks = getBookmarksForDay(enrichedBookmarks, "1");
-
-	if (!dayOneBookmarks.length) {
-		throw new Error("No bookmarks found for day 1");
-	}
-
-	await Promise.all(subscriptions.map(async (subscription) => {
-		await processUserNotifications(subscription, [dayOneBookmarks[0]], keys, env);
-	}));
-	
-	console.log(`Test notifications sent successfully to ${subscriptions.length} devices`);
-}
-
 export async function triggerNotifications(
 	event: { cron: string },
 	env: Env,

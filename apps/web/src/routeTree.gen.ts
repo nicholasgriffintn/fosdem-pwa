@@ -26,6 +26,7 @@ import { Route as TrackSlugRouteImport } from './routes/track/$slug'
 import { Route as SpeakersSlugRouteImport } from './routes/speakers/$slug'
 import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
 import { Route as ProfileYearInReviewRouteImport } from './routes/profile/year-in-review'
+import { Route as ProfileAdminTestRouteImport } from './routes/profile/admin-test'
 import { Route as EventSlugRouteImport } from './routes/event/$slug'
 import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
 import { Route as ApiProxySubtitlesRouteImport } from './routes/api/proxy/subtitles'
@@ -130,6 +131,11 @@ const ProfileYearInReviewRoute = ProfileYearInReviewRouteImport.update({
   path: '/profile/year-in-review',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileAdminTestRoute = ProfileAdminTestRouteImport.update({
+  id: '/profile/admin-test',
+  path: '/profile/admin-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventSlugRoute = EventSlugRouteImport.update({
   id: '/event/$slug',
   path: '/event/$slug',
@@ -224,6 +230,7 @@ const ApiAuthCallbackDiscordRoute = ApiAuthCallbackDiscordRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
+  '/profile/admin-test': typeof ProfileAdminTestRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -261,6 +268,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
+  '/profile/admin-test': typeof ProfileAdminTestRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
+  '/profile/admin-test': typeof ProfileAdminTestRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -338,6 +347,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/event/$slug'
+    | '/profile/admin-test'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/event/$slug'
+    | '/profile/admin-test'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/event/$slug'
+    | '/profile/admin-test'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
@@ -450,6 +462,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventSlugRoute: typeof EventSlugRoute
+  ProfileAdminTestRoute: typeof ProfileAdminTestRoute
   ProfileYearInReviewRoute: typeof ProfileYearInReviewRoute
   RoomsRoomIdRoute: typeof RoomsRoomIdRoute
   SpeakersSlugRoute: typeof SpeakersSlugRoute
@@ -606,6 +619,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileYearInReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/admin-test': {
+      id: '/profile/admin-test'
+      path: '/profile/admin-test'
+      fullPath: '/profile/admin-test'
+      preLoaderRoute: typeof ProfileAdminTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/event/$slug': {
       id: '/event/$slug'
       path: '/event/$slug'
@@ -738,6 +758,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventSlugRoute: EventSlugRoute,
+  ProfileAdminTestRoute: ProfileAdminTestRoute,
   ProfileYearInReviewRoute: ProfileYearInReviewRoute,
   RoomsRoomIdRoute: RoomsRoomIdRoute,
   SpeakersSlugRoute: SpeakersSlugRoute,
