@@ -102,7 +102,7 @@ export const unmarkEventAttended = createServerFn({
     }
 
     try {
-      await updateBookmark(ctx.data.bookmarkId, {
+      await updateBookmark(ctx.data.bookmarkId, user.id, {
         attended: false,
         attended_at: null,
         attended_in_person: false,
@@ -161,7 +161,7 @@ export const toggleAttendanceFromForm = createServerFn({
 
     try {
       if (currentStatus) {
-        await updateBookmark(bookmarkId, {
+        await updateBookmark(bookmarkId, user.id, {
           attended: false,
           attended_at: null,
           attended_in_person: false,
@@ -176,7 +176,7 @@ export const toggleAttendanceFromForm = createServerFn({
     return new Response(null, {
       status: 303,
       headers: {
-        Location: returnTo?.startsWith("/") ? returnTo : "/",
+        Location: returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/",
       },
     });
   });

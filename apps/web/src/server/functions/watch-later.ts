@@ -126,7 +126,7 @@ export const setPlaybackSpeed = createServerFn({
     }
 
     try {
-      await updateBookmark(ctx.data.bookmarkId, {
+      await updateBookmark(ctx.data.bookmarkId, user.id, {
         playback_speed: ctx.data.speed,
       });
       return ok(true);

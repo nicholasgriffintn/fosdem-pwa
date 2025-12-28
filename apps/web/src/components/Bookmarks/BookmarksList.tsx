@@ -156,7 +156,7 @@ export function BookmarksList({
 			.sort(sortEvents);
 
 		const conflicts = showConflicts
-			? detectEventConflicts(formattedEvents, fosdemData.conference)
+			? detectEventConflicts(formattedEvents, year)
 			: [];
 
 		const formattedTracks = bookmarkedTracks

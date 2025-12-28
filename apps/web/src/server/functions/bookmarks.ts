@@ -69,26 +69,31 @@ export const createBookmark = createServerFn({
 
 		const user = await getAuthUser();
 		if (!user) {
-			if (returnTo) {
+			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
 				return new Response(null, {
 					status: 303,
 					headers: {
-						Location: returnTo.startsWith("/") ? returnTo : "/signin",
+						Location: returnTo,
 					},
 				});
 			}
-			return null;
+			return new Response(null, {
+				status: 303,
+				headers: {
+					Location: "/signin",
+				},
+			});
 		}
 
 		try {
 			const yearNum = validateYear(year);
 			await upsertBookmark(user.id, yearNum, type, slug, status);
 
-			if (returnTo) {
+			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
 				return new Response(null, {
 					status: 303,
 					headers: {
-						Location: returnTo.startsWith("/") ? returnTo : "/",
+						Location: returnTo,
 					},
 				});
 			}
@@ -97,11 +102,11 @@ export const createBookmark = createServerFn({
 		} catch (error) {
 			console.error(error);
 
-			if (returnTo) {
+			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
 				return new Response(null, {
 					status: 303,
 					headers: {
-						Location: returnTo.startsWith("/") ? returnTo : "/",
+						Location: returnTo,
 					},
 				});
 			}
@@ -159,7 +164,7 @@ export const createBookmarkFromForm = createServerFn({
 		return new Response(null, {
 			status: 303,
 			headers: {
-				Location: returnTo?.startsWith("/") ? returnTo : "/",
+				Location: returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/",
 			},
 		});
 	});
@@ -205,7 +210,7 @@ export const updateBookmark = createServerFn({
 		}
 
 		try {
-			await updateBookmarkRepo(id, safeUpdates);
+			await updateBookmarkRepo(id, user.id, safeUpdates);
 			return ok(true);
 		} catch (error) {
 			console.error(error);
@@ -254,7 +259,7 @@ export const deleteBookmark = createServerFn({
 		}
 
 		try {
-			await deleteBookmarkRepo(id);
+			await deleteBookmarkRepo(id, user.id);
 			return ok(true);
 		} catch (error) {
 			console.error(error);

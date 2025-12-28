@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { Event, ConferenceData } from "~/types/fosdem";
+import type { Event } from "~/types/fosdem";
 import { detectEventConflicts, generateTimeSlots } from "~/lib/fosdem";
 
 const buildEvent = (overrides: Partial<Event>): Event =>
@@ -28,19 +28,6 @@ const buildEvent = (overrides: Partial<Event>): Event =>
 		...overrides,
 	}) as Event;
 
-const conference: ConferenceData = {
-	acronym: "F",
-	title: "FOSDEM",
-	venue: "",
-	city: "",
-	start: "2024-02-03",
-	end: "2024-02-04",
-	days: ["2024-02-03", "2024-02-04"],
-	day_change: "",
-	timeslot_duration: "",
-	time_zone_name: "UTC",
-};
-
 describe("fosdem helpers", () => {
 	it("detects overlapping events on the same day", () => {
 		const events = [
@@ -49,7 +36,7 @@ describe("fosdem helpers", () => {
 			buildEvent({ id: "3", startTime: "12:00", duration: "01:00" }),
 		];
 
-		const conflicts = detectEventConflicts(events, conference);
+		const conflicts = detectEventConflicts(events, 2024);
 		expect(conflicts).toHaveLength(1);
 		expect(conflicts[0].event1.id).toBe("1");
 		expect(conflicts[0].event2.id).toBe("2");

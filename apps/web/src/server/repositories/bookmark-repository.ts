@@ -83,6 +83,7 @@ export async function upsertBookmark(
 
 export async function updateBookmark(
   id: string,
+  userId: number,
   updates: Partial<Pick<Bookmark,
     | "status"
     | "priority"
@@ -97,11 +98,11 @@ export async function updateBookmark(
     | "attended_in_person"
   >>,
 ): Promise<void> {
-  await db.update(bookmarkTable).set(updates).where(eq(bookmarkTable.id, id));
+  await db.update(bookmarkTable).set(updates).where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
 }
 
-export async function deleteBookmark(id: string): Promise<void> {
-  await db.delete(bookmarkTable).where(eq(bookmarkTable.id, id));
+export async function deleteBookmark(id: string, userId: number): Promise<void> {
+  await db.delete(bookmarkTable).where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
 }
 
 export async function findWatchLaterBookmarks(
@@ -153,7 +154,7 @@ export async function updateWatchProgress(
     updates.watch_status = "watching";
   }
 
-  await db.update(bookmarkTable).set(updates).where(eq(bookmarkTable.id, id));
+  await db.update(bookmarkTable).set(updates).where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
 }
 
 export async function markAsWatched(
@@ -169,7 +170,7 @@ export async function markAsWatched(
       watch_status: "watched",
       last_watched_at: new Date().toISOString(),
     })
-    .where(eq(bookmarkTable.id, id));
+    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
 }
 
 export async function toggleWatchLater(
@@ -183,7 +184,7 @@ export async function toggleWatchLater(
   await db
     .update(bookmarkTable)
     .set({ watch_later: newValue })
-    .where(eq(bookmarkTable.id, id));
+    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
 
   return newValue;
 }
@@ -203,5 +204,5 @@ export async function markAsAttended(
       attended_at: new Date().toISOString(),
       attended_in_person: inPerson,
     })
-    .where(eq(bookmarkTable.id, id));
+    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
 }

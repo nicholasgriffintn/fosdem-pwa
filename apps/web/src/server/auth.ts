@@ -24,6 +24,7 @@ import {
 	type User,
 } from "~/server/db/schema";
 import type { GitHubUser } from "~/types/user";
+import { randomInt, randomBase32 } from "~/server/lib/random";
 
 export const SESSION_COOKIE_NAME = "session";
 const TTL = 60 * 60 * 24 * 30;
@@ -246,15 +247,21 @@ export const getFullAuthSession = getAuthSession;
 /**
  * Generates a random guest username
  */
-function generateGuestUsername(): string {
-	const adjectives = ["Happy", "Quick", "Clever", "Bright", "Swift"];
-	const nouns = ["Penguin", "Dolphin", "Eagle", "Lion", "Fox"];
-	const randomNum = Math.floor(Math.random() * 10000);
+const adjectives = [
+	"happy", "quick", "clever", "bright", "swift", "bold", "calm", "eager", "fair", "gentle",
+	"kind", "lively", "nice", "proud", "wise"
+];
+const nouns = [
+	"penguin", "dolphin", "eagle", "lion", "fox", "tiger", "bear", "wolf", "owl", "falcon",
+	"deer", "panda", "hawk", "raven", "otter"
+];
+export function generateGuestUsername(): string {
+	const adjective = adjectives[randomInt(adjectives.length)];
+	const noun = nouns[randomInt(nouns.length)];
 
-	const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-	const noun = nouns[Math.floor(Math.random() * nouns.length)];
+	const suffix = randomBase32(10);
 
-	return `${adjective}${noun}${randomNum}`;
+	return `${adjective}-${noun}-${suffix}`;
 }
 
 /**
@@ -262,19 +269,29 @@ function generateGuestUsername(): string {
  */
 export async function createGuestUser(): Promise<User> {
 	const now = createStandardDate(new Date()).toISOString();
-	const username = generateGuestUsername();
-	const guestUser = {
-		name: username,
-		email: `guest-${username}@fosdempwa.com`,
-		github_id: null,
-		is_guest: true,
-		created_at: now,
-		updated_at: now,
-	};
 
-	const [user] = await db.insert(userTable).values(guestUser).returning();
+	for (let attempt = 0; attempt < 5; attempt++) {
+		const username = generateGuestUsername();
+		const guestUser = {
+			name: username,
+			email: `guest-${username}@fosdempwa.com`,
+			github_id: null,
+			is_guest: true,
+			created_at: now,
+			updated_at: now,
+		};
 
-	return user;
+		try {
+			const [user] = await db.insert(userTable).values(guestUser).returning();
+			return user;
+		} catch (error: any) {
+			if (attempt === 4 || !error?.message?.includes('UNIQUE')) {
+				throw error;
+			}
+		}
+	}
+
+	throw new Error('Failed to generate unique guest username');
 }
 
 /**

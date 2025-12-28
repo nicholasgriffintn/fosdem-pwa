@@ -1,4 +1,4 @@
-import type { Event, ConferenceData } from "~/types/fosdem";
+import type { Event } from "~/types/fosdem";
 
 interface TimeSlot {
 	time: string;
@@ -24,8 +24,7 @@ export interface GroupedConflict {
 }
 
 export function detectEventConflicts(
-	events: Event[],
-	conference: ConferenceData,
+	events: Event[], year: number
 ): EventConflict[] {
 	const conflicts: EventConflict[] = [];
 
@@ -65,7 +64,7 @@ export function detectEventConflicts(
 			if (overlapStart < overlapEnd) {
 				const overlapDuration = overlapEnd - overlapStart;
 
-				const baseDate = new Date(2024, 0, 1);
+				const baseDate = new Date(year, 0, 1);
 				const startDate = new Date(baseDate);
 				startDate.setHours(Math.floor(overlapStart / 60), overlapStart % 60);
 				const endDate = new Date(baseDate);

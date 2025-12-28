@@ -121,7 +121,7 @@ export const importBookmarksCsv = createServerFn({
         }
         await upsertBookmark(user.id, yearNum, "event", slug, "favourited");
         if (priority !== null) {
-          await updateBookmark(generateBookmarkId(user.id, yearNum, slug), { priority });
+          await updateBookmark(generateBookmarkId(user.id, yearNum, slug), user.id, { priority });
         }
         importedEvents++;
         continue;
@@ -142,7 +142,7 @@ export const importBookmarksCsv = createServerFn({
       if (eventSlug) {
         await upsertBookmark(user.id, yearNum, "event", eventSlug, "favourited");
         if (priority !== null) {
-          await updateBookmark(generateBookmarkId(user.id, yearNum, eventSlug), { priority });
+          await updateBookmark(generateBookmarkId(user.id, yearNum, eventSlug), user.id, { priority });
         }
         importedEvents++;
         continue;
