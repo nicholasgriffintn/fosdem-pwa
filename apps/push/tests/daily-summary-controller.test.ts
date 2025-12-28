@@ -141,8 +141,8 @@ describe("triggerDailySummary", () => {
 		(enrichBookmarks as vi.Mock).mockReturnValue([]);
 		(getBookmarksForDay as vi.Mock).mockReturnValue([]);
 		(createDailySummaryPayload as vi.Mock).mockReturnValue({
-			title: "Summary",
-			body: "Body",
+			title: "FOSDEM Day 1 Summary",
+			body: "No events in your schedule today.",
 			url: "https://example.com",
 		});
 
@@ -150,7 +150,10 @@ describe("triggerDailySummary", () => {
 
 		await triggerDailySummary({ cron: "" }, env, {} as any, false, false);
 
+		// Should filter out low priority bookmarks (priority > 1)
 		expect(enrichBookmarks).toHaveBeenCalledWith([], {});
-		expect(sendNotification).not.toHaveBeenCalled();
+		// Should still send a notification with "No events" message
+		expect(sendNotification).toHaveBeenCalled();
+		expect(createDailySummaryPayload).toHaveBeenCalledWith([], "1", false);
 	});
 });
