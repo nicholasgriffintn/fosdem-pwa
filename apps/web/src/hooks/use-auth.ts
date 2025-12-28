@@ -31,6 +31,7 @@ export function useAuth() {
 		if (!user?.id) return;
 
 		let isMounted = true;
+		let syncTimeout: NodeJS.Timeout | undefined;
 
 		enableSync();
 		checkAndSyncOnOnline(user.id).catch((error) => {
@@ -44,17 +45,25 @@ export function useAuth() {
 		}
 
 		const handleOnline = () => {
-			if (isMounted) {
-				checkAndSyncOnOnline(user.id).catch((error) => {
-					console.error("Online sync failed:", error);
-				});
+			if (syncTimeout) {
+				clearTimeout(syncTimeout);
 			}
+			syncTimeout = setTimeout(() => {
+				if (isMounted) {
+					checkAndSyncOnOnline(user.id).catch((error) => {
+						console.error("Online sync failed:", error);
+					});
+				}
+			}, 1000);
 		};
 
 		window.addEventListener("online", handleOnline);
 
 		return () => {
 			isMounted = false;
+			if (syncTimeout) {
+				clearTimeout(syncTimeout);
+			}
 			window.removeEventListener("online", handleOnline);
 		};
 	}, [user?.id]);

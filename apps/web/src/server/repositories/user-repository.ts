@@ -59,7 +59,7 @@ export async function updateUser(
 
   if (updated) {
     const sessions = await db
-      .select()
+      .select({ id: sessionTable.id })
       .from(sessionTable)
       .where(eq(sessionTable.user_id, userId));
 
@@ -87,7 +87,7 @@ export async function upgradeGuestUser(
 
   if (updated) {
     const sessions = await db
-      .select()
+      .select({ id: sessionTable.id })
       .from(sessionTable)
       .where(eq(sessionTable.user_id, userId));
 

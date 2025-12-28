@@ -36,13 +36,13 @@ const getFullData = async (year: number): Promise<Conference> => {
 			signal: controller.signal,
 			cf: { cacheTtl, cacheEverything: true },
 		});
+		clearTimeout(timeout);
 	} catch (error) {
+		clearTimeout(timeout);
 		if ((error as Error)?.name === "AbortError") {
 			throw new Error("Fetching conference data timed out");
 		}
 		throw error;
-	} finally {
-		clearTimeout(timeout);
 	}
 
 	if (!response.ok) {

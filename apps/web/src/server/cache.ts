@@ -11,6 +11,7 @@ export class CacheManager {
 	private memoryCache: Map<string, InMemoryCacheEntry> = new Map();
 	private readonly PREFIX = "fosdem:";
 	private readonly TTL = CONSTANTS.DEFAULT_TTL;
+	private readonly MAX_MEMORY_ENTRIES = 1000;
 
 	constructor() {
 		if (
@@ -36,10 +37,10 @@ export class CacheManager {
 				if (data === null || data === undefined) {
 					return null;
 				}
-				if (typeof data === "string") {
+				if (typeof data === "string" && (data.startsWith('{') || data.startsWith('['))) {
 					try {
 						return JSON.parse(data);
-					} catch (error) {
+					} catch {
 						return data;
 					}
 				}
@@ -72,8 +73,16 @@ export class CacheManager {
 			try {
 				const stringData = typeof data === "string" ? data : JSON.stringify(data);
 				await this.kvCache.put(prefixedKey, stringData, { expirationTtl: effectiveTtl });
+				return;
 			} catch (error) {
 				console.error(`KV set error for key ${key}:`, error);
+			}
+		}
+
+		if (this.memoryCache.size >= this.MAX_MEMORY_ENTRIES) {
+			const oldestKey = this.memoryCache.keys().next().value;
+			if (oldestKey) {
+				this.memoryCache.delete(oldestKey);
 			}
 		}
 

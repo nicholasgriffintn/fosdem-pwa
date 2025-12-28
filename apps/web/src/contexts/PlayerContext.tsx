@@ -183,28 +183,37 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 		}
 	}, [currentEvent]);
 
+	const persistStateRef = useRef<NodeJS.Timeout | undefined>(undefined);
 	useEffect(() => {
 		const shouldPersist =
 			currentEvent && portalTarget === "floating" && isPlaying;
 
 		if (currentEvent && !shouldPersist) {
 			clearPlayerState();
+			if (persistStateRef.current) {
+				clearTimeout(persistStateRef.current);
+			}
 			return;
 		}
 
 		if (shouldPersist && currentEvent) {
-			savePlayerState({
-				eventSlug: currentEvent.id,
-				year,
-				currentTime,
-				volume,
-				isPlaying,
-				isMuted,
-				isMinimized,
-				streamUrl,
-				eventTitle: currentEvent.title,
-				isLive,
-			});
+			if (persistStateRef.current) {
+				clearTimeout(persistStateRef.current);
+			}
+			persistStateRef.current = setTimeout(() => {
+				savePlayerState({
+					eventSlug: currentEvent.id,
+					year,
+					currentTime,
+					volume,
+					isPlaying,
+					isMuted,
+					isMinimized,
+					streamUrl,
+					eventTitle: currentEvent.title,
+					isLive,
+				});
+			}, 500);
 		}
 	}, [
 		currentEvent,
@@ -435,17 +444,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			isLive,
 			portalTarget,
 			streamUrl,
-			loadEvent,
-			play,
-			pause,
-			togglePlay,
-			setVolume,
-			setMuted,
-			setCurrentTime,
-			minimize,
-			restore,
-			close,
-			setPortalTarget,
 		],
 	);
 

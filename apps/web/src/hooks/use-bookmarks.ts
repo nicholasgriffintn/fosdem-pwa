@@ -110,11 +110,22 @@ export function useBookmarks({
 		return merged;
 	}, [localOnly, userId, localBookmarks, serverBookmarks]);
 
+	const serverBookmarksRef = useRef<Bookmark[]>([]);
+	const localBookmarksRef = useRef<LocalBookmark[]>([]);
+
 	useEffect(() => {
 		if (localOnly) return;
 		if (!userId) return;
 		if (!serverBookmarks || !localBookmarks) return;
 		if (reconciliationInProgress.current) return;
+
+		const serverChanged = JSON.stringify(serverBookmarks.map(b => b.id)) !== JSON.stringify(serverBookmarksRef.current.map(b => b.id));
+		const localChanged = JSON.stringify(localBookmarks.map(b => b.id)) !== JSON.stringify(localBookmarksRef.current.map(b => b.id));
+
+		if (!serverChanged && !localChanged) return;
+
+		serverBookmarksRef.current = serverBookmarks;
+		localBookmarksRef.current = localBookmarks;
 
 		let cancelled = false;
 		reconciliationInProgress.current = true;
@@ -127,35 +138,36 @@ export function useBookmarks({
 
 			try {
 				const localBySlug = new Map(localBookmarks.map((b) => [b.slug, b]));
+				const updates: Array<() => Promise<any>> = [];
 
-				const operations = serverBookmarks.map(async (serverBookmark) => {
-					if (cancelled) return { status: "skipped" as const };
+				for (const serverBookmark of serverBookmarks) {
+					if (cancelled) break;
 
 					const existingLocal = localBySlug.get(serverBookmark.slug);
 
-					try {
-							if (!existingLocal) {
-								await saveLocalBookmark(
-									{
-										year: serverBookmark.year,
-										slug: serverBookmark.slug,
-										type: serverBookmark.type,
-										status: serverBookmark.status,
-										serverId: serverBookmark.id,
-										watch_later: serverBookmark.watch_later ?? null,
-									},
-									true,
-								);
-								return { status: "created" as const };
-							}
-
-							const needsUpdate =
-								existingLocal.serverId !== serverBookmark.id ||
-								existingLocal.status !== serverBookmark.status ||
-								existingLocal.type !== serverBookmark.type ||
-								existingLocal.watch_later !== serverBookmark.watch_later;
+					if (!existingLocal) {
+						updates.push(async () => {
+							await saveLocalBookmark(
+								{
+									year: serverBookmark.year,
+									slug: serverBookmark.slug,
+									type: serverBookmark.type,
+									status: serverBookmark.status,
+									serverId: serverBookmark.id,
+									watch_later: serverBookmark.watch_later ?? null,
+								},
+								true,
+							);
+						});
+					} else {
+						const needsUpdate =
+							existingLocal.serverId !== serverBookmark.id ||
+							existingLocal.status !== serverBookmark.status ||
+							existingLocal.type !== serverBookmark.type ||
+							existingLocal.watch_later !== serverBookmark.watch_later;
 
 						if (needsUpdate) {
+							updates.push(async () => {
 								await updateLocalBookmark(
 									existingLocal.id,
 									{
@@ -166,33 +178,16 @@ export function useBookmarks({
 									},
 									true,
 								);
-							return { status: "updated" as const };
+							});
 						}
-
-						return { status: "unchanged" as const };
-					} catch (error) {
-						console.error(`Failed to reconcile bookmark ${serverBookmark.slug}:`, error);
-						return { status: "failed" as const, error };
 					}
-				});
+				}
 
-				if (operations.length > 0) {
-					const results = await Promise.allSettled(operations);
-					const failures = results.filter(
-						(r) => r.status === "rejected" || (r.status === "fulfilled" && r.value?.status === "failed")
-					);
-
-					if (failures.length > 0) {
-						console.warn(
-							`Bookmark reconciliation completed with ${failures.length} failures out of ${results.length} operations`
-						);
-					}
-
-					if (!cancelled) {
-						await queryClient.invalidateQueries({
-							queryKey: localQueryKey,
-						});
-					}
+				if (updates.length > 0 && !cancelled) {
+					await Promise.all(updates.map(fn => fn()));
+					await queryClient.invalidateQueries({
+						queryKey: localQueryKey,
+					});
 				}
 			} catch (error) {
 				console.error("Failed to reconcile local bookmarks:", error);

@@ -222,7 +222,12 @@ export default Sentry.withSentry(
 						await markNotificationSent(message.body.bookmarkId, env);
 					}
 				} catch (error) {
-					console.error('Failed to process notification:', error);
+					console.error('Failed to process notification:', {
+						bookmarkId: message.body?.bookmarkId,
+						title: message.body?.notification?.title,
+						error: error instanceof Error ? error.message : String(error),
+					});
+					message.retry();
 				}
 			}
 		}
