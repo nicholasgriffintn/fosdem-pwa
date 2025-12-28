@@ -110,7 +110,7 @@ export async function triggerNotifications(
 				const bookmarks = await getUserBookmarks(typedSubscription.user_id, env);
 				const filteredBookmarks = prefs.notify_low_priority
 					? bookmarks
-					: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
+					: bookmarks.filter((bookmark) => (bookmark.priority ?? 0) <= 1);
 
 				const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
 				const bookmarksRunningToday = getBookmarksForDay(enrichedBookmarks, whichDay);

@@ -19,8 +19,8 @@ const REQUIRED_ENV: Array<keyof Env> = [
 ];
 
 const DEDUPE_WINDOW_MS = 5 * 60 * 1000;
-const MAX_SEND_RETRIES = 2;
-const RETRY_DELAY_MS = 250;
+const MAX_SEND_RETRIES = 3;
+const RETRY_BASE_DELAY_MS = 1000;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -213,7 +213,9 @@ export default Sentry.withSentry(
 								throw error;
 							}
 
-							await delay(RETRY_DELAY_MS * (attempt + 1));
+							const backoffDelay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+							const jitter = Math.random() * 200;
+							await delay(backoffDelay + jitter);
 						}
 					}
 					const shouldMarkSent = message.body.shouldMarkSent ?? true;
@@ -226,8 +228,16 @@ export default Sentry.withSentry(
 						bookmarkId: message.body?.bookmarkId,
 						title: message.body?.notification?.title,
 						error: error instanceof Error ? error.message : String(error),
+						attempts: message.attempts,
 					});
-					message.retry();
+
+					if (message.attempts < 5) {
+						message.retry({ delaySeconds: Math.min(60 * Math.pow(2, message.attempts), 3600) });
+					} else {
+						console.error('Max retry attempts exceeded, dropping notification', {
+							bookmarkId: message.body?.bookmarkId,
+						});
+					}
 				}
 			}
 		}

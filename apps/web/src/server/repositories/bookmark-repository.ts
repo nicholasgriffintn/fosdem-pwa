@@ -58,6 +58,9 @@ export async function findBookmarkById(
   });
 }
 
+const VALID_BOOKMARK_TYPES = ['event', 'track', 'speaker', 'room'] as const;
+const VALID_BOOKMARK_STATUSES = ['favourited', 'unfavourited'] as const;
+
 export async function upsertBookmark(
   userId: number,
   year: number,
@@ -65,6 +68,18 @@ export async function upsertBookmark(
   slug: string,
   status: string,
 ): Promise<void> {
+  if (!VALID_BOOKMARK_TYPES.includes(type as any)) {
+    throw new Error(`Invalid bookmark type: ${type}`);
+  }
+
+  if (!VALID_BOOKMARK_STATUSES.includes(status as any)) {
+    throw new Error(`Invalid bookmark status: ${status}`);
+  }
+
+  if (!slug || typeof slug !== 'string' || slug.length > 255) {
+    throw new Error('Invalid slug');
+  }
+
   await db
     .insert(bookmarkTable)
     .values({

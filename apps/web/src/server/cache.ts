@@ -73,7 +73,6 @@ export class CacheManager {
 			try {
 				const stringData = typeof data === "string" ? data : JSON.stringify(data);
 				await this.kvCache.put(prefixedKey, stringData, { expirationTtl: effectiveTtl });
-				return;
 			} catch (error) {
 				console.error(`KV set error for key ${key}:`, error);
 			}

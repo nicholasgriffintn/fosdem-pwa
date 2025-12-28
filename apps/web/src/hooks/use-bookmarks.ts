@@ -119,8 +119,13 @@ export function useBookmarks({
 		if (!serverBookmarks || !localBookmarks) return;
 		if (reconciliationInProgress.current) return;
 
-		const serverChanged = JSON.stringify(serverBookmarks.map(b => b.id)) !== JSON.stringify(serverBookmarksRef.current.map(b => b.id));
-		const localChanged = JSON.stringify(localBookmarks.map(b => b.id)) !== JSON.stringify(localBookmarksRef.current.map(b => b.id));
+		const serverIds = serverBookmarks.map(b => b.id).sort().join(',');
+		const localIds = localBookmarks.map(b => b.id).sort().join(',');
+		const prevServerIds = serverBookmarksRef.current.map(b => b.id).sort().join(',');
+		const prevLocalIds = localBookmarksRef.current.map(b => b.id).sort().join(',');
+
+		const serverChanged = serverIds !== prevServerIds;
+		const localChanged = localIds !== prevLocalIds;
 
 		if (!serverChanged && !localChanged) return;
 

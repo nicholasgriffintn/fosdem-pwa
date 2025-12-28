@@ -65,14 +65,22 @@ export function getBookmarksStartingSoon(
 ): EnrichedBookmark[] {
 	return bookmarks.filter((bookmark) => {
 		const [hours, minutes] = bookmark.startTime.split(":").map(Number);
+
 		const now = new Date();
-		
-		const eventTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Brussels' }));
-		eventTime.setHours(hours, minutes, 0, 0);
-		
-		const brusselsNow = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Brussels' }));
-		
-		const timeDiff = (eventTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
+		const brusselsTimeStr = now.toLocaleString('en-US', {
+			timeZone: 'Europe/Brussels',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+			hour12: false
+		});
+
+		const [currentHour, currentMinute, currentSecond] = brusselsTimeStr.split(':').map(Number);
+
+		const eventTimeMinutes = hours * 60 + minutes;
+		const currentTimeMinutes = currentHour * 60 + currentMinute + currentSecond / 60;
+
+		const timeDiff = eventTimeMinutes - currentTimeMinutes;
 		const windowMinutes = Number.isFinite(reminderMinutes)
 			? Math.max(0, reminderMinutes)
 			: 15;

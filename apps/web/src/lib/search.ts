@@ -75,13 +75,15 @@ export function formatTrack(
 	track: Track,
 	fosdemEvents: Record<string, Event>,
 ): Track {
+	const eventCount = track.eventCount ?? Object.values(fosdemEvents || {}).filter((event) =>
+		isEvent(event) && doesEventMatchTrack(event, track),
+	).length;
+
 	return {
 		id: track.id,
 		name: track.name,
 		room: track.room,
-		eventCount: Object.values(fosdemEvents || {}).filter((event) =>
-			isEvent(event) && doesEventMatchTrack(event, track),
-		).length,
+		eventCount,
 	} as Track;
 }
 
