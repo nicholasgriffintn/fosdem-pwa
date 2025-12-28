@@ -20,9 +20,9 @@ export function SetBookmarksVisability({
 	return (
 		<div className="flex items-center justify-between py-4">
 			<div className="space-y-0.5">
-				<Label htmlFor="bookmarks-visibility">Bookmarks Visibility</Label>
+				<Label htmlFor="bookmarks-visibility">Profile Visibility</Label>
 				<p className="text-sm text-muted-foreground">
-					Make your bookmarks visible to other users
+					Make your profile and bookmarks visible to other users
 				</p>
 			</div>
 			{/** biome-ignore lint/correctness/useUniqueElementIds: it's wrong */}

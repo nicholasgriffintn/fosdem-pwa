@@ -26,6 +26,7 @@ export function useUserSettings({ userId }: { userId: string }) {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["profile", "me"] });
+			queryClient.invalidateQueries({ queryKey: ["auth"] });
 			queryClient.invalidateQueries({ queryKey: ["userBookmarks", userId] });
 		},
 	});

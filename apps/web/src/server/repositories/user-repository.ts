@@ -57,6 +57,17 @@ export async function updateUser(
     .where(eq(userTable.id, userId))
     .returning();
 
+  if (updated) {
+    const sessions = await db
+      .select()
+      .from(sessionTable)
+      .where(eq(sessionTable.user_id, userId));
+
+    await Promise.all(
+      sessions.map((session) => cache.invalidate(CacheKeys.session(session.id))),
+    );
+  }
+
   return updated;
 }
 
