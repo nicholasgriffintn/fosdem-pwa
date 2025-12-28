@@ -11,12 +11,12 @@ import { getSession } from "~/server/functions/session";
 import { sendTestNotification } from "~/server/functions/test-notification";
 import { getSubscriptions } from "~/server/functions/subscriptions";
 
-export const Route = createFileRoute("/profile/admin-test")({
+export const Route = createFileRoute("/tester/")({
   component: AdminTestPage,
   head: () => ({
     meta: [
       ...generateCommonSEOTags({
-        title: "Admin Test - Notifications | FOSDEM PWA",
+        title: "Test Panel | FOSDEM PWA",
         description: "Test notification system",
       })
     ],
@@ -82,7 +82,7 @@ function AdminTestPage() {
   if (!resolvedUser) {
     return (
       <PageShell>
-        <PageHeader heading="Admin Test - Notifications" year={constants.DEFAULT_YEAR} />
+        <PageHeader heading="Test Panel" year={constants.DEFAULT_YEAR} />
         <SectionStack>
           <p className="text-muted-foreground">Please sign in to access this page.</p>
         </SectionStack>
@@ -92,7 +92,7 @@ function AdminTestPage() {
 
   return (
     <PageShell>
-      <PageHeader heading="Admin Test - Notifications" year={constants.DEFAULT_YEAR} />
+      <PageHeader heading="Test Panel" year={constants.DEFAULT_YEAR} />
       <SectionStack>
         <div className="max-w-2xl space-y-6">
           <div className="rounded-lg border border-border bg-card p-6">
@@ -139,11 +139,10 @@ function AdminTestPage() {
 
               {result && (
                 <div
-                  className={`rounded-md p-4 ${
-                    result.success
+                  className={`rounded-md p-4 ${result.success
                       ? "bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800"
                       : "bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800"
-                  }`}
+                    }`}
                 >
                   <p className="text-sm font-medium">
                     {result.success ? "Success!" : "Error"}

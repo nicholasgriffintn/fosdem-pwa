@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TesterIndexRouteImport } from './routes/tester/index'
 import { Route as TermsIndexRouteImport } from './routes/terms/index'
 import { Route as SpeakersIndexRouteImport } from './routes/speakers/index'
 import { Route as SigninIndexRouteImport } from './routes/signin/index'
@@ -26,7 +27,6 @@ import { Route as TrackSlugRouteImport } from './routes/track/$slug'
 import { Route as SpeakersSlugRouteImport } from './routes/speakers/$slug'
 import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
 import { Route as ProfileYearInReviewRouteImport } from './routes/profile/year-in-review'
-import { Route as ProfileAdminTestRouteImport } from './routes/profile/admin-test'
 import { Route as EventSlugRouteImport } from './routes/event/$slug'
 import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
 import { Route as ApiProxySubtitlesRouteImport } from './routes/api/proxy/subtitles'
@@ -49,6 +49,11 @@ import { Route as ApiAuthCallbackDiscordRouteImport } from './routes/api/auth/ca
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TesterIndexRoute = TesterIndexRouteImport.update({
+  id: '/tester/',
+  path: '/tester/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsIndexRoute = TermsIndexRouteImport.update({
@@ -129,11 +134,6 @@ const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
 const ProfileYearInReviewRoute = ProfileYearInReviewRouteImport.update({
   id: '/profile/year-in-review',
   path: '/profile/year-in-review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileAdminTestRoute = ProfileAdminTestRouteImport.update({
-  id: '/profile/admin-test',
-  path: '/profile/admin-test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventSlugRoute = EventSlugRouteImport.update({
@@ -230,7 +230,6 @@ const ApiAuthCallbackDiscordRoute = ApiAuthCallbackDiscordRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
-  '/profile/admin-test': typeof ProfileAdminTestRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -247,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
+  '/tester': typeof TesterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -268,7 +268,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
-  '/profile/admin-test': typeof ProfileAdminTestRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -285,6 +284,7 @@ export interface FileRoutesByTo {
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
+  '/tester': typeof TesterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -307,7 +307,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
-  '/profile/admin-test': typeof ProfileAdminTestRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
@@ -324,6 +323,7 @@ export interface FileRoutesById {
   '/signin/': typeof SigninIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
   '/terms/': typeof TermsIndexRoute
+  '/tester/': typeof TesterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -347,7 +347,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/event/$slug'
-    | '/profile/admin-test'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
@@ -364,6 +363,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/speakers'
     | '/terms'
+    | '/tester'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -385,7 +385,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/event/$slug'
-    | '/profile/admin-test'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
@@ -402,6 +401,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/speakers'
     | '/terms'
+    | '/tester'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -423,7 +423,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/event/$slug'
-    | '/profile/admin-test'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
@@ -440,6 +439,7 @@ export interface FileRouteTypes {
     | '/signin/'
     | '/speakers/'
     | '/terms/'
+    | '/tester/'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -462,7 +462,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventSlugRoute: typeof EventSlugRoute
-  ProfileAdminTestRoute: typeof ProfileAdminTestRoute
   ProfileYearInReviewRoute: typeof ProfileYearInReviewRoute
   RoomsRoomIdRoute: typeof RoomsRoomIdRoute
   SpeakersSlugRoute: typeof SpeakersSlugRoute
@@ -479,6 +478,7 @@ export interface RootRouteChildren {
   SigninIndexRoute: typeof SigninIndexRoute
   SpeakersIndexRoute: typeof SpeakersIndexRoute
   TermsIndexRoute: typeof TermsIndexRoute
+  TesterIndexRoute: typeof TesterIndexRoute
   ApiAuthDiscordRoute: typeof ApiAuthDiscordRoute
   ApiAuthGithubRoute: typeof ApiAuthGithubRoute
   ApiAuthGitlabRoute: typeof ApiAuthGitlabRoute
@@ -505,6 +505,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tester/': {
+      id: '/tester/'
+      path: '/tester'
+      fullPath: '/tester'
+      preLoaderRoute: typeof TesterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms/': {
@@ -617,13 +624,6 @@ declare module '@tanstack/react-router' {
       path: '/profile/year-in-review'
       fullPath: '/profile/year-in-review'
       preLoaderRoute: typeof ProfileYearInReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile/admin-test': {
-      id: '/profile/admin-test'
-      path: '/profile/admin-test'
-      fullPath: '/profile/admin-test'
-      preLoaderRoute: typeof ProfileAdminTestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/event/$slug': {
@@ -758,7 +758,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventSlugRoute: EventSlugRoute,
-  ProfileAdminTestRoute: ProfileAdminTestRoute,
   ProfileYearInReviewRoute: ProfileYearInReviewRoute,
   RoomsRoomIdRoute: RoomsRoomIdRoute,
   SpeakersSlugRoute: SpeakersSlugRoute,
@@ -775,6 +774,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninIndexRoute: SigninIndexRoute,
   SpeakersIndexRoute: SpeakersIndexRoute,
   TermsIndexRoute: TermsIndexRoute,
+  TesterIndexRoute: TesterIndexRoute,
   ApiAuthDiscordRoute: ApiAuthDiscordRoute,
   ApiAuthGithubRoute: ApiAuthGithubRoute,
   ApiAuthGitlabRoute: ApiAuthGitlabRoute,
