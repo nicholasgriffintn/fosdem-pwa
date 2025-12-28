@@ -1,13 +1,5 @@
 import type { Event, Track } from "~/types/fosdem";
-
-export interface BookmarkSnapshot {
-  slug: string;
-  status: string;
-  id?: string;
-  watch_later?: boolean | null;
-  watch_status?: string | null;
-  attended?: boolean | null;
-}
+import type { Bookmark } from "~/server/db/schema";
 
 export interface ItemWithId {
   id: string;
@@ -23,7 +15,7 @@ export function isTrack(item: Event | Track): item is Track {
 
 export function hasBookmark<T extends ItemWithId>(
   item: T,
-  bookmarks: BookmarkSnapshot[]
+  bookmarks: Bookmark[]
 ): boolean {
   return bookmarks.some(
     (bookmark) => bookmark.slug === item.id && bookmark.status === 'favourited'
@@ -77,6 +69,6 @@ export function isValidServerNote(note: unknown): note is { id: number; year: nu
   );
 }
 
-export function isFavourited(bookmark: BookmarkSnapshot | { status: string }): boolean {
+export function isFavourited(bookmark: Bookmark | { status: string }): boolean {
   return bookmark.status === 'favourited';
 }

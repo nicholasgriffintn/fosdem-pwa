@@ -123,6 +123,16 @@ export const bookmark = sqliteTable(
 			yearIdx: index("year_idx").on(table.year),
 			typeIdx: index("type_idx").on(table.type),
 			slugIdx: index("slug_idx").on(table.slug),
+			userYearStatusIdx: index("bookmark_user_year_status_idx").on(
+				table.user_id,
+				table.year,
+				table.status,
+			),
+			userYearSlugIdx: index("bookmark_user_year_slug_idx").on(
+				table.user_id,
+				table.year,
+				table.slug,
+			),
 			watchLaterIdx: index("watch_later_idx").on(table.watch_later),
 			watchStatusIdx: index("watch_status_idx").on(table.watch_status),
 		};

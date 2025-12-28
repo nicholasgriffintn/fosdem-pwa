@@ -81,12 +81,15 @@ function BookmarksHome() {
 		fosdemData: serverFosdemData,
 	} = Route.useLoaderData();
 	const { view, tab } = Route.useSearch();
-	const { bookmarks, loading } = useBookmarks({ year });
+	const { user: serverUser } = useAuthSnapshot();
+	const { bookmarks, loading } = useBookmarks({
+		year,
+		initialServerBookmarks: serverBookmarks
+	});
 	const { create, update } = useMutateBookmark({ year });
 	const { watchLaterList, loading: watchLaterLoading, toggle: toggleWatchLater } = useWatchLater({ year });
 	const { fosdemData } = useFosdemData({ year });
 	const { user, loading: authLoading } = useAuth();
-	const { user: serverUser } = useAuthSnapshot();
 	const isClient = useIsClient();
 	const hasServerSnapshot = Boolean(serverFosdemData);
 	const useServerSnapshot =

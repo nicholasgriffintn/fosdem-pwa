@@ -12,6 +12,7 @@ import {
 	updateLocalBookmark,
 	type LocalBookmark,
 } from "~/lib/localStorage";
+import type { Bookmark } from "~/server/db/schema";
 
 type MergedBookmark = LocalBookmark & {
 	existsOnServer?: boolean;
@@ -21,14 +22,17 @@ type MergedBookmark = LocalBookmark & {
 export function useBookmarks({
 	year,
 	localOnly = false,
+	initialServerBookmarks,
 }: {
 	year: number;
 	localOnly?: boolean;
+		initialServerBookmarks?: Bookmark[];
 }): {
 	bookmarks: MergedBookmark[];
 	loading: boolean;
 } {
 	const { user } = useAuth();
+	const userId = user?.id;
 	const queryClient = useQueryClient();
 	const reconciliationInProgress = useRef(false);
 
@@ -42,9 +46,9 @@ export function useBookmarks({
 	});
 
 	const { data: serverBookmarks, isLoading: serverLoading } = useQuery({
-		queryKey: ["bookmarks", year, user?.id],
+		queryKey: ["bookmarks", year, userId],
 		queryFn: async () => {
-			if (!user?.id) return [];
+			if (!userId) return [];
 
 			const data = await getBookmarksFromServer({
 				data: { year, status: "favourited" },
@@ -52,8 +56,9 @@ export function useBookmarks({
 
 			return data;
 		},
-		enabled: !!user?.id && !localOnly,
+		enabled: !!userId && !localOnly,
 		staleTime: 5 * 60 * 1000, // 5 minutes
+		initialData: userId && initialServerBookmarks ? initialServerBookmarks : undefined,
 	});
 
 	const mergedBookmarks = useMemo(() => {
@@ -61,7 +66,7 @@ export function useBookmarks({
 			return localBookmarks || [];
 		}
 
-		if (!user?.id) {
+		if (!userId) {
 			return localBookmarks || [];
 		}
 
@@ -103,7 +108,7 @@ export function useBookmarks({
 
 	useEffect(() => {
 		if (localOnly) return;
-		if (!user?.id) return;
+		if (!userId) return;
 		if (!serverBookmarks || !localBookmarks) return;
 		if (reconciliationInProgress.current) return;
 
@@ -197,10 +202,10 @@ export function useBookmarks({
 		return () => {
 			cancelled = true;
 		};
-	}, [localOnly, user?.id, serverBookmarks, localBookmarks, year, queryClient]);
+	}, [localOnly, userId, serverBookmarks, localBookmarks, year, queryClient]);
 
 	return {
 		bookmarks: mergedBookmarks,
-		loading: localLoading || (!localOnly && user?.id ? serverLoading : false),
+		loading: localLoading || (!localOnly && userId ? serverLoading : false),
 	};
 }

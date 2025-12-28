@@ -2,8 +2,8 @@ import type React from "react";
 import clsx from "clsx";
 import { Link } from "@tanstack/react-router";
 
+import type { Bookmark } from "~/server/db/schema";
 import type { Event } from "~/types/fosdem";
-import type { BookmarkSnapshot } from "~/lib/type-guards";
 import type { EventConflict } from "~/lib/fosdem";
 import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
 import { ItemActions } from "~/components/shared/ItemActions";
@@ -35,7 +35,7 @@ type EventListProps = {
 		slug: string;
 		status: string;
 	}) => void;
-	serverBookmarks?: BookmarkSnapshot[];
+	serverBookmarks?: Bookmark[];
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 

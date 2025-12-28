@@ -84,7 +84,10 @@ function ProfilePage() {
   const { user, loading } = useProfile();
   const { user: serverUserFromRoot } = useAuthSnapshot();
   const resolvedServerUser = serverUserFromLoader ?? serverUserFromRoot;
-  const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
+  const { bookmarks, loading: bookmarksLoading } = useBookmarks({
+    year,
+    initialServerBookmarks: serverBookmarks,
+  });
   const { create: createBookmark } = useMutateBookmark({ year });
   const { fosdemData } = useFosdemData({ year });
   const { stats, loading: statsLoading } = useUserStats({ year });

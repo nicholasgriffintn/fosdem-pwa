@@ -8,8 +8,9 @@ import {
 } from "~/lib/sorting";
 import type { Event, Track } from "~/types/fosdem";
 import { useIsClient } from "~/hooks/use-is-client";
-import type { BookmarkSnapshot, ItemWithId } from "~/lib/type-guards";
+import type { ItemWithId } from "~/lib/type-guards";
 import { isFavourited } from "~/lib/type-guards";
+import type { Bookmark } from "~/server/db/schema";
 
 type ItemWithFavorites<T extends ItemWithId> = T & {
 	isFavourited?: boolean;
@@ -17,16 +18,19 @@ type ItemWithFavorites<T extends ItemWithId> = T & {
 	watchLater?: boolean;
 };
 
-function useBookmarkResolution(year: number, serverBookmarks?: BookmarkSnapshot[]) {
+function useBookmarkResolution(year: number, serverBookmarks?: Bookmark[]) {
 	const isClient = useIsClient();
-	const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
+	const { bookmarks, loading: bookmarksLoading } = useBookmarks({
+		year,
+		initialServerBookmarks: serverBookmarks,
+	});
 	const resolvedBookmarks = isClient ? bookmarks : serverBookmarks || [];
 	const resolvedLoading = isClient ? bookmarksLoading : false;
 
 	return { resolvedBookmarks, resolvedLoading };
 }
 
-export function createFavoritesMap(bookmarks: (BookmarkSnapshot | { slug: string; status: string })[]): Record<string, boolean> {
+export function createFavoritesMap(bookmarks: (Bookmark | { slug: string; status: string })[]): Record<string, boolean> {
 	return bookmarks?.reduce(
 		(acc: Record<string, boolean>, bookmark) => {
 			if (isFavourited(bookmark)) {
@@ -40,7 +44,7 @@ export function createFavoritesMap(bookmarks: (BookmarkSnapshot | { slug: string
 
 function addFavoritesToItems<T extends ItemWithId>(
 	items: T[],
-	bookmarks: (BookmarkSnapshot | LocalBookmark)[]
+	bookmarks: (Bookmark | LocalBookmark)[]
 ): ItemWithFavorites<T>[] {
 	return items?.length
 		? items.map((item) => {
@@ -62,21 +66,21 @@ interface UseEventListProps {
 	year: number;
 	sortFn?: (a: Event, b: Event) => number;
 	sortByFavourites?: boolean;
-	serverBookmarks?: BookmarkSnapshot[];
+	serverBookmarks?: Bookmark[];
 }
 
 interface UseTrackListProps {
 	items: Track[];
 	year: number;
 	sortByFavourites?: boolean;
-	serverBookmarks?: BookmarkSnapshot[];
+	serverBookmarks?: Bookmark[];
 }
 
 interface UseItemListProps<T extends ItemWithId> {
 	items: T[];
 	year: number;
 	sortByFavourites?: boolean;
-	serverBookmarks?: BookmarkSnapshot[];
+	serverBookmarks?: Bookmark[];
 	defaultSortFn: (a: T, b: T) => number;
 	favoritesSortFn: (favorites: Record<string, boolean>) => (a: T, b: T) => number;
 }
