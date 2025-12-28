@@ -5,7 +5,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
-import type { SessionUser } from "~/server/auth";
+import type { SessionUser } from "~/types/auth";
 import { Icons } from "~/components/shared/Icons";
 import { buildProfileLink } from "~/lib/link-builder";
 

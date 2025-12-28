@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 
-import type { SessionUser } from "~/server/auth";
+import type { SessionUser } from "~/types/auth";
 
 type AuthSnapshot = {
 	user: SessionUser | null;

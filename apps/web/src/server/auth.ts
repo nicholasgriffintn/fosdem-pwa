@@ -120,9 +120,7 @@ export async function validateSessionToken(token: string) {
 	return result;
 }
 
-export type SessionUser = NonNullable<
-	Awaited<ReturnType<typeof validateSessionToken>>["user"]
->;
+export type { SessionUser } from "~/types/auth";
 
 export async function invalidateSession(sessionId: string): Promise<void> {
 	await Promise.all([
