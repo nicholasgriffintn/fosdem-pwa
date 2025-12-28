@@ -5,13 +5,13 @@
   "scripts": {
     "build": "wrangler build",
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev --test-scheduled",
-    "start": "wrangler dev --test-scheduled",
+    "dev": "wrangler dev --test-scheduled --persist-to ../cloudflare/state",
+    "start": "wrangler dev --test-scheduled --persist-to ../cloudflare/state",
     "cf-typegen": "wrangler types",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate:local": "wrangler d1 migrations apply fosdem --local",
+    "db:migrate:local": "wrangler d1 migrations apply fosdem --local --persist-to ../cloudflare/state",
     "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote"
   },
   "devDependencies": {

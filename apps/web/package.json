@@ -20,11 +20,8 @@
     "db": "drizzle-kit",
     "ui": "pnpm dlx shadcn@latest",
     "db:generate": "drizzle-kit generate",
-    "db:migrate:local": "wrangler d1 migrations apply fosdem --local",
-    "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote",
-    "db:studio:local": "DB_LOCAL_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit) drizzle-kit studio",
-    "db:studio:preview": "NODE_ENV='preview' drizzle-kit studio",
-    "db:studio:prod": "drizzle-kit studio"
+    "db:migrate:local": "wrangler d1 migrations apply fosdem --local --persist-to ../cloudflare/state",
+    "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote"
   },
   "engines": {
     "node": ">=22.0.0"

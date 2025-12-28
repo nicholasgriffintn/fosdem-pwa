@@ -33,6 +33,8 @@ importers:
         specifier: 4.56.0
         version: 4.56.0(@cloudflare/workers-types@4.20251225.0)
 
+  apps/cloudflare: {}
+
   apps/push:
     dependencies:
       '@sentry/cloudflare':
