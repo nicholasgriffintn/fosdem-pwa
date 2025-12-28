@@ -1,5 +1,11 @@
 import { getSyncQueue, removeFromSyncQueue } from "~/lib/localStorage";
 import { withRetry } from "~/lib/withRetry";
+import {
+	createBookmark,
+	deleteBookmark,
+	updateBookmark,
+} from "~/server/functions/bookmarks";
+import { createNote, updateNote, deleteNote } from "~/server/functions/notes";
 
 let currentSyncPromise: Promise<{
 	bookmarks: SyncResult;
@@ -17,13 +23,6 @@ export interface SyncResult {
 	syncedCount: number;
 	errors: string[];
 }
-
-import {
-	createBookmark,
-	deleteBookmark,
-	updateBookmark,
-} from "~/server/functions/bookmarks";
-import { createNote, updateNote, deleteNote } from "~/server/functions/notes";
 
 type ServerActionResult = {
 	success: boolean;

@@ -85,11 +85,6 @@ export async function triggerDailySummary(
 				const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
 				const bookmarksToday = getBookmarksForDay(enrichedBookmarks, whichDay);
 
-				if (!bookmarksToday.length) {
-					console.log(`No bookmarks today for ${typedSubscription.user_id}`);
-					return;
-				}
-
 				const notification = createDailySummaryPayload(bookmarksToday, whichDay, isEvening);
 
 				if (queueMode) {
