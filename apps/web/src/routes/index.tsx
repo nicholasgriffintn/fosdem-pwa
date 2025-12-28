@@ -16,9 +16,7 @@ import { SectionStack } from "~/components/shared/SectionStack";
 export const Route = createFileRoute("/")({
 	component: Home,
 	validateSearch: ({ year }: { year: number }) => ({
-		year:
-			(constants.AVAILABLE_YEARS.includes(year) && year) ||
-			constants.DEFAULT_YEAR,
+		year: constants.AVAILABLE_YEARS.includes(year) ? year : constants.DEFAULT_YEAR,
 	}),
 	loaderDeps: ({ search: { year } }) => ({ year }),
 	loader: async ({ deps: { year } }) => {

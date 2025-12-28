@@ -65,29 +65,20 @@ export async function upsertBookmark(
   slug: string,
   status: string,
 ): Promise<void> {
-  const existingBookmark = await findBookmark(userId, year, slug);
-
-  if (existingBookmark) {
-    await db
-      .update(bookmarkTable)
-      .set({ status })
-      .where(eq(bookmarkTable.id, existingBookmark.id));
-  } else {
-    await db
-      .insert(bookmarkTable)
-      .values({
-        id: generateBookmarkId(userId, year, slug),
-        slug,
-        type: `bookmark_${type}`,
-        year,
-        status,
-        user_id: userId,
-      })
-      .onConflictDoUpdate({
-        target: bookmarkTable.id,
-        set: { status },
-      });
-  }
+  await db
+    .insert(bookmarkTable)
+    .values({
+      id: generateBookmarkId(userId, year, slug),
+      slug,
+      type: `bookmark_${type}`,
+      year,
+      status,
+      user_id: userId,
+    })
+    .onConflictDoUpdate({
+      target: bookmarkTable.id,
+      set: { status },
+    });
 }
 
 export async function updateBookmark(

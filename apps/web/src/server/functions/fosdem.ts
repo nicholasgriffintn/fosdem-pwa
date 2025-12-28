@@ -5,13 +5,10 @@ import type { Conference } from "~/types/fosdem";
 import { isValidYear, isNumber } from "~/lib/type-guards";
 import { CacheManager } from "~/server/cache";
 import { CacheKeys } from "~/server/lib/cache-keys";
-
-const FETCH_TIMEOUT_MS = 8000;
-const CURRENT_YEAR_TTL = 60 * 5; // 5 minutes
-const PAST_YEAR_TTL = 60 * 60 * 24; // 1 day
+import { CONSTANTS } from "~/server/constants";
 
 const getCacheTTL = (year: number): number => {
-	return year === constants.DEFAULT_YEAR ? CURRENT_YEAR_TTL : PAST_YEAR_TTL;
+	return year === constants.DEFAULT_YEAR ? CONSTANTS.CURRENT_YEAR_TTL : CONSTANTS.PAST_YEAR_TTL;
 };
 
 const cache = new CacheManager();
@@ -29,7 +26,7 @@ const getFullData = async (year: number): Promise<Conference> => {
 	const url = constants.DATA_LINK.replace("${YEAR}", year.toString());
 
 	const controller = new AbortController();
-	const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+	const timeout = setTimeout(() => controller.abort(), CONSTANTS.FETCH_TIMEOUT_MS);
 
 	let response: Response;
 

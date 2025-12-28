@@ -1,0 +1,73 @@
+import { getSyncQueue } from "~/lib/localStorage";
+import type { SyncResult } from "~/lib/backgroundSync/types";
+import { syncBookmarksToServer } from "~/lib/backgroundSync/syncBookmarksToServer";
+import { syncNotesToServer } from "~/lib/backgroundSync/syncNotesToServer";
+
+let currentSyncPromise: Promise<{
+  bookmarks: SyncResult;
+  notes: SyncResult;
+}> | null = null;
+
+export async function checkAndSyncOnOnline(userId?: string) {
+  if (typeof navigator === "undefined" || typeof window === "undefined") {
+    return;
+  }
+
+  if (navigator.onLine && userId) {
+    const syncQueue = await getSyncQueue();
+    if (syncQueue.length > 0) {
+      const wasRunning = !!currentSyncPromise;
+      if (!wasRunning) {
+        console.info("Syncing offline data...");
+      }
+      try {
+        const results = await syncAllOfflineData();
+        if (!wasRunning) {
+          console.info("Sync completed:", results);
+        }
+
+        window.dispatchEvent(
+          new CustomEvent("offline-sync-completed", {
+            detail: results,
+          }),
+        );
+      } catch (error) {
+        console.error("Sync failed:", error);
+
+        window.dispatchEvent(
+          new CustomEvent("offline-sync-failed", {
+            detail: error,
+          }),
+        );
+      }
+    }
+  }
+}
+
+
+export async function syncAllOfflineData(): Promise<{
+  bookmarks: SyncResult;
+  notes: SyncResult;
+}> {
+  if (currentSyncPromise) {
+    return currentSyncPromise;
+  }
+
+  currentSyncPromise = (async () => {
+    const [bookmarkResult, noteResult] = await Promise.all([
+      syncBookmarksToServer(),
+      syncNotesToServer(),
+    ]);
+
+    return {
+      bookmarks: bookmarkResult,
+      notes: noteResult,
+    };
+  })();
+
+  try {
+    return await currentSyncPromise;
+  } finally {
+    currentSyncPromise = null;
+  }
+}

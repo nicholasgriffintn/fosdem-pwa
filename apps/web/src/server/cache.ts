@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { CONSTANTS } from "~/server/constants";
 
 interface InMemoryCacheEntry {
 	data: unknown;
@@ -9,7 +10,7 @@ export class CacheManager {
 	private kvCache: KVNamespace | null;
 	private memoryCache: Map<string, InMemoryCacheEntry> = new Map();
 	private readonly PREFIX = "fosdem:";
-	private readonly TTL = 60 * 60 * 24; // 24 hours in seconds
+	private readonly TTL = CONSTANTS.DEFAULT_TTL;
 
 	constructor() {
 		if (
@@ -31,7 +32,7 @@ export class CacheManager {
 
 		if (this.kvCache) {
 			try {
-				const data = await this.kvCache.get(this.getKey(key));
+				const data = await this.kvCache.get(prefixedKey);
 				if (data === null || data === undefined) {
 					return null;
 				}
@@ -70,7 +71,7 @@ export class CacheManager {
 		if (this.kvCache) {
 			try {
 				const stringData = typeof data === "string" ? data : JSON.stringify(data);
-				await this.kvCache.put(this.getKey(key), stringData, { expirationTtl: ttl || this.TTL });
+				await this.kvCache.put(prefixedKey, stringData, { expirationTtl: effectiveTtl });
 			} catch (error) {
 				console.error(`KV set error for key ${key}:`, error);
 			}
@@ -92,7 +93,7 @@ export class CacheManager {
 		}
 
 		try {
-			await this.kvCache.delete(this.getKey(key));
+			await this.kvCache.delete(prefixedKey);
 		} catch (error) {
 			console.error(`KV invalidate error for key ${key}:`, error);
 		}

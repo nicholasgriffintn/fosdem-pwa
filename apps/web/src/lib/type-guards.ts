@@ -77,3 +77,12 @@ export function isValidServerNote(note: unknown): note is { id: number; year: nu
 export function isFavourited(bookmark: BookmarkSnapshot | { status: string }): boolean {
   return bookmark.status === 'favourited';
 }
+
+export function hasId(value: unknown): value is { id: number } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "id" in value &&
+    typeof (value as { id: unknown }).id === "number"
+  );
+}

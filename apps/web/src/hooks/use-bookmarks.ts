@@ -108,7 +108,7 @@ export function useBookmarks({
 			}
 
 		return merged;
-	}, [localOnly, user?.id, localBookmarks, serverBookmarks]);
+	}, [localOnly, userId, localBookmarks, serverBookmarks]);
 
 	useEffect(() => {
 		if (localOnly) return;
@@ -206,7 +206,7 @@ export function useBookmarks({
 		return () => {
 			cancelled = true;
 		};
-	}, [localOnly, userId, serverBookmarks, localBookmarks, year, queryClient]);
+	}, [localOnly, userId, serverBookmarks, localBookmarks, year, queryClient, localQueryKey]);
 
 	return {
 		bookmarks: mergedBookmarks,

@@ -1,0 +1,6 @@
+export const CONSTANTS = {
+	CURRENT_YEAR_TTL: 60 * 5,
+	PAST_YEAR_TTL: 60 * 60 * 24,
+	DEFAULT_TTL: 60 * 60 * 24,
+	FETCH_TIMEOUT_MS: 8000,
+} as const;

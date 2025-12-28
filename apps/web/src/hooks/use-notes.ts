@@ -14,7 +14,7 @@ import {
 	addToSyncQueue,
 	type LocalNote,
 } from "~/lib/localStorage";
-import { isValidServerNote, isNumber } from "~/lib/type-guards";
+import { isValidServerNote, isNumber, hasId } from "~/lib/type-guards";
 import { notesQueryKeys } from "~/lib/query-keys";
 
 type UseNotesArgs = {
@@ -91,9 +91,9 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 			return {
 				...local,
-				serverId: matchingServerNote && typeof matchingServerNote === 'object' && 'id' in matchingServerNote ? matchingServerNote.id : undefined,
-				existsOnServer: !!matchingServerNote && typeof matchingServerNote === 'object',
-				isPending: !!user?.id && (!matchingServerNote || typeof matchingServerNote !== 'object'),
+				serverId: matchingServerNote && hasId(matchingServerNote) ? matchingServerNote.id : undefined,
+				existsOnServer: !!matchingServerNote,
+				isPending: !!user?.id && !matchingServerNote,
 			};
 		});
 

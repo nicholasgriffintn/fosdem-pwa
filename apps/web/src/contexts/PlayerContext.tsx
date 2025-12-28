@@ -445,6 +445,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			minimize,
 			restore,
 			close,
+			setPortalTarget,
 		],
 	);
 

@@ -165,13 +165,13 @@ function EventPage() {
   const onCreateBookmark = async (bookmark: any) => {
     await createBookmark(bookmark);
   };
-  const isBookmarked = bookmark?.status === "favourited" || serverBookmark?.status === "favourited";
-  const isInWatchLater = isClient ? bookmark?.watch_later === true : serverBookmark?.watch_later === true;
-  const isAttended = isClient ? bookmark?.attended === true : serverBookmark?.attended === true;
-  const isAttendedInPerson = isClient
-    ? bookmark?.attended_in_person === true
-    : serverBookmark?.attended_in_person === true;
-  const currentBookmarkId = isClient ? bookmark?.id : serverBookmark?.id;
+
+  const currentBookmark = isClient ? bookmark : serverBookmark;
+  const isBookmarked = currentBookmark?.status === "favourited";
+  const isInWatchLater = currentBookmark?.watch_later === true;
+  const isAttended = currentBookmark?.attended === true;
+  const isAttendedInPerson = currentBookmark?.attended_in_person === true;
+  const currentBookmarkId = currentBookmark?.id;
   const eventFinished = fosdem.event && fosdem.conference ? isEventFinished(fosdem.event, fosdem.conference) : false;
   const eventLive = fosdem.event && fosdem.conference ? isEventLive(fosdem.event, fosdem.conference) : false;
   const canMarkAttendance = eventFinished || eventLive;

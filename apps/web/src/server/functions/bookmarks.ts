@@ -177,6 +177,15 @@ export const updateBookmark = createServerFn({
 
 		for (const [key, value] of Object.entries(updates ?? {})) {
 			if (allowedFields.includes(key as AllowedField)) {
+				if (key === "status" && typeof value !== "string") {
+					return err(`Invalid type for ${key}: expected string`);
+				}
+				if (key === "priority" && value !== null && typeof value !== "number") {
+					return err(`Invalid type for ${key}: expected number or null`);
+				}
+				if (key === "last_notification_sent_at" && value !== null && typeof value !== "string") {
+					return err(`Invalid type for ${key}: expected ISO date string or null`);
+				}
 				(safeUpdates as Record<string, unknown>)[key] = value;
 			}
 		}
