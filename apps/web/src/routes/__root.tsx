@@ -22,6 +22,7 @@ import { AuthSnapshotProvider } from "~/contexts/AuthSnapshotContext";
 // import { AppNotice } from "~/components/AppNotice";
 import { siteMeta } from "~/constants/site";
 import { PlayerProvider } from "~/contexts/PlayerContext";
+import { TooltipProvider } from "~/components/ui/tooltip";
 import { FloatingPlayer } from "~/components/FloatingPlayer";
 import { VideoPortal } from "~/components/VideoPlayer/VideoPortal";
 import { VideoProgressTracker } from "~/components/VideoPlayer/VideoProgressTracker";
@@ -105,13 +106,15 @@ function RootComponent() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<PlayerProvider>
-				<AuthSnapshotProvider user={user ?? null}>
-					<RootDocument>
-						<Outlet />
-					</RootDocument>
-				</AuthSnapshotProvider>
-			</PlayerProvider>
+			<TooltipProvider>
+				<PlayerProvider>
+					<AuthSnapshotProvider user={user ?? null}>
+						<RootDocument>
+							<Outlet />
+						</RootDocument>
+					</AuthSnapshotProvider>
+				</PlayerProvider>
+			</TooltipProvider>
 		</QueryClientProvider>
 	);
 }

@@ -4,11 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 
 import { Button } from "~/components/ui/button";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "~/components/ui/tooltip";
 import { Icons } from "~/components/shared/Icons";
 import { toast } from "~/hooks/use-toast";
 import { Spinner } from "~/components/shared/Spinner";
 import { useIsClient } from "~/hooks/use-is-client";
 import { createBookmarkFromForm } from "~/server/functions/bookmarks";
+import { buildSearchParams } from "~/lib/url";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 
 type FavouriteButtonProps = {
@@ -27,30 +33,8 @@ type FavouriteButtonProps = {
 		slug: string;
 		status: string;
 	}) => Promise<void> | void;
+	className?: string;
 };
-
-function buildUpSearchParams(search: {
-	year?: number | undefined;
-	type?: string | undefined;
-	day?: string | null | undefined;
-	test?: boolean | undefined;
-	time?: string | undefined;
-	track?: string | undefined;
-	sortFavourites?: string | undefined;
-	view?: string | undefined;
-	q?: string | undefined;
-}) {
-	const params = Object.entries(search)
-		.filter(([, value]) => value !== undefined && value !== null)
-		.map(
-			([key, value]) =>
-				`${encodeURIComponent(key)}=${encodeURIComponent(
-					String(value),
-				)}`,
-		)
-		.join("&");
-	return params ? `?${params}` : "";
-}
 
 export function FavouriteButton({
 	year,
@@ -58,6 +42,7 @@ export function FavouriteButton({
 	slug,
 	status,
 	onCreateBookmark,
+	className,
 }: FavouriteButtonProps) {
 	const isClient = useIsClient();
 	const { user: serverUser } = useAuthSnapshot();
@@ -65,7 +50,7 @@ export function FavouriteButton({
 		select: (state) => {
 			const searchValue = state.location.search;
 			if (searchValue) {
-				return `${state.location.pathname}${buildUpSearchParams(searchValue)}`;
+				return `${state.location.pathname}${buildSearchParams(searchValue)}`;
 			}
 			return state.location.pathname;
 		},
@@ -125,48 +110,59 @@ export function FavouriteButton({
 		const canSubmit = Boolean(serverUser?.id);
 
 		return (
-			<form method="post" action={createBookmarkFromForm.url}>
-				<input type="hidden" name="year" value={year} />
-				<input type="hidden" name="type" value={type} />
-				<input type="hidden" name="slug" value={slug} />
-				<input type="hidden" name="status" value={nextStatus} />
-				<input type="hidden" name="returnTo" value={returnTo} />
-				<Button
-					variant="outline"
-					disabled={!canSubmit}
-					title={
-						canSubmit
-							? "Bookmark this item"
-							: "Sign in to bookmark events"
-					}
-					type="submit"
-				>
-					<Icons.star
-						className={status === "favourited" ? "icon--filled" : ""}
-					/>
-				</Button>
-			</form>
+			<div className={className}>
+				<form method="post" action={createBookmarkFromForm.url}>
+					<input type="hidden" name="year" value={year} />
+					<input type="hidden" name="type" value={type} />
+					<input type="hidden" name="slug" value={slug} />
+					<input type="hidden" name="status" value={nextStatus} />
+					<input type="hidden" name="returnTo" value={returnTo} />
+					<Button
+						variant="outline"
+						disabled={!canSubmit}
+						title={
+							canSubmit
+								? "Bookmark this item"
+								: "Sign in to bookmark events"
+						}
+						type="submit"
+						className="w-full"
+					>
+						<Icons.star
+							className={status === "favourited" ? "icon--filled" : ""}
+						/>
+					</Button>
+				</form>
+			</div>
 		);
 	}
 
+	const tooltipLabel = currentStatus === "favourited" ? "Remove from bookmarks" : "Add to bookmarks";
+
 	return (
-		<Button
-			variant="outline"
-			onClick={handleFavourite}
-			disabled={currentStatus === "loading" || isProcessing}
-			aria-label={
-				currentStatus === "favourited"
-					? "Remove from bookmarks"
-					: "Add to bookmarks"
-			}
-		>
-			{currentStatus === "loading" || isProcessing ? (
-				<Spinner />
-			) : (
-				<Icons.star
-					className={currentStatus === "favourited" ? "icon--filled" : ""}
-				/>
-			)}
-		</Button>
+		<div className={className}>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<Button
+						variant="outline"
+						onClick={handleFavourite}
+						disabled={currentStatus === "loading" || isProcessing}
+						aria-label={tooltipLabel}
+						className="w-full"
+					>
+						{currentStatus === "loading" || isProcessing ? (
+							<Spinner />
+						) : (
+							<Icons.star
+								className={currentStatus === "favourited" ? "icon--filled" : ""}
+							/>
+						)}
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent>
+					<p>{tooltipLabel}</p>
+				</TooltipContent>
+			</Tooltip>
+		</div>
 	);
 }

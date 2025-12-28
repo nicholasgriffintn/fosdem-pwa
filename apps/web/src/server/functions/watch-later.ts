@@ -135,3 +135,50 @@ export const setPlaybackSpeed = createServerFn({
       return err("Failed to set playback speed");
     }
   });
+
+export const toggleWatchLaterFromForm = createServerFn({
+  method: "POST",
+})
+  .inputValidator((data: FormData) => {
+    if (!(data instanceof FormData)) {
+      throw new Error("Invalid! FormData is required");
+    }
+
+    const bookmarkId = data.get("bookmarkId");
+    const returnTo = data.get("returnTo");
+
+    if (!bookmarkId) {
+      throw new Error("Invalid request: bookmarkId is required");
+    }
+
+    return {
+      bookmarkId: bookmarkId.toString(),
+      returnTo: returnTo?.toString(),
+    };
+  })
+  .handler(async (ctx): Promise<Response> => {
+    const { bookmarkId, returnTo } = ctx.data;
+    const user = await getAuthUser();
+
+    if (!user) {
+      return new Response(null, {
+        status: 303,
+        headers: {
+          Location: "/signin",
+        },
+      });
+    }
+
+    try {
+      await toggleWatchLaterRepo(bookmarkId, user.id);
+    } catch (error) {
+      console.error("Failed to toggle watch later:", error);
+    }
+
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: returnTo?.startsWith("/") ? returnTo : "/",
+      },
+    });
+  });

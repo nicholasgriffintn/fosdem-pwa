@@ -113,3 +113,70 @@ export const unmarkEventAttended = createServerFn({
       return err("Failed to unmark event as attended");
     }
   });
+
+export const toggleAttendanceFromForm = createServerFn({
+  method: "POST",
+})
+  .inputValidator((data: FormData) => {
+    if (!(data instanceof FormData)) {
+      throw new Error("Invalid! FormData is required");
+    }
+
+    const bookmarkId = data.get("bookmarkId");
+    const currentStatus = data.get("currentStatus");
+    const returnTo = data.get("returnTo");
+
+    if (!bookmarkId) {
+      throw new Error("Invalid request: bookmarkId is required");
+    }
+
+    return {
+      bookmarkId: bookmarkId.toString(),
+      currentStatus: currentStatus?.toString() === "true",
+      returnTo: returnTo?.toString(),
+    };
+  })
+  .handler(async (ctx): Promise<Response> => {
+    const { bookmarkId, currentStatus, returnTo } = ctx.data;
+    const user = await getAuthUser();
+
+    if (!user) {
+      return new Response(null, {
+        status: 303,
+        headers: {
+          Location: "/signin",
+        },
+      });
+    }
+
+    const bookmark = await findBookmarkById(bookmarkId, user.id);
+    if (!bookmark) {
+      return new Response(null, {
+        status: 303,
+        headers: {
+          Location: returnTo?.startsWith("/") ? returnTo : "/",
+        },
+      });
+    }
+
+    try {
+      if (currentStatus) {
+        await updateBookmark(bookmarkId, {
+          attended: false,
+          attended_at: null,
+          attended_in_person: false,
+        });
+      } else {
+        await markAsAttendedRepo(bookmarkId, user.id, false);
+      }
+    } catch (error) {
+      console.error("Failed to toggle attendance:", error);
+    }
+
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: returnTo?.startsWith("/") ? returnTo : "/",
+      },
+    });
+  });

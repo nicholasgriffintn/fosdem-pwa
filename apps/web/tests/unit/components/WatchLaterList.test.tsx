@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { TooltipProvider } from "~/components/ui/tooltip";
 import { WatchLaterList } from "~/components/WatchLater/WatchLaterList";
 import type { Bookmark } from "~/server/db/schema";
 import type { Conference } from "~/types/fosdem";
@@ -125,7 +126,9 @@ describe("WatchLaterList", () => {
       defaultOptions: { queries: { retry: false } },
     });
     const result = render(
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>{ui}</TooltipProvider>
+      </QueryClientProvider>,
     );
     return { ...result, queryClient };
   };

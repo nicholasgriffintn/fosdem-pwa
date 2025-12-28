@@ -1,6 +1,11 @@
 "use client";
 
 import { Button, buttonVariants } from "~/components/ui/button";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "~/components/ui/tooltip";
 import { Icons } from "~/components/shared/Icons";
 import { toast } from "~/hooks/use-toast";
 import { shareSupported, clipboardSupported } from "~/lib/browserSupport";
@@ -10,9 +15,10 @@ type ShareButtonProps = {
 	title: string;
 	text: string;
 	url: string;
+	className?: string;
 };
 
-export function ShareButton({ title, text, url }: ShareButtonProps) {
+export function ShareButton({ title, text, url, className }: ShareButtonProps) {
 	const handleShare = async () => {
 		try {
 			if (shareSupported() && navigator.canShare({ title, text, url })) {
@@ -48,12 +54,12 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
 	};
 
 	return (
-		<>
+		<div className={className}>
 			<details className="no-js-only relative">
 				<summary
 					className={cn(
 						buttonVariants({ variant: "outline" }),
-						"cursor-pointer list-none [&::-webkit-details-marker]:hidden",
+						"cursor-pointer list-none [&::-webkit-details-marker]:hidden w-full",
 					)}
 					title="Share"
 					aria-label={`Share ${title}`}
@@ -71,14 +77,21 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
 					/>
 				</div>
 			</details>
-			<Button
-				variant="outline"
-				onClick={handleShare}
-				className="js-only"
-				aria-label={`Share ${title}`}
-			>
-				<Icons.share className="h-4 w-4" />
-			</Button>
-		</>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<Button
+						variant="outline"
+						onClick={handleShare}
+						className="js-only w-full"
+						aria-label={`Share ${title}`}
+					>
+						<Icons.share className="h-4 w-4" />
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent>
+					<p>Share</p>
+				</TooltipContent>
+			</Tooltip>
+		</div>
 	);
 }

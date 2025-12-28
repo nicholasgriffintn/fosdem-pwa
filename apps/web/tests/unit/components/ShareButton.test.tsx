@@ -1,6 +1,7 @@
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { describe, expect, it, beforeEach, vi, afterEach } from "vitest";
 
+import { renderWithProviders } from "../../utils/test-providers";
 import { ShareButton } from "~/components/shared/ShareButton";
 
 const supportMocks = vi.hoisted(() => ({
@@ -55,7 +56,7 @@ describe("ShareButton", () => {
 			configurable: true,
 		});
 
-		render(
+		renderWithProviders(
 			<ShareButton
 				title="Talk"
 				text="Check out Talk"
@@ -81,7 +82,7 @@ describe("ShareButton", () => {
 			configurable: true,
 		});
 
-		render(
+		renderWithProviders(
 			<ShareButton
 				title="Talk"
 				text="Check out Talk"

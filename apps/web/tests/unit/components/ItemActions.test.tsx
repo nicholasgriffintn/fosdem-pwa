@@ -3,8 +3,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { TooltipProvider } from "~/components/ui/tooltip";
 import { ItemActions } from "~/components/shared/ItemActions";
 import type { Event } from "~/types/fosdem";
+
+const renderWithTooltip = (ui: React.ReactElement) =>
+	render(<TooltipProvider>{ui}</TooltipProvider>);
 
 const routerMocks = vi.hoisted(() => ({
 	Link: ({ children, ...props }: { children: ReactNode }) => (
@@ -59,7 +63,7 @@ describe("ItemActions", () => {
 		const user = userEvent.setup();
 		const onCreateBookmark = vi.fn().mockResolvedValue(undefined);
 
-		render(
+		renderWithTooltip(
 			<ItemActions
 				item={createEvent()}
 				year={2024}
@@ -90,7 +94,7 @@ describe("ItemActions", () => {
 		const user = userEvent.setup();
 		const onCreateBookmark = vi.fn().mockResolvedValue(undefined);
 
-		render(
+		renderWithTooltip(
 			<ItemActions
 				item={createEvent({ isFavourited: true })}
 				year={2024}
@@ -120,7 +124,7 @@ describe("ItemActions", () => {
 	it("keeps favourite button interactive during bookmark refetches", () => {
 		const onCreateBookmark = vi.fn().mockResolvedValue(undefined);
 
-		render(
+		renderWithTooltip(
 			<ItemActions
 				item={createEvent({ isFavourited: true })}
 				year={2024}
