@@ -48,9 +48,12 @@ export function createNotificationPayload(bookmark: EnrichedBookmark): Notificat
 export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: string, isEvening = false): NotificationPayload {
 	if (!bookmarks.length) {
 		if (isEvening) {
+			const message = day === "2"
+				? "FOSDEM is over! Your Year in Review is now ready to view."
+				: "Day 1 has ended! See you tomorrow!";
 			return {
 				title: `FOSDEM Day ${day} Wrap-up`,
-				body: "Thanks for joining us! Your Year in Review is now ready to view.",
+				body: message,
 				url: `https://${DOMAIN}/profile/year-in-review?year=${constants.YEAR}`,
 			};
 		}

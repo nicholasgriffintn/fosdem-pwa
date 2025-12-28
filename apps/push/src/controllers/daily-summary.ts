@@ -25,7 +25,7 @@ export async function triggerDailySummary(
 		return;
 	}
 
-	if (whichDay === "2" && isEvening) {
+	if (isEvening) {
 		try {
 			await refreshYearInReviewStats(env);
 		} catch (error) {
