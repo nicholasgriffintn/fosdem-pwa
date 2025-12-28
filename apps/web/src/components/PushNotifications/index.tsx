@@ -10,11 +10,19 @@ import { useSubscriptions } from "~/hooks/use-subscriptions";
 import { constants } from "~/constants";
 import { urlBase64ToUint8Array } from "~/lib/base64";
 import { LoadingState } from "~/components/shared/LoadingState";
-import { NotificationPreferences } from "./NotificationPreferences";
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetDescription,
+} from "~/components/ui/sheet";
+import { NotificationPreferencesContent } from "./NotificationPreferences";
 
 export function PushNotifications() {
 	const { subscriptions, loading: subscriptionsLoading } = useSubscriptions();
 	const [currentEndpoint, setCurrentEndpoint] = useState<string | null>(null);
+	const [preferencesOpen, setPreferencesOpen] = useState(false);
 	const {
 		create: createSubscription,
 		delete: deleteSubscription,
@@ -285,9 +293,38 @@ export function PushNotifications() {
 
 			{subscriptions && subscriptions.length > 0 && (
 				<div className="border-t pt-6 mt-6">
-					<NotificationPreferences />
+					<div className="flex items-center justify-between">
+						<div className="space-y-0.5">
+							<h3 className="text-lg font-semibold text-foreground">
+								Notification Preferences
+							</h3>
+							<p className="text-sm text-muted-foreground">
+								Customize which notifications you want to receive
+							</p>
+						</div>
+						<Button
+							variant="outline"
+							onClick={() => setPreferencesOpen(true)}
+						>
+							Configure
+						</Button>
+					</div>
 				</div>
 			)}
+
+			<Sheet open={preferencesOpen} onOpenChange={setPreferencesOpen}>
+				<SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+					<SheetHeader>
+						<SheetTitle>Notification Preferences</SheetTitle>
+						<SheetDescription>
+							Customize which notifications you want to receive
+						</SheetDescription>
+					</SheetHeader>
+					<div className="mt-6">
+						<NotificationPreferencesContent />
+					</div>
+				</SheetContent>
+			</Sheet>
 		</div>
 	);
 }

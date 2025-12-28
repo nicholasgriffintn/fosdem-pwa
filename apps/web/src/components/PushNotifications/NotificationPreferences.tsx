@@ -17,7 +17,7 @@ const REMINDER_OPTIONS = [
   { value: "30", label: "30 minutes before" },
 ];
 
-export function NotificationPreferences() {
+export function NotificationPreferencesContent() {
   const { preferences, loading, update, updating } = useNotificationPreferences();
 
   const handleUpdate = useCallback(
@@ -59,9 +59,6 @@ export function NotificationPreferences() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-foreground">
-          Notification Preferences
-        </h3>
         <LoadingState
           type="spinner"
           message="Loading preferences..."
@@ -77,10 +74,6 @@ export function NotificationPreferences() {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold text-foreground">
-        Notification Preferences
-      </h3>
-
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
