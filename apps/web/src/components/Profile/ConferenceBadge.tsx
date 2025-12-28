@@ -4,12 +4,12 @@ import { lazy, Suspense } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { Card } from "~/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/shared/Icons";
 import type { User, UserConferenceStats } from "~/server/db/schema";
 import { getAchievements } from "~/lib/achievements";
+import { UserAvatar } from "~/components/shared/UserAvatar";
 
 const QRCodeSVG = lazy(() =>
 	import("qrcode.react").then((mod) => ({
@@ -32,16 +32,6 @@ function hashStringToInt(input: string) {
 	return hash >>> 0;
 }
 
-function getInitials(name: string) {
-	const parts = name
-		.trim()
-		.split(/\s+/)
-		.filter(Boolean);
-	if (parts.length === 0) return "?";
-	const first = parts[0]?.[0] ?? "?";
-	const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
-	return `${first}${last}`.toUpperCase();
-}
 
 function normalizeSiteUrl(site: string) {
 	if (/^https?:\/\//i.test(site)) return site;
@@ -74,8 +64,6 @@ export function ConferenceBadge({
 		publicProfileId ||
 		user.email?.split("@")[0] ||
 		"Anonymous";
-	const avatarAlt = user.name || displayName;
-	const avatarFallback = getInitials(displayName);
 
 	const profileUrl = publicProfileId
 		? `https://fosdempwa.com/profile/${publicProfileId}`
@@ -131,15 +119,7 @@ export function ConferenceBadge({
 
 			<div className="p-6">
 				<div className="flex items-start gap-4">
-					<Avatar
-						className="w-24 h-24 border-4"
-						style={{ borderColor: theme.accent }}
-					>
-						{user.avatar_url ? (
-							<AvatarImage src={user.avatar_url} alt={avatarAlt} />
-						) : null}
-						<AvatarFallback>{avatarFallback}</AvatarFallback>
-					</Avatar>
+					<UserAvatar user={user} size="xl" borderColor={theme.accent} />
 					<div className="flex-1">
 						<h2 className="text-2xl font-bold text-foreground">{displayName}</h2>
 						{user.email && <p className="text-muted-foreground">{user.email}</p>}

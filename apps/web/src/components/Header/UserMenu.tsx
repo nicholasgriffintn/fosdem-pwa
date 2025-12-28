@@ -3,11 +3,11 @@
 import { useEffect, useId, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import type { SessionUser } from "~/types/auth";
 import { Icons } from "~/components/shared/Icons";
 import { buildProfileLink } from "~/lib/link-builder";
+import { UserAvatar } from "~/components/shared/UserAvatar";
 
 type AvatarMenuProps = {
 	user: SessionUser;
@@ -35,15 +35,7 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 				className="peer/avatar sr-only"
 			/>
 			<label htmlFor={`user-menu-${menuId}`} className="cursor-pointer">
-				<Avatar className="h-7 w-7">
-					<AvatarImage
-						src={user.avatar_url ?? undefined}
-						alt={user.name ?? undefined}
-					/>
-					<AvatarFallback>
-						<Icons.user className="h-4 w-4" />
-					</AvatarFallback>
-				</Avatar>
+				<UserAvatar user={user} size="sm" />
 			</label>
 			<div className="hidden peer-checked/avatar:block absolute right-0 mt-2 w-56 rounded-md border bg-popover text-popover-foreground shadow-md z-50 p-1">
 				<div className="flex items-center justify-start gap-2 p-2 min-w-0">

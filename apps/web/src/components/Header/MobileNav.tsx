@@ -11,6 +11,7 @@ import { Badge } from "~/components/ui/badge";
 import { buildProfileLink } from "~/lib/link-builder";
 import type { NavItem } from "~/components/shared/types";
 import { preserveYearSearch } from "~/lib/search-params";
+import { UserAvatar } from "~/components/shared/UserAvatar";
 
 const mobileNavLinkBase = "flex w-full items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors";
 const mobileNavLinkDefault = "text-foreground/90 hover:bg-muted/60 hover:text-foreground no-underline";
@@ -157,43 +158,29 @@ export function MobileNav({
 
 					<div className="my-5 border-t" />
 
-					{user?.id && (
-						<div className="flex items-center gap-3 rounded-lg border bg-muted/20 px-3 py-3">
-							<div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-								<Icons.user className="h-4 w-4" />
-							</div>
-							<div className="min-w-0 flex-1">
-								<div className="truncate text-sm font-medium">{user.name}</div>
-								{user.is_guest && (
-									<Badge variant="secondary" className="mt-1 text-xs">
-										Guest
-									</Badge>
-								)}
-							</div>
-						</div>
-					)}
-
-					<div className="mt-4 grid gap-1">
+					<div className="grid gap-1">
 						{user?.id ? (
 							<>
-								<Button
-									variant="ghost"
-									className="h-11 justify-start gap-3 rounded-lg px-3"
-									asChild
+								<Link
+									{...buildProfileLink({})}
+									onClick={() => {
+										if (menuCheckboxRef?.current) {
+											menuCheckboxRef.current.checked = false;
+										}
+										onClose();
+									}}
+									className="flex items-center gap-3 rounded-lg border bg-muted/20 px-3 py-3 no-underline hover:bg-muted/30 transition-colors"
 								>
-									<Link
-										{...buildProfileLink({})}
-										onClick={() => {
-											if (menuCheckboxRef?.current) {
-												menuCheckboxRef.current.checked = false;
-											}
-											onClose();
-										}}
-										className="no-underline"
-									>
-										View Profile
-									</Link>
-								</Button>
+									<UserAvatar user={user} size="md" />
+									<div className="min-w-0 flex-1">
+										<div className="truncate text-sm font-medium">{user.name}</div>
+										{user.is_guest && (
+											<Badge variant="secondary" className="mt-1 text-xs">
+												Guest
+											</Badge>
+										)}
+									</div>
+								</Link>
 								<Button
 									variant="ghost"
 									className="h-11 justify-start gap-3 rounded-lg px-3"

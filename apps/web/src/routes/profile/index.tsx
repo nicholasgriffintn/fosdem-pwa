@@ -157,6 +157,7 @@ function ProfilePage() {
                 showViewMode={false}
                 user={resolvedUser}
                 onCreateBookmark={onCreateBookmark}
+                title="Your Scheduled Bookmarks"
               />
             </div>
           </div>

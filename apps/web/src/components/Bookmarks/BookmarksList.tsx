@@ -70,6 +70,7 @@ type BookmarksListProps = {
 	defaultViewMode?: "list" | "schedule" | "calendar";
 	showViewMode?: boolean;
 	user?: User | null;
+	title?: string;
 	emptyStateTitle?: string;
 	emptyStateMessage?: string;
 	onCreateBookmark?: ({
@@ -100,6 +101,7 @@ export function BookmarksList({
 	defaultViewMode = "calendar",
 	showViewMode = true,
 	user,
+	title,
 	emptyStateTitle = "No bookmarks yet",
 	emptyStateMessage = "Start bookmarking events to see them here.",
 	onCreateBookmark,
@@ -261,7 +263,7 @@ export function BookmarksList({
 									<TrackList
 										tracks={tracks}
 										year={year}
-										title="Saved Tracks"
+										title={title || "Bookmarked Tracks"}
 										day={day}
 										user={user}
 										onCreateBookmark={onCreateBookmark}
@@ -276,7 +278,7 @@ export function BookmarksList({
 										events={events}
 										year={year}
 										conflicts={conflicts}
-										title="Saved Events"
+										title={title || "Bookmarked Events"}
 										groupByDay={true}
 										days={days}
 										day={day}
