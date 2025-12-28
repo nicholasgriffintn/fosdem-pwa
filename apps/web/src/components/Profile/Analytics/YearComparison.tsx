@@ -34,7 +34,7 @@ export function YearComparison({ history, loading }: YearComparisonProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-foreground">
-        Your FOSDEM Journey
+        History
       </h3>
       <div className="space-y-2">
         {sortedHistory.map((yearStats) => (
@@ -53,8 +53,8 @@ function YearRow({ stats }: YearRowProps) {
   const completionRate =
     stats.events_bookmarked && stats.events_bookmarked > 0
       ? Math.round(
-          ((stats.events_attended ?? 0) / stats.events_bookmarked) * 100,
-        )
+        ((stats.events_attended ?? 0) / stats.events_bookmarked) * 100,
+      )
       : 0;
 
   return (

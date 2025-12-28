@@ -68,17 +68,18 @@ export async function calculateAndUpdateUserStats(
       ),
     );
 
-  const eventsBookmarked = bookmarks.filter(
+  const eventBookmarks = bookmarks.filter(
     (b) => b.type === "bookmark_event",
-  ).length;
-  const eventsAttended = bookmarks.filter((b) => b.attended === true).length;
-  const eventsAttendedInPerson = bookmarks.filter(
+  );
+  const eventsBookmarked = eventBookmarks.length;
+  const eventsAttended = eventBookmarks.filter((b) => b.attended === true).length;
+  const eventsAttendedInPerson = eventBookmarks.filter(
     (b) => b.attended_in_person === true,
   ).length;
-  const eventsWatched = bookmarks.filter(
+  const eventsWatched = eventBookmarks.filter(
     (b) => b.watch_status === "watched",
   ).length;
-  const totalWatchTimeSeconds = bookmarks.reduce(
+  const totalWatchTimeSeconds = eventBookmarks.reduce(
     (sum, b) => sum + (b.watch_progress_seconds || 0),
     0,
   );

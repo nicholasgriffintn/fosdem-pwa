@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { ConferenceStats } from "~/components/Analytics/ConferenceStats";
+import { ConferenceStats } from "~/components/Profile/Analytics/ConferenceStats";
 import type { UserConferenceStats } from "~/server/db/schema";
 
 const createStats = (overrides: Partial<UserConferenceStats> = {}): UserConferenceStats => {

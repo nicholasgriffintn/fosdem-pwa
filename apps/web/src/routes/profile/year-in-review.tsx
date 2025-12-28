@@ -8,9 +8,9 @@ import { constants } from "~/constants";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { getUserStats, getUserStatsHistory } from "~/server/functions/user-stats";
 import { getSession } from "~/server/functions/session";
-import { YearInReview } from "~/components/Analytics/YearInReview";
-import { ConferenceStats } from "~/components/Analytics/ConferenceStats";
-import { YearComparison } from "~/components/Analytics/YearComparison";
+import { YearInReview } from "~/components/Profile/Analytics/YearInReview";
+import { ConferenceStats } from "~/components/Profile/Analytics/ConferenceStats";
+import { YearComparison } from "~/components/Profile/Analytics/YearComparison";
 import { useUserStats, useUserStatsHistory } from "~/hooks/use-user-stats";
 import { useProfile } from "~/hooks/use-user-me";
 import { useIsClient } from "~/hooks/use-is-client";
@@ -87,8 +87,8 @@ function YearInReviewPage() {
       />
 
       <SectionStack>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
             {[...constants.AVAILABLE_YEARS]
               .reverse()
               .map((y) => (
@@ -96,6 +96,7 @@ function YearInReviewPage() {
                   key={y}
                   variant={y === year ? "default" : "outline"}
                   size="sm"
+                  className="min-w-[72px]"
                   onClick={() => handleYearChange(y)}
                 >
                   {y}
@@ -107,6 +108,7 @@ function YearInReviewPage() {
             size="sm"
             onClick={() => refresh()}
             disabled={refreshing}
+            className="w-full md:w-auto"
           >
             <Icons.refresh className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
             Refresh Stats
