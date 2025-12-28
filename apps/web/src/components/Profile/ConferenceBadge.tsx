@@ -1,12 +1,15 @@
 "use client";
 
 import { lazy, Suspense } from "react";
+import { Link } from "@tanstack/react-router";
 
 import { Card } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/shared/Icons";
-import type { User } from "~/server/db/schema";
+import type { User, UserConferenceStats } from "~/server/db/schema";
+import { getAchievements } from "~/lib/achievements";
 
 const QRCodeSVG = lazy(() =>
 	import("qrcode.react").then((mod) => ({
@@ -17,6 +20,7 @@ const QRCodeSVG = lazy(() =>
 type ConferenceBadgeProps = {
 	user?: User | null;
 	conferenceYear: number;
+	stats?: UserConferenceStats | null;
 };
 
 function hashStringToInt(input: string) {
@@ -58,6 +62,7 @@ function getPublicProfileId(user: User) {
 export function ConferenceBadge({
 	user,
 	conferenceYear,
+	stats,
 }: ConferenceBadgeProps) {
 	if (!user) {
 		return null;
@@ -88,6 +93,10 @@ export function ConferenceBadge({
 	const theme = themes[hash % themes.length];
 	const patternVariant = (hash >>> 3) % 3;
 	const badgeNumber = (hash % 9000) + 1000;
+
+	const achievements = getAchievements(stats);
+	const earnedAchievements = achievements.filter((a) => a.earned);
+	const totalAchievements = achievements.length;
 
 	return (
 		<Card className="w-full max-w-md mx-auto overflow-hidden">
@@ -236,6 +245,53 @@ export function ConferenceBadge({
 							</a>
 						</Badge>
 					)}
+				</div>
+
+				<div className="mt-6 space-y-3">
+					{stats && earnedAchievements.length > 0 && (
+						<>
+							<div className="flex items-center justify-between">
+								<h3 className="text-sm font-semibold text-foreground">
+									Achievements
+								</h3>
+								<span className="text-xs text-muted-foreground">
+									{earnedAchievements.length} of {totalAchievements}
+								</span>
+							</div>
+							<div className="grid grid-cols-2 gap-2">
+								{earnedAchievements.slice(0, 4).map((achievement) => {
+									const Icon = Icons[achievement.icon];
+									return (
+										<div
+											key={achievement.id}
+											className="bg-muted/50 rounded-lg p-2.5 flex items-center gap-2"
+										>
+											<div
+												className="h-7 w-7 rounded-md flex items-center justify-center flex-shrink-0"
+												style={{ backgroundColor: `${theme.accent}22` }}
+											>
+												<Icon className="h-3.5 w-3.5" style={{ color: theme.accent }} />
+											</div>
+											<span className="text-xs font-medium text-foreground leading-tight line-clamp-2">
+												{achievement.label}
+											</span>
+										</div>
+									);
+								})}
+							</div>
+							{earnedAchievements.length > 4 && (
+								<p className="text-xs text-center text-muted-foreground">
+									+{earnedAchievements.length - 4} more
+								</p>
+							)}
+						</>
+					)}
+					<Button asChild variant="outline" size="sm" className="w-full no-underline">
+						<Link to="/profile/year-in-review" search={{ year: conferenceYear }}>
+							<Icons.star className="h-3.5 w-3.5 mr-2" />
+							View Year in Review
+						</Link>
+					</Button>
 				</div>
 
 				{profileUrl && (

@@ -11,8 +11,6 @@ import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { SetBookmarksVisability } from "~/components/Profile/SetBookmarksVisability";
 import { PushNotifications } from "~/components/PushNotifications";
 import { UpgradeNotice } from "~/components/shared/UpgradeNotice";
-import { Button } from "~/components/ui/button";
-import { Icons } from "~/components/shared/Icons";
 import { buildHomeLink } from "~/lib/link-builder";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
@@ -21,8 +19,10 @@ import { SectionStack } from "~/components/shared/SectionStack";
 import { getAllData } from "~/server/functions/fosdem";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { getSession } from "~/server/functions/session";
+import { getUserStats } from "~/server/functions/user-stats";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { useIsClient } from "~/hooks/use-is-client";
+import { useUserStats } from "~/hooks/use-user-stats";
 
 export const Route = createFileRoute("/profile/")({
   component: ProfilePage,
@@ -64,18 +64,20 @@ export const Route = createFileRoute("/profile/")({
       data: { year, status: "favourited" },
     });
     const user = await getSession();
+    const stats = await getUserStats({ data: { year } });
 
     return {
       year,
       fosdemData,
       serverBookmarks,
       user,
+      stats,
     };
   },
 });
 
 function ProfilePage() {
-  const { year, fosdemData: serverFosdemData, serverBookmarks, user: serverUserFromLoader } =
+  const { year, fosdemData: serverFosdemData, serverBookmarks, user: serverUserFromLoader, stats: serverStats } =
     Route.useLoaderData();
   const { tab: tabRaw, day, view } = Route.useSearch();
   const tab = tabRaw ?? "events";
@@ -85,6 +87,7 @@ function ProfilePage() {
   const { bookmarks, loading: bookmarksLoading } = useBookmarks({ year });
   const { create: createBookmark } = useMutateBookmark({ year });
   const { fosdemData } = useFosdemData({ year });
+  const { stats, loading: statsLoading } = useUserStats({ year });
   const isClient = useIsClient();
   const hasServerSnapshot = Boolean(serverFosdemData);
   const useServerSnapshot =
@@ -93,6 +96,7 @@ function ProfilePage() {
   const resolvedBookmarks = useServerSnapshot ? serverBookmarks : bookmarks;
   const resolvedBookmarksLoading = useServerSnapshot ? false : bookmarksLoading;
   const resolvedFosdemData = useServerSnapshot ? serverFosdemData : fosdemData;
+  const resolvedStats = useServerSnapshot ? serverStats : stats;
 
   const profileIdentifier = resolvedUser
     ? resolvedUser.github_username ||
@@ -127,19 +131,10 @@ function ProfilePage() {
 
         <div className="flex flex-col lg:flex-row items-start gap-8">
           <div className="w-full lg:w-auto lg:max-w-md">
-            <ConferenceBadge user={resolvedUser} conferenceYear={year} />
+            <ConferenceBadge user={resolvedUser} conferenceYear={year} stats={resolvedStats} />
           </div>
 
           <div className="w-full lg:flex-1 space-y-8">
-            <div className="flex flex-wrap gap-3">
-              <Button asChild variant="outline" className="no-underline">
-                <Link to="/profile/year-in-review" search={{ year }}>
-                  <Icons.star className="h-4 w-4 mr-2" />
-                  Year in Review
-                </Link>
-              </Button>
-            </div>
-
             {!resolvedUser.is_guest && <PushNotifications />}
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-foreground">Your Bookmarks</h2>
