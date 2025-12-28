@@ -10,7 +10,9 @@
     "cf-typegen": "wrangler types",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:migrate:local": "wrangler d1 migrations apply fosdem --local",
+    "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20251225.0",
