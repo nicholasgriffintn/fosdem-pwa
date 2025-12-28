@@ -1,3 +1,9 @@
+export interface FosdemEventLink {
+	type?: string;
+	href?: string;
+	title?: string;
+}
+
 export interface FosdemEvent {
 	day: string;
 	title: string;
@@ -7,6 +13,7 @@ export interface FosdemEvent {
 	room: string;
 	startTime: string;
 	duration: string;
+	links?: FosdemEventLink[];
 }
 
 export interface FosdemData {
@@ -56,7 +63,6 @@ export interface QueueMessage {
 
 export interface Env {
 	DB: D1Database;
-	DB_PREVIEW: D1Database;
 	ANALYTICS: AnalyticsEngineDataset;
 	NOTIFICATION_QUEUE: Queue<QueueMessage>;
 	VAPID_EMAIL: string;

@@ -9,11 +9,7 @@ import {
 	getBookmarksForDay,
 	getBookmarksStartingSoon,
 } from "../src/lib/bookmarks";
-import {
-	bookmarkNotificationsEnabled,
-	scheduleChangeNotificationsEnabled,
-} from "../src/utils/config";
-import type { EnrichedBookmark, ScheduleSnapshot, Env } from "../src/types";
+import type { EnrichedBookmark, ScheduleSnapshot } from "../src/types";
 
 const baseBookmark: EnrichedBookmark = {
 	id: "1",
@@ -47,7 +43,7 @@ describe("notification payloads", () => {
 		expect(payload.title).toBe("Event Starting Soon");
 		expect(payload.body).toContain("starts in 15 minutes");
 		expect(payload.body).toContain(baseBookmark.room);
-		expect(payload.url).toContain("year=2025");
+		expect(payload.url).toContain("year=2026");
 	});
 
 	it("creates daily summary payloads for morning and evening", () => {
@@ -115,24 +111,32 @@ describe("bookmark helpers", () => {
 		expect(startingSoon).toHaveLength(1);
 		expect(startingSoon[0].slug).toBe("test-talk");
 	});
-});
 
-describe("notification feature flags", () => {
-	it("enables by default and respects env flags", () => {
-		const envDefault = {} as Env;
-		const envFalse = { BOOKMARK_NOTIFICATIONS_ENABLED: "false" } as Env;
-		const envTrue = { BOOKMARK_NOTIFICATIONS_ENABLED: "true" } as Env;
+	it("respects a custom reminder window", () => {
+		// 2025-02-01T08:57:00Z -> 09:57 Brussels
+		vi.useFakeTimers();
+		vi.setSystemTime(new Date("2025-02-01T08:57:00Z"));
 
-		expect(bookmarkNotificationsEnabled(envDefault)).toBe(false);
-		expect(bookmarkNotificationsEnabled(envFalse)).toBe(false);
-		expect(bookmarkNotificationsEnabled(envTrue)).toBe(true);
+		const bookmarks = [
+			{ ...baseBookmark, startTime: "10:00" }, // 3 minutes away
+			{ ...baseBookmark, id: "2", slug: "later", startTime: "10:10" }, // 13 minutes
+		];
+
+		const startingSoon = getBookmarksStartingSoon(bookmarks, 5);
+		expect(startingSoon).toHaveLength(1);
+		expect(startingSoon[0].slug).toBe("test-talk");
 	});
 
-	it("separates schedule change flag", () => {
-		const env = {
-			SCHEDULE_CHANGE_NOTIFICATIONS_ENABLED: false,
-		} as Env;
+	it("falls back to default reminder window for invalid input", () => {
+		// 2025-02-01T08:45:00Z -> 09:45 Brussels
+		vi.useFakeTimers();
+		vi.setSystemTime(new Date("2025-02-01T08:45:00Z"));
 
-		expect(scheduleChangeNotificationsEnabled(env)).toBe(false);
+		const bookmarks = [
+			{ ...baseBookmark, startTime: "10:00" }, // 15 minutes away
+		];
+
+		const startingSoon = getBookmarksStartingSoon(bookmarks, Number.NaN);
+		expect(startingSoon).toHaveLength(1);
 	});
 });

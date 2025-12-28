@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { LoadingState } from "~/components/shared/LoadingState";
 import { EventList } from "~/components/Event/EventList";
 import { TrackList } from "~/components/Track/TrackList";
+import { WatchLaterList } from "~/components/WatchLater/WatchLaterList";
 import type { Conference, Track, Event } from "~/types/fosdem";
 import { detectEventConflicts } from "~/lib/fosdem";
 import { sortEvents, sortTracks } from "~/lib/sorting";
@@ -56,8 +57,10 @@ type BookmarksListProps = {
 	loading: boolean;
 	day?: string;
 	view?: string;
-	tab?: "events" | "tracks" | "all";
+	tab?: "events" | "tracks" | "all" | "watch-later";
 	headerActions?: React.ReactNode;
+	watchLaterItems?: Bookmark[];
+	watchLaterLoading?: boolean;
 	onUpdateBookmark?: (params: {
 		id: string;
 		serverId?: string;
@@ -78,6 +81,7 @@ type BookmarksListProps = {
 		slug: string;
 		status: string;
 	}) => void;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 export function BookmarksList({
@@ -89,6 +93,8 @@ export function BookmarksList({
 	view,
 	tab = "events",
 	headerActions,
+	watchLaterItems,
+	watchLaterLoading,
 	onUpdateBookmark,
 	showConflicts = true,
 	defaultViewMode = "calendar",
@@ -97,6 +103,7 @@ export function BookmarksList({
 	emptyStateTitle = "No bookmarks yet",
 	emptyStateMessage = "Start bookmarking events to see them here.",
 	onCreateBookmark,
+	onToggleWatchLater,
 }: BookmarksListProps) {
 	if (!bookmarks || bookmarks.length === 0) {
 		return (
@@ -229,6 +236,17 @@ export function BookmarksList({
 								>
 									Tracks
 								</Link>
+								<Link
+									to="."
+									search={(prev) => ({ ...prev, tab: "watch-later" })}
+									className={cn(
+										tabBaseClass,
+										"flex-1",
+										tab === "watch-later" && tabActiveClass
+									)}
+								>
+									Watch Later
+								</Link>
 							</div>
 							{headerActions ? (
 								<div className="flex w-full justify-end md:w-auto">
@@ -239,7 +257,7 @@ export function BookmarksList({
 
 						<div>
 							{tracks.length > 0 && (
-								<div className={cn(tab === "events" ? "hidden" : "")}>
+								<div className={cn(tab === "events" || tab === "watch-later" ? "hidden" : "")}>
 									<TrackList
 										tracks={tracks}
 										year={year}
@@ -253,7 +271,7 @@ export function BookmarksList({
 							)}
 
 							{events.length > 0 && (
-								<div className={cn(tab === "tracks" ? "hidden" : "")}>
+								<div className={cn(tab === "tracks" || tab === "watch-later" ? "hidden" : "")}>
 									<EventList
 										events={events}
 										year={year}
@@ -270,6 +288,20 @@ export function BookmarksList({
 										user={user}
 										onCreateBookmark={onCreateBookmark}
 										serverBookmarks={bookmarkSnapshot}
+										onToggleWatchLater={onToggleWatchLater}
+									/>
+								</div>
+							)}
+
+							{tab === "watch-later" && (
+								<div>
+									<WatchLaterList
+										items={watchLaterItems || []}
+										fosdemData={fosdemData || null}
+										year={year}
+										loading={watchLaterLoading}
+										onToggleWatchLater={onToggleWatchLater || (async () => {})}
+										onMarkAsWatched={async () => {}}
 									/>
 								</div>
 							)}

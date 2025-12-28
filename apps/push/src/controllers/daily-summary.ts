@@ -4,7 +4,9 @@ import {
 	enrichBookmarks, 
 	getBookmarksForDay,
 } from "../lib/bookmarks";
+import { refreshYearInReviewStats } from "../lib/year-in-review";
 import { getApplicationKeys, sendNotification, createDailySummaryPayload } from "../lib/notifications";
+import { getUserNotificationPreference } from "../lib/notification-preferences";
 import type { Subscription, Env } from "../types";
 
 export async function triggerDailySummary(
@@ -12,13 +14,23 @@ export async function triggerDailySummary(
 	env: Env,
 	ctx: ExecutionContext,
 	queueMode = false,
-	isEvening = false
+	isEvening = false,
+	dayOverride?: string,
 ) {
-	const whichDay = getCurrentDay();
+	const currentDay = getCurrentDay();
+	const whichDay = dayOverride ?? currentDay;
 
 	if (!whichDay) {
 		console.error("FOSDEM is not running today");
 		return;
+	}
+
+	if (isEvening) {
+		try {
+			await refreshYearInReviewStats(env);
+		} catch (error) {
+			console.error("Failed to refresh year in review stats:", error);
+		}
 	}
 
 	const keys = await getApplicationKeys(env);
@@ -55,16 +67,23 @@ export async function triggerDailySummary(
 					p256dh: subscription.p256dh as string,
 				};
 
+				const prefs = await getUserNotificationPreference(
+					typedSubscription.user_id,
+					env,
+				);
+
+				if (!prefs.daily_summary) {
+					return;
+				}
+
 				const bookmarks = await getUserBookmarks(typedSubscription.user_id, env, {
 					includeSent: true,
 				});
-				const enrichedBookmarks = enrichBookmarks(bookmarks, fosdemData.events);
+				const filteredBookmarks = prefs.notify_low_priority
+					? bookmarks
+					: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
+				const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
 				const bookmarksToday = getBookmarksForDay(enrichedBookmarks, whichDay);
-
-				if (!bookmarksToday.length) {
-					console.log(`No bookmarks today for ${typedSubscription.user_id}`);
-					return;
-				}
 
 				const notification = createDailySummaryPayload(bookmarksToday, whichDay, isEvening);
 

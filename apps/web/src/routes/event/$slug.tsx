@@ -1,13 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 
 import { PageHeader } from "~/components/shared/PageHeader";
 import { FavouriteButton } from "~/components/shared/FavouriteButton";
 import { ShareButton } from "~/components/shared/ShareButton";
+import { WatchLaterButton } from "~/components/WatchLater/WatchLaterButton";
+import { AttendanceButton } from "~/components/Event/AttendanceButton";
+import { useWatchLater } from "~/hooks/use-watch-later";
+import { useAttendance } from "~/hooks/use-attendance";
 import { testLiveEvent, testConferenceData } from "~/data/test-data";
 import { getAllData } from "~/server/functions/fosdem";
 import { EventMain } from "~/components/Event/EventMain";
 import { constants } from "~/constants";
-import { calculateEndTime } from "~/lib/dateTime";
+import { calculateEndTime, isEventFinished, isEventLive } from "~/lib/dateTime";
 import { useBookmark } from "~/hooks/use-bookmark";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
@@ -15,7 +20,6 @@ import { useIsClient } from "~/hooks/use-is-client";
 import { getEventBookmark } from "~/server/functions/bookmarks";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
-import { useEffect, useRef, useState } from "react";
 
 type BookmarkLike = {
   status?: string;
@@ -156,9 +160,21 @@ function EventPage() {
     slug: fosdem?.event?.id,
   });
   const { create: createBookmark } = useMutateBookmark({ year });
+  const { toggle: toggleWatchLater } = useWatchLater({ year });
+  const { markAttended, unmarkAttended } = useAttendance({ year });
   const onCreateBookmark = async (bookmark: any) => {
     await createBookmark(bookmark);
   };
+  const isBookmarked = bookmark?.status === "favourited" || serverBookmark?.status === "favourited";
+  const isInWatchLater = isClient ? bookmark?.watch_later === true : serverBookmark?.watch_later === true;
+  const isAttended = isClient ? bookmark?.attended === true : serverBookmark?.attended === true;
+  const isAttendedInPerson = isClient
+    ? bookmark?.attended_in_person === true
+    : serverBookmark?.attended_in_person === true;
+  const currentBookmarkId = isClient ? bookmark?.id : serverBookmark?.id;
+  const eventFinished = fosdem.event && fosdem.conference ? isEventFinished(fosdem.event, fosdem.conference) : false;
+  const eventLive = fosdem.event && fosdem.conference ? isEventLive(fosdem.event, fosdem.conference) : false;
+  const canMarkAttendance = eventFinished || eventLive;
   const favouriteStatus = isClient
     ? resolveFavouriteStatus({
         bookmark,
@@ -241,6 +257,27 @@ function EventPage() {
             status={favouriteStatus}
             onCreateBookmark={onCreateBookmark}
           />
+          {eventFinished && (
+            <>
+              <WatchLaterButton
+                bookmarkId={currentBookmarkId ?? ""}
+                isInWatchLater={isInWatchLater}
+                onToggle={toggleWatchLater}
+                variant="icon"
+                disabled={!isBookmarked || !currentBookmarkId}
+              />
+            </>
+          )}
+          {canMarkAttendance && (
+              <AttendanceButton
+                bookmarkId={currentBookmarkId ?? ""}
+                isAttended={isAttended}
+                isInPerson={isAttendedInPerson}
+                onMarkAttended={markAttended}
+                onUnmarkAttended={unmarkAttended}
+                disabled={!isBookmarked || !currentBookmarkId}
+              />
+          )}
           <ShareButton
             title={fosdem?.event?.title}
             text={`Check out ${fosdem?.event?.title} at FOSDEM`}
@@ -250,28 +287,55 @@ function EventPage() {
       </PageHeader>
       <div ref={headerSentinelRef} />
       <div className="sticky top-14 z-12 -mx-4 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b md:hidden">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <span
-              className={`block text-sm font-medium text-foreground truncate transition-all duration-200 ${
-                showStickyTitle ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"
+        <div className={`flex items-center transition-all duration-300 ease-out ${showStickyTitle ? "gap-3" : "gap-0"}`}>
+          <div
+            className={`min-w-0 overflow-hidden transition-all duration-300 ease-out ${showStickyTitle ? "flex-1 opacity-100" : "w-0 flex-none opacity-0"
               }`}
-            >
+          >
+            <span className="block text-sm font-medium text-foreground truncate">
               {fosdem.event.title}
             </span>
           </div>
-          <div className="flex items-center justify-end gap-2 shrink-0">
+          <div
+            className={`flex items-center transition-all duration-300 ease-out ${showStickyTitle ? "gap-2 shrink-0" : "gap-2 flex-1"
+              }`}
+          >
             <FavouriteButton
               year={year}
               type="event"
               slug={fosdem?.event?.id}
               status={favouriteStatus}
               onCreateBookmark={onCreateBookmark}
+              className={showStickyTitle ? undefined : "flex-1 w-full"}
             />
+            {eventFinished && (
+              <>
+                <WatchLaterButton
+                  bookmarkId={currentBookmarkId ?? ""}
+                  isInWatchLater={isInWatchLater}
+                  onToggle={toggleWatchLater}
+                  variant="icon"
+                  disabled={!isBookmarked || !currentBookmarkId}
+                  className={showStickyTitle ? undefined : "flex-1 w-full"}
+                />
+              </>
+            )}
+            {canMarkAttendance && (
+              <AttendanceButton
+                bookmarkId={currentBookmarkId ?? ""}
+                isAttended={isAttended}
+                isInPerson={isAttendedInPerson}
+                onMarkAttended={markAttended}
+                onUnmarkAttended={unmarkAttended}
+                disabled={!isBookmarked || !currentBookmarkId}
+                className={showStickyTitle ? undefined : "flex-1 w-full"}
+              />
+            )}
             <ShareButton
               title={fosdem?.event?.title}
               text={`Check out ${fosdem?.event?.title} at FOSDEM`}
               url={`https://fosdempwa.com/event/${fosdem?.event?.id}?year=${year}`}
+              className={showStickyTitle ? undefined : "flex-1 w-full"}
             />
           </div>
         </div>

@@ -85,17 +85,18 @@ export function useBookmarks({
 			existsOnServer: serverMap.has(local.slug),
 		}));
 
-		for (const serverBookmark of serverBookmarks) {
-			if (!localMap.has(serverBookmark.slug)) {
-				merged.push({
-					...serverBookmark,
-					id: `${serverBookmark.year}_${serverBookmark.slug}`,
-					created_at: new Date().toISOString(),
-					serverId: serverBookmark.id,
-					existsOnServer: true,
-				});
+			for (const serverBookmark of serverBookmarks) {
+				if (!localMap.has(serverBookmark.slug)) {
+					merged.push({
+						...serverBookmark,
+						id: `${serverBookmark.year}_${serverBookmark.slug}`,
+						created_at: new Date().toISOString(),
+						serverId: serverBookmark.id,
+						existsOnServer: true,
+						watch_later: serverBookmark.watch_later ?? null,
+					});
+				}
 			}
-		}
 
 		return merged;
 	}, [localOnly, user?.id, localBookmarks, serverBookmarks]);
@@ -124,35 +125,38 @@ export function useBookmarks({
 					const existingLocal = localBySlug.get(serverBookmark.slug);
 
 					try {
-						if (!existingLocal) {
-							await saveLocalBookmark(
-								{
-									year: serverBookmark.year,
-									slug: serverBookmark.slug,
-									type: serverBookmark.type,
-									status: serverBookmark.status,
-									serverId: serverBookmark.id,
-								},
-								true,
-							);
-							return { status: "created" as const };
-						}
+							if (!existingLocal) {
+								await saveLocalBookmark(
+									{
+										year: serverBookmark.year,
+										slug: serverBookmark.slug,
+										type: serverBookmark.type,
+										status: serverBookmark.status,
+										serverId: serverBookmark.id,
+										watch_later: serverBookmark.watch_later ?? null,
+									},
+									true,
+								);
+								return { status: "created" as const };
+							}
 
-						const needsUpdate =
-							existingLocal.serverId !== serverBookmark.id ||
-							existingLocal.status !== serverBookmark.status ||
-							existingLocal.type !== serverBookmark.type;
+							const needsUpdate =
+								existingLocal.serverId !== serverBookmark.id ||
+								existingLocal.status !== serverBookmark.status ||
+								existingLocal.type !== serverBookmark.type ||
+								existingLocal.watch_later !== serverBookmark.watch_later;
 
 						if (needsUpdate) {
-							await updateLocalBookmark(
-								existingLocal.id,
-								{
-									serverId: serverBookmark.id,
-									status: serverBookmark.status,
-									type: serverBookmark.type,
-								},
-								true,
-							);
+								await updateLocalBookmark(
+									existingLocal.id,
+									{
+										serverId: serverBookmark.id,
+										status: serverBookmark.status,
+										type: serverBookmark.type,
+										watch_later: serverBookmark.watch_later ?? null,
+									},
+									true,
+								);
 							return { status: "updated" as const };
 						}
 

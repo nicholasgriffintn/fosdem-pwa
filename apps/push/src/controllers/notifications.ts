@@ -8,8 +8,8 @@ import {
 	getBookmarksStartingSoon,
 	markNotificationSent,
 } from "../lib/bookmarks";
+import { getUserNotificationPreference } from "../lib/notification-preferences";
 import { getApplicationKeys, sendNotification, createNotificationPayload } from "../lib/notifications";
-import { bookmarkNotificationsEnabled } from "../utils/config";
 import type { Subscription, EnrichedBookmark, Env } from "../types";
 
 async function processUserNotifications(
@@ -49,61 +49,15 @@ async function processUserNotifications(
 	}
 }
 
-export async function triggerTestNotification(env: Env, ctx: ExecutionContext) {
-	if (!bookmarkNotificationsEnabled(env)) {
-		console.log("Bookmark notifications disabled; skipping test send");
-		return;
-	}
-
-	const keys = await getApplicationKeys(env);
-
-	const testSubscriptions = await env.DB.prepare(
-		"SELECT user_id, endpoint, auth, p256dh FROM subscription WHERE user_id = ?",
-	)
-		.bind("1")
-		.run();
-
-	if (!testSubscriptions.success || !testSubscriptions.results?.length) {
-		throw new Error("No test subscriptions found");
-	}
-
-	const subscriptions: Subscription[] = testSubscriptions.results.map(sub => ({
-		user_id: sub.user_id as string,
-		endpoint: sub.endpoint as string,
-		auth: sub.auth as string,
-		p256dh: sub.p256dh as string,
-	}));
-
-	const fosdemData = await getFosdemData();
-	const bookmarks = await getUserBookmarks(subscriptions[0].user_id, env, {
-		includeSent: true,
-	});
-	const enrichedBookmarks = enrichBookmarks(bookmarks, fosdemData.events);
-	const dayOneBookmarks = getBookmarksForDay(enrichedBookmarks, "1");
-
-	if (!dayOneBookmarks.length) {
-		throw new Error("No bookmarks found for day 1");
-	}
-
-	await Promise.all(subscriptions.map(async (subscription) => {
-		await processUserNotifications(subscription, [dayOneBookmarks[0]], keys, env);
-	}));
-	
-	console.log(`Test notifications sent successfully to ${subscriptions.length} devices`);
-}
-
 export async function triggerNotifications(
 	event: { cron: string },
 	env: Env,
 	ctx: ExecutionContext,
-	queueMode = false
+	queueMode = false,
+	dayOverride?: string,
 ) {
-	if (!bookmarkNotificationsEnabled(env)) {
-		console.log("Bookmark notifications disabled; skipping processing");
-		return;
-	}
-
-	const whichDay = getCurrentDay();
+	const currentDay = getCurrentDay();
+	const whichDay = dayOverride ?? currentDay;
 
 	if (!whichDay) {
 		console.error("FOSDEM is not running today");
@@ -144,8 +98,21 @@ export async function triggerNotifications(
 					p256dh: subscription.p256dh as string,
 				};
 
+				const prefs = await getUserNotificationPreference(
+					typedSubscription.user_id,
+					env,
+				);
+
+				if (!prefs.event_reminders) {
+					return;
+				}
+
 				const bookmarks = await getUserBookmarks(typedSubscription.user_id, env);
-				const enrichedBookmarks = enrichBookmarks(bookmarks, fosdemData.events);
+				const filteredBookmarks = prefs.notify_low_priority
+					? bookmarks
+					: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
+
+				const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
 				const bookmarksRunningToday = getBookmarksForDay(enrichedBookmarks, whichDay);
 
 				if (!bookmarksRunningToday.length) {
@@ -153,7 +120,10 @@ export async function triggerNotifications(
 					return;
 				}
 
-				const bookmarksStartingSoon = getBookmarksStartingSoon(bookmarksRunningToday);
+				const bookmarksStartingSoon = getBookmarksStartingSoon(
+					bookmarksRunningToday,
+					prefs.reminder_minutes_before,
+				);
 
 				if (!bookmarksStartingSoon.length) {
 					console.log(`No bookmarks starting soon for ${typedSubscription.user_id}`);

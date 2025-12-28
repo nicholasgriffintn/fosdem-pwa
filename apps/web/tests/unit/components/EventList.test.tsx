@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { TooltipProvider } from "~/components/ui/tooltip";
 import { EventList } from "~/components/Event/EventList";
 import type { Event } from "~/types/fosdem";
 
@@ -75,7 +76,11 @@ const renderWithClient = (ui: ReactNode) => {
 	});
 	return {
 		queryClient,
-		...render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>),
+		...render(
+			<QueryClientProvider client={queryClient}>
+				<TooltipProvider>{ui}</TooltipProvider>
+			</QueryClientProvider>
+		),
 	};
 };
 

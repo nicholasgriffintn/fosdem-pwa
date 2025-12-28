@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+import { renderWithProviders } from "../../utils/test-providers";
 import { FavouriteButton } from "~/components/shared/FavouriteButton";
 
 const routerMocks = vi.hoisted(() => ({
@@ -24,7 +26,7 @@ describe("FavouriteButton", () => {
 		const onCreateBookmark = vi.fn().mockResolvedValue(undefined);
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<FavouriteButton
 				year={2024}
 				type="event"
@@ -49,7 +51,7 @@ describe("FavouriteButton", () => {
 		const onCreateBookmark = vi.fn().mockResolvedValue(undefined);
 		const user = userEvent.setup();
 
-		const { rerender } = render(
+		const { rerender } = renderWithProviders(
 			<FavouriteButton
 				year={2024}
 				type="event"
@@ -93,7 +95,7 @@ describe("FavouriteButton", () => {
 		const onCreateBookmark = vi.fn().mockResolvedValue(undefined);
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<FavouriteButton
 				year={2024}
 				type="event"
@@ -122,7 +124,7 @@ describe("FavouriteButton", () => {
 		const user = userEvent.setup();
 		const toastSpy = vi.mocked(toast);
 
-		render(
+		renderWithProviders(
 			<FavouriteButton
 				year={2024}
 				type="event"
@@ -157,7 +159,7 @@ describe("FavouriteButton", () => {
 		const onCreateBookmark = vi.fn().mockReturnValue(bookmarkPromise);
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<FavouriteButton
 				year={2024}
 				type="event"
@@ -187,7 +189,7 @@ describe("FavouriteButton", () => {
 		const onCreateBookmark = vi.fn().mockReturnValue(bookmarkPromise);
 		const user = userEvent.setup();
 
-		render(
+		renderWithProviders(
 			<FavouriteButton
 				year={2024}
 				type="event"
@@ -215,7 +217,7 @@ describe("FavouriteButton", () => {
 		const user = userEvent.setup();
 		const toastSpy = vi.mocked(toast);
 
-		render(
+		renderWithProviders(
 			<FavouriteButton
 				year={2024}
 				type="event"

@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
-
+import { TooltipProvider } from "~/components/ui/tooltip";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import type { Bookmark } from "~/server/db/schema";
 import type { Conference } from "~/types/fosdem";
@@ -126,7 +126,9 @@ describe("BookmarksList", () => {
 			defaultOptions: { queries: { retry: false } },
 		});
 		const result = render(
-			<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+			<QueryClientProvider client={queryClient}>
+				<TooltipProvider>{ui}</TooltipProvider>
+			</QueryClientProvider>,
 		);
 		return { ...result, queryClient };
 	};
@@ -158,6 +160,14 @@ describe("BookmarksList", () => {
 				user_id: 1,
 				priority: null,
 				last_notification_sent_at: null,
+				watch_later: false,
+				watch_status: "unwatched",
+				watch_progress_seconds: 0,
+				playback_speed: "1",
+				last_watched_at: null,
+				attended: false,
+				attended_at: null,
+				attended_in_person: false,
 				created_at: timestamp,
 				updated_at: timestamp,
 			},
@@ -170,6 +180,14 @@ describe("BookmarksList", () => {
 				user_id: 1,
 				priority: null,
 				last_notification_sent_at: null,
+				watch_later: false,
+				watch_status: "unwatched",
+				watch_progress_seconds: 0,
+				playback_speed: "1",
+				last_watched_at: null,
+				attended: false,
+				attended_at: null,
+				attended_in_person: false,
 				created_at: timestamp,
 				updated_at: timestamp,
 			},

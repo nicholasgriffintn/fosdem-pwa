@@ -22,8 +22,10 @@ import { AuthSnapshotProvider } from "~/contexts/AuthSnapshotContext";
 // import { AppNotice } from "~/components/AppNotice";
 import { siteMeta } from "~/constants/site";
 import { PlayerProvider } from "~/contexts/PlayerContext";
+import { TooltipProvider } from "~/components/ui/tooltip";
 import { FloatingPlayer } from "~/components/FloatingPlayer";
 import { VideoPortal } from "~/components/VideoPlayer/VideoPortal";
+import { VideoProgressTracker } from "~/components/VideoPlayer/VideoProgressTracker";
 import { getSession } from "~/server/functions/session";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { BottomTabNav } from "~/components/BottomTabNav";
@@ -104,13 +106,15 @@ function RootComponent() {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<PlayerProvider>
-				<AuthSnapshotProvider user={user ?? null}>
-					<RootDocument>
-						<Outlet />
-					</RootDocument>
-				</AuthSnapshotProvider>
-			</PlayerProvider>
+			<TooltipProvider>
+				<PlayerProvider>
+					<AuthSnapshotProvider user={user ?? null}>
+						<RootDocument>
+							<Outlet />
+						</RootDocument>
+					</AuthSnapshotProvider>
+				</PlayerProvider>
+			</TooltipProvider>
 		</QueryClientProvider>
 	);
 }
@@ -163,6 +167,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					<ServiceWorkerUpdater />
 					<FloatingPlayer />
 					<VideoPortal />
+					<VideoProgressTracker />
 				</main>
 
 				<ScriptOnce>

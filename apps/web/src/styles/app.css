@@ -152,6 +152,10 @@ html.js-enabled .js-only {
 	display: revert !important;
 }
 
+html.js-enabled button.js-only {
+	display: inline-flex !important;
+}
+
 .no-js-only {
 	display: revert !important;
 }

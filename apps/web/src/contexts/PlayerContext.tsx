@@ -20,6 +20,11 @@ import type { Event } from "~/types/fosdem";
 
 export type PortalTarget = "floating" | "event-page" | null;
 
+export interface PlayerBookmark {
+	id: string;
+	watch_later?: boolean;
+}
+
 interface PlayerContextValue {
 	videoRef: React.RefObject<HTMLVideoElement | null>;
 	currentEvent: Event | null;

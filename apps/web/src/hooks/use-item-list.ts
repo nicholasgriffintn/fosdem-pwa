@@ -9,10 +9,12 @@ import {
 import type { Event, Track } from "~/types/fosdem";
 import { useIsClient } from "~/hooks/use-is-client";
 import type { BookmarkSnapshot, ItemWithId } from "~/lib/type-guards";
-import { hasBookmark, isFavourited } from "~/lib/type-guards";
+import { isFavourited } from "~/lib/type-guards";
 
 type ItemWithFavorites<T extends ItemWithId> = T & {
 	isFavourited?: boolean;
+	bookmarkId?: string;
+	watchLater?: boolean;
 };
 
 function useBookmarkResolution(year: number, serverBookmarks?: BookmarkSnapshot[]) {
@@ -41,12 +43,17 @@ function addFavoritesToItems<T extends ItemWithId>(
 	bookmarks: (BookmarkSnapshot | LocalBookmark)[]
 ): ItemWithFavorites<T>[] {
 	return items?.length
-		? items.map((item) => ({
+		? items.map((item) => {
+			const bookmark = bookmarks?.find((b) => b.slug === item.id);
+			const bookmarkId = bookmark && 'id' in bookmark ? bookmark.id : undefined;
+			const watchLater = bookmark && 'watch_later' in bookmark ? bookmark.watch_later === true : false;
+			return {
 				...item,
-			isFavourited: bookmarks?.length
-				? hasBookmark(item, bookmarks)
-				: undefined,
-			}))
+				isFavourited: bookmark ? isFavourited(bookmark) : undefined,
+				bookmarkId,
+				watchLater,
+			};
+		})
 		: [];
 }
 

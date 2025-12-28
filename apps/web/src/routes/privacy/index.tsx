@@ -31,7 +31,11 @@ function PrivacyPolicyPage() {
 				<section className="space-y-3">
 					<h2 className="text-2xl font-semibold text-foreground">Summary</h2>
 					<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-						<li>No analytics or advertising trackers are used.</li>
+						<li>
+							No third party analytics or advertising trackers are used, we
+							do track some usage to provide better push notifications and
+							the year in review feature.
+						</li>
 						<li>
 							We store some data locally in your browser to make the app work
 							offline and remember preferences.

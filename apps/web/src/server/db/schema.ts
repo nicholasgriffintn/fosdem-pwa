@@ -105,6 +105,14 @@ export const bookmark = sqliteTable(
 		year: integer().notNull(),
 		priority: integer(),
 		last_notification_sent_at: text(),
+		watch_later: integer({ mode: "boolean" }).default(false),
+		watch_status: text().default("unwatched"), // "unwatched" | "watching" | "watched"
+		watch_progress_seconds: integer().default(0),
+		playback_speed: text().default("1"),
+		last_watched_at: text(),
+		attended: integer({ mode: "boolean" }).default(false),
+		attended_at: text(),
+		attended_in_person: integer({ mode: "boolean" }).default(false),
 		created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
 		updated_at: text()
 			.default(sql`(CURRENT_TIMESTAMP)`)
@@ -115,6 +123,8 @@ export const bookmark = sqliteTable(
 			yearIdx: index("year_idx").on(table.year),
 			typeIdx: index("type_idx").on(table.type),
 			slugIdx: index("slug_idx").on(table.slug),
+			watchLaterIdx: index("watch_later_idx").on(table.watch_later),
+			watchStatusIdx: index("watch_status_idx").on(table.watch_status),
 		};
 	},
 );
@@ -197,3 +207,111 @@ export const scheduleSnapshot = sqliteTable(
 );
 
 export type ScheduleSnapshot = typeof scheduleSnapshot.$inferSelect;
+
+export const notificationPreference = sqliteTable(
+	"notification_preference",
+	{
+		id: integer().primaryKey({ autoIncrement: true }),
+		user_id: integer()
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		reminder_minutes_before: integer().default(15), // 5, 10, 15, 30
+		event_reminders: integer({ mode: "boolean" }).default(true),
+		schedule_changes: integer({ mode: "boolean" }).default(true),
+		room_status_alerts: integer({ mode: "boolean" }).default(true),
+		recording_available: integer({ mode: "boolean" }).default(false),
+		daily_summary: integer({ mode: "boolean" }).default(true),
+		notify_low_priority: integer({ mode: "boolean" }).default(false),
+		created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+		updated_at: text()
+			.default(sql`(CURRENT_TIMESTAMP)`)
+			.$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+	},
+	(table) => {
+		return {
+			userIdIdx: uniqueIndex("notification_preference_user_id_idx").on(
+				table.user_id,
+			),
+		};
+	},
+);
+
+export type NotificationPreference = typeof notificationPreference.$inferSelect;
+
+export const roomStatusHistory = sqliteTable(
+	"room_status_history",
+	{
+		id: integer().primaryKey({ autoIncrement: true }),
+		room_name: text().notNull(),
+		state: text().notNull(), // "1" = full, "0" = available
+		year: integer().notNull(),
+		recorded_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+	},
+	(table) => {
+		return {
+			roomYearIdx: index("room_status_room_year_idx").on(
+				table.room_name,
+				table.year,
+			),
+			recordedAtIdx: index("room_status_recorded_at_idx").on(table.recorded_at),
+		};
+	},
+);
+
+export type RoomStatusHistory = typeof roomStatusHistory.$inferSelect;
+
+export const userConferenceStats = sqliteTable(
+	"user_conference_stats",
+	{
+		id: integer().primaryKey({ autoIncrement: true }),
+		user_id: integer()
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		year: integer().notNull(),
+		events_bookmarked: integer().default(0),
+		events_attended: integer().default(0),
+		events_attended_in_person: integer().default(0),
+		events_watched: integer().default(0),
+		tracks_covered: integer().default(0),
+		notes_taken: integer().default(0),
+		total_watch_time_seconds: integer().default(0),
+		created_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+		updated_at: text()
+			.default(sql`(CURRENT_TIMESTAMP)`)
+			.$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+	},
+	(table) => {
+		return {
+			userYearIdx: uniqueIndex("user_conference_stats_user_year_idx").on(
+				table.user_id,
+				table.year,
+			),
+		};
+	},
+);
+
+export type UserConferenceStats = typeof userConferenceStats.$inferSelect;
+
+export const recordingSnapshot = sqliteTable(
+	"recording_snapshot",
+	{
+		slug: text().notNull(),
+		year: integer().notNull(),
+		has_recording: integer({ mode: "boolean" }).default(false),
+		recording_url: text(),
+		notified_at: text(),
+		updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+	},
+	(table) => {
+		return {
+			recordingSnapshotPk: primaryKey({
+				columns: [table.slug, table.year],
+			}),
+			recordingSnapshotYearIdx: index("recording_snapshot_year_idx").on(
+				table.year,
+			),
+		};
+	},
+);
+
+export type RecordingSnapshot = typeof recordingSnapshot.$inferSelect;

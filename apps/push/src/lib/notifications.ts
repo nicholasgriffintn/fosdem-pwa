@@ -47,6 +47,17 @@ export function createNotificationPayload(bookmark: EnrichedBookmark): Notificat
 
 export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: string, isEvening = false): NotificationPayload {
 	if (!bookmarks.length) {
+		if (isEvening) {
+			const message = day === "2"
+				? "FOSDEM is over! Your Year in Review is now ready to view."
+				: "Day 1 has ended! See you tomorrow!";
+			return {
+				title: `FOSDEM Day ${day} Wrap-up`,
+				body: message,
+				url: `https://${DOMAIN}/profile/year-in-review?year=${constants.YEAR}`,
+			};
+		}
+
 		return {
 			title: `FOSDEM Day ${day} Summary`,
 			body: "No events in your schedule today.",
@@ -62,7 +73,7 @@ export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: st
 		return {
 			title: `FOSDEM Day ${day} Wrap-up`,
 			body: `You attended ${totalEvents} events today! See you ${day === "1" ? "tomorrow" : "next year"}! 🎉`,
-			url: `https://${DOMAIN}/bookmarks?day=${day}&year=${constants.YEAR}`,
+			url: `https://${DOMAIN}/profile/year-in-review?year=${constants.YEAR}`,
 		};
 	}
 

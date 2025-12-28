@@ -1,9 +1,10 @@
 import * as Sentry from "@sentry/cloudflare";
 import type { ExecutionContext, ExportedHandler } from "@cloudflare/workers-types";
 
-import { triggerNotifications, triggerTestNotification } from "./controllers/notifications";
+import { triggerNotifications } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
-import { bookmarkNotificationsEnabled } from "./utils/config";
+import { triggerRoomStatusNotifications, pollAndStoreRoomStatus, cleanupOldRoomStatus } from "./controllers/room-status";
+import { triggerRecordingNotifications } from "./controllers/recording-notifications";
 import { triggerDailySummary } from "./controllers/daily-summary";
 import { getApplicationKeys, sendNotification } from "./lib/notifications";
 import { markNotificationSent } from "./lib/bookmarks";
@@ -11,7 +12,6 @@ import type { Env, QueueMessage } from "./types";
 
 const REQUIRED_ENV: Array<keyof Env> = [
 	"DB",
-	"DB_PREVIEW",
 	"NOTIFICATION_QUEUE",
 	"VAPID_EMAIL",
 	"VAPID_PUBLIC_KEY",
@@ -51,15 +51,9 @@ export default Sentry.withSentry(
 
 			try {
 				const url = new URL(request.url);
-				const isTestMode = url.searchParams.has("test");
 				const isDailySummary = url.searchParams.has("daily-summary");
 				const isEveningSummary = url.searchParams.has("evening-summary");
 				const isScheduleChange = url.searchParams.has("schedule-changes");
-
-				if (isTestMode) {
-					await triggerTestNotification(env, ctx);
-					return new Response("Test notification sent");
-				}
 
 				if (isDailySummary) {
 					await triggerDailySummary({ cron: "fetch" }, env, ctx, true, false);
@@ -74,6 +68,57 @@ export default Sentry.withSentry(
 				if (isScheduleChange) {
 					await triggerScheduleChangeNotifications({ cron: "fetch" }, env, ctx, true);
 					return new Response("Schedule change notifications queued");
+				}
+
+				const isRoomStatus = url.searchParams.has("room-status");
+				if (isRoomStatus) {
+					await triggerRoomStatusNotifications({ cron: "fetch" }, env, ctx, true);
+					return new Response("Room status notifications queued");
+				}
+
+				const isPollRooms = url.searchParams.has("poll-rooms");
+				if (isPollRooms) {
+					await pollAndStoreRoomStatus(env);
+					return new Response("Room statuses polled and stored");
+				}
+
+				const isRecordings = url.searchParams.has("recordings");
+				if (isRecordings) {
+					await triggerRecordingNotifications({ cron: "fetch" }, env, ctx, true);
+					return new Response("Recording notifications queued");
+				}
+
+				const isTest = url.searchParams.has("test");
+				if (isTest) {
+					const type = url.searchParams.get("type");
+					const dayOverride = url.searchParams.get("day") || undefined;
+
+					if (!type) {
+						return new Response("Missing type parameter", { status: 400 });
+					}
+
+					switch (type) {
+						case "event-reminder":
+							await triggerNotifications({ cron: "test" }, env, ctx, true, dayOverride);
+							return new Response("Event reminder notifications triggered");
+						case "daily-summary-morning":
+							await triggerDailySummary({ cron: "test" }, env, ctx, true, false, dayOverride);
+							return new Response("Morning summary notifications triggered");
+						case "daily-summary-evening":
+							await triggerDailySummary({ cron: "test" }, env, ctx, true, true, dayOverride);
+							return new Response("Evening summary notifications triggered");
+						case "schedule-change":
+							await triggerScheduleChangeNotifications({ cron: "test" }, env, ctx, true);
+							return new Response("Schedule change notifications triggered");
+						case "room-status":
+							await triggerRoomStatusNotifications({ cron: "test" }, env, ctx, true, dayOverride);
+							return new Response("Room status notifications triggered");
+						case "recording-available":
+							await triggerRecordingNotifications({ cron: "test" }, env, ctx, true);
+							return new Response("Recording notifications triggered");
+						default:
+							return new Response(`Unknown notification type: ${type}`, { status: 400 });
+					}
 				}
 
 				await triggerNotifications({ cron: "fetch" }, env, ctx, true);
@@ -107,6 +152,25 @@ export default Sentry.withSentry(
 				return;
 			}
 
+			// Room status polling (every 5 minutes during conference)
+			if (event.cron === "*/5 * 1,2 2 *") {
+				await pollAndStoreRoomStatus(env);
+				await triggerRoomStatusNotifications(event, env, ctx, true);
+				return;
+			}
+
+			// Daily cleanup at midnight
+			if (event.cron === "0 0 * * *") {
+				await cleanupOldRoomStatus(env);
+				return;
+			}
+
+			// Recording notifications (hourly after conference)
+			if (event.cron === "0 * * * *") {
+				await triggerRecordingNotifications(event, env, ctx, true);
+				return;
+			}
+
 			// Regular notifications for starting events (every 15 minutes)
 			await triggerNotifications(event, env, ctx, true);
 			await triggerScheduleChangeNotifications(event, env, ctx, true);
@@ -120,11 +184,6 @@ export default Sentry.withSentry(
 			}
 
 			console.log(`Processing ${batch.messages.length} notifications`);
-
-			if (!bookmarkNotificationsEnabled(env)) {
-				console.log("Bookmark notifications disabled; skipping queue batch");
-				return;
-			}
 
 			const keys = await getApplicationKeys(env);
 			const dedupe = new Map<string, number>();

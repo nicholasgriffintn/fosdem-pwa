@@ -137,11 +137,9 @@ function RoomPage() {
 				</div>
 
 				<div className="space-y-6">
-					{isConferenceRunning && (
-						<div>
-							<RoomStatus roomId={roomInfo.name} />
-						</div>
-					)}
+					<div>
+						<RoomStatus roomId={roomInfo.name} isRunning={isConferenceRunning} />
+					</div>
 
 					<div>
 						<h2 className="text-xl font-semibold mb-2 text-foreground">

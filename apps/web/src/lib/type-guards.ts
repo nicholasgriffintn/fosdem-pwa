@@ -3,6 +3,10 @@ import type { Event, Track } from "~/types/fosdem";
 export interface BookmarkSnapshot {
   slug: string;
   status: string;
+  id?: string;
+  watch_later?: boolean | null;
+  watch_status?: string | null;
+  attended?: boolean | null;
 }
 
 export interface ItemWithId {

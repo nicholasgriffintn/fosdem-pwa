@@ -210,6 +210,7 @@ export interface LocalBookmark {
   slug: string;
   type: string;
   status: string;
+  watch_later?: boolean | null;
   created_at: string;
   updated_at?: string | null;
   user_id?: number | null;

@@ -3,10 +3,15 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { FavouriteButton } from "~/components/shared/FavouriteButton";
 import { ShareButton } from "~/components/shared/ShareButton";
+import { WatchLaterButton } from "~/components/WatchLater/WatchLaterButton";
 import { constants } from "~/constants";
 import type { Event, Track } from "~/types/fosdem";
 
-type ItemWithFavorite = (Event | Track) & { isFavourited?: boolean };
+type ItemWithFavorite = (Event | Track) & {
+	isFavourited?: boolean;
+	bookmarkId?: string;
+	watchLater?: boolean;
+};
 
 type ItemActionsProps = {
 	item: ItemWithFavorite;
@@ -24,6 +29,7 @@ type ItemActionsProps = {
 		slug: string;
 		status: string;
 	}) => void;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 export function ItemActions({
@@ -34,6 +40,7 @@ export function ItemActions({
 	size = "default",
 	className = "",
 	onCreateBookmark,
+	onToggleWatchLater,
 }: ItemActionsProps) {
 	const isEvent = type === "event";
 	const title = isEvent ? (item as Event).title : (item as Track).name;
@@ -64,6 +71,14 @@ export function ItemActions({
 						shouldShowLoadingState ? "loading" : favouriteStatus
 					}
 					onCreateBookmark={onCreateBookmark}
+				/>
+			)}
+			{isEvent && item.isFavourited && item.bookmarkId && onToggleWatchLater && (
+				<WatchLaterButton
+					bookmarkId={item.bookmarkId}
+					isInWatchLater={item.watchLater === true}
+					onToggle={onToggleWatchLater}
+					variant="icon"
 				/>
 			)}
 			<ShareButton

@@ -63,6 +63,14 @@ describe("useBookmark", () => {
 			updated_at: null,
 			user_id: 1,
 			last_notification_sent_at: null,
+			watch_later: false,
+			watch_status: "unwatched",
+			watch_progress_seconds: 0,
+			playback_speed: "1",
+			last_watched_at: null,
+			attended: false,
+			attended_at: null,
+			attended_in_person: false,
 		});
 
 		const { wrapper, queryClient } = createQueryClientWrapper();
@@ -112,6 +120,14 @@ describe("useBookmark", () => {
 			updated_at: null,
 			user_id: 1,
 			last_notification_sent_at: null,
+			watch_later: false,
+			watch_status: "unwatched",
+			watch_progress_seconds: 0,
+			playback_speed: "1",
+			last_watched_at: null,
+			attended: false,
+			attended_at: null,
+			attended_in_person: false,
 		});
 
 		const { wrapper, queryClient } = createQueryClientWrapper();

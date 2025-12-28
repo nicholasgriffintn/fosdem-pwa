@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { Link } from "@tanstack/react-router";
 
 import type { Event } from "~/types/fosdem";
+import type { BookmarkSnapshot } from "~/lib/type-guards";
 import type { EventConflict } from "~/lib/fosdem";
 import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
 import { ItemActions } from "~/components/shared/ItemActions";
@@ -34,10 +35,8 @@ type EventListProps = {
 		slug: string;
 		status: string;
 	}) => void;
-	serverBookmarks?: Array<{
-		slug: string;
-		status: string;
-	}>;
+	serverBookmarks?: BookmarkSnapshot[];
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 type EventListItemProps = {
@@ -64,6 +63,7 @@ type EventListItemProps = {
 	className?: string;
 	style?: React.CSSProperties;
 	actionSize?: "default" | "sm";
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 export function EventListItem({
@@ -79,6 +79,7 @@ export function EventListItem({
 	className,
 	style,
 	actionSize,
+	onToggleWatchLater,
 }: EventListItemProps) {
 	const hasConflicts = conflicts?.some(
 		(conflict) =>
@@ -199,6 +200,7 @@ export function EventListItem({
 								: "pt-1 lg:pt-0 lg:pl-6"
 						}
 						onCreateBookmark={onCreateBookmark}
+						onToggleWatchLater={onToggleWatchLater}
 					/>
 				</div>
 			</div>
@@ -216,6 +218,7 @@ export function EventItemList({
 	onCreateBookmark,
 	sortByFavourites = false,
 	serverBookmarks,
+	onToggleWatchLater,
 }: EventListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({
 		items: events,
@@ -238,6 +241,7 @@ export function EventItemList({
 							showTrack={showTrack}
 							user={user}
 							onCreateBookmark={onCreateBookmark}
+							onToggleWatchLater={onToggleWatchLater}
 						/>
 					</li>
 				))

@@ -9,7 +9,10 @@ import { devtools } from '@tanstack/devtools-vite'
 export default defineConfig({
   plugins: [
     devtools(),
-    cloudflare({ viteEnvironment: { name: 'ssr' } }),
+    cloudflare({
+      viteEnvironment: { name: 'ssr' },
+      persistState: { path: "../cloudflare/state" },
+    }),
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),

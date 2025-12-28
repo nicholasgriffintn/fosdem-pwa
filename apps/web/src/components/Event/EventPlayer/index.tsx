@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
 import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
 import { Icons } from "~/components/shared/Icons";
 import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
 import { usePlayer } from "~/contexts/PlayerContext";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { isEventLive } from "~/lib/dateTime";
+import { PlaybackSpeedControl } from "~/components/WatchLater/PlaybackSpeedControl";
 import type { ConferenceData, Event, TypeIds } from "~/types/fosdem";
-import { EventPlayerNotStarted } from "./components/NotStarted";
+import { EventPlayerNotStarted } from "~/components/Event/EventPlayer/components/NotStarted";
 
 type EventPlayerProps = {
 	event: Event;
@@ -37,6 +39,14 @@ export function EventPlayer({
 		currentEventId: player.currentEvent?.id ?? null,
 		setPortalTarget: player.setPortalTarget,
 	});
+
+	const handleSpeedChange = (speed: number) => {
+		if (player.videoRef.current) {
+			player.videoRef.current.playbackRate = speed;
+		}
+	};
+
+	const currentSpeed = player.videoRef.current?.playbackRate ?? 1;
 
 	useEffect(() => {
 		setIsMounted(true);
@@ -169,6 +179,16 @@ export function EventPlayer({
 								</button>
 							)}
 							<div id="event-page-video-portal" className="w-full h-full" />
+							{isThisEventPlaying && !eventIsLive && (
+								<div className="absolute top-2 left-2 z-20 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+									<PlaybackSpeedControl
+										currentSpeed={currentSpeed}
+										onSpeedChange={handleSpeedChange}
+										variant="icon"
+										className="text-white bg-black/60 hover:bg-black/80"
+									/>
+								</div>
+							)}
 							{isMounted && !isOnline && (
 								<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
 									<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
