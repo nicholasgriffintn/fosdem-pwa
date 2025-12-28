@@ -128,8 +128,10 @@ export async function triggerRoomStatusNotifications(
   env: Env,
   ctx: ExecutionContext,
   queueMode = false,
+  dayOverride?: string,
 ): Promise<void> {
-  const whichDay = getCurrentDay();
+  const currentDay = getCurrentDay();
+  const whichDay = dayOverride ?? currentDay;
   if (!whichDay) {
     console.log("FOSDEM is not running today; skipping room status notifications");
     return;

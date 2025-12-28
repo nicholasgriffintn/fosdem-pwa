@@ -46,6 +46,7 @@ function AdminTestPage() {
   const resolvedUser = user ?? loaderData.user;
 
   const [notificationType, setNotificationType] = useState<NotificationType>("event-reminder");
+  const [dayOverride, setDayOverride] = useState<"auto" | "1" | "2">("auto");
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -61,6 +62,7 @@ function AdminTestPage() {
       const response = await sendTestNotification({
         data: {
           type: notificationType,
+          dayOverride: dayOverride === "auto" ? undefined : dayOverride,
         }
       });
 
@@ -127,6 +129,25 @@ function AdminTestPage() {
                   <option value="room-status">Room Status Alert</option>
                   <option value="recording-available">Recording Available</option>
                 </select>
+              </div>
+
+              <div className="rounded-md border border-border bg-background/50 p-4">
+                <label htmlFor="day-override" className="block text-xs font-medium mb-1">
+                  Day override
+                </label>
+                <select
+                  id="day-override"
+                  value={dayOverride}
+                  onChange={(e) => setDayOverride(e.target.value as "auto" | "1" | "2")}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="auto">Auto (current day)</option>
+                  <option value="1">Day 1</option>
+                  <option value="2">Day 2</option>
+                </select>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Set a specific day to test outside conference dates.
+                </p>
               </div>
 
               <button

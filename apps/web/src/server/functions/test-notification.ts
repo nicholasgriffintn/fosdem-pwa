@@ -17,9 +17,10 @@ export const sendTestNotification = createServerFn({
 })
 	.inputValidator((data: {
 		type: TestNotificationType;
+		dayOverride?: "1" | "2";
 	}) => data)
 	.handler(async (ctx): Promise<Result<{ message: string }> | null> => {
-		const { type } = ctx.data;
+		const { type, dayOverride } = ctx.data;
 
 		const user = await getAuthUser();
 		if (!user) {
@@ -38,6 +39,9 @@ export const sendTestNotification = createServerFn({
 			const url = new URL(pushServiceUrl);
 			url.searchParams.set("test", "true");
 			url.searchParams.set("type", type);
+			if (dayOverride) {
+				url.searchParams.set("day", dayOverride);
+			}
 
 			const response = await fetch(url.toString(), {
 				method: "GET",

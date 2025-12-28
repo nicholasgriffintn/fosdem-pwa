@@ -53,9 +53,11 @@ export async function triggerNotifications(
 	event: { cron: string },
 	env: Env,
 	ctx: ExecutionContext,
-	queueMode = false
+	queueMode = false,
+	dayOverride?: string,
 ) {
-	const whichDay = getCurrentDay();
+	const currentDay = getCurrentDay();
+	const whichDay = dayOverride ?? currentDay;
 
 	if (!whichDay) {
 		console.error("FOSDEM is not running today");

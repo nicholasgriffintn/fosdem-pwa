@@ -14,9 +14,11 @@ export async function triggerDailySummary(
 	env: Env,
 	ctx: ExecutionContext,
 	queueMode = false,
-	isEvening = false
+	isEvening = false,
+	dayOverride?: string,
 ) {
-	const whichDay = getCurrentDay();
+	const currentDay = getCurrentDay();
+	const whichDay = dayOverride ?? currentDay;
 
 	if (!whichDay) {
 		console.error("FOSDEM is not running today");

@@ -91,6 +91,7 @@ export default Sentry.withSentry(
 				const isTest = url.searchParams.has("test");
 				if (isTest) {
 					const type = url.searchParams.get("type");
+					const dayOverride = url.searchParams.get("day") || undefined;
 
 					if (!type) {
 						return new Response("Missing type parameter", { status: 400 });
@@ -98,19 +99,19 @@ export default Sentry.withSentry(
 
 					switch (type) {
 						case "event-reminder":
-							await triggerNotifications({ cron: "test" }, env, ctx, true);
+							await triggerNotifications({ cron: "test" }, env, ctx, true, dayOverride);
 							return new Response("Event reminder notifications triggered");
 						case "daily-summary-morning":
-							await triggerDailySummary({ cron: "test" }, env, ctx, true, false);
+							await triggerDailySummary({ cron: "test" }, env, ctx, true, false, dayOverride);
 							return new Response("Morning summary notifications triggered");
 						case "daily-summary-evening":
-							await triggerDailySummary({ cron: "test" }, env, ctx, true, true);
+							await triggerDailySummary({ cron: "test" }, env, ctx, true, true, dayOverride);
 							return new Response("Evening summary notifications triggered");
 						case "schedule-change":
 							await triggerScheduleChangeNotifications({ cron: "test" }, env, ctx, true);
 							return new Response("Schedule change notifications triggered");
 						case "room-status":
-							await triggerRoomStatusNotifications({ cron: "test" }, env, ctx, true);
+							await triggerRoomStatusNotifications({ cron: "test" }, env, ctx, true, dayOverride);
 							return new Response("Room status notifications triggered");
 						case "recording-available":
 							await triggerRecordingNotifications({ cron: "test" }, env, ctx, true);
