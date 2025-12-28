@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { getEventBookmark } from "~/server/functions/bookmarks";
 import { useAuth } from "~/hooks/use-auth";
 import { getLocalBookmarks, type LocalBookmark } from "~/lib/localStorage";
+import { bookmarkQueryKeys } from "~/lib/query-keys";
 
 type MergedBookmark = LocalBookmark & {
 	existsOnServer?: boolean;
@@ -28,14 +29,14 @@ export function useBookmark({ year, slug }: { year: number; slug: string }): {
 	const getEventBookmarkFromServer = useServerFn(getEventBookmark);
 
 	const { data: localBookmarks, isLoading: localLoading } = useQuery({
-		queryKey: ["local-bookmarks", year],
+		queryKey: bookmarkQueryKeys.local(year),
 		queryFn: () => getLocalBookmarks(year),
 		staleTime: 60 * 1000,
 		gcTime: 10 * 60 * 1000,
 	});
 
 	const { data: serverBookmark, isLoading: serverLoading } = useQuery({
-		queryKey: ["bookmark", year, slug],
+		queryKey: bookmarkQueryKeys.item(year, slug),
 		queryFn: async () => {
 			if (!user?.id) return null;
 			const data = await getEventBookmarkFromServer({ data: { year, slug } });

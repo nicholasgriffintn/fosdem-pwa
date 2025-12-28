@@ -3,6 +3,7 @@ import { generateTimeSlots, type EventConflict } from "~/lib/fosdem";
 import { useEventList } from "~/hooks/use-item-list";
 import type { User } from "~/server/db/schema";
 import { EventListItem } from "~/components/Event/EventItemList";
+import type { BookmarkSnapshot } from "~/lib/type-guards";
 
 type EventCalendarListProps = {
 	events: Event[];
@@ -24,10 +25,7 @@ type EventCalendarListProps = {
 		slug: string;
 		status: string;
 	}) => void;
-	serverBookmarks?: Array<{
-		slug: string;
-		status: string;
-	}>;
+	serverBookmarks?: BookmarkSnapshot[];
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 

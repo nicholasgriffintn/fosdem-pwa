@@ -15,6 +15,7 @@ import {
 	type LocalNote,
 } from "~/lib/localStorage";
 import { isValidServerNote, isNumber } from "~/lib/type-guards";
+import { notesQueryKeys } from "~/lib/query-keys";
 
 type UseNotesArgs = {
 	year: number;
@@ -324,7 +325,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 				if (!cancelled) {
 					await queryClient.invalidateQueries({
-						queryKey: ["local-notes", year, event?.id],
+						queryKey: notesQueryKeys.localItem(year, event?.id),
 					});
 				}
 			} catch (error) {

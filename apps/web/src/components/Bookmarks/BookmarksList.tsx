@@ -59,7 +59,7 @@ type BookmarksListProps = {
 	view?: string;
 	tab?: "events" | "tracks" | "all" | "watch-later";
 	headerActions?: React.ReactNode;
-	watchLaterItems?: Bookmark[];
+	watchLaterItems?: BookmarkListItem[];
 	watchLaterLoading?: boolean;
 	onUpdateBookmark?: (params: {
 		id: string;

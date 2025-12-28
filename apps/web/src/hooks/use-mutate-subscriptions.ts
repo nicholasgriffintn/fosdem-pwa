@@ -7,6 +7,7 @@ import {
 	createSubscription,
 	deleteSubscription,
 } from "~/server/functions/subscriptions";
+import { subscriptionQueryKeys } from "~/lib/query-keys";
 
 export function useMutateSubscriptions() {
 	const queryClient = useQueryClient();
@@ -36,7 +37,7 @@ export function useMutateSubscriptions() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["subscriptions"],
+				queryKey: subscriptionQueryKeys.list,
 			});
 		},
 	});
@@ -54,7 +55,7 @@ export function useMutateSubscriptions() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["subscriptions"],
+				queryKey: subscriptionQueryKeys.list,
 			});
 		},
 	});

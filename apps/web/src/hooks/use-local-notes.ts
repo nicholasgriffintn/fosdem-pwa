@@ -9,12 +9,13 @@ import {
 	removeLocalNote,
 	type LocalNote,
 } from "~/lib/localStorage";
+import { notesQueryKeys } from "~/lib/query-keys";
 
 export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 	const queryClient = useQueryClient();
 
 	const { data: localNotes, isLoading: localLoading } = useQuery({
-		queryKey: ["local-notes", year, slug],
+		queryKey: notesQueryKeys.localItem(year, slug),
 		queryFn: async () => {
 			const allNotes = await getLocalNotes(year);
 			return allNotes.filter((note) => note.slug && note.slug === slug);
@@ -44,7 +45,7 @@ export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["local-notes", year, slug],
+				queryKey: notesQueryKeys.localItem(year, slug),
 			});
 		},
 	});
@@ -61,7 +62,7 @@ export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["local-notes", year, slug],
+				queryKey: notesQueryKeys.localItem(year, slug),
 			});
 		},
 	});
@@ -72,7 +73,7 @@ export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: ["local-notes", year, slug],
+				queryKey: notesQueryKeys.localItem(year, slug),
 			});
 		},
 	});

@@ -9,6 +9,7 @@ import { Link } from "@tanstack/react-router";
 import { buildTrackLink } from "~/lib/link-builder";
 import { ItemListContainer } from "~/components/shared/ItemListContainer";
 import { ListContainer } from "~/components/shared/ListContainer";
+import type { BookmarkSnapshot } from "~/lib/type-guards";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -30,10 +31,7 @@ type TrackListProps = {
 		status: string;
 	}) => void;
 	displaySortByFavourites?: boolean;
-	serverBookmarks?: Array<{
-		slug: string;
-		status: string;
-	}>;
+	serverBookmarks?: BookmarkSnapshot[];
 };
 
 type TrackListItemProps = {
@@ -136,10 +134,7 @@ type TrackListContentProps = {
 		slug: string;
 		status: string;
 	}) => void;
-	serverBookmarks?: Array<{
-		slug: string;
-		status: string;
-	}>;
+	serverBookmarks?: BookmarkSnapshot[];
 };
 
 function TrackListContent({

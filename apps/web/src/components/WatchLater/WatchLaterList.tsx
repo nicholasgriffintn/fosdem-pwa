@@ -3,11 +3,12 @@
 import { EventItemList } from "~/components/Event/EventItemList";
 import { LoadingState } from "~/components/shared/LoadingState";
 import type { Bookmark } from "~/server/db/schema";
+import type { LocalBookmark } from "~/lib/localStorage";
 import type { Conference, Event } from "~/types/fosdem";
 import { isEvent } from "~/lib/type-guards";
 
 type WatchLaterListProps = {
-  items: Bookmark[];
+  items: (Bookmark | LocalBookmark)[];
   fosdemData: Conference | null;
   year: number;
   loading?: boolean;
@@ -55,7 +56,6 @@ export function WatchLaterList({
       events={events}
       year={year}
       showTrack={true}
-      serverBookmarks={items}
       onToggleWatchLater={onToggleWatchLater}
     />
   );

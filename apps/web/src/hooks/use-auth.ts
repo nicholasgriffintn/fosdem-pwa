@@ -1,32 +1,20 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 
-import { getSession } from "~/server/functions/session";
 import { checkAndSyncOnOnline } from "~/lib/backgroundSync";
 import { enableSync } from "~/lib/localStorage";
 import { buildHomeLink } from "~/lib/link-builder";
+import { useSession } from "~/hooks/use-session";
+import { sessionQueryKeys } from "~/lib/query-keys";
 
 export function useAuth() {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
-	const getSessionDataFromServer = useServerFn(getSession);
 
-	const { data: user, isLoading } = useQuery({
-		queryKey: ["auth"],
-		queryFn: async () => {
-			const user = await getSessionDataFromServer();
-
-			if (!user) {
-				return {};
-			}
-
-			return user;
-		},
-	});
+	const { data: user, isLoading } = useSession();
 
 	const logout = useMutation({
 		mutationKey: ["logout"],
@@ -34,7 +22,7 @@ export function useAuth() {
 			await fetch("/api/auth/logout", { method: "POST" });
 		},
 		onSuccess: () => {
-			queryClient.setQueryData(["auth"], null);
+			queryClient.setQueryData(sessionQueryKeys.auth, null);
 			navigate(buildHomeLink());
 		},
 	});

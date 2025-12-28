@@ -3,6 +3,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { constants } from "~/constants";
 import type { Conference } from "~/types/fosdem";
 import { isValidYear, isNumber } from "~/lib/type-guards";
+import { CacheManager } from "~/server/cache";
+import { CacheKeys } from "~/server/lib/cache-keys";
 
 const FETCH_TIMEOUT_MS = 8000;
 const CURRENT_YEAR_TTL = 60 * 5; // 5 minutes
@@ -12,9 +14,16 @@ const getCacheTTL = (year: number): number => {
 	return year === constants.DEFAULT_YEAR ? CURRENT_YEAR_TTL : PAST_YEAR_TTL;
 };
 
+const cache = new CacheManager();
+
 const getFullData = async (year: number): Promise<Conference> => {
 	if (!isValidYear(year)) {
 		throw new Error("Invalid year; expected YYYY between 2000-2100");
+	}
+
+	const cached = await cache.get(CacheKeys.fosdemData(year));
+	if (cached && typeof cached === "object" && "conference" in cached) {
+		return cached as Conference;
 	}
 
 	const url = constants.DATA_LINK.replace("${YEAR}", year.toString());
@@ -52,6 +61,7 @@ const getFullData = async (year: number): Promise<Conference> => {
 	}
 
 	const data = json as Conference;
+	await cache.set(CacheKeys.fosdemData(year), data, getCacheTTL(year));
 	return data;
 };
 

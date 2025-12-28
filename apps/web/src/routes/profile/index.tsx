@@ -89,7 +89,7 @@ function ProfilePage() {
     initialServerBookmarks: serverBookmarks,
   });
   const { create: createBookmark } = useMutateBookmark({ year });
-  const { fosdemData } = useFosdemData({ year });
+  const { fosdemData } = useFosdemData({ year, initialData: serverFosdemData });
   const { stats, loading: statsLoading } = useUserStats({ year });
   const isClient = useIsClient();
   const hasServerSnapshot = Boolean(serverFosdemData);

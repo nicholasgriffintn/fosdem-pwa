@@ -7,6 +7,7 @@ import {
   markEventAttended,
   unmarkEventAttended,
 } from "~/server/functions/user-stats";
+import { bookmarkQueryKeys, sessionQueryKeys } from "~/lib/query-keys";
 
 export function useAttendance({ year }: { year: number }) {
   const queryClient = useQueryClient();
@@ -17,10 +18,20 @@ export function useAttendance({ year }: { year: number }) {
     mutationFn: ({ bookmarkId, inPerson }: { bookmarkId: string; inPerson?: boolean }) =>
       markAttendedFn({ data: { bookmarkId, inPerson } }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["local-bookmarks"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["bookmark"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["userStats"], exact: false });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
+      queryClient.invalidateQueries({ queryKey: bookmarkQueryKeys.local(year) });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
+      queryClient.invalidateQueries({ queryKey: sessionQueryKeys.userStats, exact: false });
     },
   });
 
@@ -28,10 +39,20 @@ export function useAttendance({ year }: { year: number }) {
     mutationFn: (bookmarkId: string) =>
       unmarkAttendedFn({ data: { bookmarkId } }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["local-bookmarks"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["bookmark"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["userStats"], exact: false });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
+      queryClient.invalidateQueries({ queryKey: bookmarkQueryKeys.local(year) });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
+      queryClient.invalidateQueries({ queryKey: sessionQueryKeys.userStats, exact: false });
     },
   });
 

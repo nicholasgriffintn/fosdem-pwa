@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import { changeBookmarksVisibility } from "~/server/functions/settings";
+import { sessionQueryKeys, bookmarkQueryKeys } from "~/lib/query-keys";
 
 export function useUserSettings({ userId }: { userId: string }) {
 	const queryClient = useQueryClient();
@@ -25,9 +26,8 @@ export function useUserSettings({ userId }: { userId: string }) {
 			return data;
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["profile", "me"] });
-			queryClient.invalidateQueries({ queryKey: ["auth"] });
-			queryClient.invalidateQueries({ queryKey: ["userBookmarks", userId] });
+			queryClient.invalidateQueries({ queryKey: sessionQueryKeys.profile(userId) });
+			queryClient.invalidateQueries({ queryKey: bookmarkQueryKeys.userBookmarks(userId) });
 		},
 	});
 

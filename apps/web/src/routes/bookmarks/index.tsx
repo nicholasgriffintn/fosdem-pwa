@@ -19,7 +19,6 @@ import {
 	exportBookmarksCsv,
 	importBookmarksCsv,
 } from "~/server/functions/export";
-import { getWatchLaterList } from "~/server/functions/watch-later";
 import { Button } from "~/components/ui/button";
 import { UpgradeNotice } from "~/components/shared/UpgradeNotice";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
@@ -49,16 +48,14 @@ export const Route = createFileRoute("/bookmarks/")({
 	}),
 	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
 	loader: async ({ deps: { year, day } }) => {
-		const [fosdemData, serverBookmarks, serverWatchLater] = await Promise.all([
+		const [fosdemData, serverBookmarks] = await Promise.all([
 			getAllData({ data: { year } }),
 			getBookmarks({ data: { year, status: "favourited" } }),
-			getWatchLaterList({ data: { year } }),
 		]);
 		return {
 			year,
 			day,
 			serverBookmarks,
-			serverWatchLater,
 			fosdemData,
 		};
 	},
@@ -77,7 +74,6 @@ function BookmarksHome() {
 		year,
 		day,
 		serverBookmarks,
-		serverWatchLater,
 		fosdemData: serverFosdemData,
 	} = Route.useLoaderData();
 	const { view, tab } = Route.useSearch();
@@ -87,8 +83,8 @@ function BookmarksHome() {
 		initialServerBookmarks: serverBookmarks
 	});
 	const { create, update } = useMutateBookmark({ year });
-	const { watchLaterList, loading: watchLaterLoading, toggle: toggleWatchLater } = useWatchLater({ year });
-	const { fosdemData } = useFosdemData({ year });
+	const { toggle: toggleWatchLater } = useWatchLater({ year });
+	const { fosdemData } = useFosdemData({ year, initialData: serverFosdemData });
 	const { user, loading: authLoading } = useAuth();
 	const isClient = useIsClient();
 	const hasServerSnapshot = Boolean(serverFosdemData);
@@ -99,8 +95,10 @@ function BookmarksHome() {
 	const resolvedAuthLoading = useServerSnapshot ? false : authLoading;
 	const resolvedFosdemData = useServerSnapshot ? serverFosdemData : fosdemData;
 	const resolvedUser = useServerSnapshot ? serverUser : user;
-	const resolvedWatchLater = useServerSnapshot ? serverWatchLater : watchLaterList;
-	const resolvedWatchLaterLoading = useServerSnapshot ? false : watchLaterLoading;
+	const resolvedWatchLater = resolvedBookmarks?.filter(
+		(bookmark) => bookmark.watch_later === true,
+	);
+	const resolvedWatchLaterLoading = resolvedLoading;
 	const [csvBusy, setCsvBusy] = useState(false);
 	const [importOpen, setImportOpen] = useState(false);
 

@@ -1,38 +1,42 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import {
-  getWatchLaterList,
   toggleWatchLater,
   updateWatchProgress,
   markAsWatched,
   setPlaybackSpeed,
 } from "~/server/functions/watch-later";
+import { bookmarkQueryKeys } from "~/lib/query-keys";
 
 export function useWatchLater({ year }: { year: number }) {
   const queryClient = useQueryClient();
-  const fetchWatchLater = useServerFn(getWatchLaterList);
   const toggleWatchLaterFn = useServerFn(toggleWatchLater);
   const updateProgressFn = useServerFn(updateWatchProgress);
   const markWatchedFn = useServerFn(markAsWatched);
   const setSpeedFn = useServerFn(setPlaybackSpeed);
 
-  const queryKey = ["watchLater", year];
-
-  const { data: watchLaterList, isLoading } = useQuery({
-    queryKey,
-    queryFn: () => fetchWatchLater({ data: { year } }),
-  });
+  const localBookmarksKey = bookmarkQueryKeys.local(year);
 
   const toggleMutation = useMutation({
     mutationFn: (bookmarkId: string) =>
       toggleWatchLaterFn({ data: { bookmarkId } }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["local-bookmarks"], exact: false });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
+      queryClient.invalidateQueries({ queryKey: localBookmarksKey });
     },
   });
 
@@ -48,7 +52,12 @@ export function useWatchLater({ year }: { year: number }) {
     }) =>
       updateProgressFn({ data: { bookmarkId, progressSeconds, playbackSpeed } }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
     },
   });
 
@@ -56,9 +65,19 @@ export function useWatchLater({ year }: { year: number }) {
     mutationFn: (bookmarkId: string) =>
       markWatchedFn({ data: { bookmarkId } }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["local-bookmarks"], exact: false });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
+      queryClient.invalidateQueries({ queryKey: localBookmarksKey });
     },
   });
 
@@ -66,13 +85,16 @@ export function useWatchLater({ year }: { year: number }) {
     mutationFn: ({ bookmarkId, speed }: { bookmarkId: string; speed: string }) =>
       setSpeedFn({ data: { bookmarkId, speed } }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "bookmarks" &&
+          query.queryKey[1] === year,
+      });
     },
   });
 
   return {
-    watchLaterList: watchLaterList ?? [],
-    loading: isLoading,
     toggle: toggleMutation.mutateAsync,
     toggleLoading: toggleMutation.isPending,
     updateProgress: updateProgressMutation.mutateAsync,

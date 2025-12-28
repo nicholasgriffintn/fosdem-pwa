@@ -7,6 +7,7 @@ import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime, calculateTransitionTime } from "~/lib/dateTime";
 import { sortScheduleEvents } from "~/lib/sorting";
 import type { User } from "~/server/db/schema";
+import type { BookmarkSnapshot } from "~/lib/type-guards";
 
 type EventScheduleListProps = {
 	events: Event[];
@@ -27,10 +28,7 @@ type EventScheduleListProps = {
 		slug: string;
 		status: string;
 	}) => void;
-	serverBookmarks?: Array<{
-		slug: string;
-		status: string;
-	}>;
+	serverBookmarks?: BookmarkSnapshot[];
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 

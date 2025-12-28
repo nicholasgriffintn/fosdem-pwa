@@ -103,7 +103,7 @@ function ProfilePage() {
     enabled: shouldLoadBookmarks,
   });
 
-  const { fosdemData } = useFosdemData({ year });
+  const { fosdemData } = useFosdemData({ year, initialData: serverFosdemData });
   const isClient = useIsClient();
   const hasServerSnapshot = Boolean(serverFosdemData);
   const useServerSnapshot =

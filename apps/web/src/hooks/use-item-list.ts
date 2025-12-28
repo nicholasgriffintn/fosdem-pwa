@@ -1,4 +1,3 @@
-import type { LocalBookmark } from "~/lib/localStorage";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import {
 	sortEvents,
@@ -8,7 +7,7 @@ import {
 } from "~/lib/sorting";
 import type { Event, Track } from "~/types/fosdem";
 import { useIsClient } from "~/hooks/use-is-client";
-import type { ItemWithId } from "~/lib/type-guards";
+import type { ItemWithId, BookmarkSnapshot } from "~/lib/type-guards";
 import { isFavourited } from "~/lib/type-guards";
 import type { Bookmark } from "~/server/db/schema";
 
@@ -18,11 +17,28 @@ type ItemWithFavorites<T extends ItemWithId> = T & {
 	watchLater?: boolean;
 };
 
-function useBookmarkResolution(year: number, serverBookmarks?: Bookmark[]) {
+function isFullBookmarkList(
+	bookmarks: BookmarkSnapshot[] | undefined,
+): bookmarks is Bookmark[] {
+	if (!bookmarks?.length) {
+		return false;
+	}
+	return bookmarks.every(
+		(bookmark) =>
+			typeof (bookmark as Bookmark).id === "string" &&
+			typeof (bookmark as Bookmark).year === "number" &&
+			typeof (bookmark as Bookmark).type === "string",
+	);
+}
+
+function useBookmarkResolution(year: number, serverBookmarks?: BookmarkSnapshot[]) {
 	const isClient = useIsClient();
+	const initialServerBookmarks = isFullBookmarkList(serverBookmarks)
+		? serverBookmarks
+		: undefined;
 	const { bookmarks, loading: bookmarksLoading } = useBookmarks({
 		year,
-		initialServerBookmarks: serverBookmarks,
+		initialServerBookmarks,
 	});
 	const resolvedBookmarks = isClient ? bookmarks : serverBookmarks || [];
 	const resolvedLoading = isClient ? bookmarksLoading : false;
@@ -30,7 +46,7 @@ function useBookmarkResolution(year: number, serverBookmarks?: Bookmark[]) {
 	return { resolvedBookmarks, resolvedLoading };
 }
 
-export function createFavoritesMap(bookmarks: (Bookmark | { slug: string; status: string })[]): Record<string, boolean> {
+export function createFavoritesMap(bookmarks: BookmarkSnapshot[]): Record<string, boolean> {
 	return bookmarks?.reduce(
 		(acc: Record<string, boolean>, bookmark) => {
 			if (isFavourited(bookmark)) {
@@ -44,13 +60,13 @@ export function createFavoritesMap(bookmarks: (Bookmark | { slug: string; status
 
 function addFavoritesToItems<T extends ItemWithId>(
 	items: T[],
-	bookmarks: (Bookmark | LocalBookmark)[]
+	bookmarks: BookmarkSnapshot[]
 ): ItemWithFavorites<T>[] {
 	return items?.length
 		? items.map((item) => {
 			const bookmark = bookmarks?.find((b) => b.slug === item.id);
-			const bookmarkId = bookmark && 'id' in bookmark ? bookmark.id : undefined;
-			const watchLater = bookmark && 'watch_later' in bookmark ? bookmark.watch_later === true : false;
+			const bookmarkId = bookmark?.id;
+			const watchLater = bookmark?.watch_later === true;
 			return {
 				...item,
 				isFavourited: bookmark ? isFavourited(bookmark) : undefined,
@@ -66,21 +82,21 @@ interface UseEventListProps {
 	year: number;
 	sortFn?: (a: Event, b: Event) => number;
 	sortByFavourites?: boolean;
-	serverBookmarks?: Bookmark[];
+	serverBookmarks?: BookmarkSnapshot[];
 }
 
 interface UseTrackListProps {
 	items: Track[];
 	year: number;
 	sortByFavourites?: boolean;
-	serverBookmarks?: Bookmark[];
+	serverBookmarks?: BookmarkSnapshot[];
 }
 
 interface UseItemListProps<T extends ItemWithId> {
 	items: T[];
 	year: number;
 	sortByFavourites?: boolean;
-	serverBookmarks?: Bookmark[];
+	serverBookmarks?: BookmarkSnapshot[];
 	defaultSortFn: (a: T, b: T) => number;
 	favoritesSortFn: (favorites: Record<string, boolean>) => (a: T, b: T) => number;
 }

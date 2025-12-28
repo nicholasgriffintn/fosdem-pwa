@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
 import { getUserBookmarks } from "~/server/functions/bookmarks";
+import { bookmarkQueryKeys } from "~/lib/query-keys";
 
 export function useUserBookmarks({
 	year,
@@ -17,7 +18,7 @@ export function useUserBookmarks({
 	const getUserBookmarksFromServer = useServerFn(getUserBookmarks);
 
 	const { data: bookmarks, isLoading } = useQuery({
-		queryKey: ["userBookmarks", userId, year],
+		queryKey: bookmarkQueryKeys.userBookmarks(userId, year),
 		enabled,
 		queryFn: async () => {
 			const bookmarks = await getUserBookmarksFromServer({

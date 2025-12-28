@@ -9,6 +9,7 @@ import { EventScheduleList } from "~/components/Event/EventScheduleList";
 import type { User } from "~/server/db/schema";
 import { ViewModeSwitch } from "~/components/shared/ViewModeSwitch";
 import { ItemListContainer } from "~/components/shared/ItemListContainer";
+import type { BookmarkSnapshot } from "~/lib/type-guards";
 
 type EventListViewModes = "list" | "calendar" | "schedule";
 
@@ -43,10 +44,7 @@ type EventListProps = {
 	displaySortByFavourites?: boolean;
 	emptyStateTitle?: string;
 	emptyStateMessage?: string;
-	serverBookmarks?: Array<{
-		slug: string;
-		status: string;
-	}>;
+	serverBookmarks?: BookmarkSnapshot[];
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 

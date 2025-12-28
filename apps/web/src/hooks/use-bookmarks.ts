@@ -13,6 +13,7 @@ import {
 	type LocalBookmark,
 } from "~/lib/localStorage";
 import type { Bookmark } from "~/server/db/schema";
+import { bookmarkQueryKeys } from "~/lib/query-keys";
 
 type MergedBookmark = LocalBookmark & {
 	existsOnServer?: boolean;
@@ -38,15 +39,18 @@ export function useBookmarks({
 
 	const getBookmarksFromServer = useServerFn(getBookmarks);
 
+	const localQueryKey = bookmarkQueryKeys.local(year);
+	const serverQueryKey = bookmarkQueryKeys.list(year, userId);
+
 	const { data: localBookmarks, isLoading: localLoading } = useQuery({
-		queryKey: ["local-bookmarks", year],
+		queryKey: localQueryKey,
 		queryFn: () => getLocalBookmarks(year),
 		staleTime: 60 * 1000,
 		gcTime: 10 * 60 * 1000,
 	});
 
 	const { data: serverBookmarks, isLoading: serverLoading } = useQuery({
-		queryKey: ["bookmarks", year, userId],
+		queryKey: serverQueryKey,
 		queryFn: async () => {
 			if (!userId) return [];
 
@@ -186,7 +190,7 @@ export function useBookmarks({
 
 					if (!cancelled) {
 						await queryClient.invalidateQueries({
-							queryKey: ["local-bookmarks", year],
+							queryKey: localQueryKey,
 						});
 					}
 				}

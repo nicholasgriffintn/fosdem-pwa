@@ -2,7 +2,6 @@ import type React from "react";
 import clsx from "clsx";
 import { Link } from "@tanstack/react-router";
 
-import type { Bookmark } from "~/server/db/schema";
 import type { Event } from "~/types/fosdem";
 import type { EventConflict } from "~/lib/fosdem";
 import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
@@ -10,6 +9,7 @@ import { ItemActions } from "~/components/shared/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateEndTime } from "~/lib/dateTime";
 import type { User } from "~/server/db/schema";
+import type { BookmarkSnapshot } from "~/lib/type-guards";
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/shared/Icons";
 import { buildEventLink } from "~/lib/link-builder";
@@ -35,7 +35,7 @@ type EventListProps = {
 		slug: string;
 		status: string;
 	}) => void;
-	serverBookmarks?: Bookmark[];
+	serverBookmarks?: BookmarkSnapshot[];
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 

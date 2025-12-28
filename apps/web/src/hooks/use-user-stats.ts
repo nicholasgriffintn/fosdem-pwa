@@ -8,6 +8,7 @@ import {
   refreshUserStats,
   getUserStatsHistory,
 } from "~/server/functions/user-stats";
+import { sessionQueryKeys } from "../lib/query-keys";
 
 export function useUserStats({ year }: { year: number }) {
   const queryClient = useQueryClient();
@@ -40,7 +41,7 @@ export function useUserStatsHistory() {
   const fetchHistory = useServerFn(getUserStatsHistory);
 
   const { data: history, isLoading } = useQuery({
-    queryKey: ["userStatsHistory"],
+    queryKey: sessionQueryKeys.userStatsHisotry,
     queryFn: () => fetchHistory(),
   });
 
