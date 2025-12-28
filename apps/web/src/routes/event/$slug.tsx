@@ -12,7 +12,7 @@ import { testLiveEvent, testConferenceData } from "~/data/test-data";
 import { getAllData } from "~/server/functions/fosdem";
 import { EventMain } from "~/components/Event/EventMain";
 import { constants } from "~/constants";
-import { calculateEndTime, isEventFinished } from "~/lib/dateTime";
+import { calculateEndTime, isEventFinished, isEventLive } from "~/lib/dateTime";
 import { useBookmark } from "~/hooks/use-bookmark";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
@@ -168,8 +168,13 @@ function EventPage() {
   const isBookmarked = bookmark?.status === "favourited" || serverBookmark?.status === "favourited";
   const isInWatchLater = isClient ? bookmark?.watch_later === true : serverBookmark?.watch_later === true;
   const isAttended = isClient ? bookmark?.attended === true : serverBookmark?.attended === true;
+  const isAttendedInPerson = isClient
+    ? bookmark?.attended_in_person === true
+    : serverBookmark?.attended_in_person === true;
   const currentBookmarkId = isClient ? bookmark?.id : serverBookmark?.id;
   const eventFinished = fosdem.event && fosdem.conference ? isEventFinished(fosdem.event, fosdem.conference) : false;
+  const eventLive = fosdem.event && fosdem.conference ? isEventLive(fosdem.event, fosdem.conference) : false;
+  const canMarkAttendance = eventFinished || eventLive;
   const favouriteStatus = isClient
     ? resolveFavouriteStatus({
         bookmark,
@@ -261,14 +266,17 @@ function EventPage() {
                 variant="icon"
                 disabled={!isBookmarked || !currentBookmarkId}
               />
+            </>
+          )}
+          {canMarkAttendance && (
               <AttendanceButton
                 bookmarkId={currentBookmarkId ?? ""}
                 isAttended={isAttended}
+                isInPerson={isAttendedInPerson}
                 onMarkAttended={markAttended}
                 onUnmarkAttended={unmarkAttended}
                 disabled={!isBookmarked || !currentBookmarkId}
               />
-            </>
           )}
           <ShareButton
             title={fosdem?.event?.title}
@@ -310,15 +318,18 @@ function EventPage() {
                   disabled={!isBookmarked || !currentBookmarkId}
                   className={showStickyTitle ? undefined : "flex-1 w-full"}
                 />
-                <AttendanceButton
-                  bookmarkId={currentBookmarkId ?? ""}
-                  isAttended={isAttended}
-                  onMarkAttended={markAttended}
-                  onUnmarkAttended={unmarkAttended}
-                  disabled={!isBookmarked || !currentBookmarkId}
-                  className={showStickyTitle ? undefined : "flex-1 w-full"}
-                />
               </>
+            )}
+            {canMarkAttendance && (
+              <AttendanceButton
+                bookmarkId={currentBookmarkId ?? ""}
+                isAttended={isAttended}
+                isInPerson={isAttendedInPerson}
+                onMarkAttended={markAttended}
+                onUnmarkAttended={unmarkAttended}
+                disabled={!isBookmarked || !currentBookmarkId}
+                className={showStickyTitle ? undefined : "flex-1 w-full"}
+              />
             )}
             <ShareButton
               title={fosdem?.event?.title}
