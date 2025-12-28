@@ -5,6 +5,7 @@ import {
 } from "webpush-webcrypto";
 
 import { constants } from "../constants";
+import { createBrusselsDate } from "../utils/date";
 import type {
 	NotificationPayload,
 	Subscription,
@@ -22,11 +23,11 @@ function minutesUntilStart(start: string, now = new Date()): number {
 	const [hours, minutes] = start.split(":").map(Number);
 	if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return 0;
 
-	const brusselsNow = new Date(
-		now.toLocaleString("en-US", { timeZone: "Europe/Brussels" }),
-	);
-	const startTime = new Date(brusselsNow);
-	startTime.setHours(hours, minutes, 0, 0);
+	const brusselsNow = createBrusselsDate(now);
+	const year = brusselsNow.getUTCFullYear();
+	const month = brusselsNow.getUTCMonth();
+	const day = brusselsNow.getUTCDate();
+	const startTime = new Date(Date.UTC(year, month, day, hours, minutes, 0));
 
 	const diffMinutes =
 		(startTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
@@ -65,9 +66,12 @@ export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: st
 		};
 	}
 
+	const sortedBookmarks = [...bookmarks].sort((a, b) =>
+		a.startTime.localeCompare(b.startTime),
+	);
 	const totalEvents = bookmarks.length;
-	const firstEvent = bookmarks[0];
-	const lastEvent = bookmarks[bookmarks.length - 1];
+	const firstEvent = sortedBookmarks[0];
+	const lastEvent = sortedBookmarks[sortedBookmarks.length - 1];
 
 	if (isEvening) {
 		return {

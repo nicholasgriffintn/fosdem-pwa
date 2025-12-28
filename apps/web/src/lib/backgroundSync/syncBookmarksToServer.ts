@@ -147,17 +147,20 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
           await removeFromSyncQueue(item.id);
           return { success: true as const, id: item.id };
         }
+      } else {
+        console.warn(`Unknown bookmark sync action "${item.action}", removing from queue: ${item.id}`);
+        await removeFromSyncQueue(item.id);
+        return { success: true as const, id: item.id };
       }
-      return { success: true as const, id: item.id };
     } catch (error) {
       console.error("Sync error for bookmark:", item.id, error);
-      return { success: false as const, id: item.id, error: String(error) };
+      return { success: false, id: item.id, error: String(error) };
     }
   });
 
   const results = await Promise.allSettled(operations);
   const processedResults = results
-    .map((r) => r.status === "fulfilled" ? r.value : { success: false as const, id: "unknown", error: "Promise rejected" });
+    .map((r) => r.status === "fulfilled" ? r.value : { success: false, id: "unknown", error: "Promise rejected" });
 
   const successCount = processedResults.filter((r) => r.success).length;
   const errors = processedResults

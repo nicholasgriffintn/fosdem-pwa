@@ -10,6 +10,7 @@ import {
 	getLocalBookmarks,
 	saveLocalBookmark,
 	updateLocalBookmark,
+	removeLocalBookmark,
 	type LocalBookmark,
 } from "~/lib/localStorage";
 import type { Bookmark } from "~/server/db/schema";
@@ -143,6 +144,7 @@ export function useBookmarks({
 
 			try {
 				const localBySlug = new Map(localBookmarks.map((b) => [b.slug, b]));
+				const serverBySlug = new Map(serverBookmarks.map((b) => [b.slug, b]));
 				const updates: Array<() => Promise<any>> = [];
 
 				for (const serverBookmark of serverBookmarks) {
@@ -186,6 +188,16 @@ export function useBookmarks({
 							});
 						}
 					}
+				}
+
+				for (const localBookmark of localBookmarks) {
+					if (cancelled) break;
+					if (!localBookmark.serverId) continue;
+					if (serverBySlug.has(localBookmark.slug)) continue;
+
+					updates.push(async () => {
+						await removeLocalBookmark(localBookmark.id, true);
+					});
 				}
 
 				if (updates.length > 0 && !cancelled) {

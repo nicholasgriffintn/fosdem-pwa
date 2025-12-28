@@ -249,7 +249,15 @@ export function useMutateBookmark({ year }: { year: number }) {
 				await removeLocalBookmark(bookmarkId);
 			}
 			if (user?.id) {
-				await createServerBookmark.mutateAsync(bookmarkData);
+				if (existingBookmark?.serverId) {
+					await updateServerBookmark.mutateAsync({
+						id: existingBookmark.serverId,
+						updates: { status: "unfavourited" },
+						localId: bookmarkId,
+					});
+				} else {
+					await createServerBookmark.mutateAsync(bookmarkData);
+				}
 			}
 			queryClient.invalidateQueries({
 				queryKey: bookmarkQueryKeys.item(bookmarkData.year, bookmarkData.slug),
@@ -278,20 +286,18 @@ export function useMutateBookmark({ year }: { year: number }) {
 			return;
 		}
 
-		const resolvedServerId =
-			serverId ??
-			localBookmark?.serverId ??
-			(localBookmark
-				? `${user.id}_${localBookmark.year}_${localBookmark.slug}`
-				: undefined);
+		const resolvedServerId = serverId ?? localBookmark?.serverId;
 
-		if (resolvedServerId) {
-			updateServerBookmark.mutate({
-				id: resolvedServerId,
-				updates,
-				localId: id,
-			});
+		if (!resolvedServerId) {
+			console.warn(`Missing serverId for bookmark update: ${id}`);
+			return;
 		}
+
+		updateServerBookmark.mutate({
+			id: resolvedServerId,
+			updates,
+			localId: id,
+		});
 	};
 
 	return {

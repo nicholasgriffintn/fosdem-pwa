@@ -4,7 +4,7 @@ const BASE_DELAY_MS = 1000;
 const MAX_DELAY_MS = 30000;
 
 export async function withRetry<T>(
-  fn: () => Promise<T>,
+  fn: (options?: { signal: AbortSignal }) => Promise<T>,
   retries = MAX_RETRIES,
 ): Promise<T> {
   let lastError: Error | undefined;
@@ -15,7 +15,7 @@ export async function withRetry<T>(
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
       try {
-        const result = await fn();
+        const result = await fn({ signal: controller.signal });
         return result;
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") {

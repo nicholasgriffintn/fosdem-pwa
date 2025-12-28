@@ -462,7 +462,7 @@ export async function removeLocalNote(id: string, skipSync?: boolean): Promise<b
         id,
         type: "note",
         action: "delete",
-        data: { id },
+        data: { id, serverId: existing.serverId },
         timestamp: new Date().toISOString(),
       });
     }

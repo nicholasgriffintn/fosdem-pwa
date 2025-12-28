@@ -67,6 +67,12 @@ export const updateNote = createServerFn({
 
 		for (const [key, value] of Object.entries(updates ?? {})) {
 			if (allowedFields.includes(key as AllowedField)) {
+				if (key === "note" && typeof value !== "string") {
+					return err(`Invalid type for ${key}: expected string`);
+				}
+				if (key === "time" && value !== null && typeof value !== "number") {
+					return err(`Invalid type for ${key}: expected number or null`);
+				}
 				(safeUpdates as Record<string, unknown>)[key] = value;
 			}
 		}

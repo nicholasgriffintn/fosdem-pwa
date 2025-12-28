@@ -226,19 +226,20 @@ export const getUserBookmarks = createServerFn({
 		const { year, userId } = ctx.data;
 
 		if (!userId) {
-			throw new Error("User ID is required");
+			return [];
 		}
 
+		const yearNum = validateYear(year);
 		const user = await findUserByUsername(userId);
 		if (!user) {
-			throw new Error("User not found");
+			return [];
 		}
 
 		if (user.bookmarks_visibility === "private") {
-			throw new Error("User has private bookmarks");
+			return [];
 		}
 
-		return findBookmarksByUserAndYear(user.id, Number(year));
+		return findBookmarksByUserAndYear(user.id, yearNum);
 	});
 
 export const deleteBookmark = createServerFn({

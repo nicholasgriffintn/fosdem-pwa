@@ -70,4 +70,5 @@ export interface Env {
 	VAPID_PRIVATE_KEY: string;
 	BOOKMARK_NOTIFICATIONS_ENABLED?: string | boolean;
 	SCHEDULE_CHANGE_NOTIFICATIONS_ENABLED?: string | boolean;
+	CRON_SECRET?: string;
 }

@@ -36,6 +36,20 @@ const validateEnv = (env: Env) => {
 	};
 };
 
+const isAuthorizedRequest = (request: Request, env: Env): boolean => {
+	if (!env.CRON_SECRET) {
+		return true;
+	}
+
+	const authHeader = request.headers.get("Authorization");
+	const bearerToken = authHeader?.startsWith("Bearer ")
+		? authHeader.slice("Bearer ".length).trim()
+		: null;
+	const headerToken = request.headers.get("x-cron-secret");
+
+	return bearerToken === env.CRON_SECRET || headerToken === env.CRON_SECRET;
+};
+
 export default Sentry.withSentry(
 	env => ({
 		dsn: "https://b76a52be6f8677f808dca20da8fd8273@o4508599344365568.ingest.de.sentry.io/4508734021369936",
@@ -47,6 +61,10 @@ export default Sentry.withSentry(
 			const validation = validateEnv(env);
 			if (!validation.ok) {
 				return new Response(`Missing required bindings: ${validation.missing.join(", ")}`, { status: 500 });
+			}
+
+			if (!isAuthorizedRequest(request, env)) {
+				return new Response("Unauthorized", { status: 401 });
 			}
 
 			try {

@@ -1,4 +1,5 @@
 import { constants } from "../constants";
+import { createBrusselsDate } from "../utils/date";
 import type { FosdemEvent, Bookmark, EnrichedBookmark, Env } from "../types";
 
 interface GetUserBookmarksOptions {
@@ -28,27 +29,31 @@ export async function getUserBookmarks(
 	return bookmarks.results as unknown as Bookmark[];
 }
 
-export function enrichBookmarks(bookmarks: Bookmark[], events: { [key: string]: FosdemEvent }): EnrichedBookmark[] {
-	return bookmarks.map((bookmark) => {
-		if (typeof bookmark.slug !== "string") {
-			throw new Error(`Invalid slug for bookmark ${bookmark.slug}`);
-		}
+export function enrichBookmarks(
+	bookmarks: Bookmark[],
+	events: { [key: string]: FosdemEvent },
+): EnrichedBookmark[] {
+	const enriched: EnrichedBookmark[] = [];
 
-		if (!bookmark.slug) {
-			throw new Error(`Invalid slug for bookmark: ${JSON.stringify(bookmark)}`);
+	for (const bookmark of bookmarks) {
+		if (typeof bookmark.slug !== "string" || !bookmark.slug) {
+			console.warn("Skipping bookmark with invalid slug", bookmark);
+			continue;
 		}
 
 		const event = events[bookmark.slug];
-
 		if (!event) {
-			throw new Error(`Event not found for bookmark ${bookmark.slug}`);
+			console.warn(`Event not found for bookmark ${bookmark.slug}`);
+			continue;
 		}
 
-		return {
+		enriched.push({
 			...bookmark,
 			...event,
-		};
-	});
+		});
+	}
+
+	return enriched;
 }
 
 export function getBookmarksForDay(bookmarks: EnrichedBookmark[], day: string): EnrichedBookmark[] {
@@ -63,27 +68,28 @@ export function getBookmarksStartingSoon(
 	bookmarks: EnrichedBookmark[],
 	reminderMinutes = 15,
 ): EnrichedBookmark[] {
+	const nowBrussels = createBrusselsDate();
+	const year = nowBrussels.getUTCFullYear();
+	const month = nowBrussels.getUTCMonth();
+	const day = nowBrussels.getUTCDate();
+	const nowMinutes =
+		nowBrussels.getUTCHours() * 60 +
+		nowBrussels.getUTCMinutes() +
+		nowBrussels.getUTCSeconds() / 60;
+	const windowMinutes = Number.isFinite(reminderMinutes)
+		? Math.max(0, reminderMinutes)
+		: 15;
+
 	return bookmarks.filter((bookmark) => {
 		const [hours, minutes] = bookmark.startTime.split(":").map(Number);
+		if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+			return false;
+		}
 
-		const now = new Date();
-		const brusselsTimeStr = now.toLocaleString('en-US', {
-			timeZone: 'Europe/Brussels',
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit',
-			hour12: false
-		});
-
-		const [currentHour, currentMinute, currentSecond] = brusselsTimeStr.split(':').map(Number);
-
-		const eventTimeMinutes = hours * 60 + minutes;
-		const currentTimeMinutes = currentHour * 60 + currentMinute + currentSecond / 60;
-
-		const timeDiff = eventTimeMinutes - currentTimeMinutes;
-		const windowMinutes = Number.isFinite(reminderMinutes)
-			? Math.max(0, reminderMinutes)
-			: 15;
+		const eventTime = new Date(Date.UTC(year, month, day, hours, minutes, 0));
+		const eventMinutes =
+			eventTime.getUTCHours() * 60 + eventTime.getUTCMinutes();
+		const timeDiff = eventMinutes - nowMinutes;
 
 		return timeDiff > 0 && timeDiff <= windowMinutes;
 	});

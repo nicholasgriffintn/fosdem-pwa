@@ -125,8 +125,11 @@ export async function syncNotesToServer(): Promise<SyncResult> {
           await removeFromSyncQueue(item.id);
           return { success: true as const, id: item.id };
         }
+      } else {
+        console.warn(`Unknown note sync action "${item.action}", removing from queue: ${item.id}`);
+        await removeFromSyncQueue(item.id);
+        return { success: true as const, id: item.id };
       }
-      return { success: true as const, id: item.id };
     } catch (error) {
       console.error("Sync error for note:", item.id, error);
       return { success: false as const, id: item.id, error: String(error) };

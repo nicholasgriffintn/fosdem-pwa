@@ -5,6 +5,7 @@ import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { getUserBookmarks, enrichBookmarks, getBookmarksForDay } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
 import { getUserNotificationPreference } from "../lib/notification-preferences";
+import { createBrusselsDate } from "../utils/date";
 import type { Env, Subscription, NotificationPayload } from "../types";
 
 const ROOMS_API = "https://api.fosdem.org/roomstatus/v1/listrooms";
@@ -52,27 +53,17 @@ async function storeRoomStatuses(
   await env.DB.batch(statements);
 }
 
-async function getRoomTrend(roomName: string, env: Env): Promise<RoomTrend> {
-  const history = await env.DB.prepare(
-    `SELECT state, recorded_at 
-     FROM room_status_history 
-     WHERE room_name = ? AND year = ? AND recorded_at > datetime('now', '-30 minutes')
-     ORDER BY recorded_at DESC`,
-  )
-    .bind(roomName, constants.YEAR)
-    .all();
-
-  if (!history.success || !history.results || history.results.length < 2) {
+function calculateRoomTrend(history: Array<{ state: string }>): RoomTrend {
+  if (history.length < 2) {
     return "unknown";
   }
 
-  const results = history.results as Array<{ state: string; recorded_at: string }>;
-  const fullCount = results.filter((h) => h.state === "1").length;
-  const total = results.length;
+  const fullCount = history.filter((h) => h.state === "1").length;
+  const total = history.length;
 
   if (fullCount / total > 0.6) {
-    const recentHalf = results.slice(0, Math.floor(total / 2));
-    const olderHalf = results.slice(Math.floor(total / 2));
+    const recentHalf = history.slice(0, Math.floor(total / 2));
+    const olderHalf = history.slice(Math.floor(total / 2));
     const recentFullRate =
       recentHalf.filter((h) => h.state === "1").length / recentHalf.length;
     const olderFullRate =
@@ -83,10 +74,10 @@ async function getRoomTrend(roomName: string, env: Env): Promise<RoomTrend> {
     }
   }
 
-  const availableCount = results.filter((h) => h.state !== "1").length;
+  const availableCount = history.filter((h) => h.state !== "1").length;
   if (availableCount / total > 0.6) {
-    const recentHalf = results.slice(0, Math.floor(total / 2));
-    const olderHalf = results.slice(Math.floor(total / 2));
+    const recentHalf = history.slice(0, Math.floor(total / 2));
+    const olderHalf = history.slice(Math.floor(total / 2));
     const recentAvailableRate =
       recentHalf.filter((h) => h.state !== "1").length / recentHalf.length;
     const olderAvailableRate =
@@ -98,6 +89,49 @@ async function getRoomTrend(roomName: string, env: Env): Promise<RoomTrend> {
   }
 
   return "stable";
+}
+
+async function getRoomTrends(
+  roomNames: string[],
+  env: Env,
+): Promise<Map<string, RoomTrend>> {
+  const trends = new Map<string, RoomTrend>();
+  if (!roomNames.length) {
+    return trends;
+  }
+
+  const placeholders = roomNames.map(() => "?").join(", ");
+  const history = await env.DB.prepare(
+    `SELECT room_name, state, recorded_at
+     FROM room_status_history
+     WHERE year = ? AND recorded_at > datetime('now', '-30 minutes')
+       AND room_name IN (${placeholders})
+     ORDER BY recorded_at DESC`,
+  )
+    .bind(constants.YEAR, ...roomNames)
+    .all();
+
+  if (!history.success || !history.results) {
+    for (const roomName of roomNames) {
+      trends.set(roomName, "unknown");
+    }
+    return trends;
+  }
+
+  const grouped = new Map<string, Array<{ state: string }>>();
+  for (const row of history.results as Array<{ room_name: string; state: string }>) {
+    if (!grouped.has(row.room_name)) {
+      grouped.set(row.room_name, []);
+    }
+    grouped.get(row.room_name)?.push({ state: row.state });
+  }
+
+  for (const roomName of roomNames) {
+    const roomHistory = grouped.get(roomName) ?? [];
+    trends.set(roomName, calculateRoomTrend(roomHistory));
+  }
+
+  return trends;
 }
 
 function createRoomFillingNotification(
@@ -113,14 +147,16 @@ function createRoomFillingNotification(
   };
 }
 
-export async function pollAndStoreRoomStatus(env: Env): Promise<void> {
-  try {
-    const statuses = await fetchRoomStatuses();
-    await storeRoomStatuses(statuses, env);
-    console.log(`Stored ${statuses.length} room statuses`);
-  } catch (error) {
-    console.error("Failed to poll room status:", error);
-  }
+export async function pollAndStoreRoomStatus(env: Env): Promise<RoomStatusResponse[]> {
+	try {
+		const statuses = await fetchRoomStatuses();
+		await storeRoomStatuses(statuses, env);
+		console.log(`Stored ${statuses.length} room statuses`);
+		return statuses;
+	} catch (error) {
+		console.error("Failed to poll room status:", error);
+		return [];
+	}
 }
 
 export async function triggerRoomStatusNotifications(
@@ -137,27 +173,28 @@ export async function triggerRoomStatusNotifications(
     return;
   }
 
-  await pollAndStoreRoomStatus(env);
+	const currentStatuses = await pollAndStoreRoomStatus(env);
+	if (!currentStatuses.length) {
+		console.log("No room statuses available");
+		return;
+	}
+	const statusMap = new Map(
+		currentStatuses.map((s) => [s.roomname, s.state]),
+	);
 
-  const currentStatuses = await fetchRoomStatuses();
-  const statusMap = new Map(
-    currentStatuses.map((s) => [s.roomname, s.state]),
+  const roomNames = [...statusMap.keys()];
+  const trends = await getRoomTrends(roomNames, env);
+  const fillingRooms = roomNames.filter(
+    (roomName) => trends.get(roomName) === "filling",
   );
 
-  const fillingRooms: string[] = [];
-  for (const [roomName] of statusMap) {
-    const trend = await getRoomTrend(roomName, env);
-    if (trend === "filling") {
-      fillingRooms.push(roomName);
-    }
-  }
+	if (!fillingRooms.length) {
+		console.log("No rooms are filling up");
+		return;
+	}
 
-  if (!fillingRooms.length) {
-    console.log("No rooms are filling up");
-    return;
-  }
-
-  console.log(`Rooms filling up: ${fillingRooms.join(", ")}`);
+	const fillingRoomSet = new Set(fillingRooms);
+	console.log(`Rooms filling up: ${fillingRooms.join(", ")}`);
 
   const fosdemData = await getFosdemData();
   const keys = await getApplicationKeys(env);
@@ -203,20 +240,22 @@ export async function triggerRoomStatusNotifications(
     const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
     const todayBookmarks = getBookmarksForDay(enrichedBookmarks, whichDay);
 
-    const now = new Date();
-    const brusselsNow = new Date(
-      now.toLocaleString("en-US", { timeZone: "Europe/Brussels" }),
-    );
+	const brusselsNow = createBrusselsDate();
+	const year = brusselsNow.getUTCFullYear();
+	const month = brusselsNow.getUTCMonth();
+	const day = brusselsNow.getUTCDate();
 
-    for (const bookmark of todayBookmarks) {
-      if (!fillingRooms.includes(bookmark.room)) continue;
+	for (const bookmark of todayBookmarks) {
+		if (!fillingRoomSet.has(bookmark.room)) continue;
 
-      const [hours, minutes] = bookmark.startTime.split(":").map(Number);
-      const eventTime = new Date(brusselsNow);
-      eventTime.setHours(hours, minutes, 0, 0);
+		const [hours, minutes] = bookmark.startTime.split(":").map(Number);
+		if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+			continue;
+		}
+		const eventTime = new Date(Date.UTC(year, month, day, hours, minutes, 0));
 
-      const minutesUntilStart =
-        (eventTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
+		const minutesUntilStart =
+			(eventTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
 
       if (minutesUntilStart > 20 && minutesUntilStart <= 45) {
         const notification = createRoomFillingNotification(
