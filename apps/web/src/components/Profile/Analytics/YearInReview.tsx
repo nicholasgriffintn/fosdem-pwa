@@ -182,7 +182,7 @@ function ReviewStat({ value, label, icon: Icon }: ReviewStatProps) {
         className="h-12 w-12 mx-auto mb-2 rounded-2xl flex items-center justify-center"
         style={{ backgroundColor: "var(--review-accent-soft)" }}
       >
-        <Icon className="h-6 w-6" style={{ color: "var(--review-accent)" }} />
+        <Icon className="h-6 w-6" />
       </div>
       <p className="text-2xl font-bold text-foreground">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>

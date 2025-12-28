@@ -115,40 +115,26 @@ describe("recording notifications", () => {
       const bookmark = {
         attended: false,
         watch_status: "unwatched",
-        priority: 1,
       };
 
       const missed = isEventMissed(bookmark);
       expect(missed).toBe(true);
     });
 
-    it("returns true when low priority", () => {
-      const bookmark = {
-        attended: true,
-        watch_status: "watched",
-        priority: 2,
-      };
-
-      const missed = isEventMissed(bookmark);
-      expect(missed).toBe(true);
-    });
-
-    it("returns false when attended and high priority", () => {
+    it("returns false when attended", () => {
       const bookmark = {
         attended: true,
         watch_status: "unwatched",
-        priority: 1,
       };
 
       const missed = isEventMissed(bookmark);
       expect(missed).toBe(false);
     });
 
-    it("returns false when watched and high priority", () => {
+    it("returns false when watched", () => {
       const bookmark = {
         attended: false,
         watch_status: "watched",
-        priority: 1,
       };
 
       const missed = isEventMissed(bookmark);
@@ -183,11 +169,9 @@ function createRecordingAvailableNotification(
 function isEventMissed(bookmark: {
   attended: boolean;
   watch_status: string;
-  priority: number;
 }): boolean {
   const notAttended = !bookmark.attended;
   const notWatched = bookmark.watch_status !== "watched";
-  const isLowPriority = bookmark.priority > 1;
 
-  return (notAttended && notWatched) || isLowPriority;
+  return notAttended && notWatched;
 }

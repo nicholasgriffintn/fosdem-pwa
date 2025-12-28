@@ -12,6 +12,7 @@ import {
 	bookmarkNotificationsEnabled,
 	scheduleChangeNotificationsEnabled,
 } from "../utils/config";
+import { getUserNotificationPreference } from "../lib/notification-preferences";
 import type { Env, Subscription, ScheduleSnapshot } from "../types";
 
 type SnapshotRow = ScheduleSnapshot;
@@ -112,15 +113,28 @@ export async function triggerScheduleChangeNotifications(
 				p256dh: subscription.p256dh as string,
 			};
 
+			const prefs = await getUserNotificationPreference(
+				typedSubscription.user_id,
+				env,
+			);
+
+			if (!prefs.schedule_changes) {
+				return;
+			}
+
 			const bookmarks = await getUserBookmarks(typedSubscription.user_id, env, {
 				includeSent: true,
 			});
 
-			if (!bookmarks.length) {
+			const filteredBookmarks = prefs.notify_low_priority
+				? bookmarks
+				: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
+
+			if (!filteredBookmarks.length) {
 				return;
 			}
 
-			const relevantBookmarks = bookmarks.filter((bookmark) =>
+			const relevantBookmarks = filteredBookmarks.filter((bookmark) =>
 				changedEvents.has(bookmark.slug),
 			);
 

@@ -8,6 +8,7 @@ import {
 	getBookmarksStartingSoon,
 	markNotificationSent,
 } from "../lib/bookmarks";
+import { getUserNotificationPreference } from "../lib/notification-preferences";
 import { getApplicationKeys, sendNotification, createNotificationPayload } from "../lib/notifications";
 import { bookmarkNotificationsEnabled } from "../utils/config";
 import type { Subscription, EnrichedBookmark, Env } from "../types";
@@ -144,8 +145,21 @@ export async function triggerNotifications(
 					p256dh: subscription.p256dh as string,
 				};
 
+				const prefs = await getUserNotificationPreference(
+					typedSubscription.user_id,
+					env,
+				);
+
+				if (!prefs.event_reminders) {
+					return;
+				}
+
 				const bookmarks = await getUserBookmarks(typedSubscription.user_id, env);
-				const enrichedBookmarks = enrichBookmarks(bookmarks, fosdemData.events);
+				const filteredBookmarks = prefs.notify_low_priority
+					? bookmarks
+					: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
+
+				const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
 				const bookmarksRunningToday = getBookmarksForDay(enrichedBookmarks, whichDay);
 
 				if (!bookmarksRunningToday.length) {
@@ -153,7 +167,10 @@ export async function triggerNotifications(
 					return;
 				}
 
-				const bookmarksStartingSoon = getBookmarksStartingSoon(bookmarksRunningToday);
+				const bookmarksStartingSoon = getBookmarksStartingSoon(
+					bookmarksRunningToday,
+					prefs.reminder_minutes_before,
+				);
 
 				if (!bookmarksStartingSoon.length) {
 					console.log(`No bookmarks starting soon for ${typedSubscription.user_id}`);

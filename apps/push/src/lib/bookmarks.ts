@@ -59,7 +59,10 @@ export function getBookmarksForDay(bookmarks: EnrichedBookmark[], day: string): 
 	return bookmarks.filter((bookmark) => bookmark.day === day);
 }
 
-export function getBookmarksStartingSoon(bookmarks: EnrichedBookmark[]): EnrichedBookmark[] {
+export function getBookmarksStartingSoon(
+	bookmarks: EnrichedBookmark[],
+	reminderMinutes = 15,
+): EnrichedBookmark[] {
 	return bookmarks.filter((bookmark) => {
 		const [hours, minutes] = bookmark.startTime.split(":").map(Number);
 		const now = new Date();
@@ -70,8 +73,11 @@ export function getBookmarksStartingSoon(bookmarks: EnrichedBookmark[]): Enriche
 		const brusselsNow = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Brussels' }));
 		
 		const timeDiff = (eventTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
-		
-		return timeDiff > 0 && timeDiff <= 15;
+		const windowMinutes = Number.isFinite(reminderMinutes)
+			? Math.max(0, reminderMinutes)
+			: 15;
+
+		return timeDiff > 0 && timeDiff <= windowMinutes;
 	});
 }
 

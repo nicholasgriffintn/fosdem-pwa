@@ -2,8 +2,9 @@ import type { ExecutionContext } from "@cloudflare/workers-types";
 
 import { constants } from "../constants";
 import { getFosdemData } from "../lib/fosdem-data";
-import { getUserBookmarks, enrichBookmarks } from "../lib/bookmarks";
+import { getUserBookmarks } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
+import { getUserNotificationPreference } from "../lib/notification-preferences";
 import { bookmarkNotificationsEnabled } from "../utils/config";
 import type { Env, Subscription, NotificationPayload, FosdemEvent } from "../types";
 
@@ -64,31 +65,12 @@ async function markRecordingNotified(slug: string, env: Env): Promise<void> {
     .run();
 }
 
-async function getUserNotificationPreference(
-  userId: string,
-  env: Env,
-): Promise<{ recording_available: boolean }> {
-  const result = await env.DB.prepare(
-    "SELECT recording_available FROM notification_preference WHERE user_id = ?",
-  )
-    .bind(userId)
-    .first();
-
-  if (!result) {
-    return { recording_available: false };
-  }
-
-  return {
-    recording_available: result.recording_available !== 0,
-  };
-}
-
 async function isEventMissed(
   bookmarkId: string,
   env: Env,
 ): Promise<boolean> {
   const result = await env.DB.prepare(
-    `SELECT attended, watch_status, priority 
+    `SELECT attended, watch_status 
      FROM bookmark 
      WHERE id = ?`,
   )
@@ -99,9 +81,7 @@ async function isEventMissed(
 
   const notAttended = !result.attended;
   const notWatched = result.watch_status !== "watched";
-  const isLowPriority = (result.priority as number) > 1;
-
-  return (notAttended && notWatched) || isLowPriority;
+  return notAttended && notWatched;
 }
 
 function createRecordingAvailableNotification(
@@ -190,10 +170,14 @@ export async function triggerRecordingNotifications(
       includeSent: true,
     });
 
-    if (!bookmarks.length) continue;
+    const filteredBookmarks = prefs.notify_low_priority
+      ? bookmarks
+      : bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
+
+    if (!filteredBookmarks.length) continue;
 
     for (const recording of newRecordings) {
-      const bookmark = bookmarks.find((b) => b.slug === recording.slug);
+      const bookmark = filteredBookmarks.find((b) => b.slug === recording.slug);
       if (!bookmark) continue;
 
       const missed = await isEventMissed(bookmark.id, env);

@@ -115,6 +115,34 @@ describe("bookmark helpers", () => {
 		expect(startingSoon).toHaveLength(1);
 		expect(startingSoon[0].slug).toBe("test-talk");
 	});
+
+	it("respects a custom reminder window", () => {
+		// 2025-02-01T08:57:00Z -> 09:57 Brussels
+		vi.useFakeTimers();
+		vi.setSystemTime(new Date("2025-02-01T08:57:00Z"));
+
+		const bookmarks = [
+			{ ...baseBookmark, startTime: "10:00" }, // 3 minutes away
+			{ ...baseBookmark, id: "2", slug: "later", startTime: "10:10" }, // 13 minutes
+		];
+
+		const startingSoon = getBookmarksStartingSoon(bookmarks, 5);
+		expect(startingSoon).toHaveLength(1);
+		expect(startingSoon[0].slug).toBe("test-talk");
+	});
+
+	it("falls back to default reminder window for invalid input", () => {
+		// 2025-02-01T08:45:00Z -> 09:45 Brussels
+		vi.useFakeTimers();
+		vi.setSystemTime(new Date("2025-02-01T08:45:00Z"));
+
+		const bookmarks = [
+			{ ...baseBookmark, startTime: "10:00" }, // 15 minutes away
+		];
+
+		const startingSoon = getBookmarksStartingSoon(bookmarks, Number.NaN);
+		expect(startingSoon).toHaveLength(1);
+	});
 });
 
 describe("notification feature flags", () => {

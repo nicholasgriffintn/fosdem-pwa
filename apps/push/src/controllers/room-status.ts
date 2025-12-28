@@ -4,6 +4,7 @@ import { constants } from "../constants";
 import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { getUserBookmarks, enrichBookmarks, getBookmarksForDay } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
+import { getUserNotificationPreference } from "../lib/notification-preferences";
 import { bookmarkNotificationsEnabled } from "../utils/config";
 import type { Env, Subscription, NotificationPayload } from "../types";
 
@@ -113,26 +114,6 @@ function createRoomFillingNotification(
   };
 }
 
-async function getUserNotificationPreference(
-  userId: string,
-  env: Env,
-): Promise<{ room_status_alerts: boolean; reminder_minutes_before: number }> {
-  const result = await env.DB.prepare(
-    "SELECT room_status_alerts, reminder_minutes_before FROM notification_preference WHERE user_id = ?",
-  )
-    .bind(userId)
-    .first();
-
-  if (!result) {
-    return { room_status_alerts: true, reminder_minutes_before: 15 };
-  }
-
-  return {
-    room_status_alerts: result.room_status_alerts !== 0,
-    reminder_minutes_before: (result.reminder_minutes_before as number) ?? 15,
-  };
-}
-
 export async function pollAndStoreRoomStatus(env: Env): Promise<void> {
   try {
     const statuses = await fetchRoomStatuses();
@@ -217,9 +198,13 @@ export async function triggerRoomStatusNotifications(
       includeSent: true,
     });
 
-    if (!bookmarks.length) continue;
+    const filteredBookmarks = prefs.notify_low_priority
+      ? bookmarks
+      : bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
 
-    const enrichedBookmarks = enrichBookmarks(bookmarks, fosdemData.events);
+    if (!filteredBookmarks.length) continue;
+
+    const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
     const todayBookmarks = getBookmarksForDay(enrichedBookmarks, whichDay);
 
     const now = new Date();

@@ -17,6 +17,10 @@ vi.mock("../src/lib/notifications", () => ({
 	createScheduleChangePayload: vi.fn(),
 }));
 
+vi.mock("../src/lib/notification-preferences", () => ({
+	getUserNotificationPreference: vi.fn(),
+}));
+
 vi.mock("../src/utils/config", () => ({
 	bookmarkNotificationsEnabled: vi.fn(() => true),
 	scheduleChangeNotificationsEnabled: vi.fn(() => true),
@@ -29,6 +33,9 @@ const {
 	sendNotification,
 	createScheduleChangePayload,
 } = await import("../src/lib/notifications");
+const { getUserNotificationPreference } = await import(
+	"../src/lib/notification-preferences"
+);
 
 const { triggerScheduleChangeNotifications } = await import(
 	"../src/controllers/schedule-changes"
@@ -98,6 +105,15 @@ afterEach(() => {
 
 describe("triggerScheduleChangeNotifications", () => {
 	it("seeds snapshot when empty and skips notifications", async () => {
+		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+			reminder_minutes_before: 15,
+			event_reminders: true,
+			schedule_changes: true,
+			room_status_alerts: true,
+			recording_available: false,
+			daily_summary: true,
+			notify_low_priority: false,
+		});
 		(getFosdemData as vi.Mock).mockResolvedValue({
 			events: {
 				"talk-a": { startTime: "09:00", duration: "00:30", room: "H.1301" },
@@ -120,7 +136,52 @@ describe("triggerScheduleChangeNotifications", () => {
 		expect((env as any)._batchCalls[0]).toHaveLength(1);
 	});
 
+	it("skips when schedule change preference is disabled", async () => {
+		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+			reminder_minutes_before: 15,
+			event_reminders: true,
+			schedule_changes: false,
+			room_status_alerts: true,
+			recording_available: false,
+			daily_summary: true,
+			notify_low_priority: false,
+		});
+		(getFosdemData as vi.Mock).mockResolvedValue({
+			events: {
+				"talk-a": { startTime: "09:30", duration: "00:30", room: "H.1302" },
+			},
+		});
+
+		const env = createMockEnv({
+			snapshots: [
+				{
+					slug: "talk-a",
+					start_time: "09:00",
+					duration: "00:30",
+					room: "H.1301",
+				},
+			],
+			subscriptions: [
+				{ user_id: "1", endpoint: "e", auth: "a", p256dh: "k" },
+			],
+		});
+
+		await triggerScheduleChangeNotifications({ cron: "" }, env, {} as any, false);
+
+		expect(getUserBookmarks).not.toHaveBeenCalled();
+		expect(sendNotification).not.toHaveBeenCalled();
+	});
+
 	it("sends notifications for changed events and updates snapshot", async () => {
+		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+			reminder_minutes_before: 15,
+			event_reminders: true,
+			schedule_changes: true,
+			room_status_alerts: true,
+			recording_available: false,
+			daily_summary: true,
+			notify_low_priority: false,
+		});
 		const subscriptions: Subscription[] = [
 			{
 				user_id: "1",
