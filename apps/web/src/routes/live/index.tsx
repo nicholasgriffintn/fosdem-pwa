@@ -37,7 +37,10 @@ export const Route = createFileRoute("/live/")({
 
 			return { liveEvents, upcomingEvents, year, serverBookmarks: [] };
 		}
-		const data = (await getAllData({ data: { year } })) as Conference;
+		const [data, serverBookmarks] = await Promise.all([
+			getAllData({ data: { year } }),
+			getBookmarks({ data: { year, status: "favourited" } }),
+		]);
 
 		const liveEvents = Object.values(data.events)
 			.filter((event) => isEvent(event) && isEventLive(event, data.conference))
@@ -46,10 +49,6 @@ export const Route = createFileRoute("/live/")({
 		const upcomingEvents = Object.values(data.events)
 			.filter((event) => isEvent(event) && isEventUpcoming(event, data.conference))
 			.sort(sortUpcomingEvents);
-
-		const serverBookmarks = await getBookmarks({
-			data: { year, status: "favourited" },
-		});
 
 		return { liveEvents, upcomingEvents, year, serverBookmarks };
 	},

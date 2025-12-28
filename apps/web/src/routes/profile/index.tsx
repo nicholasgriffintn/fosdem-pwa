@@ -59,12 +59,12 @@ export const Route = createFileRoute("/profile/")({
   },
   loaderDeps: ({ search: { year, day, view, tab } }) => ({ year, day, view, tab }),
   loader: async ({ deps: { year } }) => {
-    const fosdemData = await getAllData({ data: { year } });
-    const serverBookmarks = await getBookmarks({
-      data: { year, status: "favourited" },
-    });
-    const user = await getSession();
-    const stats = await getUserStats({ data: { year } });
+    const [fosdemData, serverBookmarks, user, stats] = await Promise.all([
+      getAllData({ data: { year } }),
+      getBookmarks({ data: { year, status: "favourited" } }),
+      getSession(),
+      getUserStats({ data: { year } }),
+    ]);
 
     return {
       year,

@@ -49,11 +49,11 @@ export const Route = createFileRoute("/bookmarks/")({
 	}),
 	loaderDeps: ({ search: { year, day } }) => ({ year, day }),
 	loader: async ({ deps: { year, day } }) => {
-		const fosdemData = await getAllData({ data: { year } });
-		const serverBookmarks = await getBookmarks({
-			data: { year, status: "favourited" },
-		});
-		const serverWatchLater = await getWatchLaterList({ data: { year } });
+		const [fosdemData, serverBookmarks, serverWatchLater] = await Promise.all([
+			getAllData({ data: { year } }),
+			getBookmarks({ data: { year, status: "favourited" } }),
+			getWatchLaterList({ data: { year } }),
+		]);
 		return {
 			year,
 			day,

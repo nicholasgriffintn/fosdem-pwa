@@ -53,10 +53,13 @@ export const Route = createFileRoute("/profile/$userId/")({
   loaderDeps: ({ search: { year, day, view, tab } }) => ({ year, day, view, tab }),
   loader: async ({ params, deps: { year } }) => {
     const userId = params.userId;
-    const fosdemData = await getAllData({ data: { year } });
 
     try {
-      const user = await getUserDetails({ data: { userId } });
+      const [fosdemData, user] = await Promise.all([
+        getAllData({ data: { year } }),
+        getUserDetails({ data: { userId } }),
+      ]);
+
       const serverBookmarks = user?.bookmarks_visibility === "public"
         ? await getUserBookmarks({ data: { year, userId } })
         : [];
@@ -69,6 +72,7 @@ export const Route = createFileRoute("/profile/$userId/")({
         notFound: false,
       };
     } catch {
+      const fosdemData = await getAllData({ data: { year } });
       return {
         year,
         fosdemData,
