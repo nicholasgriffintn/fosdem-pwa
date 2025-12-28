@@ -203,8 +203,8 @@ describe("BookmarksList", () => {
 			/>,
 		);
 
-		expect(screen.getByText(/Saved Events/i)).toBeInTheDocument();
-		expect(screen.getByText(/Saved Tracks/i)).toBeInTheDocument();
+		expect(screen.getByText(/Bookmarked Events/i)).toBeInTheDocument();
+		expect(screen.getByText(/Bookmarked Tracks/i)).toBeInTheDocument();
 		expect(screen.getByText(/Intro to FOSDEM/i)).toBeInTheDocument();
 		expect(screen.getAllByText(/1 events/i).length).toBeGreaterThan(0);
 		queryClient.clear();
