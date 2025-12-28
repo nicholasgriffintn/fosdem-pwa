@@ -63,7 +63,6 @@ export interface QueueMessage {
 
 export interface Env {
 	DB: D1Database;
-	DB_PREVIEW: D1Database;
 	ANALYTICS: AnalyticsEngineDataset;
 	NOTIFICATION_QUEUE: Queue<QueueMessage>;
 	VAPID_EMAIL: string;

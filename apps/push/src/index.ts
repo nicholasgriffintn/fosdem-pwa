@@ -13,7 +13,6 @@ import type { Env, QueueMessage } from "./types";
 
 const REQUIRED_ENV: Array<keyof Env> = [
 	"DB",
-	"DB_PREVIEW",
 	"NOTIFICATION_QUEUE",
 	"VAPID_EMAIL",
 	"VAPID_PUBLIC_KEY",
