@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as WatchLaterIndexRouteImport } from './routes/watch-later/index'
 import { Route as TermsIndexRouteImport } from './routes/terms/index'
 import { Route as SpeakersIndexRouteImport } from './routes/speakers/index'
 import { Route as SigninIndexRouteImport } from './routes/signin/index'
@@ -49,11 +48,6 @@ import { Route as ApiAuthCallbackDiscordRouteImport } from './routes/api/auth/ca
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WatchLaterIndexRoute = WatchLaterIndexRouteImport.update({
-  id: '/watch-later/',
-  path: '/watch-later/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsIndexRoute = TermsIndexRouteImport.update({
@@ -246,7 +240,6 @@ export interface FileRoutesByFullPath {
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
-  '/watch-later': typeof WatchLaterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -284,7 +277,6 @@ export interface FileRoutesByTo {
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
-  '/watch-later': typeof WatchLaterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -323,7 +315,6 @@ export interface FileRoutesById {
   '/signin/': typeof SigninIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
   '/terms/': typeof TermsIndexRoute
-  '/watch-later/': typeof WatchLaterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -363,7 +354,6 @@ export interface FileRouteTypes {
     | '/signin'
     | '/speakers'
     | '/terms'
-    | '/watch-later'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -401,7 +391,6 @@ export interface FileRouteTypes {
     | '/signin'
     | '/speakers'
     | '/terms'
-    | '/watch-later'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -439,7 +428,6 @@ export interface FileRouteTypes {
     | '/signin/'
     | '/speakers/'
     | '/terms/'
-    | '/watch-later/'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -478,7 +466,6 @@ export interface RootRouteChildren {
   SigninIndexRoute: typeof SigninIndexRoute
   SpeakersIndexRoute: typeof SpeakersIndexRoute
   TermsIndexRoute: typeof TermsIndexRoute
-  WatchLaterIndexRoute: typeof WatchLaterIndexRoute
   ApiAuthDiscordRoute: typeof ApiAuthDiscordRoute
   ApiAuthGithubRoute: typeof ApiAuthGithubRoute
   ApiAuthGitlabRoute: typeof ApiAuthGitlabRoute
@@ -505,13 +492,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/watch-later/': {
-      id: '/watch-later/'
-      path: '/watch-later'
-      fullPath: '/watch-later'
-      preLoaderRoute: typeof WatchLaterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms/': {
@@ -774,7 +754,6 @@ const rootRouteChildren: RootRouteChildren = {
   SigninIndexRoute: SigninIndexRoute,
   SpeakersIndexRoute: SpeakersIndexRoute,
   TermsIndexRoute: TermsIndexRoute,
-  WatchLaterIndexRoute: WatchLaterIndexRoute,
   ApiAuthDiscordRoute: ApiAuthDiscordRoute,
   ApiAuthGithubRoute: ApiAuthGithubRoute,
   ApiAuthGitlabRoute: ApiAuthGitlabRoute,

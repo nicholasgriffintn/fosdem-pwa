@@ -4,29 +4,26 @@ import { BasePage } from "./BasePage";
 export class WatchLaterPage extends BasePage {
   async goto(path?: string) {
     const year = path ? parseInt(path, 10) || 2026 : 2026;
-    await super.goto(`/watch-later?year=${year}&tab=all`);
+    await super.goto(`/bookmarks?year=${year}&tab=watch-later`);
   }
 
   async gotoYear(year = 2026) {
-    await super.goto(`/watch-later?year=${year}&tab=all`);
+    await super.goto(`/bookmarks?year=${year}&tab=watch-later`);
   }
 
   async expectPageHeader() {
     await expect(this.page.getByRole("heading", { level: 1 })).toContainText(
-      "Watch Later",
+      "Bookmarks",
     );
   }
 
   async expectEmptyState() {
     await expect(
-      this.page.getByText(/No recordings in your queue/i),
+      this.page.getByText(/No items in this category/i),
     ).toBeVisible();
   }
 
-  async expectTabsVisible() {
-    await expect(this.page.getByRole("tab", { name: /All/i })).toBeVisible();
-    await expect(this.page.getByRole("tab", { name: /Unwatched/i })).toBeVisible();
-    await expect(this.page.getByRole("tab", { name: /In Progress/i })).toBeVisible();
-    await expect(this.page.getByRole("tab", { name: /Watched/i })).toBeVisible();
+  async expectWatchLaterTabActive() {
+    await expect(this.page.getByRole("link", { name: /Watch Later/i })).toHaveClass(/bg-background/);
   }
 }
