@@ -1,19 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
+import { useCallback } from "react";
 
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import { Select } from "~/components/ui/select";
 import { toast } from "~/hooks/use-toast";
 import { LoadingState } from "~/components/shared/LoadingState";
-import {
-  getNotificationPreferences,
-  updateNotificationPreferences,
-  type NotificationPreferenceUpdate,
-} from "~/server/functions/notification-preferences";
-import type { NotificationPreference } from "~/server/db/schema";
+import { useNotificationPreferences } from "~/hooks/use-notification-preferences";
+import type { NotificationPreferenceUpdate } from "~/server/functions/notification-preferences";
 
 const REMINDER_OPTIONS = [
   { value: "5", label: "5 minutes before" },
@@ -23,54 +18,18 @@ const REMINDER_OPTIONS = [
 ];
 
 export function NotificationPreferences() {
-  const [preferences, setPreferences] = useState<NotificationPreference | null>(
-    null,
-  );
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const fetchPreferences = useServerFn(getNotificationPreferences);
-  const savePreferences = useServerFn(updateNotificationPreferences);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const load = async () => {
-      try {
-        const prefs = await fetchPreferences();
-        if (mounted && prefs) {
-          setPreferences(prefs);
-        }
-      } catch (error) {
-        console.error("Failed to load notification preferences:", error);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void load();
-
-    return () => {
-      mounted = false;
-    };
-  }, [fetchPreferences]);
+  const { preferences, loading, update, updating } = useNotificationPreferences();
 
   const handleUpdate = useCallback(
     async (updates: NotificationPreferenceUpdate) => {
       if (!preferences) return;
 
-      setSaving(true);
       try {
-        const result = await savePreferences({ data: updates });
-        if (result && "data" in result) {
-          setPreferences(result.data);
-          toast({
-            title: "Preferences saved",
-            description: "Your notification preferences have been updated.",
-          });
-        }
+        await update(updates);
+        toast({
+          title: "Preferences saved",
+          description: "Your notification preferences have been updated.",
+        });
       } catch (error) {
         console.error("Failed to save notification preferences:", error);
         toast({
@@ -78,11 +37,9 @@ export function NotificationPreferences() {
           description: "Please try again.",
           variant: "destructive",
         });
-      } finally {
-        setSaving(false);
       }
     },
-    [preferences, savePreferences],
+    [preferences, update],
   );
 
   const handleToggle = useCallback(
@@ -136,7 +93,7 @@ export function NotificationPreferences() {
             options={REMINDER_OPTIONS}
             value={String(preferences.reminder_minutes_before)}
             onValueChange={handleReminderChange}
-            disabled={saving}
+            disabled={updating}
             className="w-[180px]"
           />
         </div>
@@ -152,7 +109,7 @@ export function NotificationPreferences() {
             description="Notify when bookmarked events are about to start"
             checked={preferences.event_reminders ?? true}
             onCheckedChange={handleToggle("event_reminders")}
-            disabled={saving}
+            disabled={updating}
           />
 
           <PreferenceToggle
@@ -161,7 +118,7 @@ export function NotificationPreferences() {
             description="Notify when bookmarked events change time or room"
             checked={preferences.schedule_changes ?? true}
             onCheckedChange={handleToggle("schedule_changes")}
-            disabled={saving}
+            disabled={updating}
           />
 
           <PreferenceToggle
@@ -170,7 +127,7 @@ export function NotificationPreferences() {
             description="Notify when rooms are filling up before your events"
             checked={preferences.room_status_alerts ?? true}
             onCheckedChange={handleToggle("room_status_alerts")}
-            disabled={saving}
+            disabled={updating}
           />
 
           <PreferenceToggle
@@ -179,7 +136,7 @@ export function NotificationPreferences() {
             description="Notify when recordings are available for events you missed"
             checked={preferences.recording_available ?? true}
             onCheckedChange={handleToggle("recording_available")}
-            disabled={saving}
+            disabled={updating}
           />
 
           <PreferenceToggle
@@ -188,7 +145,7 @@ export function NotificationPreferences() {
             description="Receive morning and evening summaries during the conference"
             checked={preferences.daily_summary ?? true}
             onCheckedChange={handleToggle("daily_summary")}
-            disabled={saving}
+            disabled={updating}
           />
         </div>
 
@@ -199,7 +156,7 @@ export function NotificationPreferences() {
             description="Also notify for events you marked as lower priority"
             checked={preferences.notify_low_priority ?? false}
             onCheckedChange={handleToggle("notify_low_priority")}
-            disabled={saving}
+            disabled={updating}
           />
         </div>
       </div>

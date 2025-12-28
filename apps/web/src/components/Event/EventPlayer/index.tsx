@@ -1,20 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+
 import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
 import { Icons } from "~/components/shared/Icons";
 import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
 import { usePlayer } from "~/contexts/PlayerContext";
 import { useOnlineStatus } from "~/hooks/use-online-status";
-import { useWatchLater } from "~/hooks/use-watch-later";
 import { isEventLive } from "~/lib/dateTime";
-import { getEventBookmark } from "~/server/functions/bookmarks";
 import { PlaybackSpeedControl } from "~/components/WatchLater/PlaybackSpeedControl";
-import { WatchLaterButton } from "~/components/WatchLater/WatchLaterButton";
 import type { ConferenceData, Event, TypeIds } from "~/types/fosdem";
-import { EventPlayerNotStarted } from "./components/NotStarted";
+import { EventPlayerNotStarted } from "~/components/Event/EventPlayer/components/NotStarted";
 
 type EventPlayerProps = {
 	event: Event;
@@ -43,15 +39,6 @@ export function EventPlayer({
 		currentEventId: player.currentEvent?.id ?? null,
 		setPortalTarget: player.setPortalTarget,
 	});
-
-	const fetchBookmark = useServerFn(getEventBookmark);
-	const { data: bookmark } = useQuery({
-		queryKey: ["bookmark", year, event.id],
-		queryFn: () => fetchBookmark({ data: { year, slug: event.id } }),
-		staleTime: 60000,
-	});
-
-	const { toggle: toggleWatchLater } = useWatchLater({ year });
 
 	const handleSpeedChange = (speed: number) => {
 		if (player.videoRef.current) {
@@ -118,12 +105,10 @@ export function EventPlayer({
 	const hasPlayableMedia =
 		(eventIsLive && event.streams?.length) || hasRecordings;
 
-	const bookmarkData = bookmark ? { id: bookmark.id, watch_later: bookmark.watch_later } : null;
-
 	const handlePlay = () => {
 		if (streamUrl) {
 			player.setPortalTarget("event-page");
-			player.loadEvent(event, year, streamUrl, eventIsLive, bookmarkData);
+			player.loadEvent(event, year, streamUrl, eventIsLive);
 			player.play();
 		}
 	};
@@ -131,7 +116,7 @@ export function EventPlayer({
 	const handlePopOut = () => {
 		if (streamUrl) {
 			if (!player.currentEvent || player.currentEvent.id !== event.id) {
-				player.loadEvent(event, year, streamUrl, eventIsLive, bookmarkData);
+				player.loadEvent(event, year, streamUrl, eventIsLive);
 			}
 			player.setPortalTarget("floating");
 			player.play();
@@ -141,7 +126,7 @@ export function EventPlayer({
 	const handlePopBackIn = () => {
 		if (streamUrl) {
 			if (!player.currentEvent || player.currentEvent.id !== event.id) {
-				player.loadEvent(event, year, streamUrl, eventIsLive, bookmarkData);
+				player.loadEvent(event, year, streamUrl, eventIsLive);
 			}
 			player.setPortalTarget("event-page");
 			if (player.isPlaying) {
@@ -202,15 +187,6 @@ export function EventPlayer({
 										variant="icon"
 										className="text-white bg-black/60 hover:bg-black/80"
 									/>
-									{bookmark?.id && (
-										<WatchLaterButton
-											bookmarkId={bookmark.id}
-											isInWatchLater={bookmark.watch_later === true}
-											onToggle={toggleWatchLater}
-											variant="icon"
-											className="h-8 w-8 text-white bg-black/60 hover:bg-black/80 border-0"
-										/>
-									)}
 								</div>
 							)}
 							{isMounted && !isOnline && (

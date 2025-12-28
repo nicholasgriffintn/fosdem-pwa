@@ -9,14 +9,22 @@ const subscriptionsModule = vi.hoisted(() => ({
 const mutateSubscriptionsModule = vi.hoisted(() => ({
 	useMutateSubscriptions: vi.fn(),
 }));
+const notificationPreferencesModule = vi.hoisted(() => ({
+	useNotificationPreferences: vi.fn(),
+}));
 
 vi.mock("~/hooks/use-subscriptions", () => subscriptionsModule);
 
 vi.mock("~/hooks/use-mutate-subscriptions", () => mutateSubscriptionsModule);
 
+vi.mock("~/hooks/use-notification-preferences", () => notificationPreferencesModule);
+
 const useSubscriptionsMock = vi.mocked(subscriptionsModule.useSubscriptions);
 const useMutateSubscriptionsMock = vi.mocked(
 	mutateSubscriptionsModule.useMutateSubscriptions,
+);
+const useNotificationPreferencesMock = vi.mocked(
+	notificationPreferencesModule.useNotificationPreferences,
 );
 
 const toastMock = vi.fn();
@@ -34,6 +42,7 @@ describe("PushNotifications", () => {
 	beforeEach(() => {
 		useSubscriptionsMock.mockReset();
 		useMutateSubscriptionsMock.mockReset();
+		useNotificationPreferencesMock.mockReset();
 		toastMock.mockReset();
 		useSubscriptionsMock.mockReturnValue({ subscriptions: [], loading: false });
 		useMutateSubscriptionsMock.mockReturnValue({
@@ -41,6 +50,12 @@ describe("PushNotifications", () => {
 			delete: vi.fn(),
 			createLoading: false,
 			deleteLoading: false,
+		});
+		useNotificationPreferencesMock.mockReturnValue({
+			preferences: null,
+			loading: false,
+			update: vi.fn(),
+			updating: false,
 		});
 	});
 

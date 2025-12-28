@@ -1,76 +1,31 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 
 import { usePlayer } from "~/contexts/PlayerContext";
-import { getEventBookmark } from "~/server/functions/bookmarks";
-import {
-  updateWatchProgress,
-  markAsWatched,
-} from "~/server/functions/watch-later";
+import { useBookmark } from "~/hooks/use-bookmark";
+import { useWatchLater } from "~/hooks/use-watch-later";
 
 const SAVE_INTERVAL_MS = 30000;
 
 export function VideoProgressTracker() {
-  const queryClient = useQueryClient();
   const { videoRef, currentEvent, year, isPlaying, isLive } = usePlayer();
   const lastSavedTimeRef = useRef<number>(0);
   const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const bookmarkIdRef = useRef<string | null>(null);
 
-  const fetchBookmark = useServerFn(getEventBookmark);
-  const updateProgressFn = useServerFn(updateWatchProgress);
-  const markWatchedFn = useServerFn(markAsWatched);
-
   const eventSlug = currentEvent?.id ?? "";
   const yearNum = year ?? new Date().getFullYear();
 
-  const { data: bookmark } = useQuery({
-    queryKey: ["bookmark", yearNum, eventSlug],
-    queryFn: () => fetchBookmark({ data: { year: yearNum, slug: eventSlug } }),
-    enabled: !!eventSlug && !isLive,
-    staleTime: 60000,
-  });
+  const { bookmark } = useBookmark({ year: yearNum, slug: eventSlug });
+  const { updateProgress, markAsWatched } = useWatchLater({ year: yearNum });
 
-  bookmarkIdRef.current = bookmark?.id ?? null;
+  bookmarkIdRef.current = bookmark?.serverId ?? null;
 
-  const updateProgressMutation = useMutation({
-    mutationFn: async ({
-      bookmarkId,
-      progressSeconds,
-      playbackSpeed,
-    }: {
-      bookmarkId: string;
-      progressSeconds: number;
-      playbackSpeed?: string;
-    }) => {
-      return updateProgressFn({
-        data: { bookmarkId, progressSeconds, playbackSpeed },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["watchLater"], exact: false });
-    },
-  });
-
-  const markWatchedMutation = useMutation({
-    mutationFn: async (bookmarkId: string) => {
-      return markWatchedFn({ data: { bookmarkId } });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["watchLater"], exact: false });
-      queryClient.invalidateQueries({
-        queryKey: ["bookmark", yearNum, eventSlug],
-      });
-    },
-  });
-
-  const updateProgressRef = useRef(updateProgressMutation.mutate);
-  const markWatchedRef = useRef(markWatchedMutation.mutate);
-  updateProgressRef.current = updateProgressMutation.mutate;
-  markWatchedRef.current = markWatchedMutation.mutate;
+  const updateProgressRef = useRef(updateProgress);
+  const markWatchedRef = useRef(markAsWatched);
+  updateProgressRef.current = updateProgress;
+  markWatchedRef.current = markAsWatched;
 
   const saveProgress = useCallback(() => {
     const video = videoRef.current;
@@ -98,7 +53,7 @@ export function VideoProgressTracker() {
   }, [isLive]);
 
   useEffect(() => {
-    if (!bookmark?.id || isLive || !isPlaying) {
+    if (!bookmark?.serverId || isLive || !isPlaying) {
       if (saveIntervalRef.current) {
         clearInterval(saveIntervalRef.current);
         saveIntervalRef.current = null;
@@ -120,7 +75,7 @@ export function VideoProgressTracker() {
         saveIntervalRef.current = null;
       }
     };
-  }, [bookmark?.id, isLive, isPlaying, saveProgress]);
+  }, [bookmark?.serverId, isLive, isPlaying, saveProgress]);
 
   useEffect(() => {
     const video = videoRef.current;

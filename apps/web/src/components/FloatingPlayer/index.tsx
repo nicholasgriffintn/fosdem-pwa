@@ -6,8 +6,6 @@ import clsx from "clsx";
 import { Icons } from "~/components/shared/Icons";
 import { usePlayer } from "~/contexts/PlayerContext";
 import { buildEventLink } from "~/lib/link-builder";
-import { useWatchLater } from "~/hooks/use-watch-later";
-import { WatchLaterButton } from "~/components/WatchLater/WatchLaterButton";
 import { PlaybackSpeedControl } from "~/components/WatchLater/PlaybackSpeedControl";
 
 export function FloatingPlayer() {
@@ -21,11 +19,7 @@ export function FloatingPlayer() {
 		portalTarget,
 		videoRef,
 		isLive,
-		bookmark,
 	} = usePlayer();
-
-	const yearNum = year ?? new Date().getFullYear();
-	const { toggle: toggleWatchLater } = useWatchLater({ year: yearNum });
 
 	const handleSpeedChange = (speed: number) => {
 		if (videoRef.current) {
@@ -97,15 +91,6 @@ export function FloatingPlayer() {
 									onSpeedChange={handleSpeedChange}
 									variant="icon"
 									className="text-white hover:bg-white/20"
-								/>
-							)}
-							{!isLive && bookmark?.id && (
-								<WatchLaterButton
-									bookmarkId={bookmark.id}
-									isInWatchLater={bookmark.watch_later === true}
-									onToggle={toggleWatchLater}
-									variant="icon"
-									className="h-8 w-8 text-white hover:bg-white/20 border-0"
 								/>
 							)}
 							<button

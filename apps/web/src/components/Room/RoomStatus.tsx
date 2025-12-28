@@ -8,7 +8,7 @@ import { RoomStatusTrend } from "./RoomStatusTrend";
 
 type RoomStatusProps = {
 	roomId: string;
-	isRunning: boolean;
+	isRunning?: boolean;
 	className?: string;
 };
 

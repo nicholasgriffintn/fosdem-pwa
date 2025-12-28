@@ -1,10 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-
 import { Icons } from "~/components/shared/Icons";
-import { getRoomStatusHistory } from "~/server/functions/room-status";
+import { useRoomStatusHistory } from "~/hooks/use-room-status-history";
 import { cn } from "~/lib/utils";
 
 type RoomTrend = "filling" | "emptying" | "stable" | "unknown";
@@ -81,14 +78,7 @@ const trendConfig: Record<
 };
 
 export function RoomStatusTrend({ roomId, className }: RoomStatusTrendProps) {
-  const fetchHistory = useServerFn(getRoomStatusHistory);
-
-  const { data: history, isLoading } = useQuery({
-    queryKey: ["roomStatusHistory", roomId],
-    queryFn: () => fetchHistory({ data: { roomName: roomId, limit: 10 } }),
-    refetchInterval: 60000,
-    staleTime: 30000,
-  });
+  const { data: history, isLoading } = useRoomStatusHistory(roomId);
 
   if (isLoading || !history) {
     return null;
