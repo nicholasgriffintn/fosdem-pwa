@@ -113,7 +113,7 @@ export async function sendNotification(
 		applicationServerKeys: keys,
 		payload: JSON.stringify(notification),
 		target,
-		adminContact: constants.VAPID_EMAIL,
+		adminContact: env.VAPID_EMAIL,
 		ttl: PUSH_TTL_SECONDS,
 		urgency: "normal",
 	});
@@ -152,7 +152,7 @@ export async function sendNotification(
 }
 
 export async function getApplicationKeys(env: Env) {
-	if (!constants.VAPID_EMAIL || !constants.VAPID_PUBLIC_KEY) {
+	if (!env.VAPID_EMAIL || !env.VAPID_PUBLIC_KEY) {
 		throw new Error("VAPID details not set");
 	}
 
@@ -161,7 +161,7 @@ export async function getApplicationKeys(env: Env) {
 	}
 
 	return ApplicationServerKeys.fromJSON({
-		publicKey: constants.VAPID_PUBLIC_KEY,
+		publicKey: env.VAPID_PUBLIC_KEY,
 		privateKey: env.VAPID_PRIVATE_KEY,
 	});
 } 
