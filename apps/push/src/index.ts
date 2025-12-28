@@ -5,7 +5,6 @@ import { triggerNotifications } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
 import { triggerRoomStatusNotifications, pollAndStoreRoomStatus, cleanupOldRoomStatus } from "./controllers/room-status";
 import { triggerRecordingNotifications } from "./controllers/recording-notifications";
-import { bookmarkNotificationsEnabled } from "./utils/config";
 import { triggerDailySummary } from "./controllers/daily-summary";
 import { getApplicationKeys, sendNotification } from "./lib/notifications";
 import { markNotificationSent } from "./lib/bookmarks";
@@ -184,11 +183,6 @@ export default Sentry.withSentry(
 			}
 
 			console.log(`Processing ${batch.messages.length} notifications`);
-
-			if (!bookmarkNotificationsEnabled(env)) {
-				console.log("Bookmark notifications disabled; skipping queue batch");
-				return;
-			}
 
 			const keys = await getApplicationKeys(env);
 			const dedupe = new Map<string, number>();

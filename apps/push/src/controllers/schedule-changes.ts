@@ -8,10 +8,6 @@ import {
 	sendNotification,
 	createScheduleChangePayload,
 } from "../lib/notifications";
-import {
-	bookmarkNotificationsEnabled,
-	scheduleChangeNotificationsEnabled,
-} from "../utils/config";
 import { getUserNotificationPreference } from "../lib/notification-preferences";
 import type { Env, Subscription, ScheduleSnapshot } from "../types";
 
@@ -51,16 +47,6 @@ export async function triggerScheduleChangeNotifications(
 	ctx: ExecutionContext,
 	queueMode = false,
 ) {
-	if (!scheduleChangeNotificationsEnabled(env)) {
-		console.log("Schedule change notifications disabled; skipping");
-		return;
-	}
-
-	if (!bookmarkNotificationsEnabled(env)) {
-		console.log("Bookmark notifications disabled; skipping schedule change flow");
-		return;
-	}
-
 	const fosdemData = await getFosdemData();
 	const snapshots = await loadSnapshots(env);
 

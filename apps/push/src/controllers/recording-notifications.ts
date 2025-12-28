@@ -5,7 +5,6 @@ import { getFosdemData } from "../lib/fosdem-data";
 import { getUserBookmarks } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
 import { getUserNotificationPreference } from "../lib/notification-preferences";
-import { bookmarkNotificationsEnabled } from "../utils/config";
 import type { Env, Subscription, NotificationPayload, FosdemEvent } from "../types";
 
 const DOMAIN = "fosdempwa.com";
@@ -101,11 +100,6 @@ export async function triggerRecordingNotifications(
   ctx: ExecutionContext,
   queueMode = false,
 ): Promise<void> {
-  if (!bookmarkNotificationsEnabled(env)) {
-    console.log("Bookmark notifications disabled; skipping recording notifications");
-    return;
-  }
-
   const fosdemData = await getFosdemData();
   const existingSnapshots = await loadRecordingSnapshots(env);
   const snapshotMap = new Map(

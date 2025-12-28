@@ -5,7 +5,6 @@ import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { getUserBookmarks, enrichBookmarks, getBookmarksForDay } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
 import { getUserNotificationPreference } from "../lib/notification-preferences";
-import { bookmarkNotificationsEnabled } from "../utils/config";
 import type { Env, Subscription, NotificationPayload } from "../types";
 
 const ROOMS_API = "https://api.fosdem.org/roomstatus/v1/listrooms";
@@ -130,11 +129,6 @@ export async function triggerRoomStatusNotifications(
   ctx: ExecutionContext,
   queueMode = false,
 ): Promise<void> {
-  if (!bookmarkNotificationsEnabled(env)) {
-    console.log("Bookmark notifications disabled; skipping room status notifications");
-    return;
-  }
-
   const whichDay = getCurrentDay();
   if (!whichDay) {
     console.log("FOSDEM is not running today; skipping room status notifications");

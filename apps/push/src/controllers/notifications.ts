@@ -10,7 +10,6 @@ import {
 } from "../lib/bookmarks";
 import { getUserNotificationPreference } from "../lib/notification-preferences";
 import { getApplicationKeys, sendNotification, createNotificationPayload } from "../lib/notifications";
-import { bookmarkNotificationsEnabled } from "../utils/config";
 import type { Subscription, EnrichedBookmark, Env } from "../types";
 
 async function processUserNotifications(
@@ -56,11 +55,6 @@ export async function triggerNotifications(
 	ctx: ExecutionContext,
 	queueMode = false
 ) {
-	if (!bookmarkNotificationsEnabled(env)) {
-		console.log("Bookmark notifications disabled; skipping processing");
-		return;
-	}
-
 	const whichDay = getCurrentDay();
 
 	if (!whichDay) {
