@@ -3,6 +3,8 @@ import type { ExecutionContext, ExportedHandler } from "@cloudflare/workers-type
 
 import { triggerNotifications, triggerTestNotification } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
+import { triggerRoomStatusNotifications, pollAndStoreRoomStatus, cleanupOldRoomStatus } from "./controllers/room-status";
+import { triggerRecordingNotifications } from "./controllers/recording-notifications";
 import { bookmarkNotificationsEnabled } from "./utils/config";
 import { triggerDailySummary } from "./controllers/daily-summary";
 import { getApplicationKeys, sendNotification } from "./lib/notifications";
@@ -76,6 +78,24 @@ export default Sentry.withSentry(
 					return new Response("Schedule change notifications queued");
 				}
 
+				const isRoomStatus = url.searchParams.has("room-status");
+				if (isRoomStatus) {
+					await triggerRoomStatusNotifications({ cron: "fetch" }, env, ctx, true);
+					return new Response("Room status notifications queued");
+				}
+
+				const isPollRooms = url.searchParams.has("poll-rooms");
+				if (isPollRooms) {
+					await pollAndStoreRoomStatus(env);
+					return new Response("Room statuses polled and stored");
+				}
+
+				const isRecordings = url.searchParams.has("recordings");
+				if (isRecordings) {
+					await triggerRecordingNotifications({ cron: "fetch" }, env, ctx, true);
+					return new Response("Recording notifications queued");
+				}
+
 				await triggerNotifications({ cron: "fetch" }, env, ctx, true);
 				return new Response("Notifications queued");
 			} catch (error) {
@@ -104,6 +124,25 @@ export default Sentry.withSentry(
 			// Evening summary at 17:15 UTC (18:15 Brussels)
 			if (event.cron === "15 17 1,2 2 *") {
 				await triggerDailySummary(event, env, ctx, true, true);
+				return;
+			}
+
+			// Room status polling (every 5 minutes during conference)
+			if (event.cron === "*/5 * 1,2 2 *") {
+				await pollAndStoreRoomStatus(env);
+				await triggerRoomStatusNotifications(event, env, ctx, true);
+				return;
+			}
+
+			// Daily cleanup at midnight
+			if (event.cron === "0 0 * * *") {
+				await cleanupOldRoomStatus(env);
+				return;
+			}
+
+			// Recording notifications (hourly after conference)
+			if (event.cron === "0 * * * *") {
+				await triggerRecordingNotifications(event, env, ctx, true);
 				return;
 			}
 

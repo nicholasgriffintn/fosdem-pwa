@@ -47,6 +47,7 @@ type EventListProps = {
 		slug: string;
 		status: string;
 	}>;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 export function EventList({
@@ -70,6 +71,7 @@ export function EventList({
 	emptyStateTitle = "No events to show",
 	emptyStateMessage = "Adjust filters or pick another day to see more sessions.",
 	serverBookmarks,
+	onToggleWatchLater,
 }: EventListProps) {
 	const viewMode = (view as EventListViewModes) || defaultViewMode;
 	const sortByFavourites = sortFavourites === "true";
@@ -94,6 +96,7 @@ export function EventList({
 					user={user}
 					onCreateBookmark={onCreateBookmark}
 					serverBookmarks={serverBookmarks}
+					onToggleWatchLater={onToggleWatchLater}
 				/>
 			);
 		}
@@ -109,6 +112,7 @@ export function EventList({
 					sortByFavourites={sortByFavourites}
 					onCreateBookmark={onCreateBookmark}
 					serverBookmarks={serverBookmarks}
+					onToggleWatchLater={onToggleWatchLater}
 				/>
 			);
 		}
@@ -123,6 +127,7 @@ export function EventList({
 				sortByFavourites={sortByFavourites}
 				onCreateBookmark={onCreateBookmark}
 				serverBookmarks={serverBookmarks}
+				onToggleWatchLater={onToggleWatchLater}
 			/>
 		);
 	};

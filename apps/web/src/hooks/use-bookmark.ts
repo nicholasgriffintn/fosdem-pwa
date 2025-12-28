@@ -11,6 +11,13 @@ import { getLocalBookmarks, type LocalBookmark } from "~/lib/localStorage";
 type MergedBookmark = LocalBookmark & {
 	existsOnServer?: boolean;
 	serverId?: string;
+	watch_later?: boolean | null;
+	watch_status?: string | null;
+	watch_progress_seconds?: number | null;
+	playback_speed?: string | null;
+	attended?: boolean | null;
+	attended_in_person?: boolean | null;
+	attended_at?: string | null;
 };
 
 export function useBookmark({ year, slug }: { year: number; slug: string }): {

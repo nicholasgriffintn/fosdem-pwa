@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
 import { Icons } from "~/components/shared/Icons";
 import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
 import { usePlayer } from "~/contexts/PlayerContext";
 import { useOnlineStatus } from "~/hooks/use-online-status";
+import { useWatchLater } from "~/hooks/use-watch-later";
 import { isEventLive } from "~/lib/dateTime";
+import { getEventBookmark } from "~/server/functions/bookmarks";
+import { PlaybackSpeedControl } from "~/components/WatchLater/PlaybackSpeedControl";
+import { WatchLaterButton } from "~/components/WatchLater/WatchLaterButton";
 import type { ConferenceData, Event, TypeIds } from "~/types/fosdem";
 import { EventPlayerNotStarted } from "./components/NotStarted";
 
@@ -37,6 +43,23 @@ export function EventPlayer({
 		currentEventId: player.currentEvent?.id ?? null,
 		setPortalTarget: player.setPortalTarget,
 	});
+
+	const fetchBookmark = useServerFn(getEventBookmark);
+	const { data: bookmark } = useQuery({
+		queryKey: ["bookmark", year, event.id],
+		queryFn: () => fetchBookmark({ data: { year, slug: event.id } }),
+		staleTime: 60000,
+	});
+
+	const { toggle: toggleWatchLater } = useWatchLater({ year });
+
+	const handleSpeedChange = (speed: number) => {
+		if (player.videoRef.current) {
+			player.videoRef.current.playbackRate = speed;
+		}
+	};
+
+	const currentSpeed = player.videoRef.current?.playbackRate ?? 1;
 
 	useEffect(() => {
 		setIsMounted(true);
@@ -95,10 +118,12 @@ export function EventPlayer({
 	const hasPlayableMedia =
 		(eventIsLive && event.streams?.length) || hasRecordings;
 
+	const bookmarkData = bookmark ? { id: bookmark.id, watch_later: bookmark.watch_later } : null;
+
 	const handlePlay = () => {
 		if (streamUrl) {
 			player.setPortalTarget("event-page");
-			player.loadEvent(event, year, streamUrl, eventIsLive);
+			player.loadEvent(event, year, streamUrl, eventIsLive, bookmarkData);
 			player.play();
 		}
 	};
@@ -106,7 +131,7 @@ export function EventPlayer({
 	const handlePopOut = () => {
 		if (streamUrl) {
 			if (!player.currentEvent || player.currentEvent.id !== event.id) {
-				player.loadEvent(event, year, streamUrl, eventIsLive);
+				player.loadEvent(event, year, streamUrl, eventIsLive, bookmarkData);
 			}
 			player.setPortalTarget("floating");
 			player.play();
@@ -116,7 +141,7 @@ export function EventPlayer({
 	const handlePopBackIn = () => {
 		if (streamUrl) {
 			if (!player.currentEvent || player.currentEvent.id !== event.id) {
-				player.loadEvent(event, year, streamUrl, eventIsLive);
+				player.loadEvent(event, year, streamUrl, eventIsLive, bookmarkData);
 			}
 			player.setPortalTarget("event-page");
 			if (player.isPlaying) {
@@ -169,6 +194,25 @@ export function EventPlayer({
 								</button>
 							)}
 							<div id="event-page-video-portal" className="w-full h-full" />
+							{isThisEventPlaying && !eventIsLive && (
+								<div className="absolute top-2 left-2 z-20 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+									<PlaybackSpeedControl
+										currentSpeed={currentSpeed}
+										onSpeedChange={handleSpeedChange}
+										variant="icon"
+										className="text-white bg-black/60 hover:bg-black/80"
+									/>
+									{bookmark?.id && (
+										<WatchLaterButton
+											bookmarkId={bookmark.id}
+											isInWatchLater={bookmark.watch_later === true}
+											onToggle={toggleWatchLater}
+											variant="icon"
+											className="h-8 w-8 text-white bg-black/60 hover:bg-black/80 border-0"
+										/>
+									)}
+								</div>
+							)}
 							{isMounted && !isOnline && (
 								<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
 									<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">

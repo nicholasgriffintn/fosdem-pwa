@@ -38,6 +38,7 @@ type EventListProps = {
 		slug: string;
 		status: string;
 	}>;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 type EventListItemProps = {
@@ -64,6 +65,7 @@ type EventListItemProps = {
 	className?: string;
 	style?: React.CSSProperties;
 	actionSize?: "default" | "sm";
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 export function EventListItem({
@@ -79,6 +81,7 @@ export function EventListItem({
 	className,
 	style,
 	actionSize,
+	onToggleWatchLater,
 }: EventListItemProps) {
 	const hasConflicts = conflicts?.some(
 		(conflict) =>
@@ -199,6 +202,7 @@ export function EventListItem({
 								: "pt-1 lg:pt-0 lg:pl-6"
 						}
 						onCreateBookmark={onCreateBookmark}
+						onToggleWatchLater={onToggleWatchLater}
 					/>
 				</div>
 			</div>
@@ -216,6 +220,7 @@ export function EventItemList({
 	onCreateBookmark,
 	sortByFavourites = false,
 	serverBookmarks,
+	onToggleWatchLater,
 }: EventListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({
 		items: events,
@@ -238,6 +243,7 @@ export function EventItemList({
 							showTrack={showTrack}
 							user={user}
 							onCreateBookmark={onCreateBookmark}
+							onToggleWatchLater={onToggleWatchLater}
 						/>
 					</li>
 				))

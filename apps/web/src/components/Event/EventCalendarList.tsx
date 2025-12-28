@@ -28,6 +28,7 @@ type EventCalendarListProps = {
 		slug: string;
 		status: string;
 	}>;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 type EventCalendarListItemProps = {
@@ -50,6 +51,7 @@ type EventCalendarListItemProps = {
 		slug: string;
 		status: string;
 	}) => void;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 function EventCalendarListItem({
@@ -61,6 +63,7 @@ function EventCalendarListItem({
 	showTrack,
 	user,
 	onCreateBookmark,
+	onToggleWatchLater,
 }: EventCalendarListItemProps) {
 	const durationInMinutes =
 		Number.parseInt(event.duration.split(":")[0], 10) * 60 +
@@ -81,6 +84,7 @@ function EventCalendarListItem({
 			className="flex flex-col"
 			style={{ minHeight: itemHeight }}
 			actionSize="sm"
+			onToggleWatchLater={onToggleWatchLater}
 		/>
 	);
 }
@@ -95,6 +99,7 @@ export function EventCalendarList({
 	onCreateBookmark,
 	sortByFavourites = false,
 	serverBookmarks,
+	onToggleWatchLater,
 }: EventCalendarListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({
 		items: events,
@@ -124,6 +129,7 @@ export function EventCalendarList({
 									showTrack={showTrack}
 									user={user}
 									onCreateBookmark={onCreateBookmark}
+									onToggleWatchLater={onToggleWatchLater}
 								/>
 							))}
 						</div>

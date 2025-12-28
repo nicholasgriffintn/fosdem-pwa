@@ -5,6 +5,7 @@ import { useState } from "react";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { useBookmarks } from "~/hooks/use-bookmarks";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
+import { useWatchLater } from "~/hooks/use-watch-later";
 import { constants } from "~/constants";
 import { useFosdemData } from "~/hooks/use-fosdem-data";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
@@ -78,6 +79,7 @@ function BookmarksHome() {
 	const { view, tab } = Route.useSearch();
 	const { bookmarks, loading } = useBookmarks({ year });
 	const { create, update } = useMutateBookmark({ year });
+	const { toggle: toggleWatchLater } = useWatchLater({ year });
 	const { fosdemData } = useFosdemData({ year });
 	const { user, loading: authLoading } = useAuth();
 	const { user: serverUser } = useAuthSnapshot();
@@ -219,6 +221,7 @@ function BookmarksHome() {
 						onUpdateBookmark={handleUpdateBookmark}
 						user={resolvedUser}
 						onCreateBookmark={handleCreateBookmark}
+						onToggleWatchLater={toggleWatchLater}
 				/>
 			)}
 		</PageShell>

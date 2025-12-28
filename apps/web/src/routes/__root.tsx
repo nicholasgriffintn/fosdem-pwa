@@ -24,6 +24,7 @@ import { siteMeta } from "~/constants/site";
 import { PlayerProvider } from "~/contexts/PlayerContext";
 import { FloatingPlayer } from "~/components/FloatingPlayer";
 import { VideoPortal } from "~/components/VideoPlayer/VideoPortal";
+import { VideoProgressTracker } from "~/components/VideoPlayer/VideoProgressTracker";
 import { getSession } from "~/server/functions/session";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { BottomTabNav } from "~/components/BottomTabNav";
@@ -163,6 +164,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					<ServiceWorkerUpdater />
 					<FloatingPlayer />
 					<VideoPortal />
+					<VideoProgressTracker />
 				</main>
 
 				<ScriptOnce>

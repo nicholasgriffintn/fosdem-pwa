@@ -33,7 +33,16 @@ import {
   Users,
   ExternalLink,
   Gitlab,
-  Search
+  Search,
+  Check,
+  RefreshCw,
+  Folder,
+  FileText,
+  Target,
+  Gauge,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from "lucide-react";
 
 export const Icons = {
@@ -153,4 +162,13 @@ export const Icons = {
   search: Search,
   externalLink: ExternalLink,
   x: X,
+  check: Check,
+  refresh: RefreshCw,
+  folder: Folder,
+  fileText: FileText,
+  target: Target,
+  gauge: Gauge,
+  trendingUp: TrendingUp,
+  trendingDown: TrendingDown,
+  minus: Minus,
 };

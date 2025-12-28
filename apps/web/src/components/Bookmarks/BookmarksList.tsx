@@ -78,6 +78,7 @@ type BookmarksListProps = {
 		slug: string;
 		status: string;
 	}) => void;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 export function BookmarksList({
@@ -97,6 +98,7 @@ export function BookmarksList({
 	emptyStateTitle = "No bookmarks yet",
 	emptyStateMessage = "Start bookmarking events to see them here.",
 	onCreateBookmark,
+	onToggleWatchLater,
 }: BookmarksListProps) {
 	if (!bookmarks || bookmarks.length === 0) {
 		return (
@@ -270,6 +272,7 @@ export function BookmarksList({
 										user={user}
 										onCreateBookmark={onCreateBookmark}
 										serverBookmarks={bookmarkSnapshot}
+										onToggleWatchLater={onToggleWatchLater}
 									/>
 								</div>
 							)}

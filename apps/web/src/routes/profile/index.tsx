@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 
 import { useProfile } from "~/hooks/use-user-me";
 import { useBookmarks } from "~/hooks/use-bookmarks";
@@ -11,6 +11,8 @@ import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { SetBookmarksVisability } from "~/components/Profile/SetBookmarksVisability";
 import { PushNotifications } from "~/components/PushNotifications";
 import { UpgradeNotice } from "~/components/shared/UpgradeNotice";
+import { Button } from "~/components/ui/button";
+import { Icons } from "~/components/shared/Icons";
 import { buildHomeLink } from "~/lib/link-builder";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
@@ -129,6 +131,15 @@ function ProfilePage() {
           </div>
 
           <div className="w-full lg:flex-1 space-y-8">
+            <div className="flex flex-wrap gap-3">
+              <Button asChild variant="outline" className="no-underline">
+                <Link to="/profile/year-in-review" search={{ year }}>
+                  <Icons.star className="h-4 w-4 mr-2" />
+                  Year in Review
+                </Link>
+              </Button>
+            </div>
+
             {!resolvedUser.is_guest && <PushNotifications />}
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-foreground">Your Bookmarks</h2>

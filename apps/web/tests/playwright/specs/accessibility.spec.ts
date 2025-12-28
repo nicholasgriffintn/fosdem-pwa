@@ -20,7 +20,8 @@ const urlsToTest = [
   '/map?year=2026',
   '/signin?year=2026',
   '/privacy',
-  '/terms'
+  '/terms',
+  '/watch-later?year=2026&tab=all',
 ];
 
 test.describe('Accessibility Tests', () => {

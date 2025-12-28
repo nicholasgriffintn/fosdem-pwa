@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WatchLaterIndexRouteImport } from './routes/watch-later/index'
 import { Route as TermsIndexRouteImport } from './routes/terms/index'
 import { Route as SpeakersIndexRouteImport } from './routes/speakers/index'
 import { Route as SigninIndexRouteImport } from './routes/signin/index'
@@ -25,6 +26,7 @@ import { Route as TypeSlugRouteImport } from './routes/type/$slug'
 import { Route as TrackSlugRouteImport } from './routes/track/$slug'
 import { Route as SpeakersSlugRouteImport } from './routes/speakers/$slug'
 import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
+import { Route as ProfileYearInReviewRouteImport } from './routes/profile/year-in-review'
 import { Route as EventSlugRouteImport } from './routes/event/$slug'
 import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
 import { Route as ApiProxySubtitlesRouteImport } from './routes/api/proxy/subtitles'
@@ -47,6 +49,11 @@ import { Route as ApiAuthCallbackDiscordRouteImport } from './routes/api/auth/ca
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WatchLaterIndexRoute = WatchLaterIndexRouteImport.update({
+  id: '/watch-later/',
+  path: '/watch-later/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsIndexRoute = TermsIndexRouteImport.update({
@@ -122,6 +129,11 @@ const SpeakersSlugRoute = SpeakersSlugRouteImport.update({
 const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
   id: '/rooms/$roomId',
   path: '/rooms/$roomId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileYearInReviewRoute = ProfileYearInReviewRouteImport.update({
+  id: '/profile/year-in-review',
+  path: '/profile/year-in-review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventSlugRoute = EventSlugRouteImport.update({
@@ -218,6 +230,7 @@ const ApiAuthCallbackDiscordRoute = ApiAuthCallbackDiscordRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
+  '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/track/$slug': typeof TrackSlugRoute
@@ -233,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
+  '/watch-later': typeof WatchLaterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -254,6 +268,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
+  '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/track/$slug': typeof TrackSlugRoute
@@ -269,6 +284,7 @@ export interface FileRoutesByTo {
   '/signin': typeof SigninIndexRoute
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
+  '/watch-later': typeof WatchLaterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -291,6 +307,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/event/$slug': typeof EventSlugRoute
+  '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/track/$slug': typeof TrackSlugRoute
@@ -306,6 +323,7 @@ export interface FileRoutesById {
   '/signin/': typeof SigninIndexRoute
   '/speakers/': typeof SpeakersIndexRoute
   '/terms/': typeof TermsIndexRoute
+  '/watch-later/': typeof WatchLaterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -329,6 +347,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/event/$slug'
+    | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
     | '/track/$slug'
@@ -344,6 +363,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/speakers'
     | '/terms'
+    | '/watch-later'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -365,6 +385,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/event/$slug'
+    | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
     | '/track/$slug'
@@ -380,6 +401,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/speakers'
     | '/terms'
+    | '/watch-later'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -401,6 +423,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/event/$slug'
+    | '/profile/year-in-review'
     | '/rooms/$roomId'
     | '/speakers/$slug'
     | '/track/$slug'
@@ -416,6 +439,7 @@ export interface FileRouteTypes {
     | '/signin/'
     | '/speakers/'
     | '/terms/'
+    | '/watch-later/'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -438,6 +462,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventSlugRoute: typeof EventSlugRoute
+  ProfileYearInReviewRoute: typeof ProfileYearInReviewRoute
   RoomsRoomIdRoute: typeof RoomsRoomIdRoute
   SpeakersSlugRoute: typeof SpeakersSlugRoute
   TrackSlugRoute: typeof TrackSlugRoute
@@ -453,6 +478,7 @@ export interface RootRouteChildren {
   SigninIndexRoute: typeof SigninIndexRoute
   SpeakersIndexRoute: typeof SpeakersIndexRoute
   TermsIndexRoute: typeof TermsIndexRoute
+  WatchLaterIndexRoute: typeof WatchLaterIndexRoute
   ApiAuthDiscordRoute: typeof ApiAuthDiscordRoute
   ApiAuthGithubRoute: typeof ApiAuthGithubRoute
   ApiAuthGitlabRoute: typeof ApiAuthGitlabRoute
@@ -479,6 +505,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watch-later/': {
+      id: '/watch-later/'
+      path: '/watch-later'
+      fullPath: '/watch-later'
+      preLoaderRoute: typeof WatchLaterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms/': {
@@ -584,6 +617,13 @@ declare module '@tanstack/react-router' {
       path: '/rooms/$roomId'
       fullPath: '/rooms/$roomId'
       preLoaderRoute: typeof RoomsRoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/year-in-review': {
+      id: '/profile/year-in-review'
+      path: '/profile/year-in-review'
+      fullPath: '/profile/year-in-review'
+      preLoaderRoute: typeof ProfileYearInReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/event/$slug': {
@@ -718,6 +758,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventSlugRoute: EventSlugRoute,
+  ProfileYearInReviewRoute: ProfileYearInReviewRoute,
   RoomsRoomIdRoute: RoomsRoomIdRoute,
   SpeakersSlugRoute: SpeakersSlugRoute,
   TrackSlugRoute: TrackSlugRoute,
@@ -733,6 +774,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninIndexRoute: SigninIndexRoute,
   SpeakersIndexRoute: SpeakersIndexRoute,
   TermsIndexRoute: TermsIndexRoute,
+  WatchLaterIndexRoute: WatchLaterIndexRoute,
   ApiAuthDiscordRoute: ApiAuthDiscordRoute,
   ApiAuthGithubRoute: ApiAuthGithubRoute,
   ApiAuthGitlabRoute: ApiAuthGitlabRoute,

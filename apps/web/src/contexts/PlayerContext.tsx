@@ -20,6 +20,11 @@ import type { Event } from "~/types/fosdem";
 
 export type PortalTarget = "floating" | "event-page" | null;
 
+export interface PlayerBookmark {
+	id: string;
+	watch_later?: boolean;
+}
+
 interface PlayerContextValue {
 	videoRef: React.RefObject<HTMLVideoElement | null>;
 	currentEvent: Event | null;
@@ -32,12 +37,15 @@ interface PlayerContextValue {
 	isLive: boolean;
 	portalTarget: PortalTarget;
 	streamUrl: string | null;
+	bookmark: PlayerBookmark | null;
 	loadEvent: (
 		event: Event,
 		year: number,
 		streamUrl: string,
 		isLive: boolean,
+		bookmark?: PlayerBookmark | null,
 	) => void;
+	setBookmark: (bookmark: PlayerBookmark | null) => void;
 	play: () => void;
 	pause: () => void;
 	togglePlay: () => void;
@@ -65,6 +73,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 	const [volume, setVolumeState] = useState(1);
 	const [isLive, setIsLive] = useState(false);
 	const [streamUrl, setStreamUrl] = useState<string | null>(null);
+	const [bookmark, setBookmarkState] = useState<PlayerBookmark | null>(null);
 	const isClient = useIsClient();
 	const [portalTarget, setPortalTarget] = useState<PortalTarget>(null);
 
@@ -297,15 +306,22 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 	}, [currentEvent, year, isMinimized, streamUrl, isLive]);
 
 	const loadEvent = useCallback(
-		(event: Event, eventYear: number, url: string, live: boolean) => {
+		(event: Event, eventYear: number, url: string, live: boolean, eventBookmark?: PlayerBookmark | null) => {
 			setCurrentEvent(event);
 			setYear(eventYear);
 			setStreamUrl(url);
 			setIsLive(live);
 			setIsMinimized(false);
+			if (eventBookmark !== undefined) {
+				setBookmarkState(eventBookmark);
+			}
 		},
 		[],
 	);
+
+	const setBookmark = useCallback((newBookmark: PlayerBookmark | null) => {
+		setBookmarkState(newBookmark);
+	}, []);
 
 	const play = useCallback(() => {
 		pendingPlayRef.current = true;
@@ -391,6 +407,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 		setStreamUrl(null);
 		setIsMinimized(false);
 		setPortalTarget(null);
+		setBookmarkState(null);
 		clearPlayerState();
 	}, []);
 
@@ -407,7 +424,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			isLive,
 			portalTarget,
 			streamUrl,
+			bookmark,
 			loadEvent,
+			setBookmark,
 			play,
 			pause,
 			togglePlay,
@@ -430,7 +449,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			isLive,
 			portalTarget,
 			streamUrl,
+			bookmark,
 			loadEvent,
+			setBookmark,
 			play,
 			pause,
 			togglePlay,

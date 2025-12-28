@@ -3,6 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { FavouriteButton } from "~/components/shared/FavouriteButton";
 import { ShareButton } from "~/components/shared/ShareButton";
+import { WatchLaterButton } from "~/components/WatchLater/WatchLaterButton";
+import { AttendanceButton } from "~/components/Event/AttendanceButton";
+import { useWatchLater } from "~/hooks/use-watch-later";
+import { useAttendance } from "~/hooks/use-attendance";
 import { testLiveEvent, testConferenceData } from "~/data/test-data";
 import { getAllData } from "~/server/functions/fosdem";
 import { EventMain } from "~/components/Event/EventMain";
@@ -156,9 +160,14 @@ function EventPage() {
     slug: fosdem?.event?.id,
   });
   const { create: createBookmark } = useMutateBookmark({ year });
+  const { toggle: toggleWatchLater } = useWatchLater({ year });
+  const { markAttended, unmarkAttended } = useAttendance({ year });
   const onCreateBookmark = async (bookmark: any) => {
     await createBookmark(bookmark);
   };
+  const isBookmarked = bookmark?.status === "favourited" || serverBookmark?.status === "favourited";
+  const isInWatchLater = bookmark?.watch_later === true;
+  const isAttended = bookmark?.attended === true;
   const favouriteStatus = isClient
     ? resolveFavouriteStatus({
         bookmark,
@@ -241,6 +250,22 @@ function EventPage() {
             status={favouriteStatus}
             onCreateBookmark={onCreateBookmark}
           />
+          {isBookmarked && bookmark?.id && (
+            <>
+              <WatchLaterButton
+                bookmarkId={bookmark.id}
+                isInWatchLater={isInWatchLater}
+                onToggle={toggleWatchLater}
+                variant="icon"
+              />
+              <AttendanceButton
+                bookmarkId={bookmark.id}
+                isAttended={isAttended}
+                onMarkAttended={markAttended}
+                onUnmarkAttended={unmarkAttended}
+              />
+            </>
+          )}
           <ShareButton
             title={fosdem?.event?.title}
             text={`Check out ${fosdem?.event?.title} at FOSDEM`}
@@ -268,6 +293,16 @@ function EventPage() {
               status={favouriteStatus}
               onCreateBookmark={onCreateBookmark}
             />
+            {isBookmarked && bookmark?.id && (
+              <>
+                <WatchLaterButton
+                  bookmarkId={bookmark.id}
+                  isInWatchLater={isInWatchLater}
+                  onToggle={toggleWatchLater}
+                  variant="icon"
+                />
+              </>
+            )}
             <ShareButton
               title={fosdem?.event?.title}
               text={`Check out ${fosdem?.event?.title} at FOSDEM`}

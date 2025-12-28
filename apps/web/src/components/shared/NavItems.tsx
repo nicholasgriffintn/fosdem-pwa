@@ -33,6 +33,12 @@ export const navItems: NavItem[] = [
     mobile: true
   },
   {
+    title: "Watch Later",
+    href: "/watch-later",
+    icon: <Icons.clock className="h-4 w-4" />,
+    mobile: true
+  },
+  {
     title: "Search",
     href: "/search",
     icon: <Icons.search className="h-4 w-4" />,

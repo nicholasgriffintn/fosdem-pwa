@@ -4,13 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
-import { Spinner } from "~/components/shared/Spinner";
 import { toast } from "~/hooks/use-toast";
 import { useMutateSubscriptions } from "~/hooks/use-mutate-subscriptions";
 import { useSubscriptions } from "~/hooks/use-subscriptions";
 import { constants } from "~/constants";
 import { urlBase64ToUint8Array } from "~/lib/base64";
 import { LoadingState } from "~/components/shared/LoadingState";
+import { NotificationPreferences } from "./NotificationPreferences";
 
 export function PushNotifications() {
 	const { subscriptions, loading: subscriptionsLoading } = useSubscriptions();
@@ -281,6 +281,12 @@ export function PushNotifications() {
 						</div>
 					)}
 				</>
+			)}
+
+			{subscriptions && subscriptions.length > 0 && (
+				<div className="border-t pt-6 mt-6">
+					<NotificationPreferences />
+				</div>
 			)}
 		</div>
 	);

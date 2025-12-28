@@ -31,6 +31,7 @@ type EventScheduleListProps = {
 		slug: string;
 		status: string;
 	}>;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 type EventScheduleListItemProps = {
@@ -54,6 +55,7 @@ type EventScheduleListItemProps = {
 		slug: string;
 		status: string;
 	}) => void;
+	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
 function EventScheduleListItem({
@@ -66,6 +68,7 @@ function EventScheduleListItem({
 	showTrack,
 	user,
 	onCreateBookmark,
+	onToggleWatchLater,
 }: EventScheduleListItemProps) {
 	const transitionTime = nextEvent
 		? calculateTransitionTime(event, nextEvent)
@@ -85,6 +88,7 @@ function EventScheduleListItem({
 				user={user}
 				onCreateBookmark={onCreateBookmark}
 				actionSize="sm"
+				onToggleWatchLater={onToggleWatchLater}
 			/>
 			{transitionTime !== null && (
 				<div
@@ -128,6 +132,7 @@ export function EventScheduleList({
 	user,
 	onCreateBookmark,
 	serverBookmarks,
+	onToggleWatchLater,
 }: EventScheduleListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({
 		items: events,
@@ -150,6 +155,7 @@ export function EventScheduleList({
 						showTrack={showTrack}
 						user={user}
 						onCreateBookmark={onCreateBookmark}
+						onToggleWatchLater={onToggleWatchLater}
 					/>
 				</li>
 			))}

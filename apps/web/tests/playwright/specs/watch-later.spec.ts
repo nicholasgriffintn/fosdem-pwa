@@ -1,0 +1,11 @@
+import { test } from "@playwright/test";
+import { WatchLaterPage } from "../pages/WatchLaterPage";
+
+test.describe("Watch Later page", () => {
+	test("displays the page header and empty state for unauthenticated users", async ({ page }) => {
+		const watchLaterPage = new WatchLaterPage(page);
+		await watchLaterPage.goto();
+		await watchLaterPage.expectPageHeader();
+		await watchLaterPage.expectEmptyState();
+	});
+});
