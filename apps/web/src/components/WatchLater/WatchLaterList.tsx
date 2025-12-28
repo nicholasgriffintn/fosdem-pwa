@@ -50,19 +50,12 @@ export function WatchLaterList({
     })
     .filter((e): e is Event => e !== null);
 
-  const serverBookmarks = items.map((item) => ({
-    slug: item.slug,
-    status: "favourited",
-    id: item.id,
-    watch_later: true,
-  }));
-
   return (
     <EventItemList
       events={events}
       year={year}
       showTrack={true}
-      serverBookmarks={serverBookmarks}
+      serverBookmarks={items}
       onToggleWatchLater={onToggleWatchLater}
     />
   );

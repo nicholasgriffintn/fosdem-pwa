@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { Link } from "@tanstack/react-router";
 
 import type { Event } from "~/types/fosdem";
+import type { BookmarkSnapshot } from "~/lib/type-guards";
 import type { EventConflict } from "~/lib/fosdem";
 import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
 import { ItemActions } from "~/components/shared/ItemActions";
@@ -34,10 +35,7 @@ type EventListProps = {
 		slug: string;
 		status: string;
 	}) => void;
-	serverBookmarks?: Array<{
-		slug: string;
-		status: string;
-	}>;
+	serverBookmarks?: BookmarkSnapshot[];
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 };
 
