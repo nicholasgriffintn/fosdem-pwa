@@ -10,10 +10,11 @@ import { buildProfileLink } from "~/lib/link-builder";
 import { UserAvatar } from "~/components/shared/UserAvatar";
 
 type AvatarMenuProps = {
+	year: number;
 	user: SessionUser;
 };
 
-export function AvatarMenu({ user }: AvatarMenuProps) {
+export function AvatarMenu({ year, user }: AvatarMenuProps) {
 	const menuId = useId();
 	const checkboxRef = useRef<HTMLInputElement>(null);
 	const locationKey = useRouterState({
@@ -57,7 +58,9 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 				{user.is_guest && (
 					<>
 						<Link
-							{...buildProfileLink()}
+							{...buildProfileLink({
+								year
+							})}
 							className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
 						>
 							<Icons.user className="h-4 w-4" />
@@ -69,7 +72,9 @@ export function AvatarMenu({ user }: AvatarMenuProps) {
 					</>
 				)}
 				<Link
-					{...buildProfileLink()}
+					{...buildProfileLink({
+						year
+					})}
 					className="flex items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
 				>
 					View profile

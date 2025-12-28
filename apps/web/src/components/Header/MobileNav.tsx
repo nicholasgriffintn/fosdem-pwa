@@ -19,6 +19,7 @@ const mobileNavLinkActive = "bg-muted text-foreground";
 const mobileNavLinkDisabled = "cursor-not-allowed opacity-60";
 
 type MobileNavProps = {
+	year: number;
 	title: string;
 	items: NavItem[];
 	menuCheckboxRef?: React.RefObject<HTMLInputElement | null>;
@@ -28,6 +29,7 @@ type MobileNavProps = {
 };
 
 export function MobileNav({
+	year,
 	title,
 	items,
 	menuCheckboxRef,
@@ -162,7 +164,9 @@ export function MobileNav({
 						{user?.id ? (
 							<>
 								<Link
-									{...buildProfileLink({})}
+									{...buildProfileLink({
+										year,
+									})}
 									onClick={() => {
 										if (menuCheckboxRef?.current) {
 											menuCheckboxRef.current.checked = false;

@@ -34,11 +34,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
       <div className="container flex h-14 items-center justify-between gap-3">
-        <MainNav title="FOSDEM PWA" items={navItems} />
+        <MainNav title="FOSDEM PWA" items={navItems} year={selectedYear} />
         <div className="flex flex-1 min-w-0 items-center justify-end gap-3">
           <div className="hidden lg:flex items-center gap-2 shrink-0">
             {resolvedUser?.id ? (
-              <AvatarMenu user={resolvedUser} />
+              <AvatarMenu year={selectedYear} user={resolvedUser} />
             ) : resolvedLoading ? (
               <TooltipProvider>
                 <Tooltip>

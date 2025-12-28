@@ -15,9 +15,10 @@ const navLinkDisabled = "cursor-not-allowed opacity-80";
 type MainNavProps = {
   title: string;
   items?: NavItem[];
+  year: number;
 };
 
-export function MainNav({ title, items }: MainNavProps) {
+export function MainNav({ title, items, year }: MainNavProps) {
   const menuCheckboxRef = useRef<HTMLInputElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
@@ -112,7 +113,8 @@ export function MainNav({ title, items }: MainNavProps) {
         </nav>
       ) : null}
 			{items && (
-				<MobileNav
+        <MobileNav
+          year={year}
           title={title}
 					items={items}
 					menuCheckboxRef={menuCheckboxRef}
