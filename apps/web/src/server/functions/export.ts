@@ -108,6 +108,9 @@ export const importBookmarksCsv = createServerFn({
     let importedTracks = 0;
     const notFound: Array<{ type?: string; id: string }> = [];
 
+    const upsertOperations: Array<Promise<unknown>> = [];
+    const updateOperations: Array<Promise<unknown>> = [];
+
     for (const row of rows) {
       const id = String(row.id).trim();
       if (!id) continue;
@@ -119,9 +122,9 @@ export const importBookmarksCsv = createServerFn({
           notFound.push({ type: "event", id });
           continue;
         }
-        await upsertBookmark(user.id, yearNum, "event", slug, "favourited");
+        upsertOperations.push(upsertBookmark(user.id, yearNum, "event", slug, "favourited"));
         if (priority !== null) {
-          await updateBookmark(generateBookmarkId(user.id, yearNum, slug), user.id, { priority });
+          updateOperations.push(updateBookmark(generateBookmarkId(user.id, yearNum, slug), user.id, { priority }));
         }
         importedEvents++;
         continue;
@@ -133,16 +136,16 @@ export const importBookmarksCsv = createServerFn({
           notFound.push({ type: "track", id });
           continue;
         }
-        await upsertBookmark(user.id, yearNum, "track", slug, "favourited");
+        upsertOperations.push(upsertBookmark(user.id, yearNum, "track", slug, "favourited"));
         importedTracks++;
         continue;
       }
 
       const eventSlug = eventIdToSlug.get(id);
       if (eventSlug) {
-        await upsertBookmark(user.id, yearNum, "event", eventSlug, "favourited");
+        upsertOperations.push(upsertBookmark(user.id, yearNum, "event", eventSlug, "favourited"));
         if (priority !== null) {
-          await updateBookmark(generateBookmarkId(user.id, yearNum, eventSlug), user.id, { priority });
+          updateOperations.push(updateBookmark(generateBookmarkId(user.id, yearNum, eventSlug), user.id, { priority }));
         }
         importedEvents++;
         continue;
@@ -150,13 +153,15 @@ export const importBookmarksCsv = createServerFn({
 
       const trackSlug = trackIdToSlug.get(id);
       if (trackSlug) {
-        await upsertBookmark(user.id, yearNum, "track", trackSlug, "favourited");
+        upsertOperations.push(upsertBookmark(user.id, yearNum, "track", trackSlug, "favourited"));
         importedTracks++;
         continue;
       }
 
       notFound.push({ id });
     }
+
+    await Promise.all([...upsertOperations, ...updateOperations]);
 
     return {
       success: true,

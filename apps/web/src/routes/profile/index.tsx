@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 import { useProfile } from "~/hooks/use-user-me";
 import { useBookmarks } from "~/hooks/use-bookmarks";

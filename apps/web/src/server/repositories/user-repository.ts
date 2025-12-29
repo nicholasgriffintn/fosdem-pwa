@@ -10,7 +10,7 @@ import { createStandardDate } from "~/lib/dateTime";
 import { CacheManager } from "~/server/cache";
 import { CacheKeys } from "~/server/lib/cache-keys";
 
-const cache = new CacheManager();
+const cache = CacheManager.getInstance();
 
 export function normalizeUserId(userId: string): string {
   return userId.trim().replace(/^@/, "").toLowerCase();

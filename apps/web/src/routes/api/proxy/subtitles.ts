@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { constants } from "~/constants";
 
 const ALLOWED_SUBTITLE_HOSTS = [
 	"fosdem.org",
@@ -8,7 +9,6 @@ const ALLOWED_SUBTITLE_HOSTS = [
 	"r2.fosdempwa.com",
 	"dosowisko.net",
 ];
-const FETCH_TIMEOUT_MS = 8000;
 
 export const Route = createFileRoute("/api/proxy/subtitles")({
 	server: {
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/api/proxy/subtitles")({
 					const controller = new AbortController();
 					const timeout = setTimeout(
 						() => controller.abort(),
-						FETCH_TIMEOUT_MS,
+						constants.FETCH.TIMEOUT_MS,
 					);
 					const conditionalHeaders: Record<string, string> = {};
 					const ifNoneMatch = request.headers.get("if-none-match");

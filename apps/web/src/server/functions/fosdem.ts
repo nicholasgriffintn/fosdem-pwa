@@ -11,7 +11,7 @@ const getCacheTTL = (year: number): number => {
 	return year === constants.DEFAULT_YEAR ? CONSTANTS.CURRENT_YEAR_TTL : CONSTANTS.PAST_YEAR_TTL;
 };
 
-const cache = new CacheManager();
+const cache = CacheManager.getInstance();
 
 const getFullData = async (year: number): Promise<Conference> => {
 	if (!isValidYear(year)) {

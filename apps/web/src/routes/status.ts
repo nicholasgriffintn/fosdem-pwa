@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/status")({
 	server: {
 		handlers: {
-			GET: async ({ request }: { request: Request }) => {
+			GET: async () => {
 				return new Response(JSON.stringify({ status: "ok" }), {
 					status: 200,
 					headers: { "Content-Type": "application/json" },

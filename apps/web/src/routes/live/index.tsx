@@ -4,7 +4,6 @@ import { PageHeader } from "~/components/shared/PageHeader";
 import { EventList } from "~/components/Event/EventList";
 import { getAllData } from "~/server/functions/fosdem";
 import { testLiveEvents, testConferenceData } from "~/data/test-data";
-import type { Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { isEventLive, isEventUpcoming } from "~/lib/dateTime";
 import { sortEvents, sortUpcomingEvents } from "~/lib/sorting";

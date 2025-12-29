@@ -1,3 +1,5 @@
+import { TIMEOUT } from "dns";
+
 export const constants = {
 	TIME_ZONE: "Europe/Brussels",
 	TURNSTILE_SITE_KEY: "0x4AAAAAAA4mg92kNkVgcTr6",
@@ -43,4 +45,10 @@ export const constants = {
 		U: { id: "U" },
 		K: { id: "K" },
 	},
+	FETCH: {
+		TIMEOUT_MS: 8000,
+	},
+	TTL: {
+		ROOM_STATUS_SECONDS: 60,
+	}
 };

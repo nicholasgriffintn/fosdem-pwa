@@ -204,13 +204,11 @@ export const updateBookmark = createServerFn({
 			return null;
 		}
 
-		const existingBookmark = await findBookmarkById(id, user.id);
-		if (!existingBookmark) {
-			return err("Bookmark not found", 404);
-		}
-
 		try {
-			await updateBookmarkRepo(id, user.id, safeUpdates);
+			const updated = await updateBookmarkRepo(id, user.id, safeUpdates);
+			if (!updated) {
+				return err("Bookmark not found", 404);
+			}
 			return ok(true);
 		} catch (error) {
 			console.error(error);
@@ -254,13 +252,11 @@ export const deleteBookmark = createServerFn({
 			return null;
 		}
 
-		const existingBookmark = await findBookmarkById(id, user.id);
-		if (!existingBookmark) {
-			return err("Bookmark not found", 404);
-		}
-
 		try {
-			await deleteBookmarkRepo(id, user.id);
+			const deleted = await deleteBookmarkRepo(id, user.id);
+			if (!deleted) {
+				return err("Bookmark not found", 404);
+			}
 			return ok(true);
 		} catch (error) {
 			console.error(error);

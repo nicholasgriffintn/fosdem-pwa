@@ -24,6 +24,7 @@ import { CacheManager } from "~/server/cache";
 
 describe("CacheManager", () => {
 	beforeEach(() => {
+		CacheManager.resetInstance();
 		mockEnv.KV_CACHING_ENABLED = "false";
 		mockKV.get.mockReset();
 		mockKV.put.mockReset();

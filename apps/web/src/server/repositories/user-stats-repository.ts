@@ -25,32 +25,23 @@ export async function upsertUserConferenceStats(
   year: number,
   stats: Partial<Omit<UserConferenceStats, "id" | "user_id" | "year" | "created_at" | "updated_at">>,
 ): Promise<UserConferenceStats> {
-  const existing = await findUserConferenceStats(userId, year);
-
-  if (existing) {
-    const [updated] = await db
-      .update(userConferenceStatsTable)
-      .set(stats)
-      .where(
-        and(
-          eq(userConferenceStatsTable.user_id, userId),
-          eq(userConferenceStatsTable.year, year),
-        ),
-      )
-      .returning();
-    return updated;
-  }
-
-  const [created] = await db
+  const [result] = await db
     .insert(userConferenceStatsTable)
     .values({
       user_id: userId,
       year,
       ...stats,
     })
+    .onConflictDoUpdate({
+      target: [userConferenceStatsTable.user_id, userConferenceStatsTable.year],
+      set: {
+        ...stats,
+        updated_at: sql`CURRENT_TIMESTAMP`,
+      },
+    })
     .returning();
 
-  return created;
+  return result;
 }
 
 export async function calculateAndUpdateUserStats(

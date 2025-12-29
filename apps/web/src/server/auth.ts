@@ -28,7 +28,7 @@ import { randomInt, randomBase32 } from "~/server/lib/random";
 
 export const SESSION_COOKIE_NAME = "session";
 const TTL = 60 * 60 * 24 * 30;
-const cache = new CacheManager();
+const cache = CacheManager.getInstance();
 
 export function generateSessionToken(): string {
 	const bytes = new Uint8Array(20);
@@ -102,8 +102,10 @@ export async function validateSessionToken(token: string) {
 		session.expires_at = newExpiresAt;
 		session.last_extended_at = newLastExtendedAt;
 
+		const result = { session, user };
+
 		await Promise.all([
-			cache.set(CacheKeys.session(sessionId), { session, user }, TTL),
+			cache.set(CacheKeys.session(sessionId), result, TTL),
 			db
 				.update(sessionTable)
 				.set({
@@ -112,6 +114,8 @@ export async function validateSessionToken(token: string) {
 				})
 				.where(eq(sessionTable.id, sessionId)),
 		]);
+
+		return result;
 	}
 
 	const result = { session, user };

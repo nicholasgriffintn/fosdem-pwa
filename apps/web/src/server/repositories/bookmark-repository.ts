@@ -123,12 +123,14 @@ export async function updateBookmark(
     | "attended_at"
     | "attended_in_person"
   >>,
-): Promise<void> {
-  await db.update(bookmarkTable).set(updates).where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
+): Promise<boolean> {
+  const result = await db.update(bookmarkTable).set(updates).where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
+  return (result.meta.changes ?? 0) > 0;
 }
 
-export async function deleteBookmark(id: string, userId: number): Promise<void> {
-  await db.delete(bookmarkTable).where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
+export async function deleteBookmark(id: string, userId: number): Promise<boolean> {
+  const result = await db.delete(bookmarkTable).where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
+  return (result.meta.changes ?? 0) > 0;
 }
 
 export async function findWatchLaterBookmarks(
@@ -164,27 +166,20 @@ export async function updateWatchProgress(
   progressSeconds: number,
   playbackSpeed?: string,
 ): Promise<void> {
-  const updates: Partial<Bookmark> = {
+  const updates: Record<string, unknown> = {
     watch_progress_seconds: progressSeconds,
     last_watched_at: new Date().toISOString(),
+    watch_status: sql`CASE WHEN ${bookmarkTable.watch_status} = 'unwatched' AND ${progressSeconds} > 0 THEN 'watching' ELSE ${bookmarkTable.watch_status} END`,
   };
 
   if (playbackSpeed) {
     updates.playback_speed = playbackSpeed;
   }
 
-  const result = await db
+  await db
     .update(bookmarkTable)
     .set(updates)
-    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)))
-    .returning({ watch_status: bookmarkTable.watch_status });
-
-  if (result.length > 0 && progressSeconds > 0 && result[0].watch_status === "unwatched") {
-    await db
-      .update(bookmarkTable)
-      .set({ watch_status: "watching" })
-      .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
-  }
+    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
 }
 
 export async function markAsWatched(

@@ -3,8 +3,10 @@ import { CONSTANTS } from "~/server/constants";
 import { LRUCache } from "~/server/lib/lru-cache";
 
 export class CacheManager {
-	private kvCache: KVNamespace | null;
-	private memoryCache: LRUCache;
+	private static instance: CacheManager | null = null;
+
+	private kvCache: KVNamespace | null = null;
+	private memoryCache!: LRUCache;
 	private readonly PREFIX = "fosdem:";
 	private readonly TTL = CONSTANTS.DEFAULT_TTL;
 	private readonly MAX_MEMORY_ENTRIES = 1000;
@@ -12,16 +14,30 @@ export class CacheManager {
 	private readonly CLEANUP_INTERVAL = 5 * 60 * 1000;
 
 	constructor() {
+		if (CacheManager.instance) {
+			return CacheManager.instance;
+		}
+
 		if (
 			env.KV_CACHING_ENABLED === "true" &&
 			env.KV
 		) {
 			this.kvCache = env.KV;
-		} else {
-			this.kvCache = null;
 		}
 
 		this.memoryCache = new LRUCache(this.MAX_MEMORY_ENTRIES);
+		CacheManager.instance = this;
+	}
+
+	static getInstance(): CacheManager {
+		if (!CacheManager.instance) {
+			CacheManager.instance = new CacheManager();
+		}
+		return CacheManager.instance;
+	}
+
+	static resetInstance(): void {
+		CacheManager.instance = null;
 	}
 
 	private maybeCleanup(): void {
