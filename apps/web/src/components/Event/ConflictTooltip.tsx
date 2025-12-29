@@ -3,11 +3,13 @@
 import { useState } from "react";
 
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "~/components/ui/tooltip";
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "~/components/ui/dialog";
 import { Icons } from "~/components/shared/Icons";
 import type { EventConflict } from "~/lib/fosdem";
 import type { Event } from "~/types/fosdem";
@@ -72,78 +74,98 @@ export function ConflictTooltip({
 	};
 
 	return (
-		<TooltipProvider>
-			<Tooltip open={isOpen} onOpenChange={setIsOpen}>
-				<TooltipTrigger asChild>
-					<div className={className}>
-						<div
-							className={`w-6 h-6 rounded-full flex items-center justify-center ${getPriorityColor(priority)}`}
-						>
-							{priority ? (
-								<span className="font-semibold text-sm">{priority}</span>
-							) : (
+		<Dialog open={isOpen} onOpenChange={setIsOpen}>
+			<DialogTrigger asChild>
+				<Button
+					variant="outline"
+					size="sm"
+					className={`${className} ${getPriorityColor(priority)} hover:opacity-90`}
+				>
+					<div className="flex items-center gap-1.5">
+						{priority ? (
+							<>
+								<span className="font-semibold text-sm">Priority {priority}</span>
+							</>
+						) : (
+								<>
 								<Icons.alertTriangle className="h-4 w-4" />
-							)}
-						</div>
-					</div>
-				</TooltipTrigger>
-				<TooltipContent className="w-[300px]">
-					<div className="space-y-3">
-						<div>
-							<p className="font-semibold">Schedule Conflicts:</p>
-							<div className="max-h-[200px] overflow-y-auto">
-								<ul className="text-sm list-disc list-inside">
-									{eventConflicts.map((conflict) => {
-										const otherEvent =
-											conflict.event1.id === event.id
-												? conflict.event2
-												: conflict.event1;
-										const otherEventPriority = otherEvent.priority;
-										return (
-											<li
-												key={otherEvent.id}
-												className="flex items-center gap-2"
-											>
-												<span className="truncate">
-													Overlaps with "{otherEvent.title}" by{" "}
-													{conflict.overlapDuration} minutes
-													{otherEventPriority &&
-														` (Priority: ${otherEventPriority})`}
-												</span>
-											</li>
-										);
-									})}
-								</ul>
-							</div>
-						</div>
-						{onSetPriority && (
-							<div className="border-t pt-2">
-								<p className="text-sm mb-2">
-									Prioritize this event over its conflicts?
-								</p>
-								<div className="flex gap-1">
-									<Button
-										size="sm"
-										variant={priority === 1 ? "default" : "outline"}
-										onClick={() => handleSetPriority(1)}
-									>
-										Yes, attend this
-									</Button>
-									{priority && (
-										<Button
-											size="sm"
-											variant="ghost"
-											onClick={() => handleSetPriority(0)}
-										>
-											Clear
-										</Button>
-									)}
-								</div>
-							</div>
+									<span className="font-medium text-sm">Resolve Conflict</span>
+								</>
 						)}
 					</div>
-				</TooltipContent>
-			</Tooltip>
-		</TooltipProvider>
+				</Button>
+			</DialogTrigger>
+			<DialogContent className="sm:max-w-[500px]">
+				<DialogHeader>
+					<DialogTitle>Schedule Conflicts</DialogTitle>
+					<DialogDescription>
+						"{event.title}" overlaps with {eventConflicts.length} other bookmarked event{eventConflicts.length > 1 ? "s" : ""}.
+					</DialogDescription>
+				</DialogHeader>
+				<div className="space-y-4">
+					<div>
+						<p className="font-semibold mb-2 text-sm">Conflicting Events:</p>
+						<div className="max-h-[300px] overflow-y-auto pr-2">
+							<ul className="space-y-2">
+								{eventConflicts.map((conflict) => {
+									const otherEvent =
+										conflict.event1.id === event.id
+											? conflict.event2
+											: conflict.event1;
+									const otherEventPriority = otherEvent.priority;
+									return (
+										<li
+											key={otherEvent.id}
+											className="text-sm bg-muted p-3 rounded-md"
+										>
+											<div className="font-medium break-words">
+												{otherEvent.title}
+											</div>
+											<div className="text-xs text-muted-foreground mt-1">
+												Overlaps by {conflict.overlapDuration} minutes
+												{otherEventPriority &&
+													` • Priority: ${otherEventPriority}`}
+											</div>
+										</li>
+									);
+								})}
+							</ul>
+						</div>
+					</div>
+					{onSetPriority && (
+						<div className="border-t pt-4">
+							<p className="text-sm mb-3 font-medium break-words">
+								Do you want to attend this event?
+							</p>
+							<div className="flex gap-2 flex-col sm:flex-row">
+								<Button
+									size="sm"
+									variant={priority === 1 ? "default" : "outline"}
+									onClick={() => handleSetPriority(1)}
+									className="flex-1 justify-center"
+								>
+									<Icons.check className="h-4 w-4 mr-1 flex-shrink-0" />
+									<span>Yes, attend this event</span>
+								</Button>
+								{priority && (
+									<Button
+										size="sm"
+										variant="ghost"
+										onClick={() => handleSetPriority(0)}
+									>
+										Clear priority
+									</Button>
+								)}
+							</div>
+							{!priority && (
+								<p className="text-xs text-muted-foreground mt-2">
+									This will set this event as your priority and mark conflicting events as lower priority.
+								</p>
+							)}
+						</div>
+					)}
+				</div>
+			</DialogContent>
+		</Dialog>
 	);
 }
