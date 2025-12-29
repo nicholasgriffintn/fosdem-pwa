@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 
 import { LoadingState } from "~/components/shared/LoadingState";
 import { EventList } from "~/components/Event/EventList";
@@ -107,36 +108,22 @@ export function BookmarksList({
 	onCreateBookmark,
 	onToggleWatchLater,
 }: BookmarksListProps) {
-	if (!bookmarks || bookmarks.length === 0) {
-		return (
-			<EmptyStateCard
-				title={emptyStateTitle}
-				description={emptyStateMessage}
-				className="my-6"
-			/>
-		);
-	}
+	const organizedBookmarks = useMemo(() => {
+		if (!bookmarks || bookmarks.length === 0) return {};
+		return organizeBookmarks(bookmarks);
+	}, [bookmarks]);
 
-	const organizedBookmarks = organizeBookmarks(bookmarks);
+	const bookmarkSnapshot = useMemo(
+		() =>
+			bookmarks?.map((bookmark) => ({
+				slug: bookmark.slug,
+				status: bookmark.status,
+			})) || [],
+		[bookmarks]
+	);
 
-	const handleSetPriority = (eventId: string, updates: { priority: number | null }) => {
-		const bookmark = bookmarks.find((b) => {
-			const event = fosdemData?.events[b.slug];
-			return event?.id === eventId;
-		});
-
-		if (bookmark && onUpdateBookmark) {
-			onUpdateBookmark({
-				id: bookmark.id,
-				serverId: bookmark.serverId,
-				updates,
-			});
-		}
-	};
-
-	const getFormattedData = () => {
+	const { tracks, events, conflicts } = useMemo(() => {
 		if (!bookmarks?.length || !fosdemData) {
-			console.warn("No bookmarks or fosdemData");
 			return { tracks: [], events: [], conflicts: [] };
 		}
 
@@ -159,33 +146,59 @@ export function BookmarksList({
 			? detectEventConflicts(formattedEvents, year)
 			: [];
 
+		const validEvents = Object.values(fosdemData.events).filter(isEvent);
+
 		const formattedTracks = bookmarkedTracks
 			.map((bookmark) => {
 				const track = fosdemData.tracks[bookmark.slug];
 				if (!track || !isTrack(track)) return null;
+
+				const eventCount = validEvents.filter(
+					(event) => doesEventMatchTrack(event, track)
+				).length;
+
 				return {
 					id: track.id,
 					name: track.name,
 					room: track.room,
-					eventCount: Object.values(fosdemData.events).filter(
-						(event) => isEvent(event) && doesEventMatchTrack(event, track)
-					).length,
+					eventCount,
 				} as Track;
 			})
 			.filter((track): track is NonNullable<typeof track> => track !== null)
 			.sort(sortTracks);
 
 		return { tracks: formattedTracks, events: formattedEvents, conflicts };
+	}, [bookmarks, fosdemData, year, organizedBookmarks, showConflicts]);
+
+	const days = useMemo(
+		() => (fosdemData ? Object.values(fosdemData.days) : []),
+		[fosdemData]
+	);
+
+	const handleSetPriority = (eventId: string, updates: { priority: number | null }) => {
+		const bookmark = bookmarks?.find((b) => {
+			const event = fosdemData?.events[b.slug];
+			return event?.id === eventId;
+		});
+
+		if (bookmark && onUpdateBookmark) {
+			onUpdateBookmark({
+				id: bookmark.id,
+				serverId: bookmark.serverId,
+				updates,
+			});
+		}
 	};
 
-	const { tracks, events, conflicts } = getFormattedData();
-
-	const days = fosdemData ? Object.values(fosdemData.days) : [];
-	const bookmarkSnapshot =
-		bookmarks?.map((bookmark) => ({
-			slug: bookmark.slug,
-			status: bookmark.status,
-		})) || [];
+	if (!bookmarks || bookmarks.length === 0) {
+		return (
+			<EmptyStateCard
+				title={emptyStateTitle}
+				description={emptyStateMessage}
+				className="my-6"
+			/>
+		);
+	}
 
 	if (tracks.length === 0 && events.length === 0) {
 		return (
