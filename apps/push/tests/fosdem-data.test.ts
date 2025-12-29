@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 vi.mock("../src/constants", () => ({
 	constants: {
 		YEAR: 2026,
-		DATA_LINK: "https://example.com/fosdem-${YEAR}.json",
+		DATA_LINK: "https://example.com/fosdem-${YEAR}-events.json",
 		DAYS_MAP: {},
 	},
 }));
