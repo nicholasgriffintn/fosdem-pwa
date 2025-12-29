@@ -8,7 +8,8 @@ export class CacheManager {
 	private readonly PREFIX = "fosdem:";
 	private readonly TTL = CONSTANTS.DEFAULT_TTL;
 	private readonly MAX_MEMORY_ENTRIES = 1000;
-	private cleanupInterval: ReturnType<typeof setInterval> | null = null;
+	private lastCleanup = 0;
+	private readonly CLEANUP_INTERVAL = 5 * 60 * 1000;
 
 	constructor() {
 		if (
@@ -21,11 +22,13 @@ export class CacheManager {
 		}
 
 		this.memoryCache = new LRUCache(this.MAX_MEMORY_ENTRIES);
+	}
 
-		if (typeof setInterval !== 'undefined') {
-			this.cleanupInterval = setInterval(() => {
-				this.memoryCache.cleanup();
-			}, 5 * 60 * 1000);
+	private maybeCleanup(): void {
+		const now = Date.now();
+		if (now - this.lastCleanup > this.CLEANUP_INTERVAL) {
+			this.memoryCache.cleanup();
+			this.lastCleanup = now;
 		}
 	}
 
@@ -34,6 +37,7 @@ export class CacheManager {
 	}
 
 	async get(key: string) {
+		this.maybeCleanup();
 		const prefixedKey = this.getKey(key);
 
 		if (this.kvCache) {
@@ -99,10 +103,4 @@ export class CacheManager {
 		}
 	}
 
-	destroy(): void {
-		if (this.cleanupInterval) {
-			clearInterval(this.cleanupInterval);
-			this.cleanupInterval = null;
-		}
-	}
 }
