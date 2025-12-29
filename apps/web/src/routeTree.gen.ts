@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TesterIndexRouteImport } from './routes/tester/index'
 import { Route as TermsIndexRouteImport } from './routes/terms/index'
@@ -46,6 +47,11 @@ import { Route as ApiAuthCallbackGitlabRouteImport } from './routes/api/auth/cal
 import { Route as ApiAuthCallbackGithubRouteImport } from './routes/api/auth/callback.github'
 import { Route as ApiAuthCallbackDiscordRouteImport } from './routes/api/auth/callback.discord'
 
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -229,6 +235,7 @@ const ApiAuthCallbackDiscordRoute = ApiAuthCallbackDiscordRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/status': typeof StatusRoute
   '/event/$slug': typeof EventSlugRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
@@ -267,6 +274,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/status': typeof StatusRoute
   '/event/$slug': typeof EventSlugRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
@@ -306,6 +314,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/status': typeof StatusRoute
   '/event/$slug': typeof EventSlugRoute
   '/profile/year-in-review': typeof ProfileYearInReviewRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
@@ -346,6 +355,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/status'
     | '/event/$slug'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
@@ -384,6 +394,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/status'
     | '/event/$slug'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
@@ -422,6 +433,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/status'
     | '/event/$slug'
     | '/profile/year-in-review'
     | '/rooms/$roomId'
@@ -461,6 +473,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  StatusRoute: typeof StatusRoute
   EventSlugRoute: typeof EventSlugRoute
   ProfileYearInReviewRoute: typeof ProfileYearInReviewRoute
   RoomsRoomIdRoute: typeof RoomsRoomIdRoute
@@ -500,6 +513,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -757,6 +777,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  StatusRoute: StatusRoute,
   EventSlugRoute: EventSlugRoute,
   ProfileYearInReviewRoute: ProfileYearInReviewRoute,
   RoomsRoomIdRoute: RoomsRoomIdRoute,
