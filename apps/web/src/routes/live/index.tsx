@@ -59,7 +59,7 @@ export const Route = createFileRoute("/live/")({
 			}),
 		],
 	}),
-	staleTime: 10_000,
+	staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
 function LivePage() {

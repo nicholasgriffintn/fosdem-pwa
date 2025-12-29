@@ -46,7 +46,7 @@ export function useBookmarks({
 	const { data: localBookmarks, isLoading: localLoading } = useQuery({
 		queryKey: localQueryKey,
 		queryFn: () => getLocalBookmarks(year),
-		staleTime: 60 * 1000,
+		staleTime: 1000 * 60 * 5, // 5 minutes
 		gcTime: 10 * 60 * 1000,
 	});
 

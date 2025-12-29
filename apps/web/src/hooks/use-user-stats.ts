@@ -8,9 +8,16 @@ import {
   refreshUserStats,
   getUserStatsHistory,
 } from "~/server/functions/user-stats";
+import type { UserConferenceStats } from "~/server/db/schema";
 import { sessionQueryKeys } from "../lib/query-keys";
 
-export function useUserStats({ year }: { year: number }) {
+export function useUserStats({
+  year,
+  initialData,
+}: {
+  year: number;
+  initialData?: UserConferenceStats | null;
+}) {
   const queryClient = useQueryClient();
   const fetchStats = useServerFn(getUserStats);
   const refreshStatsFn = useServerFn(refreshUserStats);
@@ -20,6 +27,7 @@ export function useUserStats({ year }: { year: number }) {
   const { data: stats, isLoading } = useQuery({
     queryKey,
     queryFn: () => fetchStats({ data: { year } }),
+    initialData,
   });
 
   const refreshMutation = useMutation({
