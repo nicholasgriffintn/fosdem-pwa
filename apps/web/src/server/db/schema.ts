@@ -171,6 +171,11 @@ export const note = sqliteTable(
 		return {
 			yearIdx: index("note_year_idx").on(table.year),
 			slugIdx: index("note_slug_idx").on(table.slug),
+			userYearSlugIdx: index("note_user_year_slug_idx").on(
+				table.user_id,
+				table.year,
+				table.slug,
+			),
 		};
 	},
 );

@@ -57,51 +57,38 @@ export async function calculateAndUpdateUserStats(
   userId: number,
   year: number,
 ): Promise<UserConferenceStats> {
-  const bookmarks = await db
-    .select()
-    .from(bookmarkTable)
-    .where(
-      and(
-        eq(bookmarkTable.user_id, userId),
-        eq(bookmarkTable.year, year),
-        eq(bookmarkTable.status, "favourited"),
+  const [bookmarkStats, notesResult] = await Promise.all([
+    db
+      .select({
+        eventsBookmarked: sql<number>`COUNT(CASE WHEN type = 'bookmark_event' THEN 1 END)`,
+        eventsAttended: sql<number>`COUNT(CASE WHEN type = 'bookmark_event' AND attended = 1 THEN 1 END)`,
+        eventsAttendedInPerson: sql<number>`COUNT(CASE WHEN type = 'bookmark_event' AND attended_in_person = 1 THEN 1 END)`,
+        eventsWatched: sql<number>`COUNT(CASE WHEN type = 'bookmark_event' AND watch_status = 'watched' THEN 1 END)`,
+        tracksCovered: sql<number>`COUNT(CASE WHEN type = 'bookmark_track' THEN 1 END)`,
+        totalWatchTime: sql<number>`COALESCE(SUM(CASE WHEN type = 'bookmark_event' THEN watch_progress_seconds END), 0)`,
+      })
+      .from(bookmarkTable)
+      .where(
+        and(
+          eq(bookmarkTable.user_id, userId),
+          eq(bookmarkTable.year, year),
+          eq(bookmarkTable.status, "favourited"),
+        ),
       ),
-    );
-
-  const eventBookmarks = bookmarks.filter(
-    (b) => b.type === "bookmark_event",
-  );
-  const eventsBookmarked = eventBookmarks.length;
-  const eventsAttended = eventBookmarks.filter((b) => b.attended === true).length;
-  const eventsAttendedInPerson = eventBookmarks.filter(
-    (b) => b.attended_in_person === true,
-  ).length;
-  const eventsWatched = eventBookmarks.filter(
-    (b) => b.watch_status === "watched",
-  ).length;
-  const totalWatchTimeSeconds = eventBookmarks.reduce(
-    (sum, b) => sum + (b.watch_progress_seconds || 0),
-    0,
-  );
-
-  const trackBookmarks = bookmarks.filter((b) => b.type === "bookmark_track");
-  const tracksCovered = trackBookmarks.length;
-
-  const notesResult = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(noteTable)
-    .where(and(eq(noteTable.user_id, userId), eq(noteTable.year, year)));
-
-  const notesTaken = notesResult[0]?.count || 0;
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(noteTable)
+      .where(and(eq(noteTable.user_id, userId), eq(noteTable.year, year))),
+  ]);
 
   return upsertUserConferenceStats(userId, year, {
-    events_bookmarked: eventsBookmarked,
-    events_attended: eventsAttended,
-    events_attended_in_person: eventsAttendedInPerson,
-    events_watched: eventsWatched,
-    tracks_covered: tracksCovered,
-    notes_taken: notesTaken,
-    total_watch_time_seconds: totalWatchTimeSeconds,
+    events_bookmarked: bookmarkStats[0].eventsBookmarked,
+    events_attended: bookmarkStats[0].eventsAttended,
+    events_attended_in_person: bookmarkStats[0].eventsAttendedInPerson,
+    events_watched: bookmarkStats[0].eventsWatched,
+    tracks_covered: bookmarkStats[0].tracksCovered,
+    notes_taken: notesResult[0]?.count || 0,
+    total_watch_time_seconds: bookmarkStats[0].totalWatchTime,
   });
 }
 

@@ -7,7 +7,6 @@ import { Button } from "~/components/ui/button";
 import { constants } from "~/constants";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { getUserStats, getUserStatsHistory } from "~/server/functions/user-stats";
-import { getSession } from "~/server/functions/session";
 import { YearInReview } from "~/components/Profile/Analytics/YearInReview";
 import { ConferenceStats } from "~/components/Profile/Analytics/ConferenceStats";
 import { YearComparison } from "~/components/Profile/Analytics/YearComparison";
@@ -17,6 +16,7 @@ import { useIsClient } from "~/hooks/use-is-client";
 import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
 import { buildHomeLink } from "~/lib/link-builder";
 import { Icons } from "~/components/shared/Icons";
+import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 
 export const Route = createFileRoute("/profile/year-in-review")({
   component: YearInReviewPage,
@@ -27,13 +27,13 @@ export const Route = createFileRoute("/profile/year-in-review")({
   }),
   loaderDeps: ({ search: { year } }) => ({ year }),
   loader: async ({ deps: { year } }) => {
-    const user = await getSession();
-    const stats = await getUserStats({ data: { year } });
-    const history = await getUserStatsHistory();
+    const [stats, history] = await Promise.all([
+      getUserStats({ data: { year } }),
+      getUserStatsHistory(),
+    ]);
 
     return {
       year,
-      serverUser: user,
       serverStats: stats,
       serverHistory: history,
     };
@@ -49,17 +49,18 @@ export const Route = createFileRoute("/profile/year-in-review")({
 });
 
 function YearInReviewPage() {
-  const { year, serverUser, serverStats, serverHistory } = Route.useLoaderData();
+  const { year, serverStats, serverHistory } = Route.useLoaderData();
   const navigate = Route.useNavigate();
 
   const { user, loading: userLoading } = useProfile();
+  const { user: serverUserFromRoot } = useAuthSnapshot();
   const { stats, loading: statsLoading, refresh, refreshing } = useUserStats({ year });
   const { history, loading: historyLoading } = useUserStatsHistory();
   const isClient = useIsClient();
 
   const hasServerSnapshot = Boolean(serverStats);
   const useServerSnapshot = !isClient || statsLoading || userLoading;
-  const resolvedUser = useServerSnapshot ? serverUser : user;
+  const resolvedUser = useServerSnapshot ? serverUserFromRoot : user;
   const resolvedStats = useServerSnapshot ? serverStats : stats;
   const resolvedHistory = useServerSnapshot ? serverHistory : history;
   const resolvedLoading = useServerSnapshot ? false : statsLoading;

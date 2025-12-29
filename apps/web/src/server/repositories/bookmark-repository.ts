@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 import { db } from "~/server/db";
 import { bookmark as bookmarkTable, type Bookmark } from "~/server/db/schema";
@@ -205,20 +205,14 @@ export async function toggleWatchLater(
   userId: number,
 ): Promise<boolean> {
   const result = await db
-    .select({ watch_later: bookmarkTable.watch_later })
-    .from(bookmarkTable)
-    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)))
-    .limit(1);
-
-  if (result.length === 0) return false;
-
-  const newValue = !result[0].watch_later;
-  await db
     .update(bookmarkTable)
-    .set({ watch_later: newValue })
-    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
+    .set({
+      watch_later: sql`CASE WHEN ${bookmarkTable.watch_later} = 1 THEN 0 ELSE 1 END`
+    })
+    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)))
+    .returning({ watch_later: bookmarkTable.watch_later });
 
-  return newValue;
+  return result[0]?.watch_later ?? false;
 }
 
 export async function markAsAttended(

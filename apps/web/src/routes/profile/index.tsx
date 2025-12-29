@@ -18,7 +18,6 @@ import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
 import { SectionStack } from "~/components/shared/SectionStack";
 import { getAllData } from "~/server/functions/fosdem";
 import { getBookmarks } from "~/server/functions/bookmarks";
-import { getSession } from "~/server/functions/session";
 import { getUserStats } from "~/server/functions/user-stats";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { useIsClient } from "~/hooks/use-is-client";
@@ -59,10 +58,9 @@ export const Route = createFileRoute("/profile/")({
   },
   loaderDeps: ({ search: { year, day, view, tab } }) => ({ year, day, view, tab }),
   loader: async ({ deps: { year } }) => {
-    const [fosdemData, serverBookmarks, user, stats] = await Promise.all([
+    const [fosdemData, serverBookmarks, stats] = await Promise.all([
       getAllData({ data: { year } }),
       getBookmarks({ data: { year, status: "favourited" } }),
-      getSession(),
       getUserStats({ data: { year } }),
     ]);
 
@@ -70,20 +68,19 @@ export const Route = createFileRoute("/profile/")({
       year,
       fosdemData,
       serverBookmarks,
-      user,
       stats,
     };
   },
 });
 
 function ProfilePage() {
-  const { year, fosdemData: serverFosdemData, serverBookmarks, user: serverUserFromLoader, stats: serverStats } =
+  const { year, fosdemData: serverFosdemData, serverBookmarks, stats: serverStats } =
     Route.useLoaderData();
   const { tab: tabRaw, day, view } = Route.useSearch();
   const tab = tabRaw ?? "events";
   const { user, loading } = useProfile();
   const { user: serverUserFromRoot } = useAuthSnapshot();
-  const resolvedServerUser = serverUserFromLoader ?? serverUserFromRoot;
+  const resolvedServerUser = serverUserFromRoot;
   const { bookmarks, loading: bookmarksLoading } = useBookmarks({
     year,
     initialServerBookmarks: serverBookmarks,
