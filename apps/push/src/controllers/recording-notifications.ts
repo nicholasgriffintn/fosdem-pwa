@@ -112,7 +112,13 @@ export async function triggerRecordingNotifications(
     const { hasRecording, url } = hasVideoRecording(event);
     const existingSnapshot = snapshotMap.get(slug);
 
-    await upsertRecordingSnapshot(slug, hasRecording, url, env);
+    const hasChanged = !existingSnapshot ||
+      existingSnapshot.has_recording !== hasRecording ||
+      existingSnapshot.recording_url !== (url ?? null);
+
+    if (hasChanged) {
+      await upsertRecordingSnapshot(slug, hasRecording, url, env);
+    }
 
     if (
       hasRecording &&

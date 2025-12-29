@@ -155,5 +155,26 @@ export async function triggerScheduleChangeNotifications(
 		`Processed schedule change notifications for ${successful} subscriptions, failed ${failed}`,
 	);
 
-	await upsertSnapshots(fosdemData.events, env);
+	const eventsToUpdate: Record<string, { startTime: string; duration: string; room: string }> = {};
+	for (const [slug, event] of Object.entries(fosdemData.events)) {
+		const previous = snapshotMap.get(slug);
+		const previousHash = previous
+			? hashEvent(previous.start_time, previous.duration, previous.room)
+			: undefined;
+		const currentHash = hashEvent(event.startTime, event.duration, event.room);
+		const hasChanged = !previous || previousHash !== currentHash;
+
+		if (hasChanged) {
+			eventsToUpdate[slug] = {
+				startTime: event.startTime,
+				duration: event.duration,
+				room: event.room,
+			};
+		}
+	}
+
+	if (Object.keys(eventsToUpdate).length > 0) {
+		await upsertSnapshots(eventsToUpdate, env);
+		console.log(`Updated ${Object.keys(eventsToUpdate).length} schedule snapshots`);
+	}
 }
