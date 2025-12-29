@@ -13,6 +13,6 @@ export function useRoomStatusHistory(roomId: string, limit = 10) {
     queryKey: roomStatusQueryKeys.history(roomId, limit),
     queryFn: () => fetchHistory({ data: { roomName: roomId, limit } }),
     refetchInterval: 60000,
-    staleTime: 30000,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

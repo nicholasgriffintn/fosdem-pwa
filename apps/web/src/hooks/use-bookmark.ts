@@ -31,7 +31,7 @@ export function useBookmark({ year, slug }: { year: number; slug: string }): {
 	const { data: localBookmarks, isLoading: localLoading } = useQuery({
 		queryKey: bookmarkQueryKeys.local(year),
 		queryFn: () => getLocalBookmarks(year),
-		staleTime: 60 * 1000,
+		staleTime: 1000 * 60 * 5, // 5 minutes
 		gcTime: 10 * 60 * 1000,
 	});
 
@@ -43,7 +43,7 @@ export function useBookmark({ year, slug }: { year: number; slug: string }): {
 			return data;
 		},
 		enabled: !!user?.id,
-		staleTime: 5 * 60 * 1000,
+		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
 
 	const localBookmark = useMemo(() => {

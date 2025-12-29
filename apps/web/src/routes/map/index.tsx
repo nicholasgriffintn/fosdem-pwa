@@ -21,7 +21,7 @@ export const Route = createFileRoute("/map/")({
 			}),
 		],
 	}),
-	staleTime: 10_000,
+	staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
 function MapPage() {

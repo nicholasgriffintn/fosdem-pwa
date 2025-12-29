@@ -19,7 +19,7 @@ export function useNotificationPreferences() {
   const { data: preferences, isLoading } = useQuery({
     queryKey,
     queryFn: () => fetchPreferences(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const updateMutation = useMutation({

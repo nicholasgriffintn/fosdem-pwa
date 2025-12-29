@@ -20,7 +20,7 @@ export function useLocalNotes({ year, slug }: { year: number; slug: string }) {
 			const allNotes = await getLocalNotes(year);
 			return allNotes.filter((note) => note.slug && note.slug === slug);
 		},
-		staleTime: 60 * 1000,
+		staleTime: 1000 * 60 * 5, // 5 minutes
 		gcTime: 10 * 60 * 1000,
 	});
 

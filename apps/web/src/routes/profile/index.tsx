@@ -71,6 +71,7 @@ export const Route = createFileRoute("/profile/")({
       stats,
     };
   },
+  staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
 function ProfilePage() {
@@ -87,7 +88,10 @@ function ProfilePage() {
   });
   const { create: createBookmark } = useMutateBookmark({ year });
   const { fosdemData } = useFosdemData({ year, initialData: serverFosdemData });
-  const { stats, loading: statsLoading } = useUserStats({ year });
+  const { stats, loading: statsLoading } = useUserStats({
+    year,
+    initialData: serverStats,
+  });
   const isClient = useIsClient();
   const hasServerSnapshot = Boolean(serverFosdemData);
   const useServerSnapshot =

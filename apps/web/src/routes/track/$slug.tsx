@@ -49,7 +49,7 @@ export const Route = createFileRoute("/track/$slug")({
 			})
 		],
 	}),
-	staleTime: 10_000,
+	staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
 function TrackPage() {

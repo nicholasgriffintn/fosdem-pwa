@@ -12,7 +12,7 @@ export function useRoomStatus(roomId: string) {
 	return useQuery({
 		queryKey: roomStatusQueryKeys.status(roomId),
 		queryFn: () => fetchRoomStatus({ data: { roomName: roomId } }),
-		refetchInterval: 60000, // Refetch every minute
-		staleTime: 30000, // Consider data stale after 30 seconds
+		refetchInterval: 60000,
+		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
 }
