@@ -63,9 +63,18 @@ async function openDatabase(): Promise<IDBDatabase | null> {
       request.onerror = () =>
         reject(request.error ?? new Error("Failed to open IndexedDB"));
       request.onblocked = () => {
+        const error = new Error("IndexedDB_BLOCKED");
         console.warn(
           "IndexedDB upgrade blocked. Please close other tabs using this app."
         );
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent("indexeddb-blocked", {
+              detail: { message: "Please close other tabs to enable offline features" },
+            })
+          );
+        }
+        reject(error);
       };
     }).catch((error) => {
       console.error("Failed to open IndexedDB database:", error);
@@ -236,6 +245,8 @@ export interface SyncQueueItem {
   action: "create" | "update" | "delete";
   data: any;
   timestamp: string;
+  retryCount?: number;
+  lastAttempt?: string;
 }
 
 export async function getLocalBookmarks(year?: number): Promise<LocalBookmark[]> {
@@ -474,9 +485,34 @@ export async function removeLocalNote(id: string, skipSync?: boolean): Promise<b
   }
 }
 
+const SYNC_QUEUE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const MAX_RETRY_COUNT = 10;
+
 export async function getSyncQueue(): Promise<SyncQueueItem[]> {
   try {
-    return await getAllFromStore<SyncQueueItem>(STORE_NAMES.SYNC_QUEUE);
+    const items = await getAllFromStore<SyncQueueItem>(STORE_NAMES.SYNC_QUEUE);
+    const now = Date.now();
+    const validItems: SyncQueueItem[] = [];
+    const expiredIds: string[] = [];
+
+    for (const item of items) {
+      const itemAge = now - new Date(item.timestamp).getTime();
+      const exceedsRetries = (item.retryCount ?? 0) >= MAX_RETRY_COUNT;
+
+      if (itemAge > SYNC_QUEUE_TTL_MS || exceedsRetries) {
+        expiredIds.push(item.id);
+      } else {
+        validItems.push(item);
+      }
+    }
+
+    if (expiredIds.length > 0) {
+      await Promise.allSettled(
+        expiredIds.map((id) => deleteFromStore(STORE_NAMES.SYNC_QUEUE, id))
+      );
+    }
+
+    return validItems;
   } catch (error) {
     console.error("Error reading sync queue:", error);
     return [];
@@ -485,7 +521,13 @@ export async function getSyncQueue(): Promise<SyncQueueItem[]> {
 
 export async function addToSyncQueue(item: SyncQueueItem): Promise<void> {
   try {
-    await putInStore(STORE_NAMES.SYNC_QUEUE, item);
+    const existingItem = await getFromStore<SyncQueueItem>(STORE_NAMES.SYNC_QUEUE, item.id);
+    const queueItem: SyncQueueItem = {
+      ...item,
+      retryCount: existingItem ? (existingItem.retryCount ?? 0) + 1 : 0,
+      lastAttempt: new Date().toISOString(),
+    };
+    await putInStore(STORE_NAMES.SYNC_QUEUE, queueItem);
   } catch (error) {
     console.error("Error adding to sync queue:", error);
   }

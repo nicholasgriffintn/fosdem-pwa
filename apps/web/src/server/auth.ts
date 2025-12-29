@@ -91,29 +91,27 @@ export async function validateSessionToken(token: string) {
 		return { session: null, user: null };
 	}
 
-	const shouldExtend = now >= expiresAt - 1000 * 60 * 60 * 24 * 15;
+	const lastExtendedAt = new Date(session.last_extended_at).getTime();
+	const timeSinceLastExtension = now - lastExtendedAt;
+	const shouldExtend = now >= expiresAt - 1000 * 60 * 60 * 24 * 15 && timeSinceLastExtension > 24 * 60 * 60 * 1000;
+
 	if (shouldExtend) {
-		const lastExtendedAt = new Date(session.last_extended_at).getTime();
-		const timeSinceLastExtension = now - lastExtendedAt;
+		const newExpiresAt = new Date(now + 1000 * TTL).toISOString();
+		const newLastExtendedAt = new Date(now).toISOString();
 
-		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
-			const newExpiresAt = new Date(now + 1000 * TTL).toISOString();
-			const newLastExtendedAt = new Date(now).toISOString();
+		session.expires_at = newExpiresAt;
+		session.last_extended_at = newLastExtendedAt;
 
-			session.expires_at = newExpiresAt;
-			session.last_extended_at = newLastExtendedAt;
-
-			await Promise.all([
-				cache.set(CacheKeys.session(sessionId), { session, user }, TTL),
-				db
-					.update(sessionTable)
-					.set({
-						expires_at: newExpiresAt,
-						last_extended_at: newLastExtendedAt,
-					})
-					.where(eq(sessionTable.id, sessionId)),
-			]);
-		}
+		await Promise.all([
+			cache.set(CacheKeys.session(sessionId), { session, user }, TTL),
+			db
+				.update(sessionTable)
+				.set({
+					expires_at: newExpiresAt,
+					last_extended_at: newLastExtendedAt,
+				})
+				.where(eq(sessionTable.id, sessionId)),
+		]);
 	}
 
 	const result = { session, user };
@@ -258,10 +256,9 @@ const nouns = [
 export function generateGuestUsername(): string {
 	const adjective = adjectives[randomInt(adjectives.length)];
 	const noun = nouns[randomInt(nouns.length)];
+	const random = randomBase32(6);
 
-	const suffix = randomBase32(10);
-
-	return `${adjective}-${noun}-${suffix}`;
+	return `${adjective}-${noun}-${random}`;
 }
 
 /**
@@ -269,29 +266,19 @@ export function generateGuestUsername(): string {
  */
 export async function createGuestUser(): Promise<User> {
 	const now = createStandardDate(new Date()).toISOString();
+	const username = generateGuestUsername();
 
-	for (let attempt = 0; attempt < 5; attempt++) {
-		const username = generateGuestUsername();
-		const guestUser = {
-			name: username,
-			email: `guest-${username}@fosdempwa.com`,
-			github_id: null,
-			is_guest: true,
-			created_at: now,
-			updated_at: now,
-		};
+	const guestUser = {
+		name: username,
+		email: `guest-${username}@fosdempwa.com`,
+		github_id: null,
+		is_guest: true,
+		created_at: now,
+		updated_at: now,
+	};
 
-		try {
-			const [user] = await db.insert(userTable).values(guestUser).returning();
-			return user;
-		} catch (error: any) {
-			if (attempt === 4 || !error?.message?.includes('UNIQUE')) {
-				throw error;
-			}
-		}
-	}
-
-	throw new Error('Failed to generate unique guest username');
+	const [user] = await db.insert(userTable).values(guestUser).returning();
+	return user;
 }
 
 /**
@@ -323,14 +310,16 @@ export async function upgradeGuestToGithub(
 		.where(and(eq(userTable.id, userId), eq(userTable.is_guest, true)))
 		.returning();
 
-	const sessions = await db
-		.select()
-		.from(sessionTable)
-		.where(eq(sessionTable.user_id, userId));
+	if (updatedUser) {
+		const sessions = await db
+			.select({ id: sessionTable.id })
+			.from(sessionTable)
+			.where(eq(sessionTable.user_id, userId));
 
-	await Promise.all(
-		sessions.map((session) => cache.invalidate(CacheKeys.session(session.id))),
-	);
+		await Promise.all(
+			sessions.map((session) => cache.invalidate(CacheKeys.session(session.id))),
+		);
+	}
 
 	return updatedUser;
 }

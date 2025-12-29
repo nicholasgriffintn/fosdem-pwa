@@ -61,6 +61,17 @@ export async function findBookmarkById(
 const VALID_BOOKMARK_TYPES = ['event', 'track', 'speaker', 'room'] as const;
 const VALID_BOOKMARK_STATUSES = ['favourited', 'unfavourited'] as const;
 
+type ValidBookmarkType = typeof VALID_BOOKMARK_TYPES[number];
+type ValidBookmarkStatus = typeof VALID_BOOKMARK_STATUSES[number];
+
+function isValidBookmarkType(type: string): type is ValidBookmarkType {
+  return (VALID_BOOKMARK_TYPES as readonly string[]).includes(type);
+}
+
+function isValidBookmarkStatus(status: string): status is ValidBookmarkStatus {
+  return (VALID_BOOKMARK_STATUSES as readonly string[]).includes(status);
+}
+
 export async function upsertBookmark(
   userId: number,
   year: number,
@@ -68,11 +79,11 @@ export async function upsertBookmark(
   slug: string,
   status: string,
 ): Promise<void> {
-  if (!VALID_BOOKMARK_TYPES.includes(type as any)) {
+  if (!isValidBookmarkType(type)) {
     throw new Error(`Invalid bookmark type: ${type}`);
   }
 
-  if (!VALID_BOOKMARK_STATUSES.includes(status as any)) {
+  if (!isValidBookmarkStatus(status)) {
     throw new Error(`Invalid bookmark status: ${status}`);
   }
 
@@ -153,9 +164,6 @@ export async function updateWatchProgress(
   progressSeconds: number,
   playbackSpeed?: string,
 ): Promise<void> {
-  const bookmark = await findBookmarkById(id, userId);
-  if (!bookmark) return;
-
   const updates: Partial<Bookmark> = {
     watch_progress_seconds: progressSeconds,
     last_watched_at: new Date().toISOString(),
@@ -165,20 +173,24 @@ export async function updateWatchProgress(
     updates.playback_speed = playbackSpeed;
   }
 
-  if (progressSeconds > 0 && bookmark.watch_status === "unwatched") {
-    updates.watch_status = "watching";
-  }
+  const result = await db
+    .update(bookmarkTable)
+    .set(updates)
+    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)))
+    .returning({ watch_status: bookmarkTable.watch_status });
 
-  await db.update(bookmarkTable).set(updates).where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
+  if (result.length > 0 && progressSeconds > 0 && result[0].watch_status === "unwatched") {
+    await db
+      .update(bookmarkTable)
+      .set({ watch_status: "watching" })
+      .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)));
+  }
 }
 
 export async function markAsWatched(
   id: string,
   userId: number,
 ): Promise<void> {
-  const bookmark = await findBookmarkById(id, userId);
-  if (!bookmark) return;
-
   await db
     .update(bookmarkTable)
     .set({
@@ -192,10 +204,15 @@ export async function toggleWatchLater(
   id: string,
   userId: number,
 ): Promise<boolean> {
-  const bookmark = await findBookmarkById(id, userId);
-  if (!bookmark) return false;
+  const result = await db
+    .select({ watch_later: bookmarkTable.watch_later })
+    .from(bookmarkTable)
+    .where(and(eq(bookmarkTable.id, id), eq(bookmarkTable.user_id, userId)))
+    .limit(1);
 
-  const newValue = !bookmark.watch_later;
+  if (result.length === 0) return false;
+
+  const newValue = !result[0].watch_later;
   await db
     .update(bookmarkTable)
     .set({ watch_later: newValue })
@@ -209,9 +226,6 @@ export async function markAsAttended(
   userId: number,
   inPerson: boolean = false,
 ): Promise<void> {
-  const bookmark = await findBookmarkById(id, userId);
-  if (!bookmark) return;
-
   await db
     .update(bookmarkTable)
     .set({

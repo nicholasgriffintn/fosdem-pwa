@@ -207,4 +207,51 @@ describe("useBookmarks", () => {
 		expect(result.current.bookmarks[0]?.existsOnServer).toBe(true);
 		queryClient.clear();
 	});
+
+	it("handles reconciliation failures gracefully with Promise.allSettled", async () => {
+		localBookmarksStore.push(
+			createLocalBookmark({
+				id: "2024_event-1",
+				slug: "event-1",
+			}),
+			createLocalBookmark({
+				id: "2024_event-2",
+				slug: "event-2",
+			}),
+		);
+
+		serverGetBookmarksMock.mockResolvedValue([
+			// @ts-ignore - test
+			{
+				id: "srv-1",
+				slug: "event-1",
+				type: "event",
+				year: 2024,
+				status: "favourited",
+			},
+			// @ts-ignore - test
+			{
+				id: "srv-2",
+				slug: "event-2",
+				type: "event",
+				year: 2024,
+				status: "favourited",
+			},
+		]);
+
+		updateLocalBookmarkMock
+			.mockRejectedValueOnce(new Error("Update failed"))
+			.mockResolvedValueOnce(createLocalBookmark({ id: "2024_event-2", slug: "event-2", serverId: "srv-2" }));
+
+		const { wrapper, queryClient } = createWrapper();
+		const { result } = renderHook(() => useBookmarks({ year: 2024 }), {
+			wrapper,
+		});
+
+		await waitFor(() => {
+			expect(result.current.bookmarks).toHaveLength(2);
+		});
+
+		queryClient.clear();
+	});
 });

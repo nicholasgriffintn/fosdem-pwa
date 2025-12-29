@@ -113,12 +113,13 @@ export function useBookmarks({
 
 	const serverBookmarksRef = useRef<Bookmark[]>([]);
 	const localBookmarksRef = useRef<LocalBookmark[]>([]);
+	const reconciliationPromiseRef = useRef<Promise<void> | null>(null);
 
 	useEffect(() => {
 		if (localOnly) return;
 		if (!userId) return;
 		if (!serverBookmarks || !localBookmarks) return;
-		if (reconciliationInProgress.current) return;
+		if (reconciliationPromiseRef.current) return;
 
 		const serverIds = serverBookmarks.map(b => b.id).sort().join(',');
 		const localIds = localBookmarks.map(b => b.id).sort().join(',');
@@ -139,6 +140,7 @@ export function useBookmarks({
 		const reconcile = async () => {
 			if (cancelled) {
 				reconciliationInProgress.current = false;
+				reconciliationPromiseRef.current = null;
 				return;
 			}
 
@@ -201,7 +203,14 @@ export function useBookmarks({
 				}
 
 				if (updates.length > 0 && !cancelled) {
-					await Promise.all(updates.map(fn => fn()));
+					const results = await Promise.allSettled(updates.map(fn => fn()));
+
+					const failures = results.filter(r => r.status === 'rejected');
+					if (failures.length > 0) {
+						console.error(`Failed to reconcile ${failures.length}/${updates.length} bookmarks:`,
+							failures.map((r) => r.status === 'rejected' ? r.reason : null));
+					}
+
 					await queryClient.invalidateQueries({
 						queryKey: localQueryKey,
 					});
@@ -210,10 +219,11 @@ export function useBookmarks({
 				console.error("Failed to reconcile local bookmarks:", error);
 			} finally {
 				reconciliationInProgress.current = false;
+				reconciliationPromiseRef.current = null;
 			}
 		};
 
-		void reconcile();
+		reconciliationPromiseRef.current = reconcile();
 
 		return () => {
 			cancelled = true;

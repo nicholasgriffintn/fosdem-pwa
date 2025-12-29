@@ -54,15 +54,31 @@ export async function syncAllOfflineData(): Promise<{
   }
 
   currentSyncPromise = (async () => {
-    const [bookmarkResult, noteResult] = await Promise.all([
+    const results = await Promise.allSettled([
       syncBookmarksToServer(),
       syncNotesToServer(),
     ]);
 
-    return {
+    const hasAnyRejected = results.some(r => r.status === 'rejected');
+
+    const bookmarkResult = results[0].status === 'fulfilled'
+      ? results[0].value
+      : { success: false, syncedCount: 0, errors: [String(results[0].reason)] };
+
+    const noteResult = results[1].status === 'fulfilled'
+      ? results[1].value
+      : { success: false, syncedCount: 0, errors: [String(results[1].reason)] };
+
+    const syncResult = {
       bookmarks: bookmarkResult,
       notes: noteResult,
     };
+
+    if (hasAnyRejected) {
+      throw new Error('Sync failed');
+    }
+
+    return syncResult;
   })();
 
   try {

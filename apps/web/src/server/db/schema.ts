@@ -140,6 +140,11 @@ export const bookmark = sqliteTable(
 				table.year,
 				table.watch_later,
 			),
+			userYearWatchStatusIdx: index("bookmark_user_year_watch_status_idx").on(
+				table.user_id,
+				table.year,
+				table.watch_status,
+			),
 		};
 	},
 );

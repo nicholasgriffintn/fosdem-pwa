@@ -254,6 +254,64 @@ describe("background sync helpers", () => {
 		expect(dispatchSpy.mock.calls.at(-1)?.[0].type).toBe("offline-sync-failed");
 	});
 
+	it("continues syncing notes when bookmarks fail with Promise.allSettled", async () => {
+		getSyncQueue.mockResolvedValue([
+			{
+				id: "bookmark1",
+				type: "bookmark",
+				action: "create",
+				data: { year: 2024, type: "event", slug: "talk1", status: "favourited" },
+			},
+			{
+				id: "note1",
+				type: "note",
+				action: "create",
+				data: { year: 2024, slug: "talk1", note: "test note" },
+			},
+		]);
+
+		createBookmark.mockRejectedValue(new Error("bookmark create failed"));
+		createNote.mockResolvedValue({ success: true });
+		removeFromSyncQueue.mockResolvedValue(undefined);
+
+		Object.defineProperty(navigator, "onLine", {
+			value: true,
+			configurable: true,
+		});
+
+		const result = await backgroundSync.syncAllOfflineData();
+
+		expect(createNote).toHaveBeenCalled();
+		expect(result.notes.success).toBe(true);
+		expect(result.bookmarks.success).toBe(false);
+	});
+
+	it("emits failure event when both bookmark and note sync fail", async () => {
+		getSyncQueue
+			.mockResolvedValueOnce([
+				{
+					id: "bookmark1",
+					type: "bookmark",
+					action: "create",
+					data: { year: 2024, type: "event", slug: "talk1", status: "favourited" },
+				},
+			])
+			.mockRejectedValueOnce(new Error("bookmark failed"))
+			.mockRejectedValueOnce(new Error("note failed"))
+			.mockResolvedValue([]);
+
+		Object.defineProperty(navigator, "onLine", {
+			value: true,
+			configurable: true,
+		});
+		const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+
+		await backgroundSync.checkAndSyncOnOnline("user");
+
+		expect(dispatchSpy).toHaveBeenCalled();
+		expect(dispatchSpy.mock.calls.at(-1)?.[0].type).toBe("offline-sync-failed");
+	});
+
 	it("retries bookmark sync on failure with exponential backoff", async () => {
 		vi.useFakeTimers();
 
