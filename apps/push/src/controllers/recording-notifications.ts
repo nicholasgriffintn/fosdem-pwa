@@ -2,9 +2,9 @@ import type { ExecutionContext } from "@cloudflare/workers-types";
 
 import { constants } from "../constants";
 import { getFosdemData } from "../lib/fosdem-data";
-import { getUserBookmarks } from "../lib/bookmarks";
+import { getBookmarksByUserIds } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
-import { getUserNotificationPreference } from "../lib/notification-preferences";
+import { resolveNotificationPreference } from "../lib/notification-preferences";
 import type { Env, Subscription, NotificationPayload, FosdemEvent } from "../types";
 
 const DOMAIN = "fosdempwa.com";
@@ -64,25 +64,6 @@ async function markRecordingNotified(slug: string, env: Env): Promise<void> {
     .run();
 }
 
-async function isEventMissed(
-  bookmarkId: string,
-  env: Env,
-): Promise<boolean> {
-  const result = await env.DB.prepare(
-    `SELECT attended, watch_status 
-     FROM bookmark 
-     WHERE id = ?`,
-  )
-    .bind(bookmarkId)
-    .first();
-
-  if (!result) return false;
-
-  const notAttended = !result.attended;
-  const notWatched = result.watch_status !== "watched";
-  return notAttended && notWatched;
-}
-
 function createRecordingAvailableNotification(
   eventTitle: string,
   eventSlug: string,
@@ -139,7 +120,11 @@ export async function triggerRecordingNotifications(
   const keys = await getApplicationKeys(env);
 
   const subscriptions = await env.DB.prepare(
-    "SELECT user_id, endpoint, auth, p256dh FROM subscription",
+    `SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
+      p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
+      p.recording_available, p.daily_summary, p.notify_low_priority
+     FROM subscription s
+     LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
   ).run();
 
   if (!subscriptions.success || !subscriptions.results?.length) {
@@ -149,27 +134,34 @@ export async function triggerRecordingNotifications(
 
   let notificationsSent = 0;
 
-  for (const subscription of subscriptions.results) {
-    const typedSubscription: Subscription = {
+  const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
+  const subscriptionEntries = subscriptionRows.map((subscription) => ({
+    subscription: {
       user_id: subscription.user_id as string,
       endpoint: subscription.endpoint as string,
       auth: subscription.auth as string,
       p256dh: subscription.p256dh as string,
-    };
+    } as Subscription,
+    prefs: resolveNotificationPreference(subscription as any),
+  }));
 
-    const prefs = await getUserNotificationPreference(
-      typedSubscription.user_id,
-      env,
-    );
+  const usersNeedingBookmarks = subscriptionEntries
+    .filter(({ prefs }) => prefs.recording_available)
+    .map(({ subscription }) => subscription.user_id);
+  const recordingSlugs = newRecordings.map((recording) => recording.slug);
+  const bookmarksByUser = usersNeedingBookmarks.length
+    ? await getBookmarksByUserIds(usersNeedingBookmarks, env, {
+        includeSent: true,
+        slugs: recordingSlugs,
+      })
+    : new Map();
 
+  for (const { subscription, prefs } of subscriptionEntries) {
     if (!prefs.recording_available) {
       continue;
     }
 
-    const bookmarks = await getUserBookmarks(typedSubscription.user_id, env, {
-      includeSent: true,
-    });
-
+    const bookmarks = bookmarksByUser.get(subscription.user_id) ?? [];
     const filteredBookmarks = prefs.notify_low_priority
       ? bookmarks
       : bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
@@ -180,7 +172,9 @@ export async function triggerRecordingNotifications(
       const bookmark = filteredBookmarks.find((b) => b.slug === recording.slug);
       if (!bookmark) continue;
 
-      const missed = await isEventMissed(bookmark.id, env);
+      const attended = Number(bookmark.attended) === 1;
+      const watched = bookmark.watch_status === "watched";
+      const missed = !attended && !watched;
       if (!missed) continue;
 
       const notification = createRecordingAvailableNotification(
@@ -191,18 +185,18 @@ export async function triggerRecordingNotifications(
       try {
         if (queueMode) {
           await env.NOTIFICATION_QUEUE.send({
-            subscription: typedSubscription,
+            subscription,
             notification,
             bookmarkId: `${bookmark.id}-recording`,
             shouldMarkSent: false,
           });
         } else {
-          await sendNotification(typedSubscription, notification, keys, env);
+          await sendNotification(subscription, notification, keys, env);
         }
         notificationsSent++;
       } catch (error) {
         console.error(
-          `Failed to send recording notification to ${typedSubscription.user_id}:`,
+          `Failed to send recording notification to ${subscription.user_id}:`,
           error,
         );
       }

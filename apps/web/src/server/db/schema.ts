@@ -286,6 +286,27 @@ export const roomStatusHistory = sqliteTable(
 
 export type RoomStatusHistory = typeof roomStatusHistory.$inferSelect;
 
+export const roomStatusLatest = sqliteTable(
+	"room_status_latest",
+	{
+		room_name: text().notNull(),
+		year: integer().notNull(),
+		state: text().notNull(),
+		updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+	},
+	(table) => {
+		return {
+			yearIdx: index("room_status_latest_year_idx").on(table.year),
+			roomYearPk: uniqueIndex("room_status_latest_room_year_pk").on(
+				table.room_name,
+				table.year,
+			),
+		};
+	},
+);
+
+export type RoomStatusLatest = typeof roomStatusLatest.$inferSelect;
+
 export const userConferenceStats = sqliteTable(
 	"user_conference_stats",
 	{

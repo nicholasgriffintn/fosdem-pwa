@@ -6,13 +6,20 @@ interface GetUserBookmarksOptions {
 	includeSent?: boolean;
 }
 
+interface GetBookmarksByUserIdsOptions extends GetUserBookmarksOptions {
+	slugs?: string[];
+}
+
+const BOOKMARK_QUERY_COLUMNS =
+	"id, user_id, type, status, year, slug, priority, attended, watch_status";
+
 export async function getUserBookmarks(
 	userId: string,
 	env: Env,
 	{ includeSent = false }: GetUserBookmarksOptions = {},
 ): Promise<Bookmark[]> {
 	const baseQuery =
-		"SELECT id, user_id, type, status, year, slug, priority FROM bookmark WHERE user_id = ? AND type = 'bookmark_event' AND status = 'favourited' AND year = ?";
+		`SELECT ${BOOKMARK_QUERY_COLUMNS} FROM bookmark WHERE user_id = ? AND type = 'bookmark_event' AND status = 'favourited' AND year = ?`;
 
 	const query = includeSent
 		? baseQuery
@@ -27,6 +34,55 @@ export async function getUserBookmarks(
 	}
 
 	return bookmarks.results as unknown as Bookmark[];
+}
+
+export async function getBookmarksByUserIds(
+	userIds: string[],
+	env: Env,
+	{ includeSent = false, slugs }: GetBookmarksByUserIdsOptions = {},
+): Promise<Map<string, Bookmark[]>> {
+	const bookmarksByUserId = new Map<string, Bookmark[]>();
+	const uniqueUserIds = Array.from(
+		new Set(userIds.filter((userId) => typeof userId === "string" && userId.length > 0)),
+	);
+	const uniqueSlugs = slugs?.length
+		? Array.from(new Set(slugs.filter((slug) => typeof slug === "string" && slug.length > 0)))
+		: [];
+
+	if (!uniqueUserIds.length) {
+		return bookmarksByUserId;
+	}
+
+	const chunkSize = 500;
+	for (let i = 0; i < uniqueUserIds.length; i += chunkSize) {
+		const chunk = uniqueUserIds.slice(i, i + chunkSize);
+		const placeholders = chunk.map(() => "?").join(", ");
+		const slugPlaceholders = uniqueSlugs.map(() => "?").join(", ");
+		const slugFilter = uniqueSlugs.length
+			? ` AND slug IN (${slugPlaceholders})`
+			: "";
+		const query = includeSent
+			? `SELECT ${BOOKMARK_QUERY_COLUMNS} FROM bookmark WHERE year = ? AND user_id IN (${placeholders}) AND type = 'bookmark_event' AND status = 'favourited'${slugFilter}`
+			: `SELECT ${BOOKMARK_QUERY_COLUMNS} FROM bookmark WHERE year = ? AND user_id IN (${placeholders}) AND type = 'bookmark_event' AND status = 'favourited' AND last_notification_sent_at IS NULL${slugFilter}`;
+
+		const result = await env.DB.prepare(query)
+			.bind(constants.YEAR, ...chunk, ...uniqueSlugs)
+			.run();
+
+		if (!result.success || !result.results?.length) {
+			continue;
+		}
+
+		for (const row of result.results as Array<Record<string, unknown>>) {
+			const userId = row.user_id as string;
+			if (!userId) continue;
+			const existing = bookmarksByUserId.get(userId) ?? [];
+			existing.push(row as unknown as Bookmark);
+			bookmarksByUserId.set(userId, existing);
+		}
+	}
+
+	return bookmarksByUserId;
 }
 
 export function enrichBookmarks(

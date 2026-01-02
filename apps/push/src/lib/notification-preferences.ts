@@ -10,7 +10,7 @@ export type NotificationPreference = {
 	notify_low_priority: boolean;
 };
 
-const DEFAULT_PREFERENCES: NotificationPreference = {
+export const DEFAULT_PREFERENCES: NotificationPreference = {
 	reminder_minutes_before: 15,
 	event_reminders: true,
 	schedule_changes: true,
@@ -19,6 +19,53 @@ const DEFAULT_PREFERENCES: NotificationPreference = {
 	daily_summary: true,
 	notify_low_priority: false,
 };
+
+const toNumber = (value: unknown, fallback: number) => {
+	const numeric = Number(value);
+	return Number.isFinite(numeric) ? numeric : fallback;
+};
+
+const toBoolean = (value: unknown, fallback: boolean) => {
+	if (value === null || value === undefined) {
+		return fallback;
+	}
+	return Number(value) !== 0;
+};
+
+export function resolveNotificationPreference(
+	row: Partial<Record<keyof NotificationPreference, unknown>> | null | undefined,
+): NotificationPreference {
+	return {
+		reminder_minutes_before: toNumber(
+			row?.reminder_minutes_before,
+			DEFAULT_PREFERENCES.reminder_minutes_before,
+		),
+		event_reminders: toBoolean(
+			row?.event_reminders,
+			DEFAULT_PREFERENCES.event_reminders,
+		),
+		schedule_changes: toBoolean(
+			row?.schedule_changes,
+			DEFAULT_PREFERENCES.schedule_changes,
+		),
+		room_status_alerts: toBoolean(
+			row?.room_status_alerts,
+			DEFAULT_PREFERENCES.room_status_alerts,
+		),
+		recording_available: toBoolean(
+			row?.recording_available,
+			DEFAULT_PREFERENCES.recording_available,
+		),
+		daily_summary: toBoolean(
+			row?.daily_summary,
+			DEFAULT_PREFERENCES.daily_summary,
+		),
+		notify_low_priority: toBoolean(
+			row?.notify_low_priority,
+			DEFAULT_PREFERENCES.notify_low_priority,
+		),
+	};
+}
 
 export async function getUserNotificationPreference(
 	userId: string,
@@ -32,21 +79,7 @@ export async function getUserNotificationPreference(
 		.bind(userId)
 		.first();
 
-	if (!result) {
-		return { ...DEFAULT_PREFERENCES };
-	}
-
-	return {
-		reminder_minutes_before: Number.isFinite(
-			Number(result.reminder_minutes_before),
-		)
-			? Number(result.reminder_minutes_before)
-			: DEFAULT_PREFERENCES.reminder_minutes_before,
-		event_reminders: Number(result.event_reminders) !== 0,
-		schedule_changes: Number(result.schedule_changes) !== 0,
-		room_status_alerts: Number(result.room_status_alerts) !== 0,
-		recording_available: Number(result.recording_available) !== 0,
-		daily_summary: Number(result.daily_summary) !== 0,
-		notify_low_priority: Number(result.notify_low_priority) !== 0,
-	};
+	return resolveNotificationPreference(
+		result as Partial<Record<keyof NotificationPreference, unknown>> | null,
+	);
 }

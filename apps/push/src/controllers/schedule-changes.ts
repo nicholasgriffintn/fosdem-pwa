@@ -2,13 +2,13 @@ import type { ExecutionContext } from "@cloudflare/workers-types";
 
 import { constants } from "../constants";
 import { getFosdemData } from "../lib/fosdem-data";
-import { getUserBookmarks, enrichBookmarks } from "../lib/bookmarks";
+import { getBookmarksByUserIds, enrichBookmarks } from "../lib/bookmarks";
 import {
 	getApplicationKeys,
 	sendNotification,
 	createScheduleChangePayload,
 } from "../lib/notifications";
-import { getUserNotificationPreference } from "../lib/notification-preferences";
+import { resolveNotificationPreference } from "../lib/notification-preferences";
 import type { Env, Subscription, ScheduleSnapshot } from "../types";
 
 type SnapshotRow = ScheduleSnapshot;
@@ -82,7 +82,11 @@ export async function triggerScheduleChangeNotifications(
 
 	const keys = await getApplicationKeys(env);
 	const subscriptions = await env.DB.prepare(
-		"SELECT user_id, endpoint, auth, p256dh FROM subscription",
+		`SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
+      p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
+      p.recording_available, p.daily_summary, p.notify_low_priority
+     FROM subscription s
+     LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
 	).run();
 
 	if (!subscriptions.success || !subscriptions.results?.length) {
@@ -90,8 +94,8 @@ export async function triggerScheduleChangeNotifications(
 		return;
 	}
 
-	const results = await Promise.allSettled(
-		subscriptions.results.map(async (subscription) => {
+	const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
+	const subscriptionEntries = subscriptionRows.map((subscription) => {
 			const typedSubscription: Subscription = {
 				user_id: subscription.user_id as string,
 				endpoint: subscription.endpoint as string,
@@ -99,19 +103,31 @@ export async function triggerScheduleChangeNotifications(
 				p256dh: subscription.p256dh as string,
 			};
 
-			const prefs = await getUserNotificationPreference(
-				typedSubscription.user_id,
-				env,
-			);
+			const prefs = resolveNotificationPreference(subscription as any);
 
+			return {
+				subscription: typedSubscription,
+				prefs,
+			};
+		});
+
+	const usersNeedingBookmarks = subscriptionEntries
+		.filter(({ prefs }) => prefs.schedule_changes)
+		.map(({ subscription }) => subscription.user_id);
+	const bookmarksByUser = usersNeedingBookmarks.length
+		? await getBookmarksByUserIds(usersNeedingBookmarks, env, {
+				includeSent: true,
+				slugs: Array.from(changedEvents.keys()),
+			})
+		: new Map();
+
+	const results = await Promise.allSettled(
+		subscriptionEntries.map(async ({ subscription, prefs }) => {
 			if (!prefs.schedule_changes) {
 				return;
 			}
 
-			const bookmarks = await getUserBookmarks(typedSubscription.user_id, env, {
-				includeSent: true,
-			});
-
+			const bookmarks = bookmarksByUser.get(subscription.user_id) ?? [];
 			const filteredBookmarks = prefs.notify_low_priority
 				? bookmarks
 				: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
@@ -136,13 +152,13 @@ export async function triggerScheduleChangeNotifications(
 
 				if (queueMode) {
 					await env.NOTIFICATION_QUEUE.send({
-						subscription: typedSubscription,
+						subscription,
 						notification,
 						bookmarkId: `${bookmark.id}-schedule-change`,
 						shouldMarkSent: false,
 					});
 				} else {
-					await sendNotification(typedSubscription, notification, keys, env);
+					await sendNotification(subscription, notification, keys, env);
 				}
 			}
 		}),

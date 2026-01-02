@@ -30,6 +30,8 @@ export interface Bookmark {
 	year: number;
 	slug: string;
 	priority: number;
+	attended?: number | boolean | null;
+	watch_status?: string | null;
 }
 
 export interface EnrichedBookmark extends Bookmark, FosdemEvent {}

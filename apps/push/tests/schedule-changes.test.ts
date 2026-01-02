@@ -7,7 +7,7 @@ vi.mock("../src/lib/fosdem-data", () => ({
 }));
 
 vi.mock("../src/lib/bookmarks", () => ({
-	getUserBookmarks: vi.fn(),
+	getBookmarksByUserIds: vi.fn(),
 	enrichBookmarks: vi.fn(),
 }));
 
@@ -18,7 +18,7 @@ vi.mock("../src/lib/notifications", () => ({
 }));
 
 vi.mock("../src/lib/notification-preferences", () => ({
-	getUserNotificationPreference: vi.fn(),
+	resolveNotificationPreference: vi.fn(),
 }));
 
 vi.mock("../src/utils/config", () => ({
@@ -27,13 +27,13 @@ vi.mock("../src/utils/config", () => ({
 }));
 
 const { getFosdemData } = await import("../src/lib/fosdem-data");
-const { getUserBookmarks, enrichBookmarks } = await import("../src/lib/bookmarks");
+const { getBookmarksByUserIds, enrichBookmarks } = await import("../src/lib/bookmarks");
 const {
 	getApplicationKeys,
 	sendNotification,
 	createScheduleChangePayload,
 } = await import("../src/lib/notifications");
-const { getUserNotificationPreference } = await import(
+const { resolveNotificationPreference } = await import(
 	"../src/lib/notification-preferences"
 );
 
@@ -71,7 +71,7 @@ function createMockEnv({
 						if (query.startsWith("SELECT slug")) {
 							return { success: true, results: snapshots };
 						}
-						if (query.startsWith("SELECT user_id")) {
+						if (query.includes("FROM subscription")) {
 							return { success: true, results: subscriptions };
 						}
 						return { success: true, results: [] };
@@ -105,7 +105,7 @@ afterEach(() => {
 
 describe("triggerScheduleChangeNotifications", () => {
 	it("seeds snapshot when empty and skips notifications", async () => {
-		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
 			event_reminders: true,
 			schedule_changes: true,
@@ -137,7 +137,7 @@ describe("triggerScheduleChangeNotifications", () => {
 	});
 
 	it("skips when schedule change preference is disabled", async () => {
-		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
 			event_reminders: true,
 			schedule_changes: false,
@@ -168,12 +168,12 @@ describe("triggerScheduleChangeNotifications", () => {
 
 		await triggerScheduleChangeNotifications({ cron: "" }, env, {} as any, false);
 
-		expect(getUserBookmarks).not.toHaveBeenCalled();
+		expect(getBookmarksByUserIds).not.toHaveBeenCalled();
 		expect(sendNotification).not.toHaveBeenCalled();
 	});
 
 	it("sends notifications for changed events and updates snapshot", async () => {
-		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
 			event_reminders: true,
 			schedule_changes: true,
@@ -196,9 +196,24 @@ describe("triggerScheduleChangeNotifications", () => {
 				"talk-a": { startTime: "09:30", duration: "00:30", room: "H.1302" },
 			},
 		});
-		(getUserBookmarks as vi.Mock).mockResolvedValue([
-			{ id: "b1", user_id: "1", slug: "talk-a", type: "bookmark_event", status: "favourited", year: 2025, priority: 1 },
-		]);
+		(getBookmarksByUserIds as vi.Mock).mockResolvedValue(
+			new Map([
+				[
+					"1",
+					[
+						{
+							id: "b1",
+							user_id: "1",
+							slug: "talk-a",
+							type: "bookmark_event",
+							status: "favourited",
+							year: 2025,
+							priority: 1,
+						},
+					],
+				],
+			]),
+		);
 		(enrichBookmarks as vi.Mock).mockReturnValue([
 			{
 				id: "b1",

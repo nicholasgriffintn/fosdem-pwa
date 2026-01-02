@@ -1,12 +1,12 @@
 import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { 
-	getUserBookmarks, 
+	getBookmarksByUserIds,
 	enrichBookmarks, 
 	getBookmarksForDay,
 } from "../lib/bookmarks";
 import { refreshYearInReviewStats } from "../lib/year-in-review";
 import { getApplicationKeys, sendNotification, createDailySummaryPayload } from "../lib/notifications";
-import { getUserNotificationPreference } from "../lib/notification-preferences";
+import { resolveNotificationPreference } from "../lib/notification-preferences";
 import type { Subscription, Env } from "../types";
 
 export async function triggerDailySummary(
@@ -37,15 +37,19 @@ export async function triggerDailySummary(
 	const fosdemData = await getFosdemData();
 
 	const subscriptions = await env.DB.prepare(
-		"SELECT user_id, endpoint, auth, p256dh FROM subscription",
+		`SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
+      p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
+      p.recording_available, p.daily_summary, p.notify_low_priority
+     FROM subscription s
+     LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
 	).run();
 
 	if (!subscriptions.success || !subscriptions.results?.length) {
 		throw new Error("No subscriptions found");
 	}
 
-	const results = await Promise.allSettled(
-		subscriptions.results.map(async (subscription) => {
+	const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
+	const subscriptionEntries = subscriptionRows.map((subscription) => {
 			console.log(
 				`Processing ${isEvening ? 'evening' : 'morning'} summary for ${subscription.user_id}`,
 			);
@@ -67,42 +71,54 @@ export async function triggerDailySummary(
 					p256dh: subscription.p256dh as string,
 				};
 
-				const prefs = await getUserNotificationPreference(
-					typedSubscription.user_id,
-					env,
-				);
+				const prefs = resolveNotificationPreference(subscription as any);
 
-				if (!prefs.daily_summary) {
-					return;
-				}
-
-				const bookmarks = await getUserBookmarks(typedSubscription.user_id, env, {
-					includeSent: true,
-				});
-				const filteredBookmarks = prefs.notify_low_priority
-					? bookmarks
-					: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
-				const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
-				const bookmarksToday = getBookmarksForDay(enrichedBookmarks, whichDay);
-
-				const notification = createDailySummaryPayload(bookmarksToday, whichDay, isEvening);
-
-				if (queueMode) {
-					await env.NOTIFICATION_QUEUE.send({
-						subscription: typedSubscription,
-						notification,
-						bookmarkId: isEvening ? 'evening-summary' : 'morning-summary',
-						shouldMarkSent: false,
-					});
-				} else {
-					await sendNotification(typedSubscription, notification, keys, env);
-				}
+				return {
+					subscription: typedSubscription,
+					prefs,
+				};
 			} catch (error) {
 				const errorMessage = error instanceof Error ? error.message : "Unknown error";
 				console.error(
 					`Error processing ${isEvening ? 'evening' : 'morning'} summary for ${subscription.user_id}: ${errorMessage}`,
 				);
 				throw error;
+			}
+		});
+
+	const usersNeedingBookmarks = subscriptionEntries
+		.filter(({ prefs }) => prefs.daily_summary)
+		.map(({ subscription }) => subscription.user_id);
+	const bookmarksByUser = usersNeedingBookmarks.length
+		? await getBookmarksByUserIds(usersNeedingBookmarks, env, {
+				includeSent: true,
+			})
+		: new Map();
+
+	const results = await Promise.allSettled(
+		subscriptionEntries.map(async ({ subscription, prefs }) => {
+			if (!prefs.daily_summary) {
+				return;
+			}
+
+			const bookmarks = bookmarksByUser.get(subscription.user_id) ?? [];
+			const filteredBookmarks = prefs.notify_low_priority
+				? bookmarks
+				: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
+			const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
+			const bookmarksToday = getBookmarksForDay(enrichedBookmarks, whichDay);
+
+			const notification = createDailySummaryPayload(bookmarksToday, whichDay, isEvening);
+
+			if (queueMode) {
+				await env.NOTIFICATION_QUEUE.send({
+					subscription,
+					notification,
+					bookmarkId: isEvening ? 'evening-summary' : 'morning-summary',
+					shouldMarkSent: false,
+				});
+			} else {
+				await sendNotification(subscription, notification, keys, env);
 			}
 		}),
 	);

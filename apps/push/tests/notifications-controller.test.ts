@@ -8,7 +8,7 @@ vi.mock("../src/lib/fosdem-data", () => ({
 }));
 
 vi.mock("../src/lib/bookmarks", () => ({
-	getUserBookmarks: vi.fn(),
+	getBookmarksByUserIds: vi.fn(),
 	enrichBookmarks: vi.fn(),
 	getBookmarksForDay: vi.fn(),
 	getBookmarksStartingSoon: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock("../src/lib/notifications", () => ({
 }));
 
 vi.mock("../src/lib/notification-preferences", () => ({
-	getUserNotificationPreference: vi.fn(),
+	resolveNotificationPreference: vi.fn(),
 }));
 
 vi.mock("../src/utils/config", () => ({
@@ -31,7 +31,7 @@ vi.mock("../src/utils/config", () => ({
 
 const { getFosdemData, getCurrentDay } = await import("../src/lib/fosdem-data");
 const {
-	getUserBookmarks,
+	getBookmarksByUserIds,
 	enrichBookmarks,
 	getBookmarksForDay,
 	getBookmarksStartingSoon,
@@ -39,7 +39,7 @@ const {
 const { getApplicationKeys, sendNotification } = await import(
 	"../src/lib/notifications",
 );
-const { getUserNotificationPreference } = await import(
+const { resolveNotificationPreference } = await import(
 	"../src/lib/notification-preferences",
 );
 const { triggerNotifications } = await import(
@@ -58,7 +58,7 @@ function createMockEnv(subscriptions: Subscription[]): Env {
 				return {
 					query,
 					async run() {
-						if (query.startsWith("SELECT user_id")) {
+						if (query.includes("FROM subscription")) {
 							return { success: true, results: subscriptions };
 						}
 						return { success: true, results: [] };
@@ -110,7 +110,7 @@ describe("triggerNotifications", () => {
 		(getCurrentDay as vi.Mock).mockReturnValue("1");
 		(getFosdemData as vi.Mock).mockResolvedValue({ events: {} });
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
-		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
 			event_reminders: false,
 			schedule_changes: true,
@@ -124,7 +124,7 @@ describe("triggerNotifications", () => {
 
 		await triggerNotifications({ cron: "" }, env, {} as any, false);
 
-		expect(getUserBookmarks).not.toHaveBeenCalled();
+		expect(getBookmarksByUserIds).not.toHaveBeenCalled();
 		expect(sendNotification).not.toHaveBeenCalled();
 	});
 
@@ -132,7 +132,7 @@ describe("triggerNotifications", () => {
 		(getCurrentDay as vi.Mock).mockReturnValue("1");
 		(getFosdemData as vi.Mock).mockResolvedValue({ events: {} });
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
-		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
 			event_reminders: true,
 			schedule_changes: true,
@@ -141,9 +141,9 @@ describe("triggerNotifications", () => {
 			daily_summary: true,
 			notify_low_priority: false,
 		});
-		(getUserBookmarks as vi.Mock).mockResolvedValue([
-			{ ...baseBookmark, priority: 2 },
-		]);
+		(getBookmarksByUserIds as vi.Mock).mockResolvedValue(
+			new Map([["1", [{ ...baseBookmark, priority: 2 }]]]),
+		);
 		(enrichBookmarks as vi.Mock).mockReturnValue([]);
 		(getBookmarksForDay as vi.Mock).mockReturnValue([]);
 		(getBookmarksStartingSoon as vi.Mock).mockReturnValue([]);

@@ -2,11 +2,11 @@ import type { ExecutionContext } from "@cloudflare/workers-types";
 
 import { constants } from "../constants";
 import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
-import { getUserBookmarks, enrichBookmarks, getBookmarksForDay } from "../lib/bookmarks";
+import { getBookmarksByUserIds, enrichBookmarks, getBookmarksForDay } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
-import { getUserNotificationPreference } from "../lib/notification-preferences";
+import { resolveNotificationPreference } from "../lib/notification-preferences";
 import { createBrusselsDate } from "../utils/date";
-import type { Env, Subscription, NotificationPayload } from "../types";
+import type { Env, NotificationPayload } from "../types";
 
 const ROOMS_API = "https://api.fosdem.org/roomstatus/v1/listrooms";
 const FETCH_TIMEOUT_MS = 8000;
@@ -38,17 +38,66 @@ async function fetchRoomStatuses(): Promise<RoomStatusResponse[]> {
   }
 }
 
+async function getLatestRoomStates(
+  roomNames: string[],
+  env: Env,
+): Promise<Map<string, string>> {
+  const latest = new Map<string, string>();
+  if (!roomNames.length) {
+    return latest;
+  }
+
+  const placeholders = roomNames.map(() => "?").join(", ");
+  const result = await env.DB.prepare(
+    `SELECT room_name, state
+     FROM room_status_latest
+     WHERE year = ? AND room_name IN (${placeholders})`,
+  )
+    .bind(constants.YEAR, ...roomNames)
+    .all();
+
+  if (!result.success || !result.results) {
+    return latest;
+  }
+
+  for (const row of result.results as Array<{ room_name: string; state: string }>) {
+    latest.set(row.room_name, row.state);
+  }
+
+  return latest;
+}
+
 async function storeRoomStatuses(
   statuses: RoomStatusResponse[],
   env: Env,
 ): Promise<void> {
   if (!statuses.length) return;
 
-  const statements = statuses.map((status) =>
+  const latestStates = await getLatestRoomStates(
+    statuses.map((status) => status.roomname),
+    env,
+  );
+  const changedStatuses = statuses.filter(
+    (status) => latestStates.get(status.roomname) !== status.state,
+  );
+
+  if (!changedStatuses.length) {
+    console.log("No room status changes detected");
+    return;
+  }
+
+  const statements = changedStatuses.flatMap((status) => [
     env.DB.prepare(
       "INSERT INTO room_status_history (room_name, state, year, recorded_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
     ).bind(status.roomname, status.state, constants.YEAR),
-  );
+    env.DB.prepare(
+      `INSERT INTO room_status_latest (room_name, year, state, updated_at)
+       VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+       ON CONFLICT(room_name, year) DO UPDATE SET
+         state = excluded.state,
+         updated_at = CURRENT_TIMESTAMP`,
+    ).bind(status.roomname, constants.YEAR, status.state),
+  ]);
 
   await env.DB.batch(statements);
 }
@@ -165,6 +214,7 @@ export async function triggerRoomStatusNotifications(
   ctx: ExecutionContext,
   queueMode = false,
   dayOverride?: string,
+  prefetchedStatuses?: RoomStatusResponse[],
 ): Promise<void> {
   const currentDay = getCurrentDay();
   const whichDay = dayOverride ?? currentDay;
@@ -173,7 +223,9 @@ export async function triggerRoomStatusNotifications(
     return;
   }
 
-	const currentStatuses = await pollAndStoreRoomStatus(env);
+	const currentStatuses = prefetchedStatuses?.length
+		? prefetchedStatuses
+		: await pollAndStoreRoomStatus(env);
 	if (!currentStatuses.length) {
 		console.log("No room statuses available");
 		return;
@@ -200,7 +252,11 @@ export async function triggerRoomStatusNotifications(
   const keys = await getApplicationKeys(env);
 
   const subscriptions = await env.DB.prepare(
-    "SELECT user_id, endpoint, auth, p256dh FROM subscription",
+    `SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
+      p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
+      p.recording_available, p.daily_summary, p.notify_low_priority
+     FROM subscription s
+     LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
   ).run();
 
   if (!subscriptions.success || !subscriptions.results?.length) {
@@ -208,28 +264,34 @@ export async function triggerRoomStatusNotifications(
     return;
   }
 
-  let notificationsSent = 0;
-
-  for (const subscription of subscriptions.results) {
-    const typedSubscription: Subscription = {
+  const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
+  const subscriptionEntries = subscriptionRows.map((subscription) => ({
+    subscription: {
       user_id: subscription.user_id as string,
       endpoint: subscription.endpoint as string,
       auth: subscription.auth as string,
       p256dh: subscription.p256dh as string,
-    };
+    },
+    prefs: resolveNotificationPreference(subscription as any),
+  }));
 
-    const prefs = await getUserNotificationPreference(
-      typedSubscription.user_id,
-      env,
-    );
+  const usersNeedingBookmarks = subscriptionEntries
+    .filter(({ prefs }) => prefs.room_status_alerts)
+    .map(({ subscription }) => subscription.user_id);
+  const bookmarksByUser = usersNeedingBookmarks.length
+    ? await getBookmarksByUserIds(usersNeedingBookmarks, env, {
+        includeSent: true,
+      })
+    : new Map();
 
+  let notificationsSent = 0;
+
+  for (const { subscription, prefs } of subscriptionEntries) {
     if (!prefs.room_status_alerts) {
       continue;
     }
 
-    const bookmarks = await getUserBookmarks(typedSubscription.user_id, env, {
-      includeSent: true,
-    });
+    const bookmarks = bookmarksByUser.get(subscription.user_id) ?? [];
 
     const filteredBookmarks = prefs.notify_low_priority
       ? bookmarks
@@ -268,18 +330,18 @@ export async function triggerRoomStatusNotifications(
         try {
           if (queueMode) {
             await env.NOTIFICATION_QUEUE.send({
-              subscription: typedSubscription,
+              subscription,
               notification,
               bookmarkId: `${bookmark.id}-room-status`,
               shouldMarkSent: false,
             });
           } else {
-            await sendNotification(typedSubscription, notification, keys, env);
+            await sendNotification(subscription, notification, keys, env);
           }
           notificationsSent++;
         } catch (error) {
           console.error(
-            `Failed to send room status notification to ${typedSubscription.user_id}:`,
+            `Failed to send room status notification to ${subscription.user_id}:`,
             error,
           );
         }

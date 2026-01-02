@@ -141,6 +141,13 @@
       "when": 1766974213207,
       "tag": "0019_amusing_doctor_strange",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1767394564182,
+      "tag": "0020_puzzling_dark_beast",
+      "breakpoints": true
     }
   ]
 }

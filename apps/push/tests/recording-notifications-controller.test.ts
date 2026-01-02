@@ -7,7 +7,7 @@ vi.mock("../src/lib/fosdem-data", () => ({
 }));
 
 vi.mock("../src/lib/bookmarks", () => ({
-	getUserBookmarks: vi.fn(),
+	getBookmarksByUserIds: vi.fn(),
 }));
 
 vi.mock("../src/lib/notifications", () => ({
@@ -16,7 +16,7 @@ vi.mock("../src/lib/notifications", () => ({
 }));
 
 vi.mock("../src/lib/notification-preferences", () => ({
-	getUserNotificationPreference: vi.fn(),
+	resolveNotificationPreference: vi.fn(),
 }));
 
 vi.mock("../src/utils/config", () => ({
@@ -24,11 +24,11 @@ vi.mock("../src/utils/config", () => ({
 }));
 
 const { getFosdemData } = await import("../src/lib/fosdem-data");
-const { getUserBookmarks } = await import("../src/lib/bookmarks");
+const { getBookmarksByUserIds } = await import("../src/lib/bookmarks");
 const { getApplicationKeys, sendNotification } = await import(
 	"../src/lib/notifications",
 );
-const { getUserNotificationPreference } = await import(
+const { resolveNotificationPreference } = await import(
 	"../src/lib/notification-preferences",
 );
 const { triggerRecordingNotifications } = await import(
@@ -68,7 +68,7 @@ function createMockEnv({
 						if (query.startsWith("SELECT slug")) {
 							return { success: true, results: snapshots };
 						}
-						if (query.startsWith("SELECT user_id")) {
+						if (query.includes("FROM subscription")) {
 							return { success: true, results: subscriptions };
 						}
 						if (query.startsWith("UPDATE recording_snapshot")) {
@@ -129,7 +129,7 @@ describe("triggerRecordingNotifications", () => {
 			events: { "talk-a": baseEvent },
 		});
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
-		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
 			event_reminders: true,
 			schedule_changes: true,
@@ -147,7 +147,7 @@ describe("triggerRecordingNotifications", () => {
 
 		await triggerRecordingNotifications({ cron: "" }, env, {} as any, false);
 
-		expect(getUserBookmarks).not.toHaveBeenCalled();
+		expect(getBookmarksByUserIds).not.toHaveBeenCalled();
 		expect(sendNotification).not.toHaveBeenCalled();
 		expect((env as any)._updateCalls).toHaveLength(1);
 	});
@@ -157,7 +157,7 @@ describe("triggerRecordingNotifications", () => {
 			events: { "talk-a": baseEvent },
 		});
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
-		(getUserNotificationPreference as vi.Mock).mockResolvedValue({
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
 			event_reminders: true,
 			schedule_changes: true,
@@ -166,22 +166,76 @@ describe("triggerRecordingNotifications", () => {
 			daily_summary: true,
 			notify_low_priority: false,
 		});
-		(getUserBookmarks as vi.Mock).mockResolvedValue([
-			{
-				id: "b1",
-				user_id: "1",
-				slug: "talk-a",
-				type: "bookmark_event",
-				status: "favourited",
-				year: 2025,
-				priority: 2,
-			},
-		]);
+		(getBookmarksByUserIds as vi.Mock).mockResolvedValue(
+			new Map([
+				[
+					"1",
+					[
+						{
+							id: "b1",
+							user_id: "1",
+							slug: "talk-a",
+							type: "bookmark_event",
+							status: "favourited",
+							year: 2025,
+							priority: 2,
+						},
+					],
+				],
+			]),
+		);
 
 		const env = createMockEnv({
 			snapshots: [],
 			subscriptions: [baseSubscription],
 			bookmarkStatus: { attended: 0, watch_status: "unwatched" },
+		});
+
+		await triggerRecordingNotifications({ cron: "" }, env, {} as any, false);
+
+		expect(sendNotification).not.toHaveBeenCalled();
+		expect((env as any)._updateCalls).toHaveLength(1);
+	});
+
+	it("skips notifications when the event was already attended", async () => {
+		(getFosdemData as vi.Mock).mockResolvedValue({
+			events: { "talk-a": baseEvent },
+		});
+		(getApplicationKeys as vi.Mock).mockResolvedValue({});
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
+			reminder_minutes_before: 15,
+			event_reminders: true,
+			schedule_changes: true,
+			room_status_alerts: true,
+			recording_available: true,
+			daily_summary: true,
+			notify_low_priority: false,
+		});
+		(getBookmarksByUserIds as vi.Mock).mockResolvedValue(
+			new Map([
+				[
+					"1",
+					[
+						{
+							id: "b1",
+							user_id: "1",
+							slug: "talk-a",
+							type: "bookmark_event",
+							status: "favourited",
+							year: 2025,
+							priority: 1,
+							attended: 1,
+							watch_status: "unwatched",
+						},
+					],
+				],
+			]),
+		);
+
+		const env = createMockEnv({
+			snapshots: [],
+			subscriptions: [baseSubscription],
+			bookmarkStatus: { attended: 1, watch_status: "unwatched" },
 		});
 
 		await triggerRecordingNotifications({ cron: "" }, env, {} as any, false);

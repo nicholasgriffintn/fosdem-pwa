@@ -172,8 +172,8 @@ export default Sentry.withSentry(
 
 			// Room status polling (every 5 minutes during conference)
 			if (event.cron === "*/5 * 1,2 2 *") {
-				await pollAndStoreRoomStatus(env);
-				await triggerRoomStatusNotifications(event, env, ctx, true);
+				const statuses = await pollAndStoreRoomStatus(env);
+				await triggerRoomStatusNotifications(event, env, ctx, true, undefined, statuses);
 				return;
 			}
 

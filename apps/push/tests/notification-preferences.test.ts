@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getUserNotificationPreference } from "../src/lib/notification-preferences";
+import { getUserNotificationPreference, resolveNotificationPreference } from "../src/lib/notification-preferences";
 import type { Env } from "../src/types";
 
 type Prepared = {
@@ -64,5 +64,27 @@ describe("notification preferences", () => {
 		expect(prefs.recording_available).toBe(false);
 		expect(prefs.daily_summary).toBe(true);
 		expect(prefs.notify_low_priority).toBe(true);
+	});
+
+	it("applies defaults for missing fields in preference rows", () => {
+		const prefs = resolveNotificationPreference({
+			reminder_minutes_before: undefined,
+			event_reminders: 0,
+			schedule_changes: undefined,
+			room_status_alerts: null,
+			recording_available: undefined,
+			daily_summary: 1,
+			notify_low_priority: undefined,
+		});
+
+		expect(prefs).toEqual({
+			reminder_minutes_before: 15,
+			event_reminders: false,
+			schedule_changes: true,
+			room_status_alerts: true,
+			recording_available: false,
+			daily_summary: true,
+			notify_low_priority: false,
+		});
 	});
 });

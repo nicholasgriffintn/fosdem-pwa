@@ -2,13 +2,13 @@ import type { ApplicationServerKeys } from "webpush-webcrypto";
 
 import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { 
-	getUserBookmarks, 
+	getBookmarksByUserIds,
 	enrichBookmarks, 
 	getBookmarksForDay,
 	getBookmarksStartingSoon,
 	markNotificationSent,
 } from "../lib/bookmarks";
-import { getUserNotificationPreference } from "../lib/notification-preferences";
+import { resolveNotificationPreference } from "../lib/notification-preferences";
 import { getApplicationKeys, sendNotification, createNotificationPayload } from "../lib/notifications";
 import type { Subscription, EnrichedBookmark, Env } from "../types";
 
@@ -68,15 +68,20 @@ export async function triggerNotifications(
 	const fosdemData = await getFosdemData();
 
 	const subscriptions = await env.DB.prepare(
-		"SELECT user_id, endpoint, auth, p256dh FROM subscription",
+		`SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
+      p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
+      p.recording_available, p.daily_summary, p.notify_low_priority
+     FROM subscription s
+     LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
 	).run();
 
 	if (!subscriptions.success || !subscriptions.results?.length) {
 		throw new Error("No subscriptions found");
 	}
 
-	const results = await Promise.allSettled(
-		subscriptions.results.map(async (subscription) => {
+	const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
+	const subscriptionEntries = subscriptionRows
+		.map((subscription) => {
 			console.log(
 				`Processing notifications for ${subscription.user_id} via ${subscription.endpoint}`,
 			);
@@ -98,40 +103,12 @@ export async function triggerNotifications(
 					p256dh: subscription.p256dh as string,
 				};
 
-				const prefs = await getUserNotificationPreference(
-					typedSubscription.user_id,
-					env,
-				);
+				const prefs = resolveNotificationPreference(subscription as any);
 
-				if (!prefs.event_reminders) {
-					return;
-				}
-
-				const bookmarks = await getUserBookmarks(typedSubscription.user_id, env);
-				const filteredBookmarks = prefs.notify_low_priority
-					? bookmarks
-					: bookmarks.filter((bookmark) => (bookmark.priority ?? 0) <= 1);
-
-				const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
-				const bookmarksRunningToday = getBookmarksForDay(enrichedBookmarks, whichDay);
-
-				if (!bookmarksRunningToday.length) {
-					console.log(`No bookmarks running today for ${typedSubscription.user_id}`);
-					return;
-				}
-
-				const bookmarksStartingSoon = getBookmarksStartingSoon(
-					bookmarksRunningToday,
-					prefs.reminder_minutes_before,
-				);
-
-				if (!bookmarksStartingSoon.length) {
-					console.log(`No bookmarks starting soon for ${typedSubscription.user_id}`);
-					return;
-				}
-
-				await processUserNotifications(typedSubscription, bookmarksStartingSoon, keys, env, queueMode);
-				return;
+				return {
+					subscription: typedSubscription,
+					prefs,
+				};
 			} catch (error) {
 				const errorMessage = error instanceof Error ? error.message : "Unknown error";
 				console.error(
@@ -139,6 +116,49 @@ export async function triggerNotifications(
 				);
 				throw error;
 			}
+		})
+		.filter((entry): entry is { subscription: Subscription; prefs: ReturnType<typeof resolveNotificationPreference> } =>
+			Boolean(entry),
+		);
+
+	const usersNeedingBookmarks = subscriptionEntries
+		.filter(({ prefs }) => prefs.event_reminders)
+		.map(({ subscription }) => subscription.user_id);
+
+	const bookmarksByUser = usersNeedingBookmarks.length
+		? await getBookmarksByUserIds(usersNeedingBookmarks, env)
+		: new Map();
+
+	const results = await Promise.allSettled(
+		subscriptionEntries.map(async ({ subscription, prefs }) => {
+			if (!prefs.event_reminders) {
+				return;
+			}
+
+			const bookmarks = bookmarksByUser.get(subscription.user_id) ?? [];
+			const filteredBookmarks = prefs.notify_low_priority
+				? bookmarks
+				: bookmarks.filter((bookmark) => (bookmark.priority ?? 0) <= 1);
+
+			const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
+			const bookmarksRunningToday = getBookmarksForDay(enrichedBookmarks, whichDay);
+
+			if (!bookmarksRunningToday.length) {
+				console.log(`No bookmarks running today for ${subscription.user_id}`);
+				return;
+			}
+
+			const bookmarksStartingSoon = getBookmarksStartingSoon(
+				bookmarksRunningToday,
+				prefs.reminder_minutes_before,
+			);
+
+			if (!bookmarksStartingSoon.length) {
+				console.log(`No bookmarks starting soon for ${subscription.user_id}`);
+				return;
+			}
+
+			await processUserNotifications(subscription, bookmarksStartingSoon, keys, env, queueMode);
 		}),
 	);
 
