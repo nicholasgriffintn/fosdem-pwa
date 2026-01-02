@@ -8,6 +8,9 @@
   ],
   "workers_dev": false,
   "preview_urls": false,
+  "placement": {
+    "mode": "smart"
+  },
   "observability": {
     "enabled": true,
     "logs": {
