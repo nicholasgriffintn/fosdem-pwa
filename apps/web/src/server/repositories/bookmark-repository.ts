@@ -104,6 +104,7 @@ export async function upsertBookmark(
     .onConflictDoUpdate({
       target: bookmarkTable.id,
       set: { status },
+      where: sql`${bookmarkTable.status} <> excluded.status`,
     });
 }
 

@@ -35,7 +35,11 @@ async function loadRecordingSnapshots(env: Env): Promise<RecordingSnapshotRow[]>
     .bind(constants.YEAR)
     .run();
 
-  return (result.results ?? []) as unknown as RecordingSnapshotRow[];
+  const rows = (result.results ?? []) as unknown as RecordingSnapshotRow[];
+  return rows.map((row) => ({
+    ...row,
+    has_recording: Boolean(row.has_recording),
+  }));
 }
 
 async function upsertRecordingSnapshot(

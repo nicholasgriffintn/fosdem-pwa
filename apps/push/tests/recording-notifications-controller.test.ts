@@ -53,6 +53,7 @@ function createMockEnv({
 	bookmarkStatus: { attended: number; watch_status: string } | null;
 }): Env {
 	const updateCalls: string[] = [];
+	const upsertCalls: Array<{ query: string; params: unknown[] }> = [];
 
 	const env: Env = {
 		DB: {
@@ -70,6 +71,9 @@ function createMockEnv({
 						}
 						if (query.includes("FROM subscription")) {
 							return { success: true, results: subscriptions };
+						}
+						if (query.startsWith("INSERT INTO recording_snapshot")) {
+							upsertCalls.push({ query, params: stmt.params });
 						}
 						if (query.startsWith("UPDATE recording_snapshot")) {
 							updateCalls.push(query);
@@ -97,6 +101,7 @@ function createMockEnv({
 	};
 
 	(env as any)._updateCalls = updateCalls;
+	(env as any)._upsertCalls = upsertCalls;
 	return env;
 }
 
@@ -242,5 +247,60 @@ describe("triggerRecordingNotifications", () => {
 
 		expect(sendNotification).not.toHaveBeenCalled();
 		expect((env as any)._updateCalls).toHaveLength(1);
+	});
+
+	it("does not upsert snapshots when the recording state is unchanged", async () => {
+		(getFosdemData as vi.Mock).mockResolvedValue({
+			events: { "talk-a": baseEvent },
+		});
+		(getApplicationKeys as vi.Mock).mockResolvedValue({});
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
+			reminder_minutes_before: 15,
+			event_reminders: true,
+			schedule_changes: true,
+			room_status_alerts: true,
+			recording_available: true,
+			daily_summary: true,
+			notify_low_priority: true,
+		});
+
+		const env = createMockEnv({
+			snapshots: [
+				{
+					slug: "talk-a",
+					year: 2025,
+					// D1 returns numbers; ensure we coerce to boolean before comparisons.
+					has_recording: 1,
+					recording_url: "https://video.example/talk.mp4",
+					notified_at: null,
+				},
+			],
+			subscriptions: [baseSubscription],
+			bookmarkStatus: { attended: 0, watch_status: "unwatched" },
+		});
+
+		(getBookmarksByUserIds as vi.Mock).mockResolvedValue(
+			new Map([
+				[
+					"1",
+					[
+						{
+							id: "b1",
+							user_id: "1",
+							slug: "talk-a",
+							type: "bookmark_event",
+							status: "favourited",
+							year: 2025,
+						},
+					],
+				],
+			]),
+		);
+
+		await triggerRecordingNotifications({ cron: "" }, env, {} as any, false);
+
+		expect((env as any)._upsertCalls).toHaveLength(0);
+		expect((env as any)._updateCalls).toHaveLength(0);
+		expect(sendNotification).not.toHaveBeenCalled();
 	});
 });
