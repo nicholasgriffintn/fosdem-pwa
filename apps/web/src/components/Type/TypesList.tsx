@@ -35,15 +35,15 @@ export function TypesList({ types, tracks }: TypesListProps) {
 	};
 
 	return (
-		<ul className="flex flex-wrap -mx-1 lg:-mx-4">
+		<ul className="flex flex-wrap gap-y-3 md:gap-y-4 -mx-4 md:-mx-1 lg:-mx-4">
 			{typeKeys.map((typeKey: string, index: number) => {
 				const isLikelyLcpImage = index === 0;
 				return (
 					<li
 						key={types[typeKey].id}
-						className="my-1 px-1 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/3"
+						className="w-full px-0 md:w-1/2 lg:w-1/3 md:px-1 lg:px-4"
 					>
-						<Card className="lg:max-w-md w-full">
+						<Card className="lg:max-w-md w-full rounded-none border-x-0 border-b-0 shadow-none md:rounded-lg md:border md:shadow-sm">
 							<CardHeader>
 								<CardTitle>
 									{(() => {

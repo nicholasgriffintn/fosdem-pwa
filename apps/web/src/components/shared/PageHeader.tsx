@@ -107,7 +107,7 @@ export function PageHeader({
           )}
           {text && <p className="text-xl text-muted-foreground">{text}</p>}
         </div>
-        {children && <div className="flex justify-end">{children}</div>}
+        {children && <div className="flex md:justify-end">{children}</div>}
       </div>
       {displayHeading && <div className={additionalHeadingPaddingClass} />}
     </>
