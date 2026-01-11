@@ -16,6 +16,7 @@ import { getAllData } from "~/server/functions/fosdem";
 import { getUserBookmarks } from "~/server/functions/bookmarks";
 import { getUserDetails } from "~/server/functions/user";
 import { useIsClient } from "~/hooks/use-is-client";
+import { pruneFosdemData } from "~/server/lib/fosdem-prune";
 
 export const Route = createFileRoute("/profile/$userId/")({
   component: ProfilePage,
@@ -60,13 +61,14 @@ export const Route = createFileRoute("/profile/$userId/")({
         getUserDetails({ data: { userId } }),
       ]);
 
-      const serverBookmarks = user?.bookmarks_visibility === "public"
+      const serverBookmarks =
+        user?.bookmarks_visibility === "public"
         ? await getUserBookmarks({ data: { year, userId } })
         : [];
 
       return {
         year,
-        fosdemData,
+        fosdemData: pruneFosdemData(fosdemData, serverBookmarks),
         user,
         serverBookmarks,
         notFound: false,
@@ -75,7 +77,7 @@ export const Route = createFileRoute("/profile/$userId/")({
       const fosdemData = await getAllData({ data: { year } });
       return {
         year,
-        fosdemData,
+        fosdemData: pruneFosdemData(fosdemData, []),
         user: null,
         serverBookmarks: [],
         notFound: true,
@@ -104,7 +106,11 @@ function ProfilePage() {
     enabled: shouldLoadBookmarks,
   });
 
-  const { fosdemData } = useFosdemData({ year, initialData: serverFosdemData });
+  const { fosdemData } = useFosdemData({
+    year,
+    initialData: serverFosdemData,
+    initialDataIsPartial: true,
+  });
   const isClient = useIsClient();
   const hasServerSnapshot = Boolean(serverFosdemData);
   const useServerSnapshot =

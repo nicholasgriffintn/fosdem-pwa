@@ -127,17 +127,6 @@ export function BookmarksList({
     [bookmarks],
   );
 
-  const eventCountByTrack = useMemo(() => {
-    if (!fosdemData) return new Map<string, number>();
-    const counts = new Map<string, number>();
-    for (const event of Object.values(fosdemData.events)) {
-      if (!isEvent(event) || !event.trackKey) continue;
-      const key = event.trackKey.toString().trim().toLowerCase();
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
-    return counts;
-  }, [fosdemData]);
-
   const { tracks, events, conflicts } = useMemo(() => {
     if (!bookmarks?.length || !fosdemData) {
       return { tracks: [], events: [], conflicts: [] };
@@ -165,23 +154,18 @@ export function BookmarksList({
         const track = fosdemData.tracks[bookmark.slug];
         if (!track || !isTrack(track)) return null;
 
-        const trackId = track.id?.toString().trim().toLowerCase() ?? "";
-        const trackName = track.name?.toString().trim().toLowerCase() ?? "";
-        const eventCount =
-          eventCountByTrack.get(trackId) || eventCountByTrack.get(trackName) || 0;
-
         return {
           id: track.id,
           name: track.name,
           room: track.room,
-          eventCount,
+          eventCount: track.eventCount ?? 0,
         } as Track;
       })
       .filter((track): track is NonNullable<typeof track> => track !== null)
       .sort(sortTracks);
 
     return { tracks: formattedTracks, events: formattedEvents, conflicts };
-  }, [bookmarks, fosdemData, year, organizedBookmarks, showConflicts, eventCountByTrack]);
+  }, [bookmarks, fosdemData, year, organizedBookmarks, showConflicts]);
 
   const days = useMemo(
     () => (fosdemData ? Object.values(fosdemData.days) : []),
@@ -202,6 +186,12 @@ export function BookmarksList({
       });
     }
   };
+
+  if (loading || !fosdemData) {
+    return (
+      <LoadingState type="spinner" message="Loading bookmarks..." variant="centered" />
+    );
+  }
 
   if (!bookmarks || bookmarks.length === 0) {
     return (
@@ -225,9 +215,7 @@ export function BookmarksList({
 
   return (
     <>
-      {loading ? (
-        <LoadingState type="spinner" message="Loading bookmarks..." variant="centered" />
-      ) : bookmarks?.length ? (
+      {bookmarks?.length ? (
         <div className="space-y-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-background/95 backdrop-blur-md p-1 text-muted-foreground md:w-auto border border-white/20 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20">

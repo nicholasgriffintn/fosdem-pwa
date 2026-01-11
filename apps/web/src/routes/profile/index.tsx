@@ -22,6 +22,7 @@ import { getUserStats } from "~/server/functions/user-stats";
 import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { useIsClient } from "~/hooks/use-is-client";
 import { useUserStats } from "~/hooks/use-user-stats";
+import { pruneFosdemData } from "~/server/lib/fosdem-prune";
 
 export const Route = createFileRoute("/profile/")({
   component: ProfilePage,
@@ -66,7 +67,7 @@ export const Route = createFileRoute("/profile/")({
 
     return {
       year,
-      fosdemData,
+      fosdemData: pruneFosdemData(fosdemData, serverBookmarks),
       serverBookmarks,
       stats,
     };
@@ -87,7 +88,11 @@ function ProfilePage() {
     initialServerBookmarks: serverBookmarks,
   });
   const { create: createBookmark } = useMutateBookmark({ year });
-  const { fosdemData } = useFosdemData({ year, initialData: serverFosdemData });
+  const { fosdemData } = useFosdemData({
+    year,
+    initialData: serverFosdemData,
+    initialDataIsPartial: true,
+  });
   const { stats, loading: statsLoading } = useUserStats({
     year,
     initialData: serverStats,

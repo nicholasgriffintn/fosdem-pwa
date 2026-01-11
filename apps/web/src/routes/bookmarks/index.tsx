@@ -26,6 +26,7 @@ import { ImportBookmarksSheet } from "~/components/Bookmarks/ImportBookmarksShee
 import { downloadFile } from "~/utils/file-download";
 import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
+import { pruneFosdemData } from "~/server/lib/fosdem-prune";
 
 export const Route = createFileRoute("/bookmarks/")({
   component: BookmarksHome,
@@ -51,11 +52,12 @@ export const Route = createFileRoute("/bookmarks/")({
       getAllData({ data: { year } }),
       getBookmarks({ data: { year, status: "favourited" } }),
     ]);
+    const prunedFosdemData = pruneFosdemData(fosdemData, serverBookmarks);
     return {
       year,
       day,
       serverBookmarks,
-      fosdemData,
+      fosdemData: prunedFosdemData,
     };
   },
   staleTime: 1000 * 60 * 5, // 5 minutes
@@ -84,7 +86,11 @@ function BookmarksHome() {
   });
   const { create, update } = useMutateBookmark({ year });
   const { toggle: toggleWatchLater } = useWatchLater({ year });
-  const { fosdemData } = useFosdemData({ year, initialData: serverFosdemData });
+  const { fosdemData } = useFosdemData({
+    year,
+    initialData: serverFosdemData,
+    initialDataIsPartial: true,
+  });
   const { user, loading: authLoading } = useAuth();
   const isClient = useIsClient();
   const hasServerSnapshot = Boolean(serverFosdemData);

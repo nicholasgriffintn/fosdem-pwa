@@ -10,14 +10,17 @@ import { dataQueryKeys } from "~/lib/query-keys";
 export function useFosdemData({
 	year,
 	initialData,
+	initialDataIsPartial = false,
 	enabled = true,
 }: {
 	year: number;
 	initialData?: Conference;
+	initialDataIsPartial?: boolean;
 	enabled?: boolean;
 }) {
 	const getData = useServerFn(getAllData);
-	const shouldFetch = enabled && Number.isFinite(year) && !initialData;
+	const shouldFetch =
+		enabled && Number.isFinite(year) && (!initialData || initialDataIsPartial);
 
 	const {
 		data: fosdemData,
