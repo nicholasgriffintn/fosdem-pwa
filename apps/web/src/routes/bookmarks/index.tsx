@@ -226,6 +226,7 @@ function BookmarksHome() {
           tab={tab}
           watchLaterItems={resolvedWatchLater}
           watchLaterLoading={resolvedWatchLaterLoading}
+          scheduleShowConflictIndicators={false}
           headerActions={
             <BookmarkActions
               onExport={handleExport}

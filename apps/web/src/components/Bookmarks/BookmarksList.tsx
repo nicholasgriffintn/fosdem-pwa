@@ -71,6 +71,7 @@ type BookmarksListProps = {
     updates: Partial<Bookmark | LocalBookmark>;
   }) => void;
   showConflicts?: boolean;
+  scheduleShowConflictIndicators?: boolean;
   defaultViewMode?: "list" | "schedule" | "calendar";
   showViewMode?: boolean;
   user?: User | null;
@@ -102,6 +103,7 @@ export function BookmarksList({
   watchLaterLoading,
   onUpdateBookmark,
   showConflicts = true,
+  scheduleShowConflictIndicators = true,
   defaultViewMode = "calendar",
   showViewMode = true,
   user,
@@ -313,7 +315,7 @@ export function BookmarksList({
                   day={day}
                   view={view}
                   onSetPriority={handleSetPriority}
-                  scheduleShowConflictIndicators={false}
+                  scheduleShowConflictIndicators={scheduleShowConflictIndicators}
                   showTrack={true}
                   defaultViewMode={defaultViewMode}
                   displayViewMode={showViewMode}

@@ -157,6 +157,7 @@ function ProfilePage() {
                 view={view}
                 tab={tab}
                 showConflicts={true}
+                scheduleShowConflictIndicators={false}
                 defaultViewMode="schedule"
                 showViewMode={false}
                 user={resolvedUser}
