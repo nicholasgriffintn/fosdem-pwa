@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router";
 
 import { Icons } from "~/components/shared/Icons";
 import { cn } from "~/lib/utils";
@@ -18,7 +18,8 @@ const VIEW_MODE_OPTIONS: ViewModeOption[] = [
   { value: "schedule", label: "Schedule", icon: <Icons.clock className="h-4 w-4" /> },
 ];
 
-const baseButtonClass = "inline-flex h-10 items-center gap-1 rounded-md border px-3 text-sm font-medium transition-colors ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 no-underline";
+const baseButtonClass =
+  "inline-flex h-10 items-center gap-1 rounded-md border px-3 text-sm font-medium transition-colors ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 no-underline";
 const activeClass = "bg-primary text-primary-foreground border-primary shadow-sm";
 const inactiveClass = "bg-background hover:bg-accent hover:text-accent-foreground";
 
@@ -36,11 +37,12 @@ export function ViewModeSwitch({ viewMode }: ViewModeSwitchProps) {
           search={(prev) => ({ ...prev, view: option.value })}
           className={cn(
             baseButtonClass,
-            viewMode === option.value ? activeClass : inactiveClass
+            viewMode === option.value ? activeClass : inactiveClass,
           )}
+          aria-label={option.label}
         >
           {option.icon}
-          {option.label}
+          <span className="hidden md:inline">{option.label}</span>
         </Link>
       ))}
     </div>

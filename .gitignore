@@ -24,3 +24,5 @@ apps/web/tests/playwright/results/
 test-results/
 
 coverage
+
+.claude
