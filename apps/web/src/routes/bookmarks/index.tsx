@@ -24,6 +24,8 @@ import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
 import { Icons } from "~/components/shared/Icons";
 import { ImportBookmarksSheet } from "~/components/Bookmarks/ImportBookmarksSheet";
 import { downloadFile } from "~/utils/file-download";
+import type { Bookmark } from "~/server/db/schema";
+import type { LocalBookmark } from "~/lib/localStorage";
 
 export const Route = createFileRoute("/bookmarks/")({
   component: BookmarksHome,
@@ -137,8 +139,16 @@ function BookmarksHome() {
     });
   };
 
-  const handleUpdateBookmark = (bookmark: any) => {
-    update(bookmark.id, { status: bookmark.status }, bookmark.serverId);
+  const handleUpdateBookmark = ({
+    id,
+    updates,
+    serverId,
+  }: {
+    id: string;
+    updates: Partial<Bookmark | LocalBookmark>;
+    serverId?: string;
+  }) => {
+    update(id, updates, serverId);
   };
 
   return (
