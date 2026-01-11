@@ -313,6 +313,7 @@ export function BookmarksList({
                   day={day}
                   view={view}
                   onSetPriority={handleSetPriority}
+                  scheduleShowConflictIndicators={false}
                   showTrack={true}
                   defaultViewMode={defaultViewMode}
                   displayViewMode={showViewMode}

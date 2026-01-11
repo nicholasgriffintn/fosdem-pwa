@@ -17,6 +17,7 @@ type EventScheduleListProps = {
 		eventId: string,
 		updates: { priority: number | null },
 	) => void;
+	showConflictIndicators?: boolean;
 	showTrack?: boolean;
 	user?: User | null;
 	onCreateBookmark?: ({
@@ -42,6 +43,7 @@ type EventScheduleListItemProps = {
 		eventId: string,
 		updates: { priority: number | null },
 	) => void;
+	showConflictIndicators?: boolean;
 	showTrack?: boolean;
 	user?: User | null;
 	onCreateBookmark?: ({
@@ -63,6 +65,7 @@ function EventScheduleListItem({
 	bookmarksLoading,
 	conflicts,
 	onSetPriority,
+	showConflictIndicators,
 	showTrack,
 	user,
 	onCreateBookmark,
@@ -82,6 +85,7 @@ function EventScheduleListItem({
 				bookmarksLoading={bookmarksLoading}
 				conflicts={conflicts}
 				onSetPriority={onSetPriority}
+				showConflictIndicators={showConflictIndicators}
 				showTrack={showTrack}
 				user={user}
 				onCreateBookmark={onCreateBookmark}
@@ -126,6 +130,7 @@ export function EventScheduleList({
 	year,
 	conflicts,
 	onSetPriority,
+	showConflictIndicators,
 	showTrack,
 	user,
 	onCreateBookmark,
@@ -150,6 +155,7 @@ export function EventScheduleList({
 						bookmarksLoading={bookmarksLoading}
 						conflicts={conflicts}
 						onSetPriority={onSetPriority}
+						showConflictIndicators={showConflictIndicators}
 						showTrack={showTrack}
 						user={user}
 						onCreateBookmark={onCreateBookmark}

@@ -30,6 +30,7 @@ type EventListProps = {
 		eventId: string,
 		updates: { priority: number | null },
 	) => void;
+	scheduleShowConflictIndicators?: boolean;
 	showTrack?: boolean;
 	user?: User | null;
 	onCreateBookmark?: ({
@@ -62,6 +63,7 @@ export function EventList({
 	sortFavourites,
 	onSortFavouritesChange,
 	onSetPriority,
+	scheduleShowConflictIndicators = true,
 	showTrack = false,
 	user = null,
 	onCreateBookmark,
@@ -90,6 +92,7 @@ export function EventList({
 					year={year}
 					conflicts={conflicts}
 					onSetPriority={onSetPriority}
+					showConflictIndicators={scheduleShowConflictIndicators}
 					showTrack={showTrack}
 					user={user}
 					onCreateBookmark={onCreateBookmark}

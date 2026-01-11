@@ -48,6 +48,7 @@ type EventListItemProps = {
 		eventId: string,
 		updates: { priority: number | null },
 	) => void;
+	showConflictIndicators?: boolean;
 	showTrack?: boolean;
 	user?: User | null;
 	onCreateBookmark?: ({
@@ -72,6 +73,7 @@ export function EventListItem({
 	bookmarksLoading,
 	conflicts,
 	onSetPriority,
+	showConflictIndicators = true,
 	showTrack,
 	user,
 	onCreateBookmark,
@@ -81,15 +83,18 @@ export function EventListItem({
 	actionSize,
 	onToggleWatchLater,
 }: EventListItemProps) {
-	const hasConflicts = conflicts?.some(
-		(conflict) =>
-			conflict.event1.id === event.id || conflict.event2.id === event.id,
-	);
+	const hasConflicts = showConflictIndicators
+		? conflicts?.some(
+			(conflict) =>
+				conflict.event1.id === event.id || conflict.event2.id === event.id,
+		)
+		: false;
 	const endTime = calculateEndTime(event.startTime, event.duration);
 	const layoutClass =
 		variant === "card"
 			? "flex flex-col gap-3 h-full"
 			: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3";
+	const showPinnedBadge = showConflictIndicators && event.priority === 1;
 	const metaBadges = [
 		{
 			key: "time",
@@ -121,7 +126,7 @@ export function EventListItem({
 		.filter(Boolean)
 		.map((meta) => meta as { key: string; label: string; icon?: React.ReactNode });
 	const hasStatusBadges = Boolean(
-		event.isLive || hasConflicts || event.priority === 1,
+		event.isLive || hasConflicts || showPinnedBadge,
 	);
 
 	const containerClass = clsx(
@@ -147,7 +152,7 @@ export function EventListItem({
 							</Badge>
 						)}
 						{hasConflicts && <Badge variant="destructive">Conflict</Badge>}
-						{event.priority === 1 && <Badge variant="secondary">Pinned</Badge>}
+						{showPinnedBadge && <Badge variant="secondary">Pinned</Badge>}
 					</div>
 				)}
 				<div className={layoutClass}>
