@@ -3,6 +3,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 const { mockKV, mockEnv } = vi.hoisted(() => {
   const mockKV = {
     get: vi.fn(),
+    getWithMetadata: vi.fn(),
     put: vi.fn(),
     delete: vi.fn(),
   };
@@ -27,6 +28,7 @@ describe("CacheManager", () => {
     CacheManager.resetInstance();
     mockEnv.KV_CACHING_ENABLED = "false";
     mockKV.get.mockReset();
+    mockKV.getWithMetadata.mockReset();
     mockKV.put.mockReset();
     mockKV.delete.mockReset();
     vi.clearAllMocks();

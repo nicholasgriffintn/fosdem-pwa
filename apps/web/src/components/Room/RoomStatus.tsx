@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { useIsClient } from "~/hooks/use-is-client";
 
 import { useRoomStatus } from "~/hooks/use-room-status";
 import { LoadingState } from "~/components/shared/LoadingState";
@@ -14,13 +15,16 @@ type RoomStatusProps = {
 
 export function RoomStatus({ roomId, isRunning, className }: RoomStatusProps) {
 	const { data: status, isLoading } = useRoomStatus(roomId);
+	const isClient = useIsClient();
+	const showSpinner = isClient && isLoading;
+	const state = status?.state ?? "unknown";
 
 	const statusClassName = clsx(
 		"inline-flex items-center px-4 py-2 rounded-full",
 		{
-			"bg-green-100 text-green-800": status?.state === "available",
-			"bg-red-100 text-red-800": status?.state === "full",
-			"bg-gray-100 text-gray-800": status?.state === "unknown" || isLoading,
+			"bg-green-100 text-green-800": state === "available",
+			"bg-red-100 text-red-800": state === "full",
+			"bg-gray-100 text-gray-800": state === "unknown" || showSpinner,
 		},
 		className,
 	);
@@ -36,10 +40,10 @@ export function RoomStatus({ roomId, isRunning, className }: RoomStatusProps) {
 			<div className="flex items-center gap-3">
 				<div className={statusClassName}>
 					<span className="capitalize">
-						{isLoading ? (
+						{showSpinner ? (
 							<LoadingState type="spinner" size="sm" variant="inline" />
 						) : (
-							status?.state || "Unknown"
+							state
 						)}
 					</span>
 				</div>

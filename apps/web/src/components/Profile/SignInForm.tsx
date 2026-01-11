@@ -30,7 +30,7 @@ export function SignInForm() {
 					type="submit"
 					variant="outline"
 					size="lg"
-					className="w-full cursor-pointer bg-[#C2410C] text-white hover:bg-[#9A3412] border-[#9A3412]"
+					className="w-full cursor-pointer bg-[#C2410C] text-white hover:bg-[#9A3412] hover:text-white border-[#9A3412]"
 					disabled={isSubmitting || isGuestSubmitting}
 				>
 					{isSubmitting && <Spinner className="w-4 h-4 mr-2" />}
@@ -45,7 +45,7 @@ export function SignInForm() {
 					type="submit"
 					variant="outline"
 					size="lg"
-					className="w-full cursor-pointer bg-gray-900 text-white hover:bg-gray-800 border-gray-700"
+					className="w-full cursor-pointer bg-gray-900 text-white hover:bg-gray-800 hover:text-white border-gray-700"
 					disabled={isSubmitting || isGuestSubmitting}
 				>
 					{isSubmitting && <Spinner className="w-4 h-4 mr-2" />}
@@ -60,7 +60,7 @@ export function SignInForm() {
 					type="submit"
 					variant="outline"
 					size="lg"
-					className="w-full cursor-pointer bg-[#5865F2] text-white hover:bg-[#4752C4] border-[#4752C4]"
+					className="w-full cursor-pointer bg-[#5865F2] text-white hover:bg-[#4752C4] hover:text-white border-[#4752C4]"
 					disabled={isSubmitting || isGuestSubmitting}
 				>
 					{isSubmitting && <Spinner className="w-4 h-4 mr-2" />}

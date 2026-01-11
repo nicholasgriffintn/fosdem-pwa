@@ -41,8 +41,8 @@ export function MastodonSignIn({ disabled = false, isUpgrade = false }: Mastodon
         variant={isUpgrade ? "outline" : "outline"}
         size={isUpgrade ? "sm" : "lg"}
         className={isUpgrade
-          ? "inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md border border-indigo-700 bg-indigo-600 text-white px-3 py-1.5 text-sm font-medium transition-colors hover:bg-indigo-700 no-underline"
-          : "w-full cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700 border-indigo-700"
+          ? "inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md border border-indigo-700 bg-indigo-600 text-white px-3 py-1.5 text-sm font-medium transition-colors hover:bg-indigo-700 hover:text-white no-underline"
+          : "w-full cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white border-indigo-700"
         }
         disabled={disabled}
         onClick={() => {
