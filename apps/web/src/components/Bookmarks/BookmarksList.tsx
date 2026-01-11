@@ -273,7 +273,10 @@ export function BookmarksList({
             <div>
               {tracks.length > 0 && (
                 <div
-                  className={cn(tab === "events" || tab === "watch-later" ? "hidden" : "")}
+                  className={cn({
+                    hidden: tab === "events" || tab === "watch-later",
+                    'pb-6': tab === "all",
+                  })}
                 >
                   <TrackList
                     tracks={tracks}
