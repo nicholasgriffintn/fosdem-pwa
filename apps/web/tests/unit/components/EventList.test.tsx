@@ -99,12 +99,12 @@ describe("EventList", () => {
 
 		expect(screen.getByRole("heading", { name: /Schedule/i })).toBeInTheDocument();
 
-		const calendarLink = screen.getByText(/calendar/i, { selector: "a" });
+		const calendarLink = screen.getByLabelText(/calendar/i);
 		fireEvent.click(calendarLink);
 		expect(screen.getByText(/Talk A/i)).toBeInTheDocument();
 		expect(screen.getByText(/Talk B/i)).toBeInTheDocument();
 		
-		const scheduleLink = screen.getByText(/schedule/i, { selector: "a" });
+		const scheduleLink = screen.getByLabelText(/schedule/i);
 		fireEvent.click(scheduleLink);
 		expect(screen.getByText(/Talk A/i)).toBeInTheDocument();
 

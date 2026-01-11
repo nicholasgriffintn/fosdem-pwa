@@ -11,6 +11,9 @@
   "placement": {
     "mode": "smart"
   },
+  "vars": {
+    "KV_CACHING_ENABLED": true
+  },
   "observability": {
     "enabled": true,
     "logs": {

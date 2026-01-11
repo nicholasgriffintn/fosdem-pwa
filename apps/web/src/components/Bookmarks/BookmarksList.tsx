@@ -12,7 +12,6 @@ import type { User } from "~/server/db/schema";
 import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
-import { doesEventMatchTrack } from "~/lib/tracks";
 import { isEvent, isTrack } from "~/lib/type-guards";
 import { cn } from "~/lib/utils";
 
@@ -126,6 +125,17 @@ export function BookmarksList({
     [bookmarks],
   );
 
+  const eventCountByTrack = useMemo(() => {
+    if (!fosdemData) return new Map<string, number>();
+    const counts = new Map<string, number>();
+    for (const event of Object.values(fosdemData.events)) {
+      if (!isEvent(event) || !event.trackKey) continue;
+      const key = event.trackKey.toString().trim().toLowerCase();
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return counts;
+  }, [fosdemData]);
+
   const { tracks, events, conflicts } = useMemo(() => {
     if (!bookmarks?.length || !fosdemData) {
       return { tracks: [], events: [], conflicts: [] };
@@ -148,16 +158,15 @@ export function BookmarksList({
 
     const conflicts = showConflicts ? detectEventConflicts(formattedEvents, year) : [];
 
-    const validEvents = Object.values(fosdemData.events).filter(isEvent);
-
     const formattedTracks = bookmarkedTracks
       .map((bookmark) => {
         const track = fosdemData.tracks[bookmark.slug];
         if (!track || !isTrack(track)) return null;
 
-        const eventCount = validEvents.filter((event) =>
-          doesEventMatchTrack(event, track),
-        ).length;
+        const trackId = track.id?.toString().trim().toLowerCase() ?? "";
+        const trackName = track.name?.toString().trim().toLowerCase() ?? "";
+        const eventCount =
+          eventCountByTrack.get(trackId) || eventCountByTrack.get(trackName) || 0;
 
         return {
           id: track.id,
@@ -170,7 +179,7 @@ export function BookmarksList({
       .sort(sortTracks);
 
     return { tracks: formattedTracks, events: formattedEvents, conflicts };
-  }, [bookmarks, fosdemData, year, organizedBookmarks, showConflicts]);
+  }, [bookmarks, fosdemData, year, organizedBookmarks, showConflicts, eventCountByTrack]);
 
   const days = useMemo(
     () => (fosdemData ? Object.values(fosdemData.days) : []),
@@ -219,101 +228,101 @@ export function BookmarksList({
       ) : bookmarks?.length ? (
         <div className="space-y-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-background/95 backdrop-blur-md p-1 text-muted-foreground md:w-auto border border-white/20 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20">
-                <Link
-                  to="."
-                  search={(prev) => ({ ...prev, tab: "all" })}
-                  className={cn(
-                    tabBaseClass,
-                    "hidden md:inline-flex",
+            <div className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-background/95 backdrop-blur-md p-1 text-muted-foreground md:w-auto border border-white/20 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20">
+              <Link
+                to="."
+                search={(prev) => ({ ...prev, tab: "all" })}
+                className={cn(
+                  tabBaseClass,
+                  "hidden md:inline-flex",
                   tab === "all" ? tabActiveClass : tabInactiveClass,
                 )}
-                >
-                  All
-                </Link>
-                <Link
-                  to="."
-                  search={(prev) => ({ ...prev, tab: "events" })}
-                  className={cn(
-                    tabBaseClass,
-                    "flex-1",
+              >
+                All
+              </Link>
+              <Link
+                to="."
+                search={(prev) => ({ ...prev, tab: "events" })}
+                className={cn(
+                  tabBaseClass,
+                  "flex-1",
                   tab === "events" ? tabActiveClass : tabInactiveClass,
                 )}
-                >
-                  Events
-                </Link>
-                <Link
-                  to="."
-                  search={(prev) => ({ ...prev, tab: "tracks" })}
-                  className={cn(
-                    tabBaseClass,
-                    "flex-1",
+              >
+                Events
+              </Link>
+              <Link
+                to="."
+                search={(prev) => ({ ...prev, tab: "tracks" })}
+                className={cn(
+                  tabBaseClass,
+                  "flex-1",
                   tab === "tracks" ? tabActiveClass : tabInactiveClass,
                 )}
-                >
-                  Tracks
-                </Link>
-                <Link
-                  to="."
-                  search={(prev) => ({ ...prev, tab: "watch-later" })}
-                  className={cn(
-                    tabBaseClass,
-                    "flex-1",
+              >
+                Tracks
+              </Link>
+              <Link
+                to="."
+                search={(prev) => ({ ...prev, tab: "watch-later" })}
+                className={cn(
+                  tabBaseClass,
+                  "flex-1",
                   tab === "watch-later" ? tabActiveClass : tabInactiveClass,
                 )}
-                >
-                  Watch Later
-                </Link>
-              </div>
-              {headerActions ? (
-                <div className="flex w-full justify-end md:w-auto">{headerActions}</div>
-              ) : null}
+              >
+                Watch Later
+              </Link>
             </div>
+            {headerActions ? (
+              <div className="flex w-full justify-end md:w-auto">{headerActions}</div>
+            ) : null}
+          </div>
 
-            <div>
-              {tracks.length > 0 && (
-                <div
-                  className={cn({
-                    hidden: tab === "events" || tab === "watch-later",
-                    'pb-6': tab === "all",
-                  })}
-                >
-                  <TrackList
-                    tracks={tracks}
-                    year={year}
-                    title={title || "Bookmarked Tracks"}
-                    day={day}
-                    user={user}
-                    onCreateBookmark={onCreateBookmark}
-                    serverBookmarks={bookmarkSnapshot}
-                  />
-                </div>
-              )}
+          <div>
+            {tracks.length > 0 && (
+              <div
+                className={cn({
+                  hidden: tab === "events" || tab === "watch-later",
+                  "pb-6": tab === "all",
+                })}
+              >
+                <TrackList
+                  tracks={tracks}
+                  year={year}
+                  title={title || "Bookmarked Tracks"}
+                  day={day}
+                  user={user}
+                  onCreateBookmark={onCreateBookmark}
+                  serverBookmarks={bookmarkSnapshot}
+                />
+              </div>
+            )}
 
-              {events.length > 0 && (
-                <div
-                  className={cn(tab === "tracks" || tab === "watch-later" ? "hidden" : "")}
-                >
-                  <EventList
-                    events={events}
-                    year={year}
-                    conflicts={conflicts}
-                    title={title || "Bookmarked Events"}
-                    groupByDay={true}
-                    days={days}
-                    day={day}
-                    view={view}
-                    onSetPriority={handleSetPriority}
-                    showTrack={true}
-                    defaultViewMode={defaultViewMode}
-                    displayViewMode={showViewMode}
-                    user={user}
-                    onCreateBookmark={onCreateBookmark}
-                    serverBookmarks={bookmarkSnapshot}
-                    onToggleWatchLater={onToggleWatchLater}
-                  />
-                </div>
-              )}
+            {events.length > 0 && (
+              <div
+                className={cn(tab === "tracks" || tab === "watch-later" ? "hidden" : "")}
+              >
+                <EventList
+                  events={events}
+                  year={year}
+                  conflicts={conflicts}
+                  title={title || "Bookmarked Events"}
+                  groupByDay={true}
+                  days={days}
+                  day={day}
+                  view={view}
+                  onSetPriority={handleSetPriority}
+                  showTrack={true}
+                  defaultViewMode={defaultViewMode}
+                  displayViewMode={showViewMode}
+                  user={user}
+                  onCreateBookmark={onCreateBookmark}
+                  serverBookmarks={bookmarkSnapshot}
+                  onToggleWatchLater={onToggleWatchLater}
+                />
+              </div>
+            )}
 
             {tab === "watch-later" && (
               <div>
@@ -322,8 +331,8 @@ export function BookmarksList({
                   fosdemData={fosdemData || null}
                   year={year}
                   loading={watchLaterLoading}
-                  onToggleWatchLater={onToggleWatchLater || (async () => { })}
-                  onMarkAsWatched={async () => { }}
+                  onToggleWatchLater={onToggleWatchLater || (async () => {})}
+                  onMarkAsWatched={async () => {}}
                 />
               </div>
             )}

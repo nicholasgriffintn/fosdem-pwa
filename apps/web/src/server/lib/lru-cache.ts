@@ -1,6 +1,7 @@
 interface InMemoryCacheEntry {
   data: unknown;
   expiresAt: number;
+  softExpiresAt?: number;
 }
 
 export class LRUCache {
@@ -24,6 +25,24 @@ export class LRUCache {
     this.cache.delete(key);
     this.cache.set(key, entry);
     return entry;
+  }
+
+  getWithStaleness(key: string): { entry: InMemoryCacheEntry; isStale: boolean } | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    const now = Date.now();
+
+    if (now > entry.expiresAt) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    this.cache.delete(key);
+    this.cache.set(key, entry);
+
+    const isStale = entry.softExpiresAt ? now > entry.softExpiresAt : false;
+    return { entry, isStale };
   }
 
   set(key: string, entry: InMemoryCacheEntry): void {

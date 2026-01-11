@@ -1,109 +1,122 @@
 import type { Event } from "~/types/fosdem";
 
 interface TimeSlot {
-	time: string;
-	events: Event[];
+  time: string;
+  events: Event[];
 }
 
 export interface EventConflict {
-	event1: Event;
-	event2: Event;
-	overlapDuration: number;
-	startOverlap: Date;
-	endOverlap: Date;
+  event1: Event;
+  event2: Event;
+  overlapDuration: number;
+  startOverlap: Date;
+  endOverlap: Date;
 }
 
 export interface GroupedConflict {
-	mainEvent: Event;
-	conflicts: {
-		event: Event;
-		duration: number;
-		startOverlap: Date;
-		endOverlap: Date;
-	}[];
+  mainEvent: Event;
+  conflicts: {
+    event: Event;
+    duration: number;
+    startOverlap: Date;
+    endOverlap: Date;
+  }[];
 }
 
-export function detectEventConflicts(
-	events: Event[], year: number
-): EventConflict[] {
-	const conflicts: EventConflict[] = [];
+interface EventWithTime {
+  event: Event;
+  day: string | number | string[] | number[];
+  start: number;
+  end: number;
+}
 
-	if (events.length < 2) {
-		return conflicts;
-	}
+function parseTimeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+}
 
-	for (let i = 0; i < events.length - 1; i++) {
-		for (let j = i + 1; j < events.length; j++) {
-			const event1 = events[i];
-			const event2 = events[j];
+function parseDurationToMinutes(duration: string): number {
+  const [hours, minutes] = duration.split(":").map(Number);
+  return hours * 60 + minutes;
+}
 
-			if (event1.day !== event2.day) {
-				continue;
-			}
+function minutesToDate(year: number, minutes: number): Date {
+  const date = new Date(year, 0, 1);
+  date.setHours(Math.floor(minutes / 60), minutes % 60);
+  return date;
+}
 
-			const [hours1, minutes1] = event1.startTime.split(":").map(Number);
-			const [hours2, minutes2] = event2.startTime.split(":").map(Number);
-			const [durationHours1, durationMinutes1] = event1.duration
-				.split(":")
-				.map(Number);
-			const [durationHours2, durationMinutes2] = event2.duration
-				.split(":")
-				.map(Number);
+export function detectEventConflicts(events: Event[], year: number): EventConflict[] {
+  if (events.length < 2) {
+    return [];
+  }
 
-			const start1 = hours1 * 60 + minutes1;
-			const start2 = hours2 * 60 + minutes2;
-			const duration1 = durationHours1 * 60 + durationMinutes1;
-			const duration2 = durationHours2 * 60 + durationMinutes2;
+  const eventsWithTime: EventWithTime[] = events.map((event) => ({
+    event,
+    day: event.day,
+    start: parseTimeToMinutes(event.startTime),
+    end: parseTimeToMinutes(event.startTime) + parseDurationToMinutes(event.duration),
+  }));
 
-			const end1 = start1 + duration1;
-			const end2 = start2 + duration2;
+  const byDay = new Map<string | number | string[] | number[], EventWithTime[]>();
+  for (const e of eventsWithTime) {
+    const dayKey = String(e.day);
+    const dayEvents = byDay.get(dayKey);
+    if (dayEvents) {
+      dayEvents.push(e);
+    } else {
+      byDay.set(dayKey, [e]);
+    }
+  }
 
-			const overlapStart = Math.max(start1, start2);
-			const overlapEnd = Math.min(end1, end2);
+  const conflicts: EventConflict[] = [];
 
-			if (overlapStart < overlapEnd) {
-				const overlapDuration = overlapEnd - overlapStart;
+  for (const dayEvents of byDay.values()) {
+    if (dayEvents.length < 2) continue;
 
-				const baseDate = new Date(year, 0, 1);
-				const startDate = new Date(baseDate);
-				startDate.setHours(Math.floor(overlapStart / 60), overlapStart % 60);
-				const endDate = new Date(baseDate);
-				endDate.setHours(Math.floor(overlapEnd / 60), overlapEnd % 60);
+    dayEvents.sort((a, b) => a.start - b.start);
 
-				conflicts.push({
-					event1,
-					event2,
-					overlapDuration,
-					startOverlap: startDate,
-					endOverlap: endDate,
-				});
-			}
-		}
-	}
+    for (let i = 0; i < dayEvents.length; i++) {
+      const current = dayEvents[i];
+      for (let j = i + 1; j < dayEvents.length && dayEvents[j].start < current.end; j++) {
+        const other = dayEvents[j];
+        const overlapStart = Math.max(current.start, other.start);
+        const overlapEnd = Math.min(current.end, other.end);
 
-	return conflicts;
+        conflicts.push({
+          event1: current.event,
+          event2: other.event,
+          overlapDuration: overlapEnd - overlapStart,
+          startOverlap: minutesToDate(year, overlapStart),
+          endOverlap: minutesToDate(year, overlapEnd),
+        });
+      }
+    }
+  }
+
+  return conflicts;
 }
 
 export function generateTimeSlots(events: Event[]): TimeSlot[] {
-	const timeSlots: { [key: string]: Event[] } = {};
-	const sortedTimes: string[] = [];
+  const timeSlots: { [key: string]: Event[] } = {};
+  const sortedTimes: string[] = [];
 
-	for (const event of events) {
-		if (!timeSlots[event.startTime]) {
-			timeSlots[event.startTime] = [];
-			sortedTimes.push(event.startTime);
-		}
-		timeSlots[event.startTime].push(event);
-	}
+  for (const event of events) {
+    if (!timeSlots[event.startTime]) {
+      timeSlots[event.startTime] = [];
+      sortedTimes.push(event.startTime);
+    }
+    timeSlots[event.startTime].push(event);
+  }
 
-	sortedTimes.sort((a, b) => {
-		const [aHours, aMinutes] = a.split(":").map(Number);
-		const [bHours, bMinutes] = b.split(":").map(Number);
-		return aHours * 60 + aMinutes - (bHours * 60 + bMinutes);
-	});
+  sortedTimes.sort((a, b) => {
+    const [aHours, aMinutes] = a.split(":").map(Number);
+    const [bHours, bMinutes] = b.split(":").map(Number);
+    return aHours * 60 + aMinutes - (bHours * 60 + bMinutes);
+  });
 
-	return sortedTimes.map((time) => ({
-		time,
-		events: timeSlots[time],
-	}));
+  return sortedTimes.map((time) => ({
+    time,
+    events: timeSlots[time],
+  }));
 }
