@@ -19,7 +19,7 @@ import { cn } from "~/lib/utils";
 const tabBaseClass =
   "inline-flex h-10 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-all no-underline backdrop-blur-sm";
 const tabActiveClass =
-  "bg-white/90 dark:bg-white/10 text-foreground shadow-lg shadow-black/5 dark:shadow-black/20 border border-white/20 dark:border-white/10";
+  "bg-secondary text-foreground shadow-lg shadow-black/5 dark:shadow-black/20 border border-white/20 dark:border-white/10";
 const tabInactiveClass =
   "text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5";
 
@@ -219,7 +219,7 @@ export function BookmarksList({
       ) : bookmarks?.length ? (
         <div className="space-y-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-white/40 dark:bg-black/20 backdrop-blur-md p-1 text-muted-foreground md:w-auto border border-white/20 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20">
+              <div className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-background/95 backdrop-blur-md p-1 text-muted-foreground md:w-auto border border-white/20 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20">
                 <Link
                   to="."
                   search={(prev) => ({ ...prev, tab: "all" })}
