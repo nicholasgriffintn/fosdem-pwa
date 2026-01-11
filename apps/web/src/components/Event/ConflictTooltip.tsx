@@ -44,14 +44,16 @@ export function ConflictTooltip({
 	}
 
 	const getPriorityColor = (p?: number) => {
-		if (!p) return "bg-destructive text-destructive-foreground";
+		if (!p) {
+			return "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:text-destructive-foreground";
+		}
 		switch (p) {
 			case 1:
-				return "bg-primary text-primary-foreground";
+				return "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground";
 			case 2:
-				return "bg-orange-500 text-white dark:text-primary-foreground";
+				return "bg-orange-500 text-white hover:bg-orange-600 hover:text-white dark:text-primary-foreground dark:hover:text-primary-foreground";
 			default:
-				return "bg-destructive text-destructive-foreground";
+				return "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:text-destructive-foreground";
 		}
 	};
 
