@@ -60,7 +60,7 @@ export function Header() {
                       variant="link"
                       size="sm"
                       className={cn(
-                        "h-8 gap-2 px-3 text-muted-foreground no-underline whitespace-nowrap"
+                        "h-8 gap-2 px-3 text-muted-foreground no-underline whitespace-nowrap",
                       )}
                       asChild
                     >
@@ -82,7 +82,9 @@ export function Header() {
               </TooltipProvider>
             )}
           </div>
-          <HeaderSearch year={selectedYear} />
+          <div className="hidden md:block">
+            <HeaderSearch year={selectedYear} />
+          </div>
         </div>
       </div>
     </header>
