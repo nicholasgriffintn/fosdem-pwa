@@ -15,7 +15,7 @@
     "@cloudflare/workers-types": "4.20260115.0",
     "typescript": "5.9.3",
     "vitest": "4.0.17",
-    "wrangler": "4.59.1"
+    "wrangler": "4.59.2"
   },
   "dependencies": {
     "@sentry/cloudflare": "10.34.0",
