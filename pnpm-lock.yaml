@@ -11,8 +11,8 @@ importers:
   apps/build-data:
     dependencies:
       '@sentry/cloudflare':
-        specifier: 10.34.0
-        version: 10.34.0(@cloudflare/workers-types@4.20260118.0)
+        specifier: 10.35.0
+        version: 10.35.0(@cloudflare/workers-types@4.20260118.0)
       xml-js:
         specifier: 1.6.11
         version: 1.6.11
@@ -38,8 +38,8 @@ importers:
   apps/push:
     dependencies:
       '@sentry/cloudflare':
-        specifier: 10.34.0
-        version: 10.34.0(@cloudflare/workers-types@4.20260118.0)
+        specifier: 10.35.0
+        version: 10.35.0(@cloudflare/workers-types@4.20260118.0)
       webpush-webcrypto:
         specifier: 1.0.5
         version: 1.0.5
@@ -1943,8 +1943,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sentry/cloudflare@10.34.0':
-    resolution: {integrity: sha512-GYBeFf/CGVJoWE6gTv7IP3hJdBecOTUUlhL74+hG6oELwn4qffCOknC/wrm3W94ydBMw0uLa4bM9Ev2ETOY8wg==}
+  '@sentry/cloudflare@10.35.0':
+    resolution: {integrity: sha512-Ob+ahHtB7QG4XSXNY0hXG8Y2R9scO1ipzZO7ked7OMqHq2pk/ycReJjPu358a19g1HSPa1FXFQioYclA/FL3Vw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cloudflare/workers-types': ^4.x
@@ -1952,8 +1952,8 @@ packages:
       '@cloudflare/workers-types':
         optional: true
 
-  '@sentry/core@10.34.0':
-    resolution: {integrity: sha512-4FFpYBMf0VFdPcsr4grDYDOR87mRu6oCfb51oQjU/Pndmty7UgYo0Bst3LEC/8v0SpytBtzXq+Wx/fkwulBesg==}
+  '@sentry/core@10.35.0':
+    resolution: {integrity: sha512-lEK1WFqt6oHtMq5dDLVE/FDzHDGs1PlYT5cZH4aBirYtJVyUiTf0NknKFob4a2zTywczlq7SbLv6Ba8UMU9dYg==}
     engines: {node: '>=18'}
 
   '@sindresorhus/is@7.1.1':
@@ -4947,14 +4947,14 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.53.3':
     optional: true
 
-  '@sentry/cloudflare@10.34.0(@cloudflare/workers-types@4.20260118.0)':
+  '@sentry/cloudflare@10.35.0(@cloudflare/workers-types@4.20260118.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@sentry/core': 10.34.0
+      '@sentry/core': 10.35.0
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260118.0
 
-  '@sentry/core@10.34.0': {}
+  '@sentry/core@10.35.0': {}
 
   '@sindresorhus/is@7.1.1': {}
 
