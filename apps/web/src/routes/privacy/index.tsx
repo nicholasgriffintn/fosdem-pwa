@@ -45,8 +45,8 @@ function PrivacyPolicyPage() {
 							and push notification subscriptions to sync across devices.
 						</li>
 						<li>
-							We use Sentry for error reporting in the data sync and push
-							notification services.
+							We use the Sentry SDK (but with my own backend [Bit Wobbly](https://bitwobbly.com))
+							for error reporting across services.
 						</li>
 					</ul>
 				</section>

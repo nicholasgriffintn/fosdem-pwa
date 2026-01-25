@@ -242,18 +242,18 @@ export interface FileRoutesByFullPath {
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/track/$slug': typeof TrackSlugRoute
   '/type/$slug': typeof TypeSlugRoute
-  '/bookmarks': typeof BookmarksIndexRoute
-  '/live': typeof LiveIndexRoute
-  '/map': typeof MapIndexRoute
-  '/offline': typeof OfflineIndexRoute
-  '/privacy': typeof PrivacyIndexRoute
-  '/profile': typeof ProfileIndexRoute
-  '/rooms': typeof RoomsIndexRoute
-  '/search': typeof SearchIndexRoute
-  '/signin': typeof SigninIndexRoute
-  '/speakers': typeof SpeakersIndexRoute
-  '/terms': typeof TermsIndexRoute
-  '/tester': typeof TesterIndexRoute
+  '/bookmarks/': typeof BookmarksIndexRoute
+  '/live/': typeof LiveIndexRoute
+  '/map/': typeof MapIndexRoute
+  '/offline/': typeof OfflineIndexRoute
+  '/privacy/': typeof PrivacyIndexRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/rooms/': typeof RoomsIndexRoute
+  '/search/': typeof SearchIndexRoute
+  '/signin/': typeof SigninIndexRoute
+  '/speakers/': typeof SpeakersIndexRoute
+  '/terms/': typeof TermsIndexRoute
+  '/tester/': typeof TesterIndexRoute
   '/api/auth/discord': typeof ApiAuthDiscordRoute
   '/api/auth/github': typeof ApiAuthGithubRoute
   '/api/auth/gitlab': typeof ApiAuthGitlabRoute
@@ -265,7 +265,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/upgrade-gitlab': typeof ApiAuthUpgradeGitlabRoute
   '/api/auth/upgrade-mastodon': typeof ApiAuthUpgradeMastodonRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
-  '/profile/$userId': typeof ProfileUserIdIndexRoute
+  '/profile/$userId/': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
   '/api/auth/callback/gitlab': typeof ApiAuthCallbackGitlabRoute
@@ -362,18 +362,18 @@ export interface FileRouteTypes {
     | '/speakers/$slug'
     | '/track/$slug'
     | '/type/$slug'
-    | '/bookmarks'
-    | '/live'
-    | '/map'
-    | '/offline'
-    | '/privacy'
-    | '/profile'
-    | '/rooms'
-    | '/search'
-    | '/signin'
-    | '/speakers'
-    | '/terms'
-    | '/tester'
+    | '/bookmarks/'
+    | '/live/'
+    | '/map/'
+    | '/offline/'
+    | '/privacy/'
+    | '/profile/'
+    | '/rooms/'
+    | '/search/'
+    | '/signin/'
+    | '/speakers/'
+    | '/terms/'
+    | '/tester/'
     | '/api/auth/discord'
     | '/api/auth/github'
     | '/api/auth/gitlab'
@@ -385,7 +385,7 @@ export interface FileRouteTypes {
     | '/api/auth/upgrade-gitlab'
     | '/api/auth/upgrade-mastodon'
     | '/api/proxy/subtitles'
-    | '/profile/$userId'
+    | '/profile/$userId/'
     | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
     | '/api/auth/callback/gitlab'
@@ -530,84 +530,84 @@ declare module '@tanstack/react-router' {
     '/tester/': {
       id: '/tester/'
       path: '/tester'
-      fullPath: '/tester'
+      fullPath: '/tester/'
       preLoaderRoute: typeof TesterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms/': {
       id: '/terms/'
       path: '/terms'
-      fullPath: '/terms'
+      fullPath: '/terms/'
       preLoaderRoute: typeof TermsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/speakers/': {
       id: '/speakers/'
       path: '/speakers'
-      fullPath: '/speakers'
+      fullPath: '/speakers/'
       preLoaderRoute: typeof SpeakersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signin/': {
       id: '/signin/'
       path: '/signin'
-      fullPath: '/signin'
+      fullPath: '/signin/'
       preLoaderRoute: typeof SigninIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search/': {
       id: '/search/'
       path: '/search'
-      fullPath: '/search'
+      fullPath: '/search/'
       preLoaderRoute: typeof SearchIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rooms/': {
       id: '/rooms/'
       path: '/rooms'
-      fullPath: '/rooms'
+      fullPath: '/rooms/'
       preLoaderRoute: typeof RoomsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile/': {
       id: '/profile/'
       path: '/profile'
-      fullPath: '/profile'
+      fullPath: '/profile/'
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy/': {
       id: '/privacy/'
       path: '/privacy'
-      fullPath: '/privacy'
+      fullPath: '/privacy/'
       preLoaderRoute: typeof PrivacyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offline/': {
       id: '/offline/'
       path: '/offline'
-      fullPath: '/offline'
+      fullPath: '/offline/'
       preLoaderRoute: typeof OfflineIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/map/': {
       id: '/map/'
       path: '/map'
-      fullPath: '/map'
+      fullPath: '/map/'
       preLoaderRoute: typeof MapIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live/': {
       id: '/live/'
       path: '/live'
-      fullPath: '/live'
+      fullPath: '/live/'
       preLoaderRoute: typeof LiveIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookmarks/': {
       id: '/bookmarks/'
       path: '/bookmarks'
-      fullPath: '/bookmarks'
+      fullPath: '/bookmarks/'
       preLoaderRoute: typeof BookmarksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -656,7 +656,7 @@ declare module '@tanstack/react-router' {
     '/profile/$userId/': {
       id: '/profile/$userId/'
       path: '/profile/$userId'
-      fullPath: '/profile/$userId'
+      fullPath: '/profile/$userId/'
       preLoaderRoute: typeof ProfileUserIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

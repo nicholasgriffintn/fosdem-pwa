@@ -5,6 +5,7 @@ import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query
 import { DefaultCatchBoundary } from "./components/shared/DefaultCatchBoundary";
 import { NotFound } from "./components/shared/NotFound";
 import { routeTree } from "./routeTree.gen";
+import { initSentry } from "./lib/sentry";
 
 export function getRouter() {
 	const queryClient = new QueryClient({
@@ -25,7 +26,7 @@ export function getRouter() {
 	const router = createRouter({
 		routeTree,
 		context: { queryClient },
-		scrollToTopSelectors: ['#main-content'],
+		scrollToTopSelectors: ["#main-content"],
 		scrollRestoration: true,
 		defaultPreload: false,
 		defaultErrorComponent: DefaultCatchBoundary,
@@ -36,6 +37,8 @@ export function getRouter() {
 		router,
 		queryClient,
 	});
+
+	initSentry(router);
 
 	return router;
 }
