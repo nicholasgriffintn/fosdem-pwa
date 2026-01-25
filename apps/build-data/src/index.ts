@@ -183,7 +183,7 @@ const run = async (env: Env) => {
 
 export default Sentry.withSentry(
   (env: Env) => ({
-    dsn: "https://07aa95ea691d47e198b5c3b291501895@ingest.bitwobbly.com/api/7",
+    dsn: "https://07aa95ea691d47e198b5c3b291501895@ingest.bitwobbly.com/7",
     tracesSampleRate: 1.0,
   }),
   {

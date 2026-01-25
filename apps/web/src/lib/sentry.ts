@@ -9,7 +9,7 @@ export function initSentry(router: AnyRouter) {
   }
 
   Sentry.init({
-    dsn: "https://52b654d9455a44b0b822cee104d62dd6@ingest.bitwobbly.com/api/9",
+    dsn: "https://52b654d9455a44b0b822cee104d62dd6@ingest.bitwobbly.com/9",
     integrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
     tracesSampleRate: 0.1,
     enabled: import.meta.env.PROD,

@@ -52,7 +52,7 @@ const isAuthorizedRequest = (request: Request, env: Env): boolean => {
 
 export default Sentry.withSentry(
 	env => ({
-		dsn: "https://2cbf756f8faa4cab906b2dc99df77f82@ingest.bitwobbly.com/api/8",
+		dsn: "https://2cbf756f8faa4cab906b2dc99df77f82@ingest.bitwobbly.com/8",
 		tracesSampleRate: 1.0,
 	}),
 	{
