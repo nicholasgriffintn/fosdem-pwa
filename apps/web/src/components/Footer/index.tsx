@@ -62,7 +62,7 @@ export function Footer() {
 						</a>
 						<span>•</span>
 						<a
-							href="https://status.fosdempwa.com/"
+							href="https://bitwobbly.com/status/fosdem-pwa"
 							target="_blank"
 							rel="noreferrer"
 							className="font-medium text-foreground hover:underline"
