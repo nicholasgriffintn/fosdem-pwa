@@ -21,6 +21,7 @@ type ConferenceBadgeProps = {
 	user?: User | null;
 	conferenceYear: number;
 	stats?: UserConferenceStats | null;
+	isPublicPage?: boolean;
 };
 
 function hashStringToInt(input: string) {
@@ -53,6 +54,7 @@ export function ConferenceBadge({
 	user,
 	conferenceYear,
 	stats,
+	isPublicPage = false,
 }: ConferenceBadgeProps) {
 	if (!user) {
 		return null;
@@ -266,15 +268,17 @@ export function ConferenceBadge({
 							)}
 						</>
 					)}
-					<Button asChild variant="outline" size="sm" className="w-full no-underline">
-						<Link to="/profile/year-in-review" search={{ year: conferenceYear }}>
-							<Icons.star className="h-3.5 w-3.5 mr-2" />
-							View Year in Review
-						</Link>
-					</Button>
+					{!isPublicPage && (
+						<Button asChild variant="outline" size="sm" className="w-full no-underline">
+							<Link to="/profile/year-in-review" search={{ year: conferenceYear }}>
+								<Icons.star className="h-3.5 w-3.5 mr-2" />
+								View Year in Review
+							</Link>
+						</Button>
+					)}
 				</div>
 
-				{profileUrl && (
+				{profileUrl && !isPublicPage && (
 					<>
 						<div className="mt-6 flex justify-center">
 							<div className="p-3 bg-white rounded-lg">

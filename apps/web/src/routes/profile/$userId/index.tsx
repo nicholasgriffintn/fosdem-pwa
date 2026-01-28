@@ -144,7 +144,7 @@ function ProfilePage() {
       <div className="space-y-8">
         <div className="flex flex-col lg:flex-row items-start gap-8">
           <div className="w-full lg:w-auto lg:max-w-md">
-            <ConferenceBadge user={resolvedUser} conferenceYear={year} />
+            <ConferenceBadge user={resolvedUser} conferenceYear={year} isPublicPage />
           </div>
 
           {resolvedUser.bookmarks_visibility === "public" ? (
@@ -159,7 +159,7 @@ function ProfilePage() {
                   day={day}
                   view={view}
                   tab={tab}
-                  showConflicts={true}
+                  showConflicts={false}
                   defaultViewMode="schedule"
                   showViewMode={false}
                 />
