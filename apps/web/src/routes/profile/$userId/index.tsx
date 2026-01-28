@@ -159,9 +159,10 @@ function ProfilePage() {
                   day={day}
                   view={view}
                   tab={tab}
-                  showConflicts={false}
+                  showConflicts={true}
                   defaultViewMode="schedule"
                   showViewMode={false}
+                  isProfilePage={true}
                 />
               </div>
             </div>

@@ -88,6 +88,7 @@ type BookmarksListProps = {
     status: string;
   }) => void;
   onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
+  isProfilePage?: boolean;
 };
 
 export function BookmarksList({
@@ -112,6 +113,7 @@ export function BookmarksList({
   emptyStateMessage = "Start bookmarking events to see them here.",
   onCreateBookmark,
   onToggleWatchLater,
+  isProfilePage = false,
 }: BookmarksListProps) {
   const organizedBookmarks = useMemo(() => {
     if (!bookmarks || bookmarks.length === 0) return {};
@@ -311,6 +313,7 @@ export function BookmarksList({
                   onCreateBookmark={onCreateBookmark}
                   serverBookmarks={bookmarkSnapshot}
                   onToggleWatchLater={onToggleWatchLater}
+                  isProfilePage={isProfilePage}
                 />
               </div>
             )}

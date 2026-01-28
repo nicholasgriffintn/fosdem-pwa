@@ -47,6 +47,7 @@ type EventListProps = {
 	emptyStateMessage?: string;
 	serverBookmarks?: BookmarkSnapshot[];
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
+	isProfilePage?: boolean;
 };
 
 export function EventList({
@@ -72,6 +73,7 @@ export function EventList({
 	emptyStateMessage = "Adjust filters or pick another day to see more sessions.",
 	serverBookmarks,
 	onToggleWatchLater,
+	isProfilePage = false,
 }: EventListProps) {
 	const viewMode = (view as EventListViewModes) || defaultViewMode;
 	const sortByFavourites = sortFavourites === "true";
@@ -98,6 +100,7 @@ export function EventList({
 					onCreateBookmark={onCreateBookmark}
 					serverBookmarks={serverBookmarks}
 					onToggleWatchLater={onToggleWatchLater}
+					isProfilePage={isProfilePage}
 				/>
 			);
 		}

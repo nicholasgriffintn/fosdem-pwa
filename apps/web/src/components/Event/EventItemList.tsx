@@ -65,6 +65,7 @@ type EventListItemProps = {
 	style?: React.CSSProperties;
 	actionSize?: "default" | "sm";
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
+	isProfilePage?: boolean;
 };
 
 export function EventListItem({
@@ -82,6 +83,7 @@ export function EventListItem({
 	style,
 	actionSize,
 	onToggleWatchLater,
+	isProfilePage = false,
 }: EventListItemProps) {
 	const hasConflicts = showConflictIndicators
 		? conflicts?.some(
@@ -151,7 +153,7 @@ export function EventListItem({
 								Live
 							</Badge>
 						)}
-						{hasConflicts && <Badge variant="destructive">Conflict</Badge>}
+						{!isProfilePage && hasConflicts && <Badge variant="destructive">Conflict</Badge>}
 						{showPinnedBadge && <Badge variant="secondary">Pinned</Badge>}
 					</div>
 				)}
@@ -183,7 +185,7 @@ export function EventListItem({
 								</div>
 							))}
 						</div>
-						{hasConflicts && (
+						{!isProfilePage && hasConflicts && (
 							<ConflictTooltip
 								event={event}
 								conflicts={conflicts}

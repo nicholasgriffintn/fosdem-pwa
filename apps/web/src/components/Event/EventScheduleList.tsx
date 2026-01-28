@@ -1,10 +1,9 @@
 import { cn } from "~/lib/utils";
 import type { Event } from "~/types/fosdem";
 import type { EventConflict } from "~/lib/fosdem";
-import { ItemActions } from "~/components/shared/ItemActions";
 import { EventListItem } from "~/components/Event/EventItemList";
 import { useEventList } from "~/hooks/use-item-list";
-import { calculateEndTime, calculateTransitionTime } from "~/lib/dateTime";
+import { calculateTransitionTime } from "~/lib/dateTime";
 import { sortScheduleEvents } from "~/lib/sorting";
 import type { User } from "~/server/db/schema";
 import type { BookmarkSnapshot } from "~/lib/type-guards";
@@ -31,6 +30,7 @@ type EventScheduleListProps = {
 	}) => void;
 	serverBookmarks?: BookmarkSnapshot[];
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
+	isProfilePage?: boolean;
 };
 
 type EventScheduleListItemProps = {
@@ -56,6 +56,7 @@ type EventScheduleListItemProps = {
 		status: string;
 	}) => void;
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
+	isProfilePage?: boolean;
 };
 
 function EventScheduleListItem({
@@ -70,6 +71,7 @@ function EventScheduleListItem({
 	user,
 	onCreateBookmark,
 	onToggleWatchLater,
+	isProfilePage = false,
 }: EventScheduleListItemProps) {
 	const transitionTime = nextEvent
 		? calculateTransitionTime(event, nextEvent)
@@ -91,6 +93,7 @@ function EventScheduleListItem({
 				onCreateBookmark={onCreateBookmark}
 				actionSize="sm"
 				onToggleWatchLater={onToggleWatchLater}
+				isProfilePage={isProfilePage}
 			/>
 			{transitionTime !== null && (
 				<div
@@ -136,6 +139,7 @@ export function EventScheduleList({
 	onCreateBookmark,
 	serverBookmarks,
 	onToggleWatchLater,
+	isProfilePage = false,
 }: EventScheduleListProps) {
 	const { items: sortedEvents, bookmarksLoading } = useEventList({
 		items: events,
@@ -160,6 +164,7 @@ export function EventScheduleList({
 						user={user}
 						onCreateBookmark={onCreateBookmark}
 						onToggleWatchLater={onToggleWatchLater}
+						isProfilePage={isProfilePage}
 					/>
 				</li>
 			))}
