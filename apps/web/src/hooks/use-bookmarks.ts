@@ -50,7 +50,11 @@ export function useBookmarks({
 		gcTime: 10 * 60 * 1000,
 	});
 
-	const { data: serverBookmarks, isLoading: serverLoading } = useQuery({
+	const {
+		data: serverBookmarks,
+		isLoading: serverLoading,
+		isFetchedAfterMount: serverFetchedAfterMount,
+	} = useQuery({
 		queryKey: serverQueryKey,
 		queryFn: async () => {
 			if (!userId) return [];
@@ -114,6 +118,12 @@ export function useBookmarks({
 	const serverBookmarksRef = useRef<Bookmark[]>([]);
 	const localBookmarksRef = useRef<LocalBookmark[]>([]);
 	const reconciliationPromiseRef = useRef<Promise<void> | null>(null);
+	const lastServerFetchAtRef = useRef<number | null>(null);
+
+	useEffect(() => {
+		if (!serverFetchedAfterMount) return;
+		lastServerFetchAtRef.current = Date.now();
+	}, [serverFetchedAfterMount, serverBookmarks]);
 
 	useEffect(() => {
 		if (localOnly) return;
@@ -194,6 +204,16 @@ export function useBookmarks({
 
 				for (const localBookmark of localBookmarks) {
 					if (cancelled) break;
+					if (!serverFetchedAfterMount) continue;
+					const lastServerFetchAt = lastServerFetchAtRef.current;
+					const localTimestamp = localBookmark.updated_at ?? localBookmark.created_at;
+					const localUpdatedAt = Date.parse(localTimestamp);
+					if (!lastServerFetchAt || Number.isNaN(localUpdatedAt)) {
+						continue;
+					}
+					if (localUpdatedAt > lastServerFetchAt) {
+						continue;
+					}
 					if (!localBookmark.serverId) continue;
 					if (serverBySlug.has(localBookmark.slug)) continue;
 
@@ -228,7 +248,16 @@ export function useBookmarks({
 		return () => {
 			cancelled = true;
 		};
-	}, [localOnly, userId, serverBookmarks, localBookmarks, year, queryClient, localQueryKey]);
+	}, [
+		localOnly,
+		userId,
+		serverBookmarks,
+		localBookmarks,
+		year,
+		queryClient,
+		localQueryKey,
+		serverFetchedAfterMount,
+	]);
 
 	return {
 		bookmarks: mergedBookmarks,

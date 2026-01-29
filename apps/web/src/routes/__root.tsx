@@ -10,7 +10,6 @@ import {
 import { lazy, Suspense } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
-// @ts-expect-error I don't know why this is erroring, but it is, seems correct...
 import appCss from "~/styles/app.css?url";
 import { cn } from "~/lib/utils";
 import { Header } from "~/components/Header";
@@ -30,6 +29,7 @@ import { getSession } from "~/server/functions/session";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { BottomTabNav } from "~/components/BottomTabNav";
 import { navItems } from "~/components/shared/NavItems";
+import { BookmarkConflictNotice } from "~/components/shared/BookmarkConflictNotice";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
@@ -150,6 +150,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 				</a>
 				<main id="main-content" className="flex min-h-screen flex-col">
 					<Header />
+					<BookmarkConflictNotice />
 					{/* <AppNotice /> */}
 					<div className="container flex-1">
 						{children}

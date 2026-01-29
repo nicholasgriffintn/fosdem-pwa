@@ -3,9 +3,24 @@ import { expect, test } from "@playwright/test";
 const DB_NAME = "fosdem_offline";
 const DB_VERSION = 1;
 
-async function seedLocalBookmark(page: any, { year, slug }: { year: number; slug: string }) {
+async function seedLocalBookmark(
+	page: any,
+	{ year, slug, status = "favourited" }: { year: number; slug: string; status?: string },
+) {
 	await page.evaluate(
-		async ({ year, slug, dbName, dbVersion }) => {
+			async ({
+				year,
+				slug,
+				status,
+				dbName,
+				dbVersion,
+			}: {
+				year: number;
+				slug: string;
+				status: string;
+				dbName: string;
+				dbVersion: number;
+			}) => {
 			const openDb = () =>
 				new Promise<IDBDatabase>((resolve, reject) => {
 					const request = indexedDB.open(dbName, dbVersion);
@@ -52,20 +67,28 @@ async function seedLocalBookmark(page: any, { year, slug }: { year: number; slug
 				year,
 				slug,
 				type: "event",
-				status: "favourited",
+				status,
 				created_at: now,
 				updated_at: now,
 			});
 
 			db.close();
 		},
-		{ year, slug, dbName: DB_NAME, dbVersion: DB_VERSION },
+		{ year, slug, status, dbName: DB_NAME, dbVersion: DB_VERSION },
 	);
 }
 
 async function getLocalBookmarkServerId(page: any, id: string) {
 	return page.evaluate(
-		async ({ id, dbName, dbVersion }) => {
+		async ({
+			id,
+			dbName,
+			dbVersion,
+		}: {
+			id: string;
+			dbName: string;
+			dbVersion: number;
+		}) => {
 			const openDb = () =>
 				new Promise<IDBDatabase>((resolve, reject) => {
 					const request = indexedDB.open(dbName, dbVersion);
@@ -89,6 +112,80 @@ async function getLocalBookmarkServerId(page: any, id: string) {
 		},
 		{ id, dbName: DB_NAME, dbVersion: DB_VERSION },
 	);
+}
+
+async function removeLocalBookmark(page: any, id: string) {
+	await page.evaluate(
+		async ({
+			id,
+			dbName,
+			dbVersion,
+		}: {
+			id: string;
+			dbName: string;
+			dbVersion: number;
+		}) => {
+			const openDb = () =>
+				new Promise<IDBDatabase>((resolve, reject) => {
+					const request = indexedDB.open(dbName, dbVersion);
+					request.onsuccess = () => resolve(request.result);
+					request.onerror = () => reject(request.error);
+				});
+
+			const deleteBookmark = (db: IDBDatabase, key: string) =>
+				new Promise<void>((resolve, reject) => {
+					const transaction = db.transaction("bookmarks", "readwrite");
+					const store = transaction.objectStore("bookmarks");
+					const request = store.delete(key);
+					request.onsuccess = () => resolve();
+					request.onerror = () => reject(request.error);
+				});
+
+			const db = await openDb();
+			await deleteBookmark(db, id);
+			db.close();
+		},
+		{ id, dbName: DB_NAME, dbVersion: DB_VERSION },
+	);
+}
+
+async function clearSyncQueue(page: any) {
+	await page.evaluate(
+		async ({
+			dbName,
+			dbVersion,
+		}: {
+			dbName: string;
+			dbVersion: number;
+		}) => {
+			const openDb = () =>
+				new Promise<IDBDatabase>((resolve, reject) => {
+					const request = indexedDB.open(dbName, dbVersion);
+					request.onsuccess = () => resolve(request.result);
+					request.onerror = () => reject(request.error);
+				});
+
+			const clearStore = (db: IDBDatabase, storeName: string) =>
+				new Promise<void>((resolve, reject) => {
+					const transaction = db.transaction(storeName, "readwrite");
+					const store = transaction.objectStore(storeName);
+					const request = store.clear();
+					request.onsuccess = () => resolve();
+					request.onerror = () => reject(request.error);
+				});
+
+			const db = await openDb();
+			await clearStore(db, "sync_queue");
+			db.close();
+		},
+		{ dbName: DB_NAME, dbVersion: DB_VERSION },
+	);
+}
+
+async function disableSync(page: any) {
+	await page.evaluate(() => {
+		localStorage.setItem("fosdem_sync_enabled", "false");
+	});
 }
 
 test.describe("Bookmark sync on login", () => {
@@ -134,6 +231,137 @@ test.describe("Bookmark sync on login", () => {
 			{ id: bookmarkId, dbName: DB_NAME, dbVersion: DB_VERSION },
 			{ timeout: 30_000 },
 		);
+
+		const serverId = await getLocalBookmarkServerId(page, bookmarkId);
+		expect(serverId).toBeTruthy();
+	});
+
+	test("resolves a local-only conflict by updating the server", async ({ page }) => {
+		const year = 2026;
+		const slug = "conflict-local-only";
+		const bookmarkId = `${year}_${slug}`;
+
+		await page.addInitScript(
+			async ({
+				year,
+				slug,
+				dbName,
+				dbVersion,
+			}: {
+				year: number;
+				slug: string;
+				dbName: string;
+				dbVersion: number;
+			}) => {
+				const openDb = () =>
+					new Promise<IDBDatabase>((resolve, reject) => {
+						const request = indexedDB.open(dbName, dbVersion);
+
+						request.onupgradeneeded = () => {
+							const db = request.result;
+							const stores = ["bookmarks", "notes", "sync_queue"];
+							for (const storeName of stores) {
+								if (!db.objectStoreNames.contains(storeName)) {
+									db.createObjectStore(storeName, { keyPath: "id" });
+								}
+							}
+						};
+
+						request.onsuccess = () => resolve(request.result);
+						request.onerror = () => reject(request.error);
+					});
+
+				const clearStore = (db: IDBDatabase, storeName: string) =>
+					new Promise<void>((resolve, reject) => {
+						const transaction = db.transaction(storeName, "readwrite");
+						const store = transaction.objectStore(storeName);
+						const request = store.clear();
+						request.onsuccess = () => resolve();
+						request.onerror = () => reject(request.error);
+					});
+
+				const putBookmark = (db: IDBDatabase, bookmark: Record<string, unknown>) =>
+					new Promise<void>((resolve, reject) => {
+						const transaction = db.transaction("bookmarks", "readwrite");
+						const store = transaction.objectStore("bookmarks");
+						const request = store.put(bookmark);
+						request.onsuccess = () => resolve();
+						request.onerror = () => reject(request.error);
+					});
+
+				const db = await openDb();
+				await clearStore(db, "bookmarks");
+				await clearStore(db, "sync_queue");
+
+				const now = new Date().toISOString();
+				await putBookmark(db, {
+					id: `${year}_${slug}`,
+					year,
+					slug,
+					type: "event",
+					status: "favourited",
+					serverId: "placeholder",
+					created_at: now,
+					updated_at: now,
+				});
+
+				db.close();
+			},
+			{ year, slug, dbName: DB_NAME, dbVersion: DB_VERSION },
+		);
+
+		await page.goto("/signin");
+		await page.getByRole("button", { name: /Continue as Guest/i }).click();
+		await page.waitForURL(/\/(\?|$)/);
+
+		await page.goto("/?year=2026");
+		await expect(
+			page.getByText("Bookmark sync needs attention", { exact: true }),
+		).toBeVisible();
+
+		const preServerId = await getLocalBookmarkServerId(page, bookmarkId);
+		expect(preServerId).toBe("placeholder");
+
+		await page.getByRole("button", { name: "Resolve conflicts" }).click();
+		await page.getByRole("button", { name: "Update server" }).click();
+
+		await expect(
+			page.getByText("Bookmark sync needs attention", { exact: true }),
+		).not.toBeVisible();
+
+		const serverId = await getLocalBookmarkServerId(page, bookmarkId);
+		expect(serverId).toBeTruthy();
+		expect(serverId).not.toBe("placeholder");
+	});
+
+	test("resolves a server-only conflict by keeping the server copy", async ({ page }) => {
+		const year = 2026;
+		const slug = "test-live";
+		const bookmarkId = `${year}_${slug}`;
+
+		await page.goto("/signin");
+		await page.getByRole("button", { name: /Continue as Guest/i }).click();
+		await page.waitForURL(/\/(\?|$)/);
+
+		await disableSync(page);
+
+		await page.goto(`/event/${slug}?test=true&year=${year}`);
+		await page.getByRole("button", { name: "Add to bookmarks" }).click();
+
+		await removeLocalBookmark(page, bookmarkId);
+		await clearSyncQueue(page);
+
+		await page.goto(`/?year=${year}`);
+		await expect(
+			page.getByText("Bookmark sync needs attention", { exact: true }),
+		).toBeVisible();
+
+		await page.getByRole("button", { name: "Resolve conflicts" }).click();
+		await page.getByRole("button", { name: "Keep server" }).click();
+
+		await expect(
+			page.getByText("Bookmark sync needs attention", { exact: true }),
+		).not.toBeVisible();
 
 		const serverId = await getLocalBookmarkServerId(page, bookmarkId);
 		expect(serverId).toBeTruthy();
