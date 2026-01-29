@@ -5,6 +5,7 @@ import { useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 
+import { useFosdemData } from "~/hooks/use-fosdem-data";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,7 @@ import { bookmarkQueryKeys } from "~/lib/query-keys";
 import { normalizeServerActionResult } from "~/lib/backgroundSync/utils";
 import { generateBookmarkId } from "~/lib/bookmark-id";
 import { withBookmarkSyncLock } from "~/lib/backgroundSync/bookmarkSyncLock";
+import type { Person } from "~/types/fosdem";
 
 const iconClass = "h-4 w-4 text-amber-600 dark:text-amber-300";
 
@@ -98,6 +100,7 @@ export function BookmarkConflictNotice() {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  const { fosdemData } = useFosdemData({ year: selectedYear, enabled: isClient });
 
   const getBookmarksFromServer = useServerFn(getBookmarks);
   const createBookmarkOnServer = useServerFn(createBookmark);
@@ -179,6 +182,70 @@ export function BookmarkConflictNotice() {
 
     return detected;
   }, [localBookmarks, serverBookmarks, user?.id]);
+
+  const eventIdLookup = useMemo(() => {
+    const map = new Map<string, string>();
+    if (fosdemData?.events) {
+      Object.entries(fosdemData.events).forEach(([slug, event]) => {
+        if (event?.id) map.set(String(event.id), slug);
+      });
+    }
+    return map;
+  }, [fosdemData]);
+
+  const trackIdLookup = useMemo(() => {
+    const map = new Map<string, string>();
+    if (fosdemData?.tracks) {
+      Object.entries(fosdemData.tracks).forEach(([slug, track]) => {
+        if (track?.id) map.set(String(track.id), slug);
+      });
+    }
+    return map;
+  }, [fosdemData]);
+
+  const personLookup = useMemo(() => {
+    const map = new Map<string, Person>();
+    if (fosdemData?.persons) {
+      Object.values(fosdemData.persons).forEach((person) => {
+        if (person.id) map.set(String(person.id), person);
+        if (person.slug) map.set(person.slug, person);
+      });
+    }
+    return map;
+  }, [fosdemData]);
+
+  const getConflictLabel = (conflict: BookmarkConflict) => {
+    const normalizedType = normalizeBookmarkType(conflict.type);
+
+    if (!fosdemData) {
+      return conflict.slug;
+    }
+
+    switch (normalizedType) {
+      case "event": {
+        const resolvedSlug = fosdemData.events[conflict.slug]
+          ? conflict.slug
+          : eventIdLookup.get(conflict.slug);
+        const event = resolvedSlug ? fosdemData.events[resolvedSlug] : undefined;
+        return event?.title ?? conflict.slug;
+      }
+      case "track": {
+        const resolvedSlug = fosdemData.tracks[conflict.slug]
+          ? conflict.slug
+          : trackIdLookup.get(conflict.slug);
+        const track = resolvedSlug ? fosdemData.tracks[resolvedSlug] : undefined;
+        return track?.name ?? conflict.slug;
+      }
+      case "room": {
+        return fosdemData.rooms[conflict.slug]?.name ?? conflict.slug;
+      }
+      case "speaker": {
+        return personLookup.get(conflict.slug)?.name ?? conflict.slug;
+      }
+      default:
+        return conflict.slug;
+    }
+  };
 
   const bannerVisible =
     isClient &&
@@ -352,7 +419,7 @@ export function BookmarkConflictNotice() {
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="grid-rows-[auto_1fr_auto] sm:max-w-2xl max-h-[85vh] overflow-hidden">
           <DialogHeader className="space-y-2">
             <div className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-200">
@@ -367,7 +434,7 @@ export function BookmarkConflictNotice() {
             </div>
           </DialogHeader>
 
-          <div className="space-y-3">
+          <div className="space-y-3 min-h-0 overflow-y-auto pr-2">
             {conflicts.map((conflict) => {
               const isProcessing = processingIds.has(conflict.id);
               const typeLabel = formatBookmarkType(conflict.type);
@@ -386,7 +453,9 @@ export function BookmarkConflictNotice() {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-medium text-foreground">{typeLabel}: {conflict.slug}</p>
+                        <p className="font-medium text-foreground">
+                          {typeLabel}: {getConflictLabel(conflict)}
+                        </p>
                         <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
                           {kindLabel}
                         </Badge>
