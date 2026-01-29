@@ -100,7 +100,6 @@ export function BookmarkConflictNotice() {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
-  const { fosdemData } = useFosdemData({ year: selectedYear, enabled: isClient });
 
   const getBookmarksFromServer = useServerFn(getBookmarks);
   const createBookmarkOnServer = useServerFn(createBookmark);
@@ -182,6 +181,11 @@ export function BookmarkConflictNotice() {
 
     return detected;
   }, [localBookmarks, serverBookmarks, user?.id]);
+
+  const { fosdemData } = useFosdemData({
+    year: selectedYear,
+    enabled: isClient && Boolean(user?.id) && (isOpen || conflicts.length > 0),
+  });
 
   const eventIdLookup = useMemo(() => {
     const map = new Map<string, string>();
