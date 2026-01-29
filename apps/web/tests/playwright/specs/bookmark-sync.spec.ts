@@ -105,7 +105,7 @@ test.describe("Bookmark sync on login", () => {
 
 		await page.goto("/bookmarks");
 		await expect(
-			page.getByRole("heading", { name: /Bookmarks/i }),
+			page.getByRole("heading", { level: 1, name: "Bookmarks" }),
 		).toBeVisible();
 
 		await page.waitForFunction(

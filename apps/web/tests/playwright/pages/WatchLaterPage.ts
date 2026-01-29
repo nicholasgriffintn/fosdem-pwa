@@ -19,7 +19,7 @@ export class WatchLaterPage extends BasePage {
 
   async expectEmptyState() {
     await expect(
-      this.page.getByText(/No items in this category/i),
+      this.page.getByRole("heading", { level: 2, name: "No bookmarks yet" }),
     ).toBeVisible();
   }
 

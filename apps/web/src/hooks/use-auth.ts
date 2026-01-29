@@ -33,10 +33,23 @@ export function useAuth() {
 		let isMounted = true;
 		let syncTimeout: NodeJS.Timeout | undefined;
 
+		const invalidateBookmarkQueries = () => {
+			queryClient.invalidateQueries({
+				predicate: (query) => query.queryKey[0] === "bookmarks",
+			});
+			queryClient.invalidateQueries({
+				predicate: (query) => query.queryKey[0] === "local-bookmarks",
+			});
+		};
+
 		enableSync();
 		checkAndSyncOnOnline(user.id).catch((error) => {
 			if (isMounted) {
 				console.error("Initial sync failed:", error);
+			}
+		}).then(() => {
+			if (isMounted) {
+				invalidateBookmarkQueries();
 			}
 		});
 
@@ -52,6 +65,10 @@ export function useAuth() {
 				if (isMounted) {
 					checkAndSyncOnOnline(user.id).catch((error) => {
 						console.error("Online sync failed:", error);
+					}).then(() => {
+						if (isMounted) {
+							invalidateBookmarkQueries();
+						}
 					});
 				}
 			}, 1000);

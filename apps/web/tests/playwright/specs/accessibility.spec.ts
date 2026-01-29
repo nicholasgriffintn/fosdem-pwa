@@ -25,6 +25,7 @@ const urlsToTest = [
 ];
 
 test.describe('Accessibility Tests', () => {
+  test.describe.configure({ mode: 'serial' });
   for (const url of urlsToTest) {
     test(`should not have any automatically detectable accessibility violations on ${url}`, async ({ page }) => {
       await page.goto(url);
