@@ -1,4 +1,4 @@
-import { getSyncQueue } from "~/lib/localStorage";
+import { getSyncQueue, queueUnsyncedBookmarksForSync } from "~/lib/localStorage";
 import type { SyncResult } from "~/lib/backgroundSync/types";
 import { syncBookmarksToServer } from "~/lib/backgroundSync/syncBookmarksToServer";
 import { syncNotesToServer } from "~/lib/backgroundSync/syncNotesToServer";
@@ -14,6 +14,7 @@ export async function checkAndSyncOnOnline(userId?: string) {
   }
 
   if (navigator.onLine && userId) {
+    await queueUnsyncedBookmarksForSync();
     const syncQueue = await getSyncQueue();
     if (syncQueue.length > 0) {
       const wasRunning = !!currentSyncPromise;
