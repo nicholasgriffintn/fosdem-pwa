@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Icons } from "~/components/shared/Icons";
 import type { Event } from "~/types/fosdem";
@@ -27,50 +27,57 @@ export function EventPlayerStarted({
 	const videoRecordings =
 		event.links?.filter((link) => link.type?.startsWith("video/")) || [];
 
+	const hlsStreamUrl = useMemo(() => {
+		if (!eventIsLive) return null;
+		return (
+			event.streams?.find(
+				(stream) => stream.type === "application/vnd.apple.mpegurl",
+			)?.href ?? null
+		);
+	}, [eventIsLive, event.streams]);
+
 	useEffect(() => {
 		const video = videoRef.current;
-		if (!video || !isPlaying) return;
+		if (!video) return;
 
-		if (eventIsLive && event.streams?.length) {
-			const hlsStream = event.streams.find(
-				(stream) => stream.type === "application/vnd.apple.mpegurl",
-			);
-
-			if (!hlsStream) return;
-
-			let cancelled = false;
-			(async () => {
-				const mod = await import("hls.js");
-				if (cancelled) return;
-				const Hls = mod.default;
-				if (!Hls.isSupported()) return;
-
-				const hls = new Hls();
-				hlsRef.current = hls;
-				hls.attachMedia(video);
-
-				hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-					hls.loadSource(hlsStream.href);
-				});
-
-				hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
-					if (data.fatal) {
-						setStreamError(true);
-					}
-				});
-			})();
-
-			return () => {
-				cancelled = true;
-			};
-		}
-
-		return () => {
+		if (!isPlaying || !eventIsLive || !hlsStreamUrl) {
 			if (hlsRef.current) {
 				hlsRef.current.destroy();
+				hlsRef.current = null;
+			}
+			return;
+		}
+
+		let cancelled = false;
+		(async () => {
+			const mod = await import("hls.js");
+			if (cancelled) return;
+			const Hls = mod.default;
+			if (!Hls.isSupported()) return;
+
+			const hls = new Hls();
+			hlsRef.current = hls;
+			hls.attachMedia(video);
+
+			hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+				hls.loadSource(hlsStreamUrl);
+			});
+
+			hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
+				if (data.fatal) {
+					setStreamError(true);
+				}
+			});
+		})();
+
+		return () => {
+			cancelled = true;
+			if (hlsRef.current) {
+				hlsRef.current.destroy();
+				hlsRef.current = null;
 			}
 		};
-	}, [event.streams, isPlaying, videoRef, eventIsLive]);
+	}, [eventIsLive, hlsStreamUrl, isPlaying, videoRef]);
 
 	const handlePlay = () => {
 		setIsPlaying(true);

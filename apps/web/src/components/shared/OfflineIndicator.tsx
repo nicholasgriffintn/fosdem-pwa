@@ -4,6 +4,7 @@ import { AlertCircle, CheckCircle, Cloud, Wifi, WifiOff } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LoadingState } from "~/components/shared/LoadingState";
 import { useAuth } from "~/hooks/use-auth";
+import { useIsClient } from "~/hooks/use-is-client";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import {
 	checkAndSyncOnOnline,
@@ -13,7 +14,7 @@ import { getSyncQueue } from "~/lib/localStorage";
 import { cn } from "~/lib/utils";
 
 export function OfflineIndicator() {
-	const [isMounted, setIsMounted] = useState(false);
+	const isClient = useIsClient();
 	const [isVisible, setIsVisible] = useState(false);
 	const [syncStatus, setSyncStatus] = useState<
 		"idle" | "syncing" | "success" | "error"
@@ -21,10 +22,6 @@ export function OfflineIndicator() {
 	const wasOfflineRef = useRef(false);
 	const isOnline = useOnlineStatus();
 	const { user } = useAuth();
-
-	useEffect(() => {
-		setIsMounted(true);
-	}, []);
 
 	const syncOfflineData = useCallback(async () => {
 		try {
@@ -152,7 +149,7 @@ export function OfflineIndicator() {
 		}
 	};
 
-	if (!isMounted || !isVisible) return null;
+	if (!isClient || !isVisible) return null;
 
 	return (
 		<div

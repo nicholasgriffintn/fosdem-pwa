@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 
 import { cn } from "~/lib/utils";
@@ -30,6 +30,9 @@ export function MainNav({ title, items, year }: MainNavProps) {
     select: (state) => state.location.pathname,
   });
   const isHome = pathname === "/";
+  const handleCloseMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
 
   useEffect(() => {
     if (menuCheckboxRef.current?.checked) {
@@ -119,7 +122,7 @@ export function MainNav({ title, items, year }: MainNavProps) {
 					items={items}
 					menuCheckboxRef={menuCheckboxRef}
 					isOpen={isMenuOpen}
-					onClose={() => setIsMenuOpen(false)}
+					onClose={handleCloseMenu}
 				/>
       )}
     </div>

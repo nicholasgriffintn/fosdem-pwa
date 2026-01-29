@@ -6,6 +6,7 @@ import { LoadingState } from "~/components/shared/LoadingState";
 import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { useIsClient } from "~/hooks/use-is-client";
+import { useWindowSize } from "~/hooks/use-window-size";
 import type { Person } from "~/types/fosdem";
 
 type SpeakerListProps = {
@@ -48,34 +49,13 @@ function SpeakerListClient({
 	const [search, setSearch] = useState(initialQuery);
 	const deferredSearch = useDeferredValue(search);
 	const parentRef = useRef<HTMLDivElement>(null);
-
-	const [columnCount, setColumnCount] = useState(() => {
-		if (typeof window === "undefined") return 1;
-		if (window.innerWidth >= 1280) return 4;
-		if (window.innerWidth >= 1024) return 3;
-		if (window.innerWidth >= 640) return 2;
+	const { width } = useWindowSize();
+	const columnCount = useMemo(() => {
+		if (width >= 1280) return 4;
+		if (width >= 1024) return 3;
+		if (width >= 640) return 2;
 		return 1;
-	});
-
-	useEffect(() => {
-		let timeoutId: ReturnType<typeof setTimeout>;
-		const updateColumns = () => {
-			clearTimeout(timeoutId);
-			timeoutId = setTimeout(() => {
-				if (window.innerWidth >= 1280) setColumnCount(4);
-				else if (window.innerWidth >= 1024) setColumnCount(3);
-				else if (window.innerWidth >= 640) setColumnCount(2);
-				else setColumnCount(1);
-			}, 100);
-		};
-
-		updateColumns();
-		window.addEventListener("resize", updateColumns);
-		return () => {
-			clearTimeout(timeoutId);
-			window.removeEventListener("resize", updateColumns);
-		};
-	}, []);
+	}, [width]);
 
 	useEffect(() => {
 		setSearch(initialQuery);

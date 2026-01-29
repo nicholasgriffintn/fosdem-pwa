@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 
 import { PageHeader } from "~/components/shared/PageHeader";
 import { TypesList } from "~/components/Type/TypesList";
@@ -24,6 +24,7 @@ import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
 import { SectionStack } from "~/components/shared/SectionStack";
 import { buildBookmarksLink } from "~/lib/link-builder";
+import { useOnlineStatus } from "~/hooks/use-online-status";
 
 export const Route = createFileRoute("/offline/")({
 	component: OfflinePage,
@@ -44,12 +45,7 @@ export const Route = createFileRoute("/offline/")({
 
 function OfflinePage() {
 	const { year } = Route.useSearch();
-	const [isOnline, setIsOnline] = useState(() => {
-		if (typeof window === "undefined") {
-			return true;
-		}
-		return window.navigator.onLine;
-	});
+	const isOnline = useOnlineStatus();
 	const { bookmarks, loading: bookmarksLoading } = useBookmarks({
 		year,
 		localOnly: !isOnline,
@@ -59,25 +55,6 @@ function OfflinePage() {
 	const currentPathname = typeof window !== "undefined" ? window.location.pathname : "";
 
 	const cachedData = useFosdemData({ year });
-
-	useEffect(() => {
-		if (typeof window === "undefined") {
-			return;
-		}
-
-		const handleOnline = () => setIsOnline(true);
-		const handleOffline = () => setIsOnline(false);
-
-		setIsOnline(window.navigator.onLine);
-
-		window.addEventListener("online", handleOnline);
-		window.addEventListener("offline", handleOffline);
-
-		return () => {
-			window.removeEventListener("online", handleOnline);
-			window.removeEventListener("offline", handleOffline);
-		};
-	}, []);
 
 	const handleRetry = useCallback(() => {
 		if (typeof window !== "undefined") {
