@@ -8,7 +8,7 @@ process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 
 export default defineConfig({
 	testDir: "./tests/playwright/specs",
-	fullyParallel: true,
+	fullyParallel: false,
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 2 : 0,
 	reporter: [["list"], ["html", { outputFolder: "tests/playwright/results" }]],

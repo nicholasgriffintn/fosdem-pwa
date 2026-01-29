@@ -40,8 +40,11 @@ export function useBookmarks({
 
 	const getBookmarksFromServer = useServerFn(getBookmarks);
 
-	const localQueryKey = bookmarkQueryKeys.local(year);
-	const serverQueryKey = bookmarkQueryKeys.list(year, userId);
+	const localQueryKey = useMemo(() => bookmarkQueryKeys.local(year), [year]);
+	const serverQueryKey = useMemo(
+		() => bookmarkQueryKeys.list(year, userId),
+		[year, userId],
+	);
 
 	const { data: localBookmarks, isLoading: localLoading } = useQuery({
 		queryKey: localQueryKey,

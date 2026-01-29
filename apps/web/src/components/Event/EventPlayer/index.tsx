@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
 import { Icons } from "~/components/shared/Icons";
 import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
 import { usePlayer } from "~/contexts/PlayerContext";
+import { useIsClient } from "~/hooks/use-is-client";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { isEventLive } from "~/lib/dateTime";
 import { PlaybackSpeedControl } from "~/components/WatchLater/PlaybackSpeedControl";
@@ -25,7 +26,7 @@ export function EventPlayer({
 	testTime,
 	year = new Date().getFullYear(),
 }: EventPlayerProps) {
-	const [isMounted, setIsMounted] = useState(false);
+	const isClient = useIsClient();
 	const isOnline = useOnlineStatus();
 	const player = usePlayer();
 	const lastStateRef = useRef<{
@@ -47,10 +48,6 @@ export function EventPlayer({
 	};
 
 	const currentSpeed = player.videoRef.current?.playbackRate ?? 1;
-
-	useEffect(() => {
-		setIsMounted(true);
-	}, []);
 
 	lastStateRef.current = {
 		isPlaying: player.isPlaying,
@@ -189,7 +186,7 @@ export function EventPlayer({
 									/>
 								</div>
 							)}
-							{isMounted && !isOnline && (
+							{isClient && !isOnline && (
 								<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
 									<div className="p-4 md:p-6 mx-2 relative bg-muted rounded-md text-center space-y-2">
 										<p className="text-sm md:text-base font-medium text-foreground">

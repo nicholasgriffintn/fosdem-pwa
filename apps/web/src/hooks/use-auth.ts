@@ -83,7 +83,7 @@ export function useAuth() {
 			}
 			window.removeEventListener("online", handleOnline);
 		};
-	}, [user?.id]);
+	}, [user?.id, queryClient, navigate]);
 
 	return {
 		user,

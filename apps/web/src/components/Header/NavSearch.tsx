@@ -56,6 +56,7 @@ export function NavSearch({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const latestQueryRef = useRef("");
 
   const ensureFuseLoaded = useCallback(async () => {
     if (FuseImpl) return FuseImpl;
@@ -118,24 +119,58 @@ export function NavSearch({
     async (query: string) => {
       setInputValue(query);
 
-      if (!query.trim()) {
+      const trimmedQuery = query.trim();
+      latestQueryRef.current = trimmedQuery;
+      if (!trimmedQuery) {
         setSearchResults([]);
-        return;
-      }
-
-      if (!tracksIndex || !eventsIndex || !roomsIndex) {
-        setIsSearching(true);
-        await ensureFuseLoaded();
-        setIsSearching(false);
+        setFocusedIndex(-1);
         return;
       }
 
       setIsSearching(true);
       setFocusedIndex(-1);
 
-      const tracksResults = formatSearchResults(tracksIndex.search(query), "track", 3);
-      const eventsResults = formatSearchResults(eventsIndex.search(query), "event", 3);
-      const roomsResults = formatSearchResults(roomsIndex.search(query), "room", 3);
+      let resolvedTracksIndex = tracksIndex;
+      let resolvedEventsIndex = eventsIndex;
+      let resolvedRoomsIndex = roomsIndex;
+
+      if (!resolvedTracksIndex || !resolvedEventsIndex || !resolvedRoomsIndex) {
+        const impl = await ensureFuseLoaded();
+        if (!fosdemData) {
+          setIsSearching(false);
+          return;
+        }
+
+        resolvedTracksIndex = createSearchIndex(
+          impl,
+          Object.values(fosdemData.tracks),
+          TRACK_SEARCH_KEYS
+        );
+        resolvedEventsIndex = createSearchIndex(
+          impl,
+          Object.values(fosdemData.events),
+          EVENT_SEARCH_KEYS
+        );
+        resolvedRoomsIndex = createSearchIndex(
+          impl,
+          Object.values(fosdemData.rooms),
+          ROOM_SEARCH_KEYS
+        );
+      }
+
+      if (!resolvedTracksIndex || !resolvedEventsIndex || !resolvedRoomsIndex) {
+        setIsSearching(false);
+        return;
+      }
+
+      if (latestQueryRef.current !== trimmedQuery) {
+        setIsSearching(false);
+        return;
+      }
+
+      const tracksResults = formatSearchResults(resolvedTracksIndex.search(trimmedQuery), "track", 3);
+      const eventsResults = formatSearchResults(resolvedEventsIndex.search(trimmedQuery), "event", 3);
+      const roomsResults = formatSearchResults(resolvedRoomsIndex.search(trimmedQuery), "room", 3);
 
       const groupedResults = [...eventsResults, ...tracksResults, ...roomsResults].slice(
         0,
@@ -144,7 +179,7 @@ export function NavSearch({
       setSearchResults(groupedResults);
       setIsSearching(false);
     },
-    [tracksIndex, eventsIndex, roomsIndex, ensureFuseLoaded]
+    [tracksIndex, eventsIndex, roomsIndex, ensureFuseLoaded, fosdemData]
   );
 
   const handleResultClick = useCallback(
