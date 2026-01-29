@@ -259,6 +259,21 @@ export function BookmarkConflictNotice() {
     !serverLoading &&
     conflicts.length > 0;
 
+  const localOnlyConflicts = useMemo(
+    () => conflicts.filter((conflict): conflict is LocalOnlyConflict => conflict.kind === "local-only"),
+    [conflicts],
+  );
+
+  const serverOnlyConflicts = useMemo(
+    () => conflicts.filter((conflict): conflict is ServerOnlyConflict => conflict.kind === "server-only"),
+    [conflicts],
+  );
+
+  const mismatchConflicts = useMemo(
+    () => conflicts.filter((conflict): conflict is MismatchConflict => conflict.kind === "mismatch"),
+    [conflicts],
+  );
+
   const setProcessing = (id: string, isProcessing: boolean) => {
     setProcessingIds((prev) => {
       const next = new Set(prev);
@@ -271,6 +286,29 @@ export function BookmarkConflictNotice() {
     });
   };
 
+  const setProcessingMany = (ids: string[], isProcessing: boolean) => {
+    setProcessingIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => {
+        if (isProcessing) {
+          next.add(id);
+        } else {
+          next.delete(id);
+        }
+      });
+      return next;
+    });
+  };
+
+  const runWithProcessing = async (ids: string[], action: () => Promise<void>) => {
+    setProcessingMany(ids, true);
+    try {
+      await action();
+    } finally {
+      setProcessingMany(ids, false);
+    }
+  };
+
   const invalidateBookmarks = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: localQueryKey }),
@@ -278,11 +316,8 @@ export function BookmarkConflictNotice() {
     ]);
   };
 
-  const handleUpdateServer = async (conflict: ConflictWithLocal) => {
+  const updateServer = async (conflict: ConflictWithLocal) => {
     if (!user?.id) return;
-
-    setProcessing(conflict.id, true);
-
     try {
       await withBookmarkSyncLock(async () => {
         const normalizedType = normalizeBookmarkType(conflict.local.type);
@@ -317,13 +352,10 @@ export function BookmarkConflictNotice() {
       });
     } catch (error) {
       console.error("Failed to update server bookmark:", error);
-    } finally {
-      setProcessing(conflict.id, false);
     }
   };
 
-  const handleRemoveLocal = async (conflict: ConflictWithLocal) => {
-    setProcessing(conflict.id, true);
+  const removeLocal = async (conflict: ConflictWithLocal) => {
     try {
       await withBookmarkSyncLock(async () => {
         await removeLocalBookmark(conflict.local.id, true);
@@ -332,13 +364,10 @@ export function BookmarkConflictNotice() {
       });
     } catch (error) {
       console.error("Failed to remove local bookmark:", error);
-    } finally {
-      setProcessing(conflict.id, false);
     }
   };
 
-  const handleRemoveServer = async (conflict: ServerOnlyConflict) => {
-    setProcessing(conflict.id, true);
+  const removeServer = async (conflict: ServerOnlyConflict) => {
     try {
       await withBookmarkSyncLock(async () => {
         const response = await deleteBookmarkOnServer({
@@ -354,13 +383,10 @@ export function BookmarkConflictNotice() {
       });
     } catch (error) {
       console.error("Failed to delete server bookmark:", error);
-    } finally {
-      setProcessing(conflict.id, false);
     }
   };
 
-  const handleAddToLocal = async (conflict: ServerOnlyConflict) => {
-    setProcessing(conflict.id, true);
+  const addToLocal = async (conflict: ServerOnlyConflict) => {
     try {
       await withBookmarkSyncLock(async () => {
         await saveLocalBookmark(
@@ -379,14 +405,176 @@ export function BookmarkConflictNotice() {
       });
     } catch (error) {
       console.error("Failed to save local bookmark:", error);
-    } finally {
-      setProcessing(conflict.id, false);
     }
+  };
+
+  const handleUpdateServer = async (conflict: ConflictWithLocal) => {
+    await runWithProcessing([conflict.id], async () => {
+      await updateServer(conflict);
+    });
+  };
+
+  const handleRemoveLocal = async (conflict: ConflictWithLocal) => {
+    await runWithProcessing([conflict.id], async () => {
+      await removeLocal(conflict);
+    });
+  };
+
+  const handleRemoveServer = async (conflict: ServerOnlyConflict) => {
+    await runWithProcessing([conflict.id], async () => {
+      await removeServer(conflict);
+    });
+  };
+
+  const handleAddToLocal = async (conflict: ServerOnlyConflict) => {
+    await runWithProcessing([conflict.id], async () => {
+      await addToLocal(conflict);
+    });
+  };
+
+  const handleUpdateServerGroup = async (group: ConflictWithLocal[]) => {
+    if (group.length === 0) return;
+    const ids = group.map((conflict) => conflict.id);
+    await runWithProcessing(ids, async () => {
+      for (const conflict of group) {
+        await updateServer(conflict);
+      }
+    });
+  };
+
+  const handleRemoveLocalGroup = async (group: ConflictWithLocal[]) => {
+    if (group.length === 0) return;
+    const ids = group.map((conflict) => conflict.id);
+    await runWithProcessing(ids, async () => {
+      for (const conflict of group) {
+        await removeLocal(conflict);
+      }
+    });
+  };
+
+  const handleRemoveServerGroup = async (group: ServerOnlyConflict[]) => {
+    if (group.length === 0) return;
+    const ids = group.map((conflict) => conflict.id);
+    await runWithProcessing(ids, async () => {
+      for (const conflict of group) {
+        await removeServer(conflict);
+      }
+    });
+  };
+
+  const handleAddToLocalGroup = async (group: ServerOnlyConflict[]) => {
+    if (group.length === 0) return;
+    const ids = group.map((conflict) => conflict.id);
+    await runWithProcessing(ids, async () => {
+      for (const conflict of group) {
+        await addToLocal(conflict);
+      }
+    });
   };
 
   if (!bannerVisible) {
     return null;
   }
+
+  const renderConflictCard = (conflict: BookmarkConflict) => {
+    const isProcessing = processingIds.has(conflict.id);
+    const typeLabel = formatBookmarkType(conflict.type);
+    const kindLabel =
+      conflict.kind === "local-only"
+        ? "Local only"
+        : conflict.kind === "server-only"
+          ? "Server only"
+          : "Mismatch";
+
+    return (
+      <div
+        key={conflict.id}
+        className="rounded-xl border border-border/60 bg-background/80 p-4 shadow-sm"
+      >
+        <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-4">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-medium text-foreground">
+                {typeLabel}: {getConflictLabel(conflict)}
+              </p>
+              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                {kindLabel}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {conflict.kind === "local-only"
+                ? "Saved locally but not on your account."
+                : conflict.kind === "server-only"
+                  ? "Saved on your account but not on this device."
+                  : "Local and server copies don't match."}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end sm:justify-start sm:pt-1">
+            {conflict.kind === "local-only" && (
+              <>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => handleUpdateServer(conflict)}
+                  disabled={isProcessing}
+                >
+                  Update server
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleRemoveLocal(conflict)}
+                  disabled={isProcessing}
+                >
+                  Remove local
+                </Button>
+              </>
+            )}
+            {conflict.kind === "server-only" && (
+              <>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => handleAddToLocal(conflict)}
+                  disabled={isProcessing}
+                >
+                  Keep server
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleRemoveServer(conflict)}
+                  disabled={isProcessing}
+                >
+                  Remove server
+                </Button>
+              </>
+            )}
+            {conflict.kind === "mismatch" && (
+              <>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => handleUpdateServer(conflict)}
+                  disabled={isProcessing}
+                >
+                  Keep local
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleRemoveLocal(conflict)}
+                  disabled={isProcessing}
+                >
+                  Keep server
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="border-b border-border/70 bg-gradient-to-r from-amber-50/80 via-background to-amber-50/80 dark:from-amber-950/40 dark:via-background dark:to-amber-950/40">
@@ -438,106 +626,126 @@ export function BookmarkConflictNotice() {
             </div>
           </DialogHeader>
 
-          <div className="space-y-3 min-h-0 overflow-y-auto pr-2">
-            {conflicts.map((conflict) => {
-              const isProcessing = processingIds.has(conflict.id);
-              const typeLabel = formatBookmarkType(conflict.type);
-              const kindLabel =
-                conflict.kind === "local-only"
-                  ? "Local only"
-                  : conflict.kind === "server-only"
-                    ? "Server only"
-                    : "Mismatch";
-
-              return (
-                <div
-                  key={conflict.id}
-                  className="rounded-xl border border-border/60 bg-background/80 p-4 shadow-sm"
-                >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-5 min-h-0 overflow-y-auto pr-2">
+            {localOnlyConflicts.length > 0 && (
+              <section className="space-y-3">
+                <div className="rounded-xl border border-border/60 bg-muted/30 p-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-medium text-foreground">
-                          {typeLabel}: {getConflictLabel(conflict)}
-                        </p>
-                        <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
-                          {kindLabel}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {conflict.kind === "local-only"
-                          ? "Saved locally but not on your account."
-                          : conflict.kind === "server-only"
-                            ? "Saved on your account but not on this device."
-                            : "Local and server copies don't match."}
+                      <p className="text-sm font-semibold text-foreground">
+                        Local only ({localOnlyConflicts.length})
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Saved locally but not on your account.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {conflict.kind === "local-only" && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleUpdateServer(conflict)}
-                            disabled={isProcessing}
-                          >
-                            Update server
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleRemoveLocal(conflict)}
-                            disabled={isProcessing}
-                          >
-                            Remove local
-                          </Button>
-                        </>
-                      )}
-                      {conflict.kind === "server-only" && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleAddToLocal(conflict)}
-                            disabled={isProcessing}
-                          >
-                            Keep server
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleRemoveServer(conflict)}
-                            disabled={isProcessing}
-                          >
-                            Remove server
-                          </Button>
-                        </>
-                      )}
-                      {conflict.kind === "mismatch" && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleUpdateServer(conflict)}
-                            disabled={isProcessing}
-                          >
-                            Keep local
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleRemoveLocal(conflict)}
-                            disabled={isProcessing}
-                          >
-                            Keep server
-                          </Button>
-                        </>
-                      )}
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleUpdateServerGroup(localOnlyConflicts)}
+                        disabled={localOnlyConflicts.some((conflict) =>
+                          processingIds.has(conflict.id),
+                        )}
+                      >
+                        Sync all to server
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRemoveLocalGroup(localOnlyConflicts)}
+                        disabled={localOnlyConflicts.some((conflict) =>
+                          processingIds.has(conflict.id),
+                        )}
+                      >
+                        Delete all local copies
+                      </Button>
                     </div>
                   </div>
                 </div>
-              );
-            })}
+                {localOnlyConflicts.map(renderConflictCard)}
+              </section>
+            )}
+
+            {serverOnlyConflicts.length > 0 && (
+              <section className="space-y-3">
+                <div className="rounded-xl border border-border/60 bg-muted/30 p-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        Server only ({serverOnlyConflicts.length})
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Saved on your account but not on this device.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleAddToLocalGroup(serverOnlyConflicts)}
+                        disabled={serverOnlyConflicts.some((conflict) =>
+                          processingIds.has(conflict.id),
+                        )}
+                      >
+                        Save all to device
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRemoveServerGroup(serverOnlyConflicts)}
+                        disabled={serverOnlyConflicts.some((conflict) =>
+                          processingIds.has(conflict.id),
+                        )}
+                      >
+                        Delete all server copies
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                {serverOnlyConflicts.map(renderConflictCard)}
+              </section>
+            )}
+
+            {mismatchConflicts.length > 0 && (
+              <section className="space-y-3">
+                <div className="rounded-xl border border-border/60 bg-muted/30 p-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        Mismatch ({mismatchConflicts.length})
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Local and server copies don't match.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleUpdateServerGroup(mismatchConflicts)}
+                        disabled={mismatchConflicts.some((conflict) =>
+                          processingIds.has(conflict.id),
+                        )}
+                      >
+                        Prefer local for all
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRemoveLocalGroup(mismatchConflicts)}
+                        disabled={mismatchConflicts.some((conflict) =>
+                          processingIds.has(conflict.id),
+                        )}
+                      >
+                        Prefer server for all
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                {mismatchConflicts.map(renderConflictCard)}
+              </section>
+            )}
           </div>
 
           <DialogFooter>

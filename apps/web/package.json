@@ -21,7 +21,8 @@
     "ui": "pnpm dlx shadcn@latest",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply fosdem --local --persist-to ../cloudflare/state",
-    "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote"
+    "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote",
+    "deploy": "wrangler deploy --env production"
   },
   "engines": {
     "node": ">=22.0.0"
