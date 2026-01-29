@@ -4,6 +4,8 @@ const PORT = process.env.PLAYWRIGHT_PORT ?? "3000";
 const baseURL =
 	process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
 
+process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
+
 export default defineConfig({
 	testDir: "./tests/playwright/specs",
 	fullyParallel: true,

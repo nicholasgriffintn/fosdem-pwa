@@ -1,4 +1,4 @@
-import { getSyncQueue } from "~/lib/localStorage";
+import { getSyncQueue, queueUnsyncedBookmarksForSync } from "~/lib/localStorage";
 import type { SyncResult } from "~/lib/backgroundSync/types";
 import { syncBookmarksToServer } from "~/lib/backgroundSync/syncBookmarksToServer";
 import { syncNotesToServer } from "~/lib/backgroundSync/syncNotesToServer";
@@ -8,12 +8,13 @@ let currentSyncPromise: Promise<{
   notes: SyncResult;
 }> | null = null;
 
-export async function checkAndSyncOnOnline(userId?: string) {
+export async function checkAndSyncOnOnline(userId?: number | string) {
   if (typeof navigator === "undefined" || typeof window === "undefined") {
     return;
   }
 
   if (navigator.onLine && userId) {
+    await queueUnsyncedBookmarksForSync();
     const syncQueue = await getSyncQueue();
     if (syncQueue.length > 0) {
       const wasRunning = !!currentSyncPromise;
@@ -21,7 +22,7 @@ export async function checkAndSyncOnOnline(userId?: string) {
         console.info("Syncing offline data...");
       }
       try {
-        const results = await syncAllOfflineData();
+        const results = await syncAllOfflineData(userId);
         if (!wasRunning) {
           console.info("Sync completed:", results);
         }
@@ -45,7 +46,7 @@ export async function checkAndSyncOnOnline(userId?: string) {
 }
 
 
-export async function syncAllOfflineData(): Promise<{
+export async function syncAllOfflineData(userId?: number | string): Promise<{
   bookmarks: SyncResult;
   notes: SyncResult;
 }> {
@@ -54,8 +55,12 @@ export async function syncAllOfflineData(): Promise<{
   }
 
   currentSyncPromise = (async () => {
+    const numericUserId =
+      typeof userId === "string" ? Number.parseInt(userId, 10) : userId;
     const results = await Promise.allSettled([
-      syncBookmarksToServer(),
+      syncBookmarksToServer(
+        Number.isFinite(numericUserId ?? NaN) ? numericUserId : undefined,
+      ),
       syncNotesToServer(),
     ]);
 

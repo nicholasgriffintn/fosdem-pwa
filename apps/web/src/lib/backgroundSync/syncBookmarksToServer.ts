@@ -1,4 +1,4 @@
-import { getSyncQueue, removeFromSyncQueue } from "~/lib/localStorage";
+import { getSyncQueue, removeFromSyncQueue, updateLocalBookmark } from "~/lib/localStorage";
 import { withRetry } from "~/lib/withRetry";
 import {
   createBookmark,
@@ -7,9 +7,9 @@ import {
 } from "~/server/functions/bookmarks";
 import type { SyncResult } from "~/lib/backgroundSync/types";
 import { normalizeServerActionResult } from "~/lib/backgroundSync/utils";
+import { generateBookmarkId } from "~/lib/bookmark-id";
 
-
-export async function syncBookmarksToServer(): Promise<SyncResult> {
+export async function syncBookmarksToServer(userId?: number): Promise<SyncResult> {
   const syncQueue = await getSyncQueue();
   const bookmarkItems = syncQueue.filter((item) => item.type === "bookmark");
 
@@ -34,6 +34,13 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
         const result = normalizeServerActionResult(response);
         if (result.success) {
           await removeFromSyncQueue(item.id);
+          if (userId && item.data?.year && item.data?.slug) {
+            await updateLocalBookmark(
+              item.id,
+              { serverId: generateBookmarkId(userId, item.data.year, item.data.slug) },
+              true,
+            );
+          }
           return { success: true as const, id: item.id };
         } else if (result.statusCode === 404) {
           console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);
@@ -105,6 +112,13 @@ export async function syncBookmarksToServer(): Promise<SyncResult> {
           const result = normalizeServerActionResult(response);
           if (result.success) {
             await removeFromSyncQueue(item.id);
+            if (userId && item.data?.year && item.data?.slug) {
+              await updateLocalBookmark(
+                item.id,
+                { serverId: generateBookmarkId(userId, item.data.year, item.data.slug) },
+                true,
+              );
+            }
             return { success: true as const, id: item.id };
           } else if (result.statusCode === 404) {
             console.warn(`Bookmark not found (404), removing from sync queue: ${item.id}`);

@@ -540,3 +540,55 @@ export async function removeFromSyncQueue(id: string): Promise<void> {
     console.error("Error removing from sync queue:", error);
   }
 }
+
+export async function queueUnsyncedBookmarksForSync(): Promise<number> {
+  if (!isSyncEnabled()) {
+    return 0;
+  }
+
+  try {
+    const [bookmarks, syncQueue] = await Promise.all([
+      getLocalBookmarks(),
+      getSyncQueue(),
+    ]);
+
+    if (bookmarks.length === 0) {
+      return 0;
+    }
+
+    const queuedIds = new Set(
+      syncQueue
+        .filter((item) => item.type === "bookmark")
+        .map((item) => item.id),
+    );
+    const now = new Date().toISOString();
+
+    const toQueue = bookmarks.filter(
+      (bookmark) =>
+        !bookmark.serverId &&
+        bookmark.status === "favourited" &&
+        !queuedIds.has(bookmark.id),
+    );
+
+    if (toQueue.length === 0) {
+      return 0;
+    }
+
+    await Promise.allSettled(
+      toQueue.map((bookmark) =>
+        addToSyncQueue({
+          id: bookmark.id,
+          type: "bookmark",
+          action: "create",
+          data: bookmark,
+          timestamp: now,
+        }),
+      ),
+    );
+
+    return toQueue.length;
+  } catch (error) {
+    console.error("Error queueing unsynced bookmarks:", error);
+    return 0;
+  }
+}

@@ -3,9 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const localStorageMocks = vi.hoisted(() => ({
 	getSyncQueue: vi.fn(),
 	removeFromSyncQueue: vi.fn(),
+	queueUnsyncedBookmarksForSync: vi.fn(),
 }));
 
-const { getSyncQueue, removeFromSyncQueue } = localStorageMocks;
+const { getSyncQueue, removeFromSyncQueue, queueUnsyncedBookmarksForSync } =
+	localStorageMocks;
 
 vi.mock("~/lib/localStorage", () => localStorageMocks);
 
@@ -35,6 +37,7 @@ describe("background sync helpers", () => {
 	beforeEach(() => {
 		getSyncQueue.mockReset();
 		removeFromSyncQueue.mockReset();
+		queueUnsyncedBookmarksForSync.mockReset();
 		createBookmark.mockReset();
 		updateBookmark.mockReset();
 		deleteBookmark.mockReset();
@@ -42,6 +45,7 @@ describe("background sync helpers", () => {
 		updateNote.mockReset();
 		deleteNote.mockReset();
 		getSyncQueue.mockResolvedValue([]);
+		queueUnsyncedBookmarksForSync.mockResolvedValue(0);
 	});
 
 	afterEach(() => {
@@ -219,6 +223,7 @@ describe("background sync helpers", () => {
 
 		await backgroundSync.checkAndSyncOnOnline("user");
 
+		expect(queueUnsyncedBookmarksForSync).toHaveBeenCalled();
 		expect(dispatchSpy).toHaveBeenCalled();
 		expect(dispatchSpy.mock.calls.at(-1)?.[0].type).toBe(
 			"offline-sync-completed",
@@ -250,6 +255,7 @@ describe("background sync helpers", () => {
 
 		await backgroundSync.checkAndSyncOnOnline("user");
 
+		expect(queueUnsyncedBookmarksForSync).toHaveBeenCalled();
 		expect(dispatchSpy).toHaveBeenCalled();
 		expect(dispatchSpy.mock.calls.at(-1)?.[0].type).toBe("offline-sync-failed");
 	});
@@ -308,6 +314,7 @@ describe("background sync helpers", () => {
 
 		await backgroundSync.checkAndSyncOnOnline("user");
 
+		expect(queueUnsyncedBookmarksForSync).toHaveBeenCalled();
 		expect(dispatchSpy).toHaveBeenCalled();
 		expect(dispatchSpy.mock.calls.at(-1)?.[0].type).toBe("offline-sync-failed");
 	});

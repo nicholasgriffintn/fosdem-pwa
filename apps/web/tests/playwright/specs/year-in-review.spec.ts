@@ -6,6 +6,6 @@ test.describe("Year in Review page", () => {
 		const yearInReviewPage = new YearInReviewPage(page);
 		await yearInReviewPage.goto();
 
-		await page.waitForURL(/^\/?(\?|$)/);
+		await page.waitForURL((url) => url.pathname === "/");
 	});
 });

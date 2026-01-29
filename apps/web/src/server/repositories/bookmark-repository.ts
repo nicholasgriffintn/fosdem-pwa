@@ -2,14 +2,7 @@ import { and, eq, sql } from "drizzle-orm";
 
 import { db } from "~/server/db";
 import { bookmark as bookmarkTable, type Bookmark } from "~/server/db/schema";
-
-export function generateBookmarkId(
-  userId: number,
-  year: number,
-  slug: string,
-): string {
-  return `${userId}_${year}_${slug}`;
-}
+import { generateBookmarkId } from "~/lib/bookmark-id";
 
 export async function findBookmarksByUserAndStatus(
   userId: number,

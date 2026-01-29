@@ -12,6 +12,7 @@ export default defineConfig({
     cloudflare({
       viteEnvironment: { name: 'ssr' },
       persistState: { path: "../cloudflare/state" },
+      inspectorPort: process.env.NODE_ENV === "test" ? false : undefined,
     }),
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],

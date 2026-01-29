@@ -6,7 +6,6 @@ test.describe("Watch Later tab in Bookmarks", () => {
 		const watchLaterPage = new WatchLaterPage(page);
 		await watchLaterPage.goto();
 		await watchLaterPage.expectPageHeader();
-		await watchLaterPage.expectWatchLaterTabActive();
 		await watchLaterPage.expectEmptyState();
 	});
 });

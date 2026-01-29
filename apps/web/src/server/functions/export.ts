@@ -15,8 +15,8 @@ import {
   findBookmarksByUserAndStatus,
   upsertBookmark,
   updateBookmark,
-  generateBookmarkId,
 } from "~/server/repositories/bookmark-repository";
+import { generateBookmarkId } from "~/lib/bookmark-id";
 
 export const exportBookmarksCsv = createServerFn({
   method: "GET",
