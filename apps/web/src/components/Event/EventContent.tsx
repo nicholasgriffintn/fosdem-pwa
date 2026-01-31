@@ -20,6 +20,7 @@ export function EventContent({ year, event, persons }: EventContentProps) {
           <h2 className="text-xl font-medium text-foreground">Abstract</h2>
           <div
             className="mt-2 prose prose-lg prose-indigo mt-4 text-foreground"
+            suppressHydrationWarning
             dangerouslySetInnerHTML={{ __html: event.abstract }}
           />
         </div>
@@ -29,6 +30,7 @@ export function EventContent({ year, event, persons }: EventContentProps) {
           <h2 className="text-xl font-medium text-foreground">Description</h2>
           <div
             className="mt-2 prose prose-lg prose-indigo mt-4 text-foreground"
+            suppressHydrationWarning
             dangerouslySetInnerHTML={{ __html: event.description }}
           />
         </div>
