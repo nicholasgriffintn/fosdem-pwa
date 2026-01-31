@@ -76,6 +76,7 @@ export function EventPlayer({
 	const hasRecordings = videoRecordings.length > 0;
 
 	const eventIsLive =
+		Boolean(referenceTime) &&
 		isEventLive(event, conference, referenceTime) &&
 		event.streams?.some(
 			(stream) => stream.type === "application/vnd.apple.mpegurl",

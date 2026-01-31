@@ -25,11 +25,8 @@ export function EventPlayerNotStarted({
 		: false;
 
 	const eventStart = isClient ? getEventDateTime(event, conference) : null;
-	const now = isClient
-		? referenceTime
-			? createStandardDate(referenceTime)
-			: createStandardDate(new Date())
-		: null;
+	const now =
+		isClient && referenceTime ? createStandardDate(referenceTime) : null;
 
 	const timeUntilStartMs =
 		eventStart != null && now != null
