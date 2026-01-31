@@ -19,13 +19,15 @@ const REQUIRED_ENV: Array<keyof Env> = [
 ];
 
 const DEDUPE_WINDOW_MS = 5 * 60 * 1000;
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
 const MAX_SEND_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 1000;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const getScheduledDate = (event: { scheduledTime?: number }) => {
 	const scheduledTime = typeof event.scheduledTime === "number" ? event.scheduledTime : Date.now();
-	return new Date(scheduledTime);
+	const roundedTime = Math.round(scheduledTime / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
+	return new Date(roundedTime);
 };
 
 const validateEnv = (env: Env) => {
