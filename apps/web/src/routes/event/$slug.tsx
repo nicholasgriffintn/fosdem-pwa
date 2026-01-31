@@ -176,8 +176,12 @@ function EventPage() {
   const isAttended = currentBookmark?.attended === true;
   const isAttendedInPerson = currentBookmark?.attended_in_person === true;
   const currentBookmarkId = currentBookmark?.id;
-  const eventFinished = fosdem.event && fosdem.conference ? isEventFinished(fosdem.event, fosdem.conference) : false;
-  const eventLive = fosdem.event && fosdem.conference ? isEventLive(fosdem.event, fosdem.conference) : false;
+  const eventFinished = fosdem.event && fosdem.conference
+    ? isEventFinished(fosdem.event, fosdem.conference, referenceTime)
+    : false;
+  const eventLive = fosdem.event && fosdem.conference
+    ? isEventLive(fosdem.event, fosdem.conference, referenceTime)
+    : false;
   const canMarkAttendance = eventFinished || eventLive;
   const favouriteStatus = isClient
     ? resolveFavouriteStatus({
