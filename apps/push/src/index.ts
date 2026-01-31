@@ -159,19 +159,19 @@ export default Sentry.withSentry(
 			}
 
 			// Morning summary at 8 AM UTC (9 AM Brussels)
-			if (event.cron === "0 8 1,2 2 *") {
+			if (["0 8 31 1 *", "0 8 1 2 *"].includes(event.cron)) {
 				await triggerDailySummary(event, env, ctx, true, false);
 				return;
 			}
 
 			// Evening summary at 17:15 UTC (18:15 Brussels)
-			if (event.cron === "15 17 1,2 2 *") {
+			if (["15 17 31 1 *", "15 17 1 2 *"].includes(event.cron)) {
 				await triggerDailySummary(event, env, ctx, true, true);
 				return;
 			}
 
 			// Room status polling (every 5 minutes during conference)
-			if (event.cron === "*/5 * 1,2 2 *") {
+			if (["*/5 * 31 1 *", "*/5 * 1 2 *"].includes(event.cron)) {
 				const statuses = await pollAndStoreRoomStatus(env);
 				await triggerRoomStatusNotifications(event, env, ctx, true, undefined, statuses);
 				return;
