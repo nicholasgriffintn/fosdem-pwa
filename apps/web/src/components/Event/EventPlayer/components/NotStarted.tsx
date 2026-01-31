@@ -10,17 +10,19 @@ import type { Event, ConferenceData } from "~/types/fosdem";
 export function EventPlayerNotStarted({
 	event,
 	conference,
-	testTime,
+	referenceTime,
 }: {
 	event: Event;
 	conference: ConferenceData;
-	testTime: Date;
+	referenceTime?: Date;
 }) {
-	const eventIsInPast = isEventFinished(event, conference, testTime);
+	const eventIsInPast = referenceTime
+		? isEventFinished(event, conference, referenceTime)
+		: false;
 
 	const eventStart = getEventDateTime(event, conference);
-	const now = testTime
-		? createStandardDate(testTime)
+	const now = referenceTime
+		? createStandardDate(referenceTime)
 		: createStandardDate(new Date());
 
 	const timeUntilStartMs =
@@ -60,6 +62,7 @@ export function EventPlayerNotStarted({
 		eventStart?.toLocaleTimeString([], {
 			hour: "2-digit",
 			minute: "2-digit",
+			timeZone: constants.TIME_ZONE,
 		}) ?? event.startTime;
 
 	return (

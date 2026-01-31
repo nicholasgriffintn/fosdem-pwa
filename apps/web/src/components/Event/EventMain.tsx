@@ -20,6 +20,7 @@ type EventMainProps = {
 	conference: ConferenceData;
 	year: number;
 	isTest?: boolean;
+	referenceTime?: Date;
 	persons?: Record<string, Person>;
 };
 
@@ -28,12 +29,13 @@ export function EventMain({
 	conference,
 	year,
 	isTest,
+	referenceTime,
 	persons,
 }: EventMainProps) {
 	const roomType = event.room?.[0];
 	const specialRoom =
 		roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
-	const testTime = isTest ? new Date(conference.start) : undefined;
+	const testTime = isTest ? new Date(conference.start) : referenceTime;
 	const imageDetails = fosdemImageDetails[event.type as TypeIds];
 
 	const { width } = useWindowSize();
@@ -75,7 +77,7 @@ export function EventMain({
 							<EventPlayer
 								event={event}
 								conference={conference}
-								testTime={testTime}
+								referenceTime={testTime}
 								year={year}
 							/>
 						</div>

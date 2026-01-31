@@ -51,6 +51,7 @@ export const Route = createFileRoute("/event/$slug")({
   }),
   loaderDeps: ({ search: { test, year } }) => ({ test, year }),
   loader: async ({ params, deps: { test, year } }) => {
+    const serverTime = Date.now();
     if (test) {
       return {
         fosdem: {
@@ -68,6 +69,7 @@ export const Route = createFileRoute("/event/$slug")({
         year,
         isTest: true,
         serverBookmark: null,
+        serverTime,
       };
     }
 
@@ -93,6 +95,7 @@ export const Route = createFileRoute("/event/$slug")({
       year,
       isTest: false,
       serverBookmark,
+      serverTime,
     };
   },
   head: ({ loaderData }) => ({
@@ -150,10 +153,11 @@ export const Route = createFileRoute("/event/$slug")({
 });
 
 function EventPage() {
-  const { fosdem, year, isTest, serverBookmark } = Route.useLoaderData();
+  const { fosdem, year, isTest, serverBookmark, serverTime } = Route.useLoaderData();
   const isClient = useIsClient();
   const headerSentinelRef = useRef<HTMLDivElement | null>(null);
   const [showStickyTitle, setShowStickyTitle] = useState(false);
+  const [referenceTime, setReferenceTime] = useState(() => new Date(serverTime));
 
   const { bookmark, loading: bookmarkLoading } = useBookmark({
     year,
@@ -186,6 +190,7 @@ function EventPage() {
     if (!isClient) {
       return;
     }
+    setReferenceTime(new Date());
     const el = headerSentinelRef.current;
     if (!el) {
       return;
@@ -346,6 +351,7 @@ function EventPage() {
           conference={fosdem.conference}
           year={year}
           isTest={isTest}
+          referenceTime={referenceTime}
           persons={fosdem.persons}
         />
       </div>
