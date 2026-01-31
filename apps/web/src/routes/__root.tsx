@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import {
 	createRootRouteWithContext,
 	Outlet,
@@ -7,7 +8,7 @@ import {
 	HeadContent,
 	Scripts,
 } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 import appCss from "~/styles/app.css?url";
@@ -30,6 +31,8 @@ import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { BottomTabNav } from "~/components/BottomTabNav";
 import { navItems } from "~/components/shared/NavItems";
 import { BookmarkConflictNotice } from "~/components/shared/BookmarkConflictNotice";
+import { useIsClient } from "~/hooks/use-is-client";
+import { createQueryPersister } from "~/lib/query-persistence";
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
@@ -103,9 +106,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootComponent() {
 	const { queryClient } = Route.useRouteContext();
 	const { user } = Route.useLoaderData();
+	const isClient = useIsClient();
+	const persister = useMemo(() => createQueryPersister(), []);
 
-	return (
-		<QueryClientProvider client={queryClient}>
+	const content = (
 			<TooltipProvider>
 				<PlayerProvider>
 					<AuthSnapshotProvider user={user ?? null}>
@@ -115,7 +119,23 @@ function RootComponent() {
 					</AuthSnapshotProvider>
 				</PlayerProvider>
 			</TooltipProvider>
-		</QueryClientProvider>
+	);
+
+	if (!isClient) {
+		return <QueryClientProvider client={queryClient}>{content}</QueryClientProvider>;
+	}
+
+	return (
+		<PersistQueryClientProvider
+			client={queryClient}
+			persistOptions={{
+				persister,
+				maxAge: 1000 * 60 * 60 * 24,
+				buster: "fosdem-pwa-v1",
+			}}
+		>
+			{content}
+		</PersistQueryClientProvider>
 	);
 }
 

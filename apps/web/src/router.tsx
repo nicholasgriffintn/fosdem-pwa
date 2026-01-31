@@ -13,6 +13,7 @@ export function getRouter() {
 			queries: {
 				networkMode: "offlineFirst",
 				staleTime: 1000 * 60 * 5, // 5 minutes
+				gcTime: 1000 * 60 * 60 * 24,
 				retry: (failureCount, error) => {
 					if (error instanceof Error && error.message === "Failed to fetch") {
 						return false;
