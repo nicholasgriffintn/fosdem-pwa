@@ -20,9 +20,14 @@ type ShareButtonProps = {
 
 export function ShareButton({ title, text, url, className }: ShareButtonProps) {
 	const handleShare = async () => {
+		const shareText = text ? `${text}\n${url}` : url;
+
 		try {
-			if (shareSupported() && navigator.canShare({ title, text, url })) {
-				await navigator.share({ title, text, url });
+			if (
+				shareSupported() &&
+				navigator.canShare({ title, text: shareText, url })
+			) {
+				await navigator.share({ title, text: shareText, url });
 				return;
 			}
 

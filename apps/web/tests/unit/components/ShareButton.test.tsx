@@ -68,7 +68,7 @@ describe("ShareButton", () => {
 
 		expect(share).toHaveBeenCalledWith({
 			title: "Talk",
-			text: "Check out Talk",
+			text: "Check out Talk\nhttps://fosdem.org",
 			url: "https://fosdem.org",
 		});
 	});
