@@ -7,6 +7,13 @@ import {
 } from "~/lib/dateTime";
 import type { Event, ConferenceData } from "~/types/fosdem";
 
+const startTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+	hour: "2-digit",
+	minute: "2-digit",
+	hour12: false,
+	timeZone: constants.TIME_ZONE,
+});
+
 export function EventPlayerNotStarted({
 	event,
 	conference,
@@ -58,12 +65,9 @@ export function EventPlayerNotStarted({
 					}
 					return `${totalMinutes} ${totalMinutes === 1 ? "minute" : "minutes"}`;
 				})();
-	const startTimeLabel =
-		eventStart?.toLocaleTimeString([], {
-			hour: "2-digit",
-			minute: "2-digit",
-			timeZone: constants.TIME_ZONE,
-		}) ?? event.startTime;
+	const startTimeLabel = eventStart
+		? startTimeFormatter.format(eventStart)
+		: event.startTime;
 
 	return (
 		<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 transition-colors">
