@@ -3,7 +3,7 @@ import type { ExecutionContext, ExportedHandler } from "@cloudflare/workers-type
 
 import { triggerNotifications } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
-import { triggerRoomStatusNotifications, pollAndStoreRoomStatus, cleanupOldRoomStatus } from "./controllers/room-status";
+import { triggerRoomStatusNotifications, cleanupOldRoomStatus } from "./controllers/room-status";
 import { triggerRecordingNotifications } from "./controllers/recording-notifications";
 import { triggerDailySummary } from "./controllers/daily-summary";
 import { getApplicationKeys, sendNotification } from "./lib/notifications";
@@ -23,6 +23,10 @@ const MAX_SEND_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 1000;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const getScheduledDate = (event: { scheduledTime?: number }) => {
+	const scheduledTime = typeof event.scheduledTime === "number" ? event.scheduledTime : Date.now();
+	return new Date(scheduledTime);
+};
 
 const validateEnv = (env: Env) => {
 	const missing = REQUIRED_ENV.filter((key) => {
@@ -148,7 +152,7 @@ export default Sentry.withSentry(
 		},
 		// @ts-expect-error - CBA
 		async scheduled(
-			event: { cron: string },
+			event: { cron: string; scheduledTime?: number },
 			env: Env,
 			ctx: ExecutionContext,
 		): Promise<void> {
@@ -158,40 +162,38 @@ export default Sentry.withSentry(
 				return;
 			}
 
-			// Morning summary at 8 AM UTC (9 AM Brussels)
-			if (["0 8 31 1 *", "0 8 1 2 *"].includes(event.cron)) {
+			const scheduledDate = getScheduledDate(event);
+			const utcHours = scheduledDate.getUTCHours();
+			const utcMinutes = scheduledDate.getUTCMinutes();
+
+			const isMorningSummary = utcHours === 8 && utcMinutes === 0;
+			const isEveningSummary = utcHours === 17 && utcMinutes === 15;
+			const isQuarterHour = utcMinutes % 15 === 0;
+			const isHourly = utcMinutes === 0;
+			const isMidnight = utcHours === 0 && utcMinutes === 0;
+
+			if (isMorningSummary) {
 				await triggerDailySummary(event, env, ctx, true, false);
-				return;
 			}
 
-			// Evening summary at 17:15 UTC (18:15 Brussels)
-			if (["15 17 31 1 *", "15 17 1 2 *"].includes(event.cron)) {
+			if (isEveningSummary) {
 				await triggerDailySummary(event, env, ctx, true, true);
-				return;
 			}
 
-			// Room status polling (every 5 minutes during conference)
-			if (["*/5 * 31 1 *", "*/5 * 1 2 *"].includes(event.cron)) {
-				const statuses = await pollAndStoreRoomStatus(env);
-				await triggerRoomStatusNotifications(event, env, ctx, true, undefined, statuses);
-				return;
-			}
-
-			// Daily cleanup at midnight
-			if (event.cron === "0 0 * * *") {
+			if (isMidnight) {
 				await cleanupOldRoomStatus(env);
-				return;
 			}
 
-			// Recording notifications (hourly after conference)
-			if (event.cron === "0 * * * *") {
+			if (isHourly) {
 				await triggerRecordingNotifications(event, env, ctx, true);
-				return;
 			}
 
-			// Regular notifications for starting events (every 15 minutes)
-			await triggerNotifications(event, env, ctx, true);
-			await triggerScheduleChangeNotifications(event, env, ctx, true);
+			if (isQuarterHour) {
+				await triggerNotifications(event, env, ctx, true);
+				await triggerScheduleChangeNotifications(event, env, ctx, true);
+			}
+
+			await triggerRoomStatusNotifications(event, env, ctx, true);
 		},
 		// @ts-ignore - CBA
 		async queue(batch: MessageBatch<QueueMessage>, env: Env, ctx: ExecutionContext): Promise<void> {
