@@ -51,7 +51,6 @@ export const Route = createFileRoute("/event/$slug")({
   }),
   loaderDeps: ({ search: { test, year } }) => ({ test, year }),
   loader: async ({ params, deps: { test, year } }) => {
-    const serverTime = Date.now();
     if (test) {
       return {
         fosdem: {
@@ -69,7 +68,6 @@ export const Route = createFileRoute("/event/$slug")({
         year,
         isTest: true,
         serverBookmark: null,
-        serverTime,
       };
     }
 
@@ -95,7 +93,6 @@ export const Route = createFileRoute("/event/$slug")({
       year,
       isTest: false,
       serverBookmark,
-      serverTime,
     };
   },
   head: ({ loaderData }) => ({
@@ -153,11 +150,11 @@ export const Route = createFileRoute("/event/$slug")({
 });
 
 function EventPage() {
-  const { fosdem, year, isTest, serverBookmark, serverTime } = Route.useLoaderData();
+  const { fosdem, year, isTest, serverBookmark } = Route.useLoaderData();
   const isClient = useIsClient();
   const headerSentinelRef = useRef<HTMLDivElement | null>(null);
   const [showStickyTitle, setShowStickyTitle] = useState(false);
-  const [referenceTime, setReferenceTime] = useState(() => new Date(serverTime));
+  const [referenceTime, setReferenceTime] = useState<Date | null>(null);
 
   const { bookmark, loading: bookmarkLoading } = useBookmark({
     year,
@@ -176,10 +173,10 @@ function EventPage() {
   const isAttended = currentBookmark?.attended === true;
   const isAttendedInPerson = currentBookmark?.attended_in_person === true;
   const currentBookmarkId = currentBookmark?.id;
-  const eventFinished = fosdem.event && fosdem.conference
+  const eventFinished = fosdem.event && fosdem.conference && referenceTime
     ? isEventFinished(fosdem.event, fosdem.conference, referenceTime)
     : false;
-  const eventLive = fosdem.event && fosdem.conference
+  const eventLive = fosdem.event && fosdem.conference && referenceTime
     ? isEventLive(fosdem.event, fosdem.conference, referenceTime)
     : false;
   const canMarkAttendance = eventFinished || eventLive;
