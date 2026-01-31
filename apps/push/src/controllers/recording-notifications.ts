@@ -79,6 +79,21 @@ function createRecordingAvailableNotification(
   };
 }
 
+function createRecordingSummaryNotification(
+  recordings: Array<{ title: string; slug: string }>,
+): NotificationPayload {
+  const MAX_TITLES = 3;
+  const listed = recordings.slice(0, MAX_TITLES).map((recording) => recording.title);
+  const remaining = recordings.length - listed.length;
+  const suffix = remaining > 0 ? ` and ${remaining} more` : "";
+
+  return {
+    title: "Recordings now available",
+    body: `New recordings from your bookmarks: ${listed.join(", ")}${suffix}.`,
+    url: `https://${DOMAIN}/bookmarks?year=${constants.YEAR}`,
+  };
+}
+
 export async function triggerRecordingNotifications(
   event: { cron: string },
   env: Env,
@@ -172,38 +187,41 @@ export async function triggerRecordingNotifications(
 
     if (!filteredBookmarks.length) continue;
 
-    for (const recording of newRecordings) {
+    const eligibleRecordings = newRecordings.filter((recording) => {
       const bookmark = filteredBookmarks.find((b) => b.slug === recording.slug);
-      if (!bookmark) continue;
+      if (!bookmark) return false;
 
       const attended = Number(bookmark.attended) === 1;
       const watched = bookmark.watch_status === "watched";
-      const missed = !attended && !watched;
-      if (!missed) continue;
+      return !attended && !watched;
+    });
 
-      const notification = createRecordingAvailableNotification(
-        recording.title,
-        recording.slug,
-      );
+    if (!eligibleRecordings.length) continue;
 
-      try {
-        if (queueMode) {
-          await env.NOTIFICATION_QUEUE.send({
-            subscription,
-            notification,
-            bookmarkId: `${bookmark.id}-recording`,
-            shouldMarkSent: false,
-          });
-        } else {
-          await sendNotification(subscription, notification, keys, env);
-        }
-        notificationsSent++;
-      } catch (error) {
-        console.error(
-          `Failed to send recording notification to ${subscription.user_id}:`,
-          error,
-        );
+    const notification = eligibleRecordings.length === 1
+      ? createRecordingAvailableNotification(
+          eligibleRecordings[0].title,
+          eligibleRecordings[0].slug,
+        )
+      : createRecordingSummaryNotification(eligibleRecordings);
+
+    try {
+      if (queueMode) {
+        await env.NOTIFICATION_QUEUE.send({
+          subscription,
+          notification,
+          bookmarkId: `recordings-${subscription.user_id}-${constants.YEAR}`,
+          shouldMarkSent: false,
+        });
+      } else {
+        await sendNotification(subscription, notification, keys, env);
       }
+      notificationsSent++;
+    } catch (error) {
+      console.error(
+        `Failed to send recording notification to ${subscription.user_id}:`,
+        error,
+      );
     }
   }
 
