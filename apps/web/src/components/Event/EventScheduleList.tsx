@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { cn } from "~/lib/utils";
 import type { Event } from "~/types/fosdem";
 import type { EventConflict } from "~/lib/fosdem";
@@ -5,8 +6,10 @@ import { EventListItem } from "~/components/Event/EventItemList";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateTransitionTime } from "~/lib/dateTime";
 import { sortScheduleEvents } from "~/lib/sorting";
+import { useRoomStatuses } from "~/hooks/use-room-statuses";
 import type { User } from "~/server/db/schema";
 import type { BookmarkSnapshot } from "~/lib/type-guards";
+import type { RoomStatusBatchResult } from "~/server/functions/room-status";
 
 type EventScheduleListProps = {
 	events: Event[];
@@ -57,6 +60,7 @@ type EventScheduleListItemProps = {
 	}) => void;
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 	isProfilePage?: boolean;
+	roomStatus?: RoomStatusBatchResult;
 };
 
 function EventScheduleListItem({
@@ -72,6 +76,7 @@ function EventScheduleListItem({
 	onCreateBookmark,
 	onToggleWatchLater,
 	isProfilePage = false,
+	roomStatus,
 }: EventScheduleListItemProps) {
 	const transitionTime = nextEvent
 		? calculateTransitionTime(event, nextEvent)
@@ -94,6 +99,7 @@ function EventScheduleListItem({
 				actionSize="sm"
 				onToggleWatchLater={onToggleWatchLater}
 				isProfilePage={isProfilePage}
+				roomStatus={roomStatus}
 			/>
 			{transitionTime !== null && (
 				<div
@@ -147,6 +153,18 @@ export function EventScheduleList({
 		sortFn: sortScheduleEvents,
 		serverBookmarks,
 	});
+	const roomNames = useMemo(
+		() =>
+			Array.from(
+				new Set(
+					sortedEvents
+						.map((event) => event.room)
+						.filter((room): room is string => Boolean(room)),
+				),
+			),
+		[sortedEvents],
+	);
+	const { statusByRoom } = useRoomStatuses(roomNames);
 
 	return (
 		<ul className="event-list w-full divide-y divide-border rounded-lg border border-border bg-card/40">
@@ -165,6 +183,7 @@ export function EventScheduleList({
 						onCreateBookmark={onCreateBookmark}
 						onToggleWatchLater={onToggleWatchLater}
 						isProfilePage={isProfilePage}
+						roomStatus={event.room ? statusByRoom.get(event.room) : undefined}
 					/>
 				</li>
 			))}

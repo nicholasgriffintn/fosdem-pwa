@@ -1,9 +1,11 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, inArray } from "drizzle-orm";
 
 import { db } from "~/server/db";
 import {
-  roomStatusHistory as roomStatusHistoryTable,
-  type RoomStatusHistory,
+	roomStatusHistory as roomStatusHistoryTable,
+	roomStatusLatest as roomStatusLatestTable,
+	type RoomStatusHistory,
+	type RoomStatusLatest,
 } from "~/server/db/schema";
 
 export async function findLatestRoomStatus(
@@ -20,9 +22,9 @@ export async function findLatestRoomStatus(
 }
 
 export async function findRoomStatusHistory(
-  roomName: string,
-  year: number,
-  limit = 10,
+	roomName: string,
+	year: number,
+	limit = 10,
 ): Promise<RoomStatusHistory[]> {
   return db
     .select()
@@ -34,5 +36,24 @@ export async function findRoomStatusHistory(
       ),
     )
     .orderBy(desc(roomStatusHistoryTable.recorded_at))
-    .limit(limit);
+	.limit(limit);
+}
+
+export async function findLatestRoomStatuses(
+	roomNames: string[],
+	year: number,
+): Promise<RoomStatusLatest[]> {
+	if (!roomNames.length) {
+		return [];
+	}
+
+	return db
+		.select()
+		.from(roomStatusLatestTable)
+		.where(
+			and(
+				eq(roomStatusLatestTable.year, year),
+				inArray(roomStatusLatestTable.room_name, roomNames),
+			),
+		);
 }

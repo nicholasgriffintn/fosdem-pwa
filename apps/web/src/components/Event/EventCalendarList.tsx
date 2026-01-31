@@ -1,9 +1,12 @@
+import { useMemo } from "react";
 import type { Event } from "~/types/fosdem";
 import { generateTimeSlots, type EventConflict } from "~/lib/fosdem";
 import { useEventList } from "~/hooks/use-item-list";
 import type { User } from "~/server/db/schema";
 import { EventListItem } from "~/components/Event/EventItemList";
 import type { BookmarkSnapshot } from "~/lib/type-guards";
+import { useRoomStatuses } from "~/hooks/use-room-statuses";
+import type { RoomStatusBatchResult } from "~/server/functions/room-status";
 
 type EventCalendarListProps = {
   events: Event[];
@@ -44,6 +47,7 @@ type EventCalendarListItemProps = {
     status: string;
   }) => void;
   onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
+  roomStatus?: RoomStatusBatchResult;
 };
 
 function EventCalendarListItem({
@@ -56,6 +60,7 @@ function EventCalendarListItem({
   user,
   onCreateBookmark,
   onToggleWatchLater,
+  roomStatus,
 }: EventCalendarListItemProps) {
   const durationInMinutes =
     Number.parseInt(event.duration.split(":")[0], 10) * 60 +
@@ -77,6 +82,7 @@ function EventCalendarListItem({
       style={{ minHeight: itemHeight }}
       actionSize="sm"
       onToggleWatchLater={onToggleWatchLater}
+      roomStatus={roomStatus}
     />
   );
 }
@@ -99,6 +105,18 @@ export function EventCalendarList({
     sortByFavourites,
     serverBookmarks,
   });
+  const roomNames = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          sortedEvents
+            .map((event) => event.room)
+            .filter((room): room is string => Boolean(room)),
+        ),
+      ),
+    [sortedEvents],
+  );
+  const { statusByRoom } = useRoomStatuses(roomNames);
   const timeSlots = generateTimeSlots(sortedEvents);
 
   return (
@@ -125,6 +143,7 @@ export function EventCalendarList({
                   user={user}
                   onCreateBookmark={onCreateBookmark}
                   onToggleWatchLater={onToggleWatchLater}
+                  roomStatus={event.room ? statusByRoom.get(event.room) : undefined}
                 />
               ))}
             </div>
