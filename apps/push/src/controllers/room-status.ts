@@ -20,48 +20,30 @@ interface RoomStatusResponse {
 type RoomTrend = "filling" | "emptying" | "stable" | "unknown";
 type RawRoomStatus = {
   roomname?: unknown;
-  room_name?: unknown;
-  room?: unknown;
   state?: unknown;
-  status?: unknown;
 };
 
 function normalizeRoomStatus(raw: RawRoomStatus): RoomStatusResponse | null {
-  const roomName = raw.roomname ?? raw.room_name ?? raw.room;
-  const state = raw.state ?? raw.status;
-
-  if (typeof roomName !== "string" || roomName.trim() === "") {
+  if (typeof raw.roomname !== "string" || raw.roomname.trim() === "") {
     return null;
   }
 
-  if (state === undefined || state === null) {
+  if (raw.state === undefined || raw.state === null) {
     return null;
   }
 
   return {
-    roomname: roomName,
-    state: String(state),
+    roomname: raw.roomname,
+    state: String(raw.state),
   };
 }
 
 function extractRoomStatuses(data: unknown): RoomStatusResponse[] {
-  let records: unknown[] = [];
-
-  if (Array.isArray(data)) {
-    records = data;
-  } else if (data && typeof data === "object") {
-    const container = data as {
-      rooms?: unknown;
-      data?: unknown;
-      results?: unknown;
-    };
-    const possibleRecords = container.rooms ?? container.data ?? container.results;
-    if (Array.isArray(possibleRecords)) {
-      records = possibleRecords;
-    }
+  if (!Array.isArray(data)) {
+    return [];
   }
 
-  return records
+  return data
     .map((record) => normalizeRoomStatus(record as RawRoomStatus))
     .filter((record): record is RoomStatusResponse => Boolean(record));
 }
