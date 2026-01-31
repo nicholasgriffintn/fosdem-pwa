@@ -32,6 +32,7 @@ export function EventSpeakers({ event, year, persons }: EventSpeakersProps) {
                 {person && (person.biography || person.extended_biography) && (
                   <div
                     className="text-sm text-muted-foreground line-clamp-3 prose-sm prose-indigo"
+                    suppressHydrationWarning
                     dangerouslySetInnerHTML={{
                       __html: person.biography || person.extended_biography || "",
                     }}
