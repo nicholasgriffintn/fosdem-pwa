@@ -18,6 +18,35 @@ interface RoomStatusResponse {
 }
 
 type RoomTrend = "filling" | "emptying" | "stable" | "unknown";
+type RawRoomStatus = {
+  roomname?: unknown;
+  state?: unknown;
+};
+
+function normalizeRoomStatus(raw: RawRoomStatus): RoomStatusResponse | null {
+  if (typeof raw.roomname !== "string" || raw.roomname.trim() === "") {
+    return null;
+  }
+
+  if (raw.state === undefined || raw.state === null) {
+    return null;
+  }
+
+  return {
+    roomname: raw.roomname,
+    state: String(raw.state),
+  };
+}
+
+function extractRoomStatuses(data: unknown): RoomStatusResponse[] {
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data
+    .map((record) => normalizeRoomStatus(record as RawRoomStatus))
+    .filter((record): record is RoomStatusResponse => Boolean(record));
+}
 
 async function fetchRoomStatuses(): Promise<RoomStatusResponse[]> {
   const controller = new AbortController();
@@ -32,7 +61,8 @@ async function fetchRoomStatuses(): Promise<RoomStatusResponse[]> {
       throw new Error(`Failed to fetch room status: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    return extractRoomStatuses(data);
   } finally {
     clearTimeout(timeout);
   }
