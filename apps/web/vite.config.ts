@@ -6,7 +6,10 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  build: {
+    sourcemap: mode === 'production',
+  },
   plugins: [
     devtools(),
     cloudflare({
@@ -21,4 +24,4 @@ export default defineConfig({
     tanstackStart(),
     viteReact(),
   ],
-})
+}))
