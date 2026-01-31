@@ -1,7 +1,6 @@
 import { glob } from 'glob'
 import { writeFileSync, readFileSync, readdirSync } from 'node:fs'
-
-const CURRENT_YEAR = 2026;
+import { constants } from '../src/constants'
 
 async function generateServiceWorker(outputDir = 'dist') {
   let manifest: Record<string, any>;
@@ -85,7 +84,7 @@ async function generateServiceWorker(outputDir = 'dist') {
   });
 
   const dataUrls = [
-    `/_serverFn/${fosdemFunctionId}?payload=${encodeURIComponent(JSON.stringify(getFosdemPayload(CURRENT_YEAR)))}&createServerFn`
+    `/_serverFn/${fosdemFunctionId}?payload=${encodeURIComponent(JSON.stringify(getFosdemPayload(constants.DEFAULT_YEAR)))}&createServerFn`
   ]
 
   const clientFiles = await glob(`${outputDir}/client/**/*`, { nodir: true })
@@ -255,7 +254,8 @@ registerRoute(
           maxEntries: 50,
           maxAgeSeconds: 24 * 60 * 60 // 24 hours
         })
-      ]
+      ],
+      networkTimeoutSeconds: 3
     }),
     {
       allowlist: [new RegExp('^(?!/api/).*$')], // All non-API routes
@@ -285,7 +285,7 @@ registerRoute(
         }
       }
     ],
-    networkTimeoutSeconds: 6
+    networkTimeoutSeconds: 3
   })
 );
 
