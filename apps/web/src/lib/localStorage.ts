@@ -1,14 +1,12 @@
 const DB_NAME = "fosdem_offline";
-const DB_VERSION = 2;
+const DB_VERSION = 1;
 
-import type { Conference } from "~/types/fosdem";
 import { isValidNote } from "./type-guards";
 
 const STORE_NAMES = {
   BOOKMARKS: "bookmarks",
   NOTES: "notes",
   SYNC_QUEUE: "sync_queue",
-  CONFERENCE: "conference",
 } as const;
 
 const SYNC_ENABLED_KEY = "fosdem_sync_enabled";
@@ -58,9 +56,6 @@ async function openDatabase(): Promise<IDBDatabase | null> {
         }
         if (!db.objectStoreNames.contains(STORE_NAMES.SYNC_QUEUE)) {
           db.createObjectStore(STORE_NAMES.SYNC_QUEUE, { keyPath: "id" });
-        }
-        if (!db.objectStoreNames.contains(STORE_NAMES.CONFERENCE)) {
-          db.createObjectStore(STORE_NAMES.CONFERENCE, { keyPath: "year" });
         }
       };
 
@@ -244,12 +239,6 @@ export interface LocalNote {
   serverId?: number;
 }
 
-export interface LocalConference {
-  year: number;
-  data: Conference;
-  cached_at: string;
-}
-
 export interface SyncQueueItem {
   id: string;
   type: "bookmark" | "note";
@@ -399,32 +388,6 @@ export async function getLocalNotes(year?: number): Promise<LocalNote[]> {
   } catch (error) {
     console.error("Error reading local notes:", error);
     return [];
-  }
-}
-
-export async function getLocalConference(year: number): Promise<Conference | null> {
-  try {
-    const entry = await getFromStore<LocalConference>(STORE_NAMES.CONFERENCE, year);
-    return entry?.data ?? null;
-  } catch (error) {
-    console.error("Error reading local conference data:", error);
-    return null;
-  }
-}
-
-export async function saveLocalConference(
-  year: number,
-  data: Conference
-): Promise<void> {
-  try {
-    const entry: LocalConference = {
-      year,
-      data,
-      cached_at: new Date().toISOString(),
-    };
-    await putInStore(STORE_NAMES.CONFERENCE, entry);
-  } catch (error) {
-    handleStorageError(error, "saving local conference data");
   }
 }
 
