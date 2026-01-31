@@ -1,18 +1,14 @@
+"use client";
+
 import { constants } from "~/constants";
 import { Icons } from "~/components/shared/Icons";
+import { useIsClient } from "~/hooks/use-is-client";
 import {
 	isEventFinished,
 	createStandardDate,
 	getEventDateTime,
 } from "~/lib/dateTime";
 import type { Event, ConferenceData } from "~/types/fosdem";
-
-const startTimeFormatter = new Intl.DateTimeFormat("en-GB", {
-	hour: "2-digit",
-	minute: "2-digit",
-	hour12: false,
-	timeZone: constants.TIME_ZONE,
-});
 
 export function EventPlayerNotStarted({
 	event,
@@ -23,17 +19,20 @@ export function EventPlayerNotStarted({
 	conference: ConferenceData;
 	referenceTime?: Date;
 }) {
+	const isClient = useIsClient();
 	const eventIsInPast = referenceTime
 		? isEventFinished(event, conference, referenceTime)
 		: false;
 
-	const eventStart = getEventDateTime(event, conference);
-	const now = referenceTime
-		? createStandardDate(referenceTime)
-		: createStandardDate(new Date());
+	const eventStart = isClient ? getEventDateTime(event, conference) : null;
+	const now = isClient
+		? referenceTime
+			? createStandardDate(referenceTime)
+			: createStandardDate(new Date())
+		: null;
 
 	const timeUntilStartMs =
-		eventStart != null
+		eventStart != null && now != null
 			? Math.max(0, eventStart.getTime() - now.getTime())
 			: null;
 
@@ -65,9 +64,7 @@ export function EventPlayerNotStarted({
 					}
 					return `${totalMinutes} ${totalMinutes === 1 ? "minute" : "minutes"}`;
 				})();
-	const startTimeLabel = eventStart
-		? startTimeFormatter.format(eventStart)
-		: event.startTime;
+	const startTimeLabel = event.startTime;
 
 	return (
 		<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 transition-colors">
@@ -85,7 +82,7 @@ export function EventPlayerNotStarted({
 								Stream opens at {startTimeLabel} ({constants.TIME_ZONE})
 							</p>
 							{timeUntilStartLabel && (
-									<p className="text-xs md:text-sm text-foreground">
+								<p className="text-xs md:text-sm text-foreground">
 									Starts in about {timeUntilStartLabel}. Come back later to
 									watch the stream.
 								</p>
