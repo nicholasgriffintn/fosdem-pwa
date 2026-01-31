@@ -18,6 +18,53 @@ interface RoomStatusResponse {
 }
 
 type RoomTrend = "filling" | "emptying" | "stable" | "unknown";
+type RawRoomStatus = {
+  roomname?: unknown;
+  room_name?: unknown;
+  room?: unknown;
+  state?: unknown;
+  status?: unknown;
+};
+
+function normalizeRoomStatus(raw: RawRoomStatus): RoomStatusResponse | null {
+  const roomName = raw.roomname ?? raw.room_name ?? raw.room;
+  const state = raw.state ?? raw.status;
+
+  if (typeof roomName !== "string" || roomName.trim() === "") {
+    return null;
+  }
+
+  if (state === undefined || state === null) {
+    return null;
+  }
+
+  return {
+    roomname: roomName,
+    state: String(state),
+  };
+}
+
+function extractRoomStatuses(data: unknown): RoomStatusResponse[] {
+  let records: unknown[] = [];
+
+  if (Array.isArray(data)) {
+    records = data;
+  } else if (data && typeof data === "object") {
+    const container = data as {
+      rooms?: unknown;
+      data?: unknown;
+      results?: unknown;
+    };
+    const possibleRecords = container.rooms ?? container.data ?? container.results;
+    if (Array.isArray(possibleRecords)) {
+      records = possibleRecords;
+    }
+  }
+
+  return records
+    .map((record) => normalizeRoomStatus(record as RawRoomStatus))
+    .filter((record): record is RoomStatusResponse => Boolean(record));
+}
 
 async function fetchRoomStatuses(): Promise<RoomStatusResponse[]> {
   const controller = new AbortController();
@@ -32,7 +79,8 @@ async function fetchRoomStatuses(): Promise<RoomStatusResponse[]> {
       throw new Error(`Failed to fetch room status: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    return extractRoomStatuses(data);
   } finally {
     clearTimeout(timeout);
   }
