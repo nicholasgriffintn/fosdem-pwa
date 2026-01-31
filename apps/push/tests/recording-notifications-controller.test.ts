@@ -202,6 +202,75 @@ describe("triggerRecordingNotifications", () => {
 		expect((env as any)._updateCalls).toHaveLength(1);
 	});
 
+	it("groups multiple recording notifications into one", async () => {
+		const secondEvent: FosdemEvent = {
+			...baseEvent,
+			title: "Talk B",
+			links: [{ type: "video/mp4", href: "https://video.example/talk-b.mp4" }],
+		};
+
+		(getFosdemData as vi.Mock).mockResolvedValue({
+			events: { "talk-a": baseEvent, "talk-b": secondEvent },
+		});
+		(getApplicationKeys as vi.Mock).mockResolvedValue({});
+		(resolveNotificationPreference as vi.Mock).mockReturnValue({
+			reminder_minutes_before: 15,
+			event_reminders: true,
+			schedule_changes: true,
+			room_status_alerts: true,
+			recording_available: true,
+			daily_summary: true,
+			notify_low_priority: true,
+		});
+		(getBookmarksByUserIds as vi.Mock).mockResolvedValue(
+			new Map([
+				[
+					"1",
+					[
+						{
+							id: "b1",
+							user_id: "1",
+							slug: "talk-a",
+							type: "bookmark_event",
+							status: "favourited",
+							year: 2025,
+							priority: 1,
+							attended: 0,
+							watch_status: "unwatched",
+						},
+						{
+							id: "b2",
+							user_id: "1",
+							slug: "talk-b",
+							type: "bookmark_event",
+							status: "favourited",
+							year: 2025,
+							priority: 1,
+							attended: 0,
+							watch_status: "unwatched",
+						},
+					],
+				],
+			]),
+		);
+
+		const env = createMockEnv({
+			snapshots: [],
+			subscriptions: [baseSubscription],
+			bookmarkStatus: { attended: 0, watch_status: "unwatched" },
+		});
+
+		await triggerRecordingNotifications({ cron: "" }, env, {} as any, false);
+
+		expect(sendNotification).toHaveBeenCalledTimes(1);
+		const notification = (sendNotification as vi.Mock).mock.calls[0][1];
+		expect(notification.title).toBe("Recordings now available");
+		expect(notification.body).toContain("Talk A");
+		expect(notification.body).toContain("Talk B");
+		expect(notification.url).toContain("/bookmarks");
+		expect((env as any)._updateCalls).toHaveLength(2);
+	});
+
 	it("skips notifications when the event was already attended", async () => {
 		(getFosdemData as vi.Mock).mockResolvedValue({
 			events: { "talk-a": baseEvent },
