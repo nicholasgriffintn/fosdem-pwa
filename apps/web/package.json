@@ -85,7 +85,7 @@
     "autoprefixer": "10.4.23",
     "drizzle-kit": "0.31.8",
     "glob": "13.0.0",
-    "globals": "17.1.0",
+    "globals": "17.2.0",
     "jsdom": "27.4.0",
     "tailwindcss": "4.1.18",
     "tsx": "4.21.0",
