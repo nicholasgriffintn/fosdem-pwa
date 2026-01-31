@@ -111,6 +111,7 @@ export function useBookmarks({
 						serverId: serverBookmark.id,
 						existsOnServer: true,
 						watch_later: serverBookmark.watch_later ?? null,
+						priority: serverBookmark.priority ?? null,
 					});
 				}
 			}
@@ -177,6 +178,7 @@ export function useBookmarks({
 									status: serverBookmark.status,
 									serverId: serverBookmark.id,
 									watch_later: serverBookmark.watch_later ?? null,
+									priority: serverBookmark.priority ?? null,
 								},
 								true,
 							);
@@ -186,7 +188,8 @@ export function useBookmarks({
 							existingLocal.serverId !== serverBookmark.id ||
 							existingLocal.status !== serverBookmark.status ||
 							existingLocal.type !== serverBookmark.type ||
-							existingLocal.watch_later !== serverBookmark.watch_later;
+							existingLocal.watch_later !== serverBookmark.watch_later ||
+							existingLocal.priority !== serverBookmark.priority;
 
 						if (needsUpdate) {
 							updates.push(async () => {
@@ -197,6 +200,7 @@ export function useBookmarks({
 										status: serverBookmark.status,
 										type: serverBookmark.type,
 										watch_later: serverBookmark.watch_later ?? null,
+										priority: serverBookmark.priority ?? null,
 									},
 									true,
 								);
