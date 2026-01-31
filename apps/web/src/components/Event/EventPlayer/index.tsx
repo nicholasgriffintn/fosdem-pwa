@@ -16,14 +16,14 @@ import { EventPlayerNotStarted } from "~/components/Event/EventPlayer/components
 type EventPlayerProps = {
 	event: Event;
 	conference: ConferenceData;
-	testTime?: Date;
+	referenceTime?: Date;
 	year?: number;
 };
 
 export function EventPlayer({
 	event,
 	conference,
-	testTime,
+	referenceTime,
 	year = new Date().getFullYear(),
 }: EventPlayerProps) {
 	const isClient = useIsClient();
@@ -76,7 +76,7 @@ export function EventPlayer({
 	const hasRecordings = videoRecordings.length > 0;
 
 	const eventIsLive =
-		isEventLive(event, conference, testTime) &&
+		isEventLive(event, conference, referenceTime) &&
 		event.streams?.some(
 			(stream) => stream.type === "application/vnd.apple.mpegurl",
 		);
@@ -225,7 +225,7 @@ export function EventPlayer({
 					<EventPlayerNotStarted
 						event={event}
 						conference={conference}
-						testTime={testTime ?? new Date()}
+						referenceTime={referenceTime}
 					/>
 				)}
 			</div>
