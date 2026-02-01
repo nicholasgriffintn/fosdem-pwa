@@ -102,8 +102,11 @@ function RoomPage() {
 	const days = fosdem.days;
 
 	const now = createStandardDate(new Date());
+	const conferenceStart = createStandardDate(conference.start);
+	const conferenceEnd = createStandardDate(conference.end);
+	conferenceEnd.setHours(23, 59, 59, 999);
 	const isConferenceRunning =
-		new Date(conference.start) < now && new Date(conference.end) > now;
+		now >= conferenceStart && now <= conferenceEnd;
 
 	if (!roomInfo) {
 		return (
