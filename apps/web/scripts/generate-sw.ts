@@ -157,7 +157,7 @@ async function generateServiceWorker(outputDir = 'dist') {
 
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js');
 
-const { registerRoute, NavigationRoute, setDefaultHandler } = workbox.routing;
+const { registerRoute, NavigationRoute, setDefaultHandler, setCatchHandler } = workbox.routing;
 const { NetworkFirst, CacheFirst, StaleWhileRevalidate, NetworkOnly } = workbox.strategies;
 const { CacheableResponsePlugin } = workbox.cacheableResponse;
 const { ExpirationPlugin } = workbox.expiration;
@@ -209,6 +209,25 @@ workbox.precaching.precacheAndRoute(
     revision: CACHE_NAME
   }))
 );
+
+setCatchHandler(async ({ event }) => {
+  const { request } = event;
+  if (request.destination === 'document') {
+    const cachedOffline = await workbox.precaching.matchPrecache('/offline');
+    if (cachedOffline) {
+      return cachedOffline;
+    }
+  }
+
+  if (request.url.includes('/_serverFn')) {
+    return new Response('', {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  return Response.error();
+});
 
 registerRoute(
   ({ url }) => url.hostname === 'avatars.githubusercontent.com',
