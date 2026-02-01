@@ -94,8 +94,10 @@ export const getRoomStatuses = createServerFn({
       throw new Error("Invalid input; expected { roomNames: string[] }");
     }
 
-    const rawRoomNames = Array.isArray((data as { roomNames: unknown }).roomNames)
-      ? (data as { roomNames: unknown }).roomNames
+    const rawRoomNames: unknown[] = Array.isArray(
+      (data as { roomNames?: unknown }).roomNames,
+    )
+      ? (data as { roomNames: unknown[] }).roomNames
       : [];
     const roomNames = rawRoomNames
       .filter((roomName): roomName is string => typeof roomName === "string")

@@ -178,15 +178,21 @@ export function isConferenceMoreThanOneMonthAway(
 	}
 }
 
-export function resolveTodayDayId(days: Array<{ id: string; date?: string }>): string | undefined {
-	if (!Array.isArray(days) || days.length === 0) return undefined;
+type DayLike = { id: string; date?: string };
+
+export function resolveTodayDayId(
+	days: Array<DayLike> | Record<string, DayLike> | undefined,
+): string | undefined {
+	if (!days) return undefined;
+	const resolvedDays = Array.isArray(days) ? days : Object.values(days);
+	if (resolvedDays.length === 0) return undefined;
 
 	const today = createStandardDate(new Date());
 	const targetYear = today.getFullYear();
 	const targetMonth = today.getMonth();
 	const targetDate = today.getDate();
 
-	return days.find((day) => {
+	return resolvedDays.find((day) => {
 		if (!day.date) return false;
 		const dayDate = createStandardDate(day.date);
 		return (
@@ -195,4 +201,4 @@ export function resolveTodayDayId(days: Array<{ id: string; date?: string }>): s
 			dayDate.getDate() === targetDate
 		);
 	})?.id;
-};
+}

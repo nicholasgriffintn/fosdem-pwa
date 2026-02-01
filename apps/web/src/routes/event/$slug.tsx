@@ -154,7 +154,7 @@ function EventPage() {
   const isClient = useIsClient();
   const headerSentinelRef = useRef<HTMLDivElement | null>(null);
   const [showStickyTitle, setShowStickyTitle] = useState(false);
-  const [referenceTime, setReferenceTime] = useState<Date | null>(null);
+  const [referenceTime, setReferenceTime] = useState<Date | undefined>(undefined);
 
   const { bookmark, loading: bookmarkLoading } = useBookmark({
     year,
