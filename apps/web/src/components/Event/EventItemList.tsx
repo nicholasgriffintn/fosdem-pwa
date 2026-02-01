@@ -17,6 +17,7 @@ import { buildEventLink } from "~/lib/link-builder";
 import { ListContainer, ListEmptyState } from "~/components/shared/ListContainer";
 import type { RoomStatusBatchResult } from "~/server/functions/room-status";
 import { useRoomStatuses } from "~/hooks/use-room-statuses";
+import { RoomStatusIndicator } from "~/components/shared/RoomStatusIndicator";
 
 type EventListProps = {
 	events: Event[];
@@ -71,26 +72,6 @@ type EventListItemProps = {
 	isProfilePage?: boolean;
 	roomStatus?: RoomStatusBatchResult;
 };
-
-type RoomStatusIndicatorProps = {
-	state: RoomStatusBatchResult["state"];
-};
-
-const roomStatusStyles: Record<RoomStatusBatchResult["state"], string> = {
-	available: "bg-green-500",
-	full: "bg-red-500",
-	unknown: "bg-gray-400",
-};
-
-function RoomStatusIndicator({ state }: RoomStatusIndicatorProps) {
-	return (
-		<span
-			className={clsx("inline-flex h-2 w-2 rounded-full", roomStatusStyles[state])}
-			aria-label={`Room status: ${state}`}
-			title={`Room status: ${state}`}
-		/>
-	);
-}
 
 export function EventListItem({
 	year,
