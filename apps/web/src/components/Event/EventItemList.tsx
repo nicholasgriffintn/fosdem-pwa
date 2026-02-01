@@ -210,7 +210,10 @@ export function EventListItem({
 							{metaBadges.map((meta) => (
 								<div
 									key={meta.key}
-									className="flex items-center gap-1 text-xs min-w-0 max-w-full flex-1"
+									className={clsx(
+										"flex items-center gap-1 text-xs",
+										meta.key === "persons" && "min-w-0 max-w-full flex-1",
+									)}
 								>
 									{meta.icon}
 									<span className="truncate">{meta.label}</span>
