@@ -31,5 +31,6 @@ export const subscriptionQueryKeys = {
 
 export const roomStatusQueryKeys = {
 	status: (roomId: string) => ["room-status", roomId],
+	statuses: (roomNames: string[]) => ["room-statuses", ...roomNames],
 	history: (roomId: string, limit: number) => ["room-status-history", roomId, limit],
 };

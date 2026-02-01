@@ -60,11 +60,6 @@ export function RoomStatus({ roomId, isRunning, className }: RoomStatusProps) {
 					really great place to have a few conversations.
 				</p>
 			) : null}
-			{status?.lastUpdate && (
-				<p className="text-sm text-muted-foreground mt-1">
-					Last updated: {new Date(status.lastUpdate).toLocaleTimeString()}
-				</p>
-			)}
 		</div>
 	);
 }

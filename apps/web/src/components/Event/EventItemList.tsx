@@ -1,4 +1,5 @@
 import type React from "react";
+import { useMemo } from "react";
 import clsx from "clsx";
 import { Link } from "@tanstack/react-router";
 
@@ -14,6 +15,8 @@ import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/shared/Icons";
 import { buildEventLink } from "~/lib/link-builder";
 import { ListContainer, ListEmptyState } from "~/components/shared/ListContainer";
+import type { RoomStatusBatchResult } from "~/server/functions/room-status";
+import { useRoomStatuses } from "~/hooks/use-room-statuses";
 
 type EventListProps = {
 	events: Event[];
@@ -66,7 +69,28 @@ type EventListItemProps = {
 	actionSize?: "default" | "sm";
 	onToggleWatchLater?: (bookmarkId: string) => Promise<unknown>;
 	isProfilePage?: boolean;
+	roomStatus?: RoomStatusBatchResult;
 };
+
+type RoomStatusIndicatorProps = {
+	state: RoomStatusBatchResult["state"];
+};
+
+const roomStatusStyles: Record<RoomStatusBatchResult["state"], string> = {
+	available: "bg-green-500",
+	full: "bg-red-500",
+	unknown: "bg-gray-400",
+};
+
+function RoomStatusIndicator({ state }: RoomStatusIndicatorProps) {
+	return (
+		<span
+			className={clsx("inline-flex h-2 w-2 rounded-full", roomStatusStyles[state])}
+			aria-label={`Room status: ${state}`}
+			title={`Room status: ${state}`}
+		/>
+	);
+}
 
 export function EventListItem({
 	year,
@@ -84,6 +108,7 @@ export function EventListItem({
 	actionSize,
 	onToggleWatchLater,
 	isProfilePage = false,
+	roomStatus,
 }: EventListItemProps) {
 	const hasConflicts = showConflictIndicators
 		? conflicts?.some(
@@ -97,7 +122,9 @@ export function EventListItem({
 			? "flex flex-col gap-3 h-full"
 			: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3";
 	const showPinnedBadge = showConflictIndicators && event.priority === 1;
-	const metaBadges = [
+	const roomStatusState = roomStatus?.state ?? "unknown";
+
+	const metaBadges: { key: string; label: string; icon?: React.ReactNode; status?: RoomStatusBatchResult["state"] }[] = [
 		{
 			key: "time",
 			label: `${event.startTime} – ${endTime}`,
@@ -107,7 +134,12 @@ export function EventListItem({
 			? {
 				key: "room",
 				label: event.room,
-				icon: <Icons.mapPin className="h-3.5 w-3.5" />,
+				icon: (
+					<span className="flex items-center gap-1">
+						<Icons.mapPin className="h-3.5 w-3.5" />
+					</span>
+				),
+				status: roomStatusState,
 			}
 			: null,
 		showTrack && event.trackKey
@@ -182,6 +214,7 @@ export function EventListItem({
 								>
 									{meta.icon}
 									<span className="truncate">{meta.label}</span>
+									{meta.status && <RoomStatusIndicator state={meta.status} />}
 								</div>
 							))}
 						</div>
@@ -233,6 +266,18 @@ export function EventItemList({
 		sortByFavourites,
 		serverBookmarks,
 	});
+	const roomNames = useMemo(
+		() =>
+			Array.from(
+				new Set(
+					sortedEvents
+						.map((event) => event.room)
+						.filter((room): room is string => Boolean(room)),
+				),
+			),
+		[sortedEvents],
+	);
+	const { statusByRoom } = useRoomStatuses(roomNames);
 
 	return (
 		<ListContainer className="event-list">
@@ -249,6 +294,7 @@ export function EventItemList({
 							user={user}
 							onCreateBookmark={onCreateBookmark}
 							onToggleWatchLater={onToggleWatchLater}
+							roomStatus={event.room ? statusByRoom.get(event.room) : undefined}
 						/>
 					</li>
 				))
