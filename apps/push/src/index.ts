@@ -211,7 +211,13 @@ export default Sentry.withSentry(
 			const dedupe = new Map<string, number>();
 
 			for (const message of batch.messages) {
-				const dedupeKey = `${message.body?.bookmarkId ?? "unknown"}:${message.body?.notification?.title ?? "untitled"}`;
+				if (!message.body) {
+					console.error("Skipping queue message with empty body", { messageId: message.id });
+					continue;
+				}
+
+				const subscriptionKey = message.body?.subscription?.user_id ?? message.body?.subscription?.endpoint ?? "unknown";
+				const dedupeKey = `${subscriptionKey}:${message.body?.bookmarkId ?? "unknown"}:${message.body?.notification?.title ?? "untitled"}`;
 				const lastSentAt = dedupe.get(dedupeKey);
 				const now = Date.now();
 				if (lastSentAt && now - lastSentAt < DEDUPE_WINDOW_MS) {
