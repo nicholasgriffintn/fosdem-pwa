@@ -17,6 +17,7 @@ import { getUserBookmarks } from "~/server/functions/bookmarks";
 import { getUserDetails } from "~/server/functions/user";
 import { useIsClient } from "~/hooks/use-is-client";
 import { pruneFosdemData } from "~/server/lib/fosdem-prune";
+import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/profile/$userId/")({
   component: ProfilePage,
@@ -92,6 +93,7 @@ function ProfilePage() {
     Route.useLoaderData();
   const { tab: tabRaw, day, view } = Route.useSearch();
   const tab = tabRaw ?? "events";
+  const resolvedDay = day;
 
   const routeUserId = Route.useParams().userId;
 
@@ -156,7 +158,7 @@ function ProfilePage() {
                   fosdemData={resolvedFosdemData}
                   year={year}
                   loading={resolvedBookmarksLoading}
-                  day={day}
+                  day={resolvedDay}
                   view={view}
                   tab={tab}
                   showConflicts={true}

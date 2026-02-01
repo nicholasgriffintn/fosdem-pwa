@@ -12,6 +12,7 @@ import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
+import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/speakers/$slug")({
     component: SpeakerPage,
@@ -76,6 +77,7 @@ function SpeakerPage() {
             }),
         });
     };
+    const resolvedDay = day ?? resolveTodayDayId(fosdem.days);
 
     if (!person) {
         return (
@@ -118,7 +120,7 @@ function SpeakerPage() {
                     displayViewMode={false}
                     groupByDay={true}
                     days={days}
-                    day={day}
+                    day={resolvedDay}
                     sortFavourites={sortFavourites}
                     onSortFavouritesChange={handleSortFavouritesChange}
                     user={user}

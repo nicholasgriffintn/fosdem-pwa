@@ -177,3 +177,22 @@ export function isConferenceMoreThanOneMonthAway(
 		return false;
 	}
 }
+
+export function resolveTodayDayId(days: Array<{ id: string; date?: string }>): string | undefined {
+	if (!Array.isArray(days) || days.length === 0) return undefined;
+
+	const today = createStandardDate(new Date());
+	const targetYear = today.getFullYear();
+	const targetMonth = today.getMonth();
+	const targetDate = today.getDate();
+
+	return days.find((day) => {
+		if (!day.date) return false;
+		const dayDate = createStandardDate(day.date);
+		return (
+			dayDate.getFullYear() === targetYear &&
+			dayDate.getMonth() === targetMonth &&
+			dayDate.getDate() === targetDate
+		);
+	})?.id;
+};

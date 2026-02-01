@@ -23,6 +23,7 @@ import { useAuthSnapshot } from "~/contexts/AuthSnapshotContext";
 import { useIsClient } from "~/hooks/use-is-client";
 import { useUserStats } from "~/hooks/use-user-stats";
 import { pruneFosdemData } from "~/server/lib/fosdem-prune";
+import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/profile/")({
   component: ProfilePage,
@@ -93,10 +94,12 @@ function ProfilePage() {
     initialData: serverFosdemData,
     initialDataIsPartial: true,
   });
-  const { stats, loading: statsLoading } = useUserStats({
+  const { stats } = useUserStats({
     year,
     initialData: serverStats,
   });
+  const resolvedDay = day ?? resolveTodayDayId(fosdemData?.days);
+
   const isClient = useIsClient();
   const hasServerSnapshot = Boolean(serverFosdemData);
   const useServerSnapshot =
@@ -158,7 +161,7 @@ function ProfilePage() {
                 fosdemData={resolvedFosdemData}
                 year={year}
                 loading={resolvedBookmarksLoading}
-                day={day}
+                day={resolvedDay}
                 view={view}
                 tab={tab}
                 showConflicts={true}

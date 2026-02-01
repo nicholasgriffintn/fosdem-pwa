@@ -13,6 +13,7 @@ import { getBookmarks } from "~/server/functions/bookmarks";
 import { isTrack } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
+import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
@@ -57,6 +58,7 @@ function TypePage() {
 	const { fosdem, year, day, serverBookmarks } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
+	const resolvedDay = day ?? resolveTodayDayId(fosdem.days);
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -106,7 +108,7 @@ function TypePage() {
 					year={year}
 					groupByDay={true}
 					days={fosdem.days}
-					day={day}
+					day={resolvedDay}
 					sortFavourites={sortFavourites}
 					onSortFavouritesChange={handleSortFavouritesChange}
 					user={user}

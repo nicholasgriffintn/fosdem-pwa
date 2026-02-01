@@ -16,6 +16,7 @@ import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
+import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/rooms/$roomId")({
 	component: RoomPage,
@@ -77,6 +78,7 @@ function RoomPage() {
 	const { fosdem, day, year, serverBookmarks } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
+	const resolvedDay = day ?? resolveTodayDayId(fosdemData?.days);
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -180,7 +182,7 @@ function RoomPage() {
 					displayViewMode={false}
 					groupByDay={true}
 					days={days}
-					day={day}
+					day={resolvedDay}
 					sortFavourites={sortFavourites}
 					onSortFavouritesChange={handleSortFavouritesChange}
 					user={user}

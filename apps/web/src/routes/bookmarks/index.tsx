@@ -27,6 +27,7 @@ import { downloadFile } from "~/utils/file-download";
 import type { Bookmark } from "~/server/db/schema";
 import type { LocalBookmark } from "~/lib/localStorage";
 import { pruneFosdemData } from "~/server/lib/fosdem-prune";
+import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/bookmarks/")({
   component: BookmarksHome,
@@ -107,6 +108,7 @@ function BookmarksHome() {
   const resolvedWatchLaterLoading = resolvedLoading;
   const [csvBusy, setCsvBusy] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const resolvedDay = day ?? resolveTodayDayId(fosdemData?.days);
 
   const exportCsv = useServerFn(exportBookmarksCsv);
   const importCsv = useServerFn(importBookmarksCsv);
@@ -227,7 +229,7 @@ function BookmarksHome() {
           fosdemData={resolvedFosdemData}
           year={year}
           loading={resolvedLoading}
-          day={day}
+            day={resolvedDay}
           view={view}
           tab={tab}
           watchLaterItems={resolvedWatchLater}

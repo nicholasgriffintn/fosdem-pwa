@@ -12,6 +12,7 @@ import { getBookmarks } from "~/server/functions/bookmarks";
 import { isEvent } from "~/lib/type-guards";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
+import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/track/$slug")({
 	component: TrackPage,
@@ -56,6 +57,7 @@ function TrackPage() {
 	const { fosdem, year, day, serverBookmarks } = Route.useLoaderData();
 	const { view, sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
+	const resolvedDay = day ?? resolveTodayDayId(fosdem.days);
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -114,7 +116,7 @@ function TrackPage() {
 					days={fosdem.days}
 					defaultViewMode="list"
 					displayViewMode={false}
-					day={day}
+					day={resolvedDay}
 					view={view}
 					sortFavourites={sortFavourites}
 					onSortFavouritesChange={handleSortFavouritesChange}
