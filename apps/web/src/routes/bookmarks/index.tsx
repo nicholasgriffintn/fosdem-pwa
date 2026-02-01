@@ -36,16 +36,22 @@ export const Route = createFileRoute("/bookmarks/")({
     day,
     view,
     tab,
+    attendance,
   }: {
     year: number;
     day?: string;
     view?: string;
     tab?: "all" | "tracks" | "events" | "watch-later";
+    attendance?: "all" | "in-person" | "online" | "unmarked";
   }) => ({
     year: (constants.AVAILABLE_YEARS.includes(year) && year) || constants.DEFAULT_YEAR,
     day: day || undefined,
     view: view || undefined,
     tab: tab || undefined,
+    attendance:
+      attendance && ["all", "in-person", "online", "unmarked"].includes(attendance)
+        ? attendance
+        : undefined,
   }),
   loaderDeps: ({ search: { year, day } }) => ({ year, day }),
   loader: async ({ deps: { year, day } }) => {
@@ -79,7 +85,8 @@ function BookmarksHome() {
     serverBookmarks,
     fosdemData: serverFosdemData,
   } = Route.useLoaderData();
-  const { view, tab } = Route.useSearch();
+  const { view, tab, attendance } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const { user: serverUser } = useAuthSnapshot();
   const { bookmarks, loading } = useBookmarks({
     year,
@@ -109,6 +116,7 @@ function BookmarksHome() {
   const [csvBusy, setCsvBusy] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const resolvedDay = day ?? resolveTodayDayId(fosdemData?.days);
+  const resolvedAttendanceFilter = attendance ?? "all";
 
   const exportCsv = useServerFn(exportBookmarksCsv);
   const importCsv = useServerFn(importBookmarksCsv);
@@ -157,6 +165,17 @@ function BookmarksHome() {
     serverId?: string;
   }) => {
     update(id, updates, serverId);
+  };
+
+  const handleAttendanceFilterChange = (
+    nextAttendance: "all" | "in-person" | "online" | "unmarked",
+  ) => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        attendance: nextAttendance === "all" ? undefined : nextAttendance,
+      }),
+    });
   };
 
   return (
@@ -229,9 +248,11 @@ function BookmarksHome() {
           fosdemData={resolvedFosdemData}
           year={year}
           loading={resolvedLoading}
-            day={resolvedDay}
+          day={resolvedDay}
           view={view}
           tab={tab}
+          attendanceFilter={resolvedAttendanceFilter}
+          onAttendanceFilterChange={handleAttendanceFilterChange}
           watchLaterItems={resolvedWatchLater}
           watchLaterLoading={resolvedWatchLaterLoading}
           scheduleShowConflictIndicators={false}

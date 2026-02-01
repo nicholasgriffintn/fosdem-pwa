@@ -14,6 +14,7 @@ import type { LocalBookmark } from "~/lib/localStorage";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { isEvent, isTrack } from "~/lib/type-guards";
 import { cn } from "~/lib/utils";
+import { Select } from "~/components/ui/select";
 
 const tabBaseClass =
   "inline-flex h-10 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-all no-underline backdrop-blur-sm";
@@ -23,6 +24,7 @@ const tabInactiveClass =
   "text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5";
 
 type BookmarkListItem = (Bookmark | LocalBookmark) & { serverId?: string };
+type AttendanceFilter = "all" | "in-person" | "online" | "unmarked";
 
 function organizeBookmarks(bookmarks: BookmarkListItem[]) {
   const byYear = bookmarks.reduce(
@@ -62,6 +64,8 @@ type BookmarksListProps = {
   day?: string;
   view?: string;
   tab?: "events" | "tracks" | "all" | "watch-later";
+  attendanceFilter?: AttendanceFilter;
+  onAttendanceFilterChange?: (filter: AttendanceFilter) => void;
   headerActions?: React.ReactNode;
   watchLaterItems?: BookmarkListItem[];
   watchLaterLoading?: boolean;
@@ -114,23 +118,50 @@ export function BookmarksList({
   onCreateBookmark,
   onToggleWatchLater,
   isProfilePage = false,
+  attendanceFilter = "all",
+  onAttendanceFilterChange,
 }: BookmarksListProps) {
+  const filteredBookmarks = useMemo(() => {
+    if (!bookmarks || attendanceFilter === "all") {
+      return bookmarks;
+    }
+
+    return bookmarks.filter((bookmark) => {
+      const isEventBookmark =
+        bookmark.type === "bookmark_event" || bookmark.type === "event";
+
+      if (!isEventBookmark) {
+        return false;
+      }
+
+      const attended = "attended" in bookmark && bookmark.attended === true;
+      const attendedInPerson =
+        "attended_in_person" in bookmark && bookmark.attended_in_person === true;
+
+      if (!attended) {
+        return attendanceFilter === "unmarked";
+      }
+
+      return attendanceFilter === (attendedInPerson ? "in-person" : "online");
+    });
+  }, [attendanceFilter, bookmarks]);
+
   const organizedBookmarks = useMemo(() => {
-    if (!bookmarks || bookmarks.length === 0) return {};
-    return organizeBookmarks(bookmarks);
-  }, [bookmarks]);
+    if (!filteredBookmarks || filteredBookmarks.length === 0) return {};
+    return organizeBookmarks(filteredBookmarks);
+  }, [filteredBookmarks]);
 
   const bookmarkSnapshot = useMemo(
     () =>
-      bookmarks?.map((bookmark) => ({
+      filteredBookmarks?.map((bookmark) => ({
         slug: bookmark.slug,
         status: bookmark.status,
       })) || [],
-    [bookmarks],
+    [filteredBookmarks],
   );
 
   const { tracks, events, conflicts } = useMemo(() => {
-    if (!bookmarks?.length || !fosdemData) {
+    if (!filteredBookmarks?.length || !fosdemData) {
       return { tracks: [], events: [], conflicts: [] };
     }
 
@@ -167,7 +198,7 @@ export function BookmarksList({
       .sort(sortTracks);
 
     return { tracks: formattedTracks, events: formattedEvents, conflicts };
-  }, [bookmarks, fosdemData, year, organizedBookmarks, showConflicts]);
+  }, [filteredBookmarks, fosdemData, year, organizedBookmarks, showConflicts]);
 
   const days = useMemo(
     () => (fosdemData ? Object.values(fosdemData.days) : []),
@@ -175,7 +206,7 @@ export function BookmarksList({
   );
 
   const handleSetPriority = (eventId: string, updates: { priority: number | null }) => {
-    const bookmark = bookmarks?.find((b) => {
+    const bookmark = filteredBookmarks?.find((b) => {
       const event = fosdemData?.events[b.slug];
       return event?.id === eventId;
     });
@@ -195,7 +226,7 @@ export function BookmarksList({
     );
   }
 
-  if (!bookmarks || bookmarks.length === 0) {
+  if (!filteredBookmarks || filteredBookmarks.length === 0) {
     return (
       <EmptyStateCard
         title={emptyStateTitle}
@@ -217,7 +248,7 @@ export function BookmarksList({
 
   return (
     <>
-      {bookmarks?.length ? (
+      {filteredBookmarks?.length ? (
         <div className="space-y-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-background/95 backdrop-blur-md p-1 text-muted-foreground md:w-auto border border-white/20 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20">
@@ -266,9 +297,38 @@ export function BookmarksList({
                 Watch Later
               </Link>
             </div>
-            {headerActions ? (
-              <div className="flex w-full justify-end md:w-auto">{headerActions}</div>
-            ) : null}
+            {(headerActions || onAttendanceFilterChange) && (
+              <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:items-center md:justify-end">
+                {onAttendanceFilterChange ? (
+                  <div className="flex w-full flex-col gap-1 md:w-56">
+                    <label
+                      htmlFor="attendance-filter"
+                      className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                    >
+                      Attendance
+                    </label>
+                    <Select
+                      id="attendance-filter"
+                      value={attendanceFilter}
+                      onValueChange={(value) =>
+                        onAttendanceFilterChange(value as AttendanceFilter)
+                      }
+                      options={[
+                        { label: "All attendance", value: "all" },
+                        { label: "Attended in person", value: "in-person" },
+                        { label: "Attended online", value: "online" },
+                        { label: "Not marked", value: "unmarked" },
+                      ]}
+                    />
+                  </div>
+                ) : null}
+                {headerActions ? (
+                  <div className="flex w-full justify-end md:w-auto">
+                    {headerActions}
+                  </div>
+                ) : null}
+              </div>
+            )}
           </div>
 
           <div>
