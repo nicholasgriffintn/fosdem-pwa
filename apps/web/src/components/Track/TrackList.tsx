@@ -1,3 +1,5 @@
+import type React from "react";
+import { useMemo } from "react";
 import type { Track } from "~/types/fosdem";
 import { ItemActions } from "~/components/shared/ItemActions";
 import { useTrackList } from "~/hooks/use-item-list";
@@ -10,6 +12,9 @@ import { buildTrackLink } from "~/lib/link-builder";
 import { ItemListContainer } from "~/components/shared/ItemListContainer";
 import { ListContainer } from "~/components/shared/ListContainer";
 import type { BookmarkSnapshot } from "~/lib/type-guards";
+import { useRoomStatuses } from "~/hooks/use-room-statuses";
+import type { RoomStatusBatchResult } from "~/server/functions/room-status";
+import { RoomStatusIndicator } from "~/components/shared/RoomStatusIndicator";
 
 type TrackListProps = {
 	tracks: Track[];
@@ -38,6 +43,7 @@ type TrackListItemProps = {
 	year: number;
 	track: Track;
 	bookmarksLoading: boolean;
+	roomStatus?: RoomStatusBatchResult;
 	user?: User | null;
 	onCreateBookmark?: ({
 		type,
@@ -54,17 +60,20 @@ function TrackListItem({
 	year,
 	track,
 	bookmarksLoading,
+	roomStatus,
 	user,
 	onCreateBookmark,
 }: TrackListItemProps) {
 	const layoutClass =
 		"flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3";
+	const roomStatusState = roomStatus?.state ?? "unknown";
 	const metaBadges = [
 		track.room
 			? {
 				key: "room",
 				label: track.room,
 				icon: <Icons.mapPin className="h-3.5 w-3.5" />,
+				status: roomStatusState,
 			}
 			: null,
 		{
@@ -79,7 +88,12 @@ function TrackListItem({
 				icon: <Icons.calendar className="h-3.5 w-3.5" />,
 			}
 			: null,
-	].filter(Boolean) as { key: string; label: string; icon?: React.ReactNode }[];
+	].filter(Boolean) as {
+		key: string;
+		label: string;
+		icon?: React.ReactNode;
+		status?: RoomStatusBatchResult["state"];
+	}[];
 
 	return (
 		<div className="relative py-4 px-3 sm:px-4 hover:bg-muted/40 transition-colors">
@@ -103,6 +117,7 @@ function TrackListItem({
 							>
 								{meta.icon}
 								<span className="truncate">{meta.label}</span>
+								{meta.status && <RoomStatusIndicator state={meta.status} />}
 							</div>
 						))}
 					</div>
@@ -151,6 +166,18 @@ function TrackListContent({
 		sortByFavourites,
 		serverBookmarks,
 	});
+	const roomNames = useMemo(
+		() =>
+			Array.from(
+				new Set(
+					sortedTracks
+						.map((track) => track.room)
+						.filter((room): room is string => Boolean(room)),
+					),
+				),
+		[sortedTracks],
+	);
+	const { statusByRoom } = useRoomStatuses(roomNames);
 
 	return (
 		<>
@@ -162,6 +189,7 @@ function TrackListContent({
 								year={year}
 								track={track}
 								bookmarksLoading={bookmarksLoading}
+								roomStatus={track.room ? statusByRoom.get(track.room) : undefined}
 								user={user}
 								onCreateBookmark={onCreateBookmark}
 							/>
