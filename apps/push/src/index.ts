@@ -3,7 +3,7 @@ import type { ExecutionContext, ExportedHandler } from "@cloudflare/workers-type
 
 import { triggerNotifications } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
-import { triggerRoomStatusNotifications, cleanupOldRoomStatus } from "./controllers/room-status";
+import { triggerRoomStatusNotifications, pollAndStoreRoomStatus, cleanupOldRoomStatus } from "./controllers/room-status";
 import { triggerRecordingNotifications } from "./controllers/recording-notifications";
 import { triggerDailySummary } from "./controllers/daily-summary";
 import { getApplicationKeys, sendNotification } from "./lib/notifications";
