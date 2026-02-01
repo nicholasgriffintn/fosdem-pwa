@@ -22,6 +22,7 @@ import { useIsClient } from "~/hooks/use-is-client";
 import { constants } from "~/constants";
 import {
   getLocalBookmarks,
+  getSyncQueue,
   removeLocalBookmark,
   saveLocalBookmark,
   updateLocalBookmark,
@@ -116,6 +117,27 @@ export function BookmarkConflictNotice() {
     enabled: isClient,
   });
 
+  const localBookmarkVersion = useMemo(() => {
+    if (!localBookmarks) return "pending";
+    return localBookmarks
+      .map((bookmark) =>
+        [
+          bookmark.id,
+          bookmark.updated_at ?? "",
+          bookmark.status,
+          bookmark.serverId ?? "",
+        ].join(":"),
+      )
+      .join("|");
+  }, [localBookmarks]);
+
+  const { data: syncQueue = [] } = useQuery({
+    queryKey: ["bookmark-sync-queue", localBookmarkVersion],
+    queryFn: getSyncQueue,
+    enabled: isClient,
+    staleTime: 0,
+  });
+
   const { data: serverBookmarks, isLoading: serverLoading } = useQuery({
     queryKey: serverQueryKey,
     queryFn: async () => {
@@ -129,6 +151,25 @@ export function BookmarkConflictNotice() {
     staleTime: 1000 * 60 * 5,
   });
 
+  const pendingLocalIds = useMemo(() => {
+    return new Set(
+      syncQueue.filter((item) => item.type === "bookmark").map((item) => item.id),
+    );
+  }, [syncQueue]);
+
+  const pendingServerIds = useMemo(() => {
+    const ids = new Set<string>();
+    syncQueue
+      .filter((item) => item.type === "bookmark")
+      .forEach((item) => {
+        const serverId = item.data?.serverId;
+        if (serverId !== undefined && serverId !== null) {
+          ids.add(String(serverId));
+        }
+      });
+    return ids;
+  }, [syncQueue]);
+
   const conflicts = useMemo<BookmarkConflict[]>(() => {
     if (!user?.id) return [];
     if (!localBookmarks || !serverBookmarks) return [];
@@ -140,6 +181,9 @@ export function BookmarkConflictNotice() {
     const detected: BookmarkConflict[] = [];
 
     for (const local of localEntries) {
+      if (pendingLocalIds.has(local.id)) {
+        continue;
+      }
       const server = serverMap.get(local.slug);
       if (!server) {
         detected.push({
@@ -167,6 +211,9 @@ export function BookmarkConflictNotice() {
     }
 
     for (const server of serverBookmarks) {
+      if (pendingServerIds.has(String(server.id))) {
+        continue;
+      }
       if (!localMap.has(server.slug)) {
         detected.push({
           id: server.id,
@@ -180,7 +227,13 @@ export function BookmarkConflictNotice() {
     }
 
     return detected;
-  }, [localBookmarks, serverBookmarks, user?.id]);
+  }, [
+    localBookmarks,
+    pendingLocalIds,
+    pendingServerIds,
+    serverBookmarks,
+    user?.id,
+  ]);
 
   const { fosdemData } = useFosdemData({
     year: selectedYear,
