@@ -123,7 +123,8 @@ export function EventListItem({
 			: "flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3";
 	const showPinnedBadge = showConflictIndicators && event.priority === 1;
 	const roomStatusState = roomStatus?.state ?? "unknown";
-	const metaBadges = [
+
+	const metaBadges: { key: string; label: string; icon?: React.ReactNode; status?: RoomStatusBatchResult["state"] }[] = [
 		{
 			key: "time",
 			label: `${event.startTime} – ${endTime}`,
@@ -136,9 +137,9 @@ export function EventListItem({
 				icon: (
 					<span className="flex items-center gap-1">
 						<Icons.mapPin className="h-3.5 w-3.5" />
-						<RoomStatusIndicator state={roomStatusState} />
 					</span>
 				),
+				status: roomStatusState,
 			}
 			: null,
 		showTrack && event.trackKey
@@ -213,6 +214,7 @@ export function EventListItem({
 								>
 									{meta.icon}
 									<span className="truncate">{meta.label}</span>
+									{meta.status && <RoomStatusIndicator state={meta.status} />}
 								</div>
 							))}
 						</div>
