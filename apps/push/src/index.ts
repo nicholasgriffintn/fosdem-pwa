@@ -26,8 +26,8 @@ const RETRY_BASE_DELAY_MS = 1000;
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const getScheduledDate = (event: { scheduledTime?: number }) => {
 	const scheduledTime = typeof event.scheduledTime === "number" ? event.scheduledTime : Date.now();
-	const roundedTime = Math.round(scheduledTime / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
-	return new Date(roundedTime);
+	const normalizedTime = Math.floor(scheduledTime / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
+	return new Date(normalizedTime);
 };
 
 const validateEnv = (env: Env) => {
