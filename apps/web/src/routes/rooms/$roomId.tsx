@@ -78,7 +78,7 @@ function RoomPage() {
 	const { fosdem, day, year, serverBookmarks } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const resolvedDay = day ?? resolveTodayDayId(fosdemData?.days);
+	const resolvedDay = day ?? resolveTodayDayId(fosdem?.days);
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });

@@ -98,7 +98,7 @@ function ProfilePage() {
     year,
     initialData: serverStats,
   });
-  const resolvedDay = day ?? resolveTodayDayId(fosdemData?.days);
+  const resolvedDay = day ?? resolveTodayDayId(serverFosdemData?.days);
 
   const isClient = useIsClient();
   const hasServerSnapshot = Boolean(serverFosdemData);
