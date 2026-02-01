@@ -170,7 +170,7 @@ export default Sentry.withSentry(
 
 			const isMorningSummary = utcHours === 8 && utcMinutes === 0;
 			const isEveningSummary = utcHours === 17 && utcMinutes === 15;
-			const isQuarterHour = utcMinutes % 15 === 0;
+			const isFiveMinute = utcMinutes % 5 === 0;
 			const isHourly = utcMinutes === 0;
 			const isMidnight = utcHours === 0 && utcMinutes === 0;
 
@@ -190,7 +190,7 @@ export default Sentry.withSentry(
 				await triggerRecordingNotifications(event, env, ctx, true);
 			}
 
-			if (isQuarterHour) {
+			if (isFiveMinute) {
 				await triggerNotifications(event, env, ctx, true);
 				await triggerScheduleChangeNotifications(event, env, ctx, true);
 			}
