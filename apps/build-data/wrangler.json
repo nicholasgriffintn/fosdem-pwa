@@ -33,5 +33,9 @@
       "remote": true
     }
   ],
-  "triggers": {}
+  "triggers": {
+    "crons": [
+      "0 * * * *"
+    ]
+  }
 }
