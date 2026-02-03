@@ -25,7 +25,11 @@
       "head_sampling_rate": 1
     }
   },
-  "triggers": {},
+  "triggers": {
+    "crons": [
+      "0 * * * *"
+    ]
+  },
   "d1_databases": [
     {
       "binding": "DB",
