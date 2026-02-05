@@ -65,7 +65,7 @@ function addFavoritesToItems<T extends ItemWithId>(
 	return items?.length
 		? items.map((item) => {
 			const bookmark = bookmarks?.find((b) => b.slug === item.id);
-			const bookmarkId = bookmark?.id;
+			const bookmarkId = bookmark?.serverId ?? bookmark?.id;
 			const watchLater = bookmark?.watch_later === true;
 			return {
 				...item,

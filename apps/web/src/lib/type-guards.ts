@@ -4,6 +4,7 @@ import type { Bookmark } from "~/server/db/schema";
 export type BookmarkSnapshot = Pick<Bookmark, "slug" | "status"> & {
   id?: string;
   watch_later?: boolean | null;
+  serverId?: string;
 };
 
 export interface ItemWithId {
