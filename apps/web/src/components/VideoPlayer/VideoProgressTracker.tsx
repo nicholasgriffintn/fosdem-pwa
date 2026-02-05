@@ -13,6 +13,7 @@ export function VideoProgressTracker() {
   const lastSavedTimeRef = useRef<number>(0);
   const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const bookmarkIdRef = useRef<string | null>(null);
+  const hasRestoredProgressRef = useRef(false);
 
   const eventSlug = currentEvent?.id ?? "";
   const yearNum = year ?? new Date().getFullYear();
@@ -26,6 +27,11 @@ export function VideoProgressTracker() {
   const markWatchedRef = useRef(markAsWatched);
   updateProgressRef.current = updateProgress;
   markWatchedRef.current = markAsWatched;
+
+  useEffect(() => {
+    hasRestoredProgressRef.current = false;
+    lastSavedTimeRef.current = 0;
+  }, [eventSlug]);
 
   const saveProgress = useCallback(() => {
     const video = videoRef.current;
@@ -104,14 +110,22 @@ export function VideoProgressTracker() {
   useEffect(() => {
     const video = videoRef.current;
     if (!video || isLive || !bookmark?.watch_progress_seconds) return;
+    if (hasRestoredProgressRef.current) return;
 
     const savedProgress = bookmark.watch_progress_seconds;
 
     const handleLoadedMetadata = () => {
+      if (hasRestoredProgressRef.current) return;
       if (savedProgress > 0 && savedProgress < video.duration - 10) {
-        video.currentTime = savedProgress;
-        lastSavedTimeRef.current = savedProgress;
+        const currentTime = video.currentTime;
+        if (currentTime < savedProgress - 1) {
+          video.currentTime = savedProgress;
+        }
+        lastSavedTimeRef.current = Math.floor(
+          Math.max(currentTime, savedProgress),
+        );
       }
+      hasRestoredProgressRef.current = true;
     };
 
     if (video.readyState >= 1) {
