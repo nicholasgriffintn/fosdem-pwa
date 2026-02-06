@@ -84,7 +84,7 @@
     "@vitest/coverage-v8": "^4.0.16",
     "autoprefixer": "10.4.24",
     "drizzle-kit": "0.31.8",
-    "glob": "13.0.0",
+    "glob": "13.0.1",
     "globals": "17.3.0",
     "jsdom": "27.4.0",
     "tailwindcss": "4.1.18",
