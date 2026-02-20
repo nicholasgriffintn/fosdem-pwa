@@ -223,8 +223,8 @@ importers:
         specifier: 0.31.9
         version: 0.31.9
       glob:
-        specifier: 13.0.4
-        version: 13.0.4
+        specifier: 13.0.5
+        version: 13.0.5
       globals:
         specifier: 17.3.0
         version: 17.3.0
@@ -2886,8 +2886,8 @@ packages:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
 
-  glob@13.0.4:
-    resolution: {integrity: sha512-KACie1EOs9BIOMtenFaxwmYODWA3/fTfGSUnLhMJpXRntu1g+uL/Xvub5f8SCTppvo9q62Qy4LeOoUiaL54G5A==}
+  glob@13.0.5:
+    resolution: {integrity: sha512-BzXxZg24Ibra1pbQ/zE7Kys4Ua1ks7Bn6pKLkVPZ9FZe4JQS6/Q7ef3LG1H+k7lUf5l4T3PLSyYyYJVYUvfgTw==}
     engines: {node: 20 || >=22}
 
   globals@17.3.0:
@@ -6082,7 +6082,7 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob@13.0.4:
+  glob@13.0.5:
     dependencies:
       minimatch: 10.2.2
       minipass: 7.1.2
