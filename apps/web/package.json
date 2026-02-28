@@ -82,7 +82,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.4",
     "@vitest/coverage-v8": "^4.0.16",
-    "autoprefixer": "10.4.24",
+    "autoprefixer": "10.4.27",
     "drizzle-kit": "0.31.9",
     "glob": "13.0.6",
     "globals": "17.3.0",
