@@ -86,7 +86,7 @@
     "drizzle-kit": "0.31.10",
     "glob": "13.0.6",
     "globals": "17.4.0",
-    "jsdom": "27.4.0",
+    "jsdom": "29.0.1",
     "tailwindcss": "4.2.2",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
