@@ -89,7 +89,7 @@
     "jsdom": "29.0.2",
     "tailwindcss": "4.2.2",
     "tsx": "4.21.0",
-    "typescript": "5.9.3",
+    "typescript": "6.0.2",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "4.1.2",
     "wrangler": "4.80.0"
