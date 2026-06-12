@@ -2,7 +2,7 @@
   "name": "fosdem-pwa",
   "version": "0.2025.1",
   "private": true,
-  "packageManager": "pnpm@10.34.1",
+  "packageManager": "pnpm@11.6.0",
   "engines": {
     "node": ">=22.0.0"
   },
