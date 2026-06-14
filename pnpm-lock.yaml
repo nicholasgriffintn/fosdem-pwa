@@ -147,8 +147,8 @@ importers:
         specifier: 0.45.2
         version: 0.45.2(@cloudflare/workers-types@4.20260607.1)(@opentelemetry/api@1.9.1)(@upstash/redis@1.35.8)
       fuse.js:
-        specifier: 7.3.0
-        version: 7.3.0
+        specifier: 7.4.2
+        version: 7.4.2
       hls.js:
         specifier: 1.6.16
         version: 1.6.16
@@ -2878,8 +2878,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  fuse.js@7.3.0:
-    resolution: {integrity: sha512-plz8RVjfcDedTGfVngWH1jmJvBvAwi1v2jecfDerbEnMcmOYUEEwKFTHbNoCiYyzaK2Ws8lABkTCcRSqCY1q4w==}
+  fuse.js@7.4.2:
+    resolution: {integrity: sha512-LVbzjD4WA6UP5B1UnP8wuaXJiLnqMdM/E4fiJXTJ5haJ5b/MBNsK29h2fm6swEoQaVQjvYFWKLE2RanyZIoRVQ==}
     engines: {node: '>=10'}
 
   gensync@1.0.0-beta.2:
@@ -5871,7 +5871,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  fuse.js@7.3.0: {}
+  fuse.js@7.4.2: {}
 
   gensync@1.0.0-beta.2: {}
 
