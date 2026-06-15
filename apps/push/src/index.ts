@@ -59,7 +59,15 @@ const isAuthorizedRequest = (request: Request, env: Env): boolean => {
 export default Sentry.withSentry(
 	env => ({
 		dsn: "https://2cbf756f8faa4cab906b2dc99df77f82@ingest.bitwobbly.com/8",
-		tracesSampleRate: 1.0,
+		sampleRate: 1,
+		enableLogs: false,
+		tracesSampleRate: 0,
+		beforeSend(event) {
+			return event.exception?.values?.length ? event : null;
+		},
+		beforeSendTransaction() {
+			return null;
+		},
 	}),
 	{
 		// @ts-expect-error - CBA

@@ -181,10 +181,18 @@ const run = async (env: Env) => {
   return data;
 };
 
-export default Sentry.withSentry(
-  (env: Env) => ({
+export default Sentry.withSentry<Env, unknown>(
+  (env) => ({
     dsn: "https://07aa95ea691d47e198b5c3b291501895@ingest.bitwobbly.com/7",
-    tracesSampleRate: 1.0,
+    sampleRate: 1,
+    enableLogs: false,
+    tracesSampleRate: 0,
+    beforeSend(event) {
+      return event.exception?.values?.length ? event : null;
+    },
+    beforeSendTransaction() {
+      return null;
+    },
   }),
   {
     async fetch(request, env, ctx): Promise<Response> {
