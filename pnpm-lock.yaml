@@ -11,8 +11,8 @@ importers:
   apps/build-data:
     dependencies:
       '@sentry/cloudflare':
-        specifier: 10.56.0
-        version: 10.56.0(@cloudflare/workers-types@4.20260611.1)
+        specifier: 10.57.0
+        version: 10.57.0(@cloudflare/workers-types@4.20260611.1)
       xml-js:
         specifier: 1.6.11
         version: 1.6.11
@@ -38,8 +38,8 @@ importers:
   apps/push:
     dependencies:
       '@sentry/cloudflare':
-        specifier: 10.56.0
-        version: 10.56.0(@cloudflare/workers-types@4.20260611.1)
+        specifier: 10.57.0
+        version: 10.57.0(@cloudflare/workers-types@4.20260611.1)
       webpush-webcrypto:
         specifier: 1.0.5
         version: 1.0.5
@@ -2090,18 +2090,14 @@ packages:
     resolution: {integrity: sha512-s36AQy/CKXTfyY9Z+qUhzNomntZXgfs0rbaK7q9ffnFkqcPwzE8qQtVs58y3Suut56u+AhwSztgQtERcuZ5VIA==}
     engines: {node: '>=18'}
 
-  '@sentry/cloudflare@10.56.0':
-    resolution: {integrity: sha512-4PH6joEJbS2+f0yWSatE/vPfE4sbtDQxdPDcsiQ8642nEH8WxKIWWPgRknfLRClmShxzQpwDXJZRJc3rcm4QtQ==}
+  '@sentry/cloudflare@10.57.0':
+    resolution: {integrity: sha512-LDKk177la/uG92ILNozcwQR7+4/pizPu01Y7M7l9J7o1uwAi9WjElafh/HU2Jqw+vST1BKknw/tQB1pnsnkDlA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cloudflare/workers-types': ^4.x
     peerDependenciesMeta:
       '@cloudflare/workers-types':
         optional: true
-
-  '@sentry/core@10.56.0':
-    resolution: {integrity: sha512-L+u1dIz5SANrmST5jhIwETtt4apILgKrylv12X4hKJU0PvZl+NorjeV/ty3MwzpKQPg6b6q6qMOSLc1rLpy3iQ==}
-    engines: {node: '>=18'}
 
   '@sentry/core@10.57.0':
     resolution: {integrity: sha512-kntItTA2kiT0YpL7encXaF6mkdZMB+y48lwj8w1wkfBpfJAC7sifdgrzLQZqmsqVNE3crg9VfufaAGA+78uFMg==}
@@ -5107,14 +5103,12 @@ snapshots:
       '@sentry-internal/replay-canvas': 10.57.0
       '@sentry/core': 10.57.0
 
-  '@sentry/cloudflare@10.56.0(@cloudflare/workers-types@4.20260611.1)':
+  '@sentry/cloudflare@10.57.0(@cloudflare/workers-types@4.20260611.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
-      '@sentry/core': 10.56.0
+      '@sentry/core': 10.57.0
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260611.1
-
-  '@sentry/core@10.56.0': {}
 
   '@sentry/core@10.57.0': {}
 
