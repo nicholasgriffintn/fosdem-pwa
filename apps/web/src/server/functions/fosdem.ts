@@ -1,9 +1,8 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 
 import { constants } from "~/constants";
 import type { Conference } from "~/types/fosdem";
 import { isValidYear, isNumber } from "~/lib/type-guards";
-import { CacheManager } from "~/server/cache";
 import { CacheKeys } from "~/server/lib/cache-keys";
 import { CONSTANTS } from "~/server/constants";
 
@@ -13,7 +12,10 @@ const getCacheTTL = (year: number): number => {
     : CONSTANTS.PAST_YEAR_TTL;
 };
 
-const cache = CacheManager.getInstance();
+const getCache = createServerOnlyFn(async () => {
+  const { CacheManager } = await import("~/server/cache");
+  return CacheManager.getInstance();
+});
 
 const revalidationInProgress = new Set<number>();
 
@@ -56,6 +58,7 @@ const revalidateInBackground = (year: number) => {
 
   fetchFromSource(year)
     .then(async (data) => {
+      const cache = await getCache();
       await cache.setWithSoftExpiry(CacheKeys.fosdemData(year), data, getCacheTTL(year));
     })
     .catch((error) => {
@@ -72,6 +75,7 @@ const getFullData = async (year: number): Promise<Conference> => {
   }
 
   const cacheKey = CacheKeys.fosdemData(year);
+  const cache = await getCache();
   const cached = await cache.getWithStaleness(cacheKey);
 
   if (

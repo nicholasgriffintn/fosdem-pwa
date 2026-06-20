@@ -1,5 +1,4 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
 	createRootRouteWithContext,
 	Outlet,
@@ -30,6 +29,15 @@ import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { BottomTabNav } from "~/components/BottomTabNav";
 import { navItems } from "~/components/shared/NavItems";
 import { BookmarkConflictNotice } from "~/components/shared/BookmarkConflictNotice";
+
+const ReactQueryDevtools =
+	process.env.NODE_ENV !== "development"
+		? () => null
+		: lazy(() =>
+			import("@tanstack/react-query-devtools").then((res) => ({
+				default: res.ReactQueryDevtools,
+			}))
+		);
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"

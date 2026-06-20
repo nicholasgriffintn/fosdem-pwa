@@ -8,7 +8,7 @@
     "cf-typegen": "wrangler types",
     "dev": "vite dev --port 3000",
     "build:sw": "tsx ./scripts/generate-sw.ts",
-    "build": "vite build && pnpm build:sw",
+    "build": "NODE_ENV=production vite build && pnpm build:sw",
     "preview": "vite preview",
     "start": "node .output/server/index.mjs",
     "test": "vitest run",
@@ -22,7 +22,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply fosdem --local --persist-to ../cloudflare/state",
     "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote",
-    "deploy": "wrangler deploy --env production"
+    "deploy": "NODE_ENV=production wrangler deploy --env production"
   },
   "engines": {
     "node": ">=22.0.0"
