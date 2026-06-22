@@ -91,7 +91,7 @@
     "tsx": "4.22.4",
     "typescript": "6.0.3",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "4.1.8",
+    "vitest": "4.1.9",
     "wrangler": "4.100.0"
   }
 }
