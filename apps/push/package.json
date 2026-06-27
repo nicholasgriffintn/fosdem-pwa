@@ -21,7 +21,7 @@
     "wrangler": "4.103.0"
   },
   "dependencies": {
-    "@sentry/cloudflare": "10.58.0",
+    "@sentry/cloudflare": "10.59.0",
     "webpush-webcrypto": "1.0.5"
   }
 }
