@@ -70,7 +70,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
-    "@biomejs/biome": "2.5.0",
+    "@biomejs/biome": "2.5.1",
     "@cloudflare/vite-plugin": "1.42.1",
     "@cloudflare/workers-types": "4.20260623.1",
     "@playwright/test": "1.61.0",
