@@ -15,15 +15,15 @@
     "KV_CACHING_ENABLED": true
   },
   "observability": {
-    "enabled": true,
+    "enabled": false,
     "logs": {
-      "enabled": true,
+      "enabled": false,
       "head_sampling_rate": 1,
       "invocation_logs": false,
       "persist": true
     },
     "traces": {
-      "enabled": true,
+      "enabled": false,
       "persist": true,
       "head_sampling_rate": 1
     }
