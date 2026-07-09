@@ -18,7 +18,7 @@
     "wrangler": "4.106.0"
   },
   "dependencies": {
-    "@sentry/cloudflare": "10.62.0",
+    "@sentry/cloudflare": "10.63.0",
     "xml-js": "1.6.11"
   }
 }
