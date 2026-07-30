@@ -7,7 +7,7 @@ import {
 import { refreshYearInReviewStats } from "../lib/year-in-review";
 import { getApplicationKeys, sendNotification, createDailySummaryPayload } from "../lib/notifications";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
-import type { Subscription, Env } from "../types";
+import type { Bookmark, Subscription, Env } from "../types";
 
 export async function triggerDailySummary(
 	event: { cron: string },
@@ -93,7 +93,7 @@ export async function triggerDailySummary(
 		? await getBookmarksByUserIds(usersNeedingBookmarks, env, {
 				includeSent: true,
 			})
-		: new Map();
+		: new Map<string, Bookmark[]>();
 
 	const results = await Promise.allSettled(
 		subscriptionEntries.map(async ({ subscription, prefs }) => {

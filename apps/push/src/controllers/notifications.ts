@@ -10,7 +10,7 @@ import {
 } from "../lib/bookmarks";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
 import { getApplicationKeys, sendNotification, createNotificationPayload } from "../lib/notifications";
-import type { Subscription, EnrichedBookmark, Env } from "../types";
+import type { Bookmark, Subscription, EnrichedBookmark, Env } from "../types";
 
 async function processUserNotifications(
 	subscription: Subscription,
@@ -127,7 +127,7 @@ export async function triggerNotifications(
 
 	const bookmarksByUser = usersNeedingBookmarks.length
 		? await getBookmarksByUserIds(usersNeedingBookmarks, env)
-		: new Map();
+		: new Map<string, Bookmark[]>();
 
 	const results = await Promise.allSettled(
 		subscriptionEntries.map(async ({ subscription, prefs }) => {

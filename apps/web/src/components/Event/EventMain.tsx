@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "~/lib/utils";
 import { EventSidebar } from "~/components/Event/EventSidebar";
 import { EventPlayer } from "~/components/Event/EventPlayer";
 import { ChatAlert } from "~/components/Event/ChatAlert";
@@ -23,6 +22,8 @@ type EventMainProps = {
 	referenceTime?: Date;
 	persons?: Record<string, Person>;
 };
+
+const eventLayoutPanelIds = ["event-player-panel", "event-notes-panel"];
 
 export function EventMain({
 	event,
@@ -57,57 +58,58 @@ export function EventMain({
 		);
 	}
 
+	const player = (
+		<div className="h-full flex flex-col">
+			<div className="flex-1">
+				<EventPlayer
+					event={event}
+					conference={conference}
+					referenceTime={testTime}
+					year={year}
+				/>
+			</div>
+			{event.chat && (
+				<div id="chat" className="scroll-mt-32">
+					<ChatAlert chatUrl={event.chat} />
+				</div>
+			)}
+		</div>
+	);
+	const sidebar = (
+		<EventSidebar event={event} year={year} isMobile={isMobile} />
+	);
+
 	return (
 		<>
-			<ResizablePanelGroup
-				key={isMobile ? "event-layout-mobile" : "event-layout-desktop"}
-				autoSaveId={isMobile ? "event-layout-mobile" : "event-layout-desktop"}
-				orientation={isMobile ? "vertical" : "horizontal"}
-				className={cn("rounded-lg", {
-					"!flex-col": isMobile,
-					"min-h-[200px] border": !isMobile,
-				})}
-			>
-				<ResizablePanel
-					id="event-player-panel"
-					minSize="50%"
-					defaultSize={isMobile ? "100%" : "75%"}
-					className={cn({
-						"!w-full !flex-[1_1_auto]": isMobile,
-					})}
+			{isMobile ? (
+				<div className="rounded-lg">
+					{player}
+					<div className="mt-4">{sidebar}</div>
+				</div>
+			) : (
+				<ResizablePanelGroup
+					autoSaveId="event-layout-desktop"
+					panelIds={eventLayoutPanelIds}
+					orientation="horizontal"
+					className="min-h-[200px] rounded-lg border"
 				>
-					<div className="h-full flex flex-col">
-						<div className="flex-1">
-							<EventPlayer
-								event={event}
-								conference={conference}
-								referenceTime={testTime}
-								year={year}
-							/>
-						</div>
-						{event.chat && (
-							<div id="chat" className="scroll-mt-32">
-								<ChatAlert chatUrl={event.chat} />
-							</div>
-						)}
-					</div>
-				</ResizablePanel>
-				{!isMobile && <ResizableHandle withHandle />}
-				<ResizablePanel
-					id="event-notes-panel"
-					minSize="20%"
-					defaultSize="25%"
-					className={cn({
-						"!w-full mt-4 !flex-[1_1_auto]": isMobile,
-					})}
-				>
-					<EventSidebar
-						event={event}
-						year={year}
-						isMobile={isMobile}
-					/>
-				</ResizablePanel>
-			</ResizablePanelGroup>
+					<ResizablePanel
+						id="event-player-panel"
+						minSize="50%"
+						defaultSize="75%"
+					>
+						{player}
+					</ResizablePanel>
+					<ResizableHandle withHandle />
+					<ResizablePanel
+						id="event-notes-panel"
+						minSize="20%"
+						defaultSize="25%"
+					>
+						{sidebar}
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			)}
 			<div className="w-full">
 				<EventContent year={year} event={event} persons={persons} />
 				<div className="mt-4">

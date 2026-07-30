@@ -55,7 +55,7 @@ const isAuthorizedRequest = (request: Request, env: Env): boolean => {
 	return bearerToken === env.CRON_SECRET || headerToken === env.CRON_SECRET;
 };
 
-export default Sentry.withSentry(
+export default Sentry.withSentry<Env, QueueMessage>(
 	env => ({
 		dsn: "https://2cbf756f8faa4cab906b2dc99df77f82@ingest.bitwobbly.com/8",
 		sampleRate: 1,
