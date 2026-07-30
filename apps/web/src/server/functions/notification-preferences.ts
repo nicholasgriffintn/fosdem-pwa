@@ -38,7 +38,7 @@ export type NotificationPreferenceUpdate = {
 export const updateNotificationPreferences = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: NotificationPreferenceUpdate) => data)
+  .validator((data: NotificationPreferenceUpdate) => data)
   .handler(async (ctx): Promise<Result<NotificationPreference> | null> => {
     const user = await getAuthUser();
     if (!user) {

@@ -1,12 +1,10 @@
-import type { ExecutionContext } from "@cloudflare/workers-types";
-
 import { constants } from "../constants";
 import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { getBookmarksByUserIds, enrichBookmarks, getBookmarksForDay } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
 import { createBrusselsDate } from "../utils/date";
-import type { Env, NotificationPayload } from "../types";
+import type { Bookmark, Env, NotificationPayload } from "../types";
 
 const ROOMS_API = "https://api.fosdem.org/roomstatus/v1/listrooms";
 const FETCH_TIMEOUT_MS = 8000;
@@ -312,7 +310,7 @@ export async function triggerRoomStatusNotifications(
     ? await getBookmarksByUserIds(usersNeedingBookmarks, env, {
         includeSent: true,
       })
-    : new Map();
+    : new Map<string, Bookmark[]>();
 
   let notificationsSent = 0;
 

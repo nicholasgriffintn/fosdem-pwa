@@ -15,7 +15,6 @@ import {
   Building2,
   Globe,
   MapPin,
-  Twitter,
   User,
   Wifi,
   WifiOff,
@@ -32,7 +31,6 @@ import {
   Upload,
   Users,
   ExternalLink,
-  Gitlab,
   Search,
   Check,
   RefreshCw,
@@ -44,6 +42,44 @@ import {
   TrendingDown,
   Minus,
 } from "lucide-react";
+
+const TwitterIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+  </svg>
+);
+
+const GitLabIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="m22 13.29-3.33-10a.42.42 0 0 0-.14-.18.38.38 0 0 0-.22-.11.39.39 0 0 0-.23.07.42.42 0 0 0-.14.18l-2.26 6.67H8.32L6.1 3.26a.42.42 0 0 0-.1-.18.38.38 0 0 0-.26-.08.39.39 0 0 0-.23.07.42.42 0 0 0-.14.18L2 13.29a.74.74 0 0 0 .27.83L12 21l9.69-6.88a.71.71 0 0 0 .31-.83Z" />
+  </svg>
+);
 
 export const Icons = {
   logo: ({ ...props }) => (
@@ -85,7 +121,7 @@ export const Icons = {
   map: MapIcon,
   building: Building2,
   globe: Globe,
-  twitter: Twitter,
+  twitter: TwitterIcon,
   mapPin: MapPin,
   user: User,
   wifi: Wifi,
@@ -154,7 +190,7 @@ export const Icons = {
       />
     </svg>
   ),
-  gitlab: Gitlab,
+  gitlab: GitLabIcon,
   clock: Clock,
   download: Download,
   upload: Upload,

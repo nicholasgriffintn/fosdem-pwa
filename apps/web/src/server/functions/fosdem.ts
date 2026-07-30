@@ -110,7 +110,7 @@ const getFullData = async (year: number): Promise<Conference> => {
 export const getAllData = createServerFn({
   method: "GET",
 })
-  .inputValidator((data: unknown): { year: number } => {
+  .validator((data: unknown): { year: number } => {
     if (
       typeof data === "object" &&
       data !== null &&

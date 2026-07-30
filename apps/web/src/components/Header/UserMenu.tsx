@@ -1,26 +1,27 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-
-import { Badge } from "~/components/ui/badge";
-import type { SessionUser } from "~/types/auth";
+import { useEffect, useId, useRef } from "react";
 import { Icons } from "~/components/shared/Icons";
-import { buildProfileLink } from "~/lib/link-builder";
 import { UserAvatar } from "~/components/shared/UserAvatar";
+import { Badge } from "~/components/ui/badge";
+import { buildProfileLink } from "~/lib/link-builder";
+import type { SessionUser } from "~/types/auth";
 
 type AvatarMenuProps = {
+	onSignOut: () => void;
 	year: number;
 	user: SessionUser;
 };
 
-export function AvatarMenu({ year, user }: AvatarMenuProps) {
+export function AvatarMenu({ onSignOut, year, user }: AvatarMenuProps) {
 	const menuId = useId();
 	const checkboxRef = useRef<HTMLInputElement>(null);
 	const locationKey = useRouterState({
 		select: (state) => state.location.href,
 	});
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Close the menu when the route changes.
 	useEffect(() => {
 		if (checkboxRef.current) {
 			checkboxRef.current.checked = false;
@@ -42,7 +43,9 @@ export function AvatarMenu({ year, user }: AvatarMenuProps) {
 				<div className="flex items-center justify-start gap-2 p-2 min-w-0">
 					<div className="flex flex-col space-y-1 min-w-0 flex-1">
 						<div className="flex items-center gap-2 min-w-0">
-							<p className="text-sm font-medium leading-none truncate">{user.name}</p>
+							<p className="text-sm font-medium leading-none truncate">
+								{user.name}
+							</p>
 							{user.is_guest && (
 								<Badge variant="secondary" className="text-xs">
 									Guest
@@ -59,7 +62,7 @@ export function AvatarMenu({ year, user }: AvatarMenuProps) {
 					<>
 						<Link
 							{...buildProfileLink({
-								year
+								year,
 							})}
 							className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
 						>
@@ -73,18 +76,19 @@ export function AvatarMenu({ year, user }: AvatarMenuProps) {
 				)}
 				<Link
 					{...buildProfileLink({
-						year
+						year,
 					})}
 					className="flex items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline text-foreground"
 				>
 					View profile
 				</Link>
-				<a
-					href="/api/auth/logout"
+				<button
+					type="button"
+					onClick={onSignOut}
 					className="flex items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent transition-colors no-underline hover:underline"
 				>
 					Sign out
-				</a>
+				</button>
 			</div>
 		</div>
 	);

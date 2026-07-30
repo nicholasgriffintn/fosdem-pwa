@@ -38,16 +38,16 @@ export const user = sqliteTable(
 	(table) => {
 		return {
 			emailIdx: uniqueIndex("email_idx").on(table.email),
-			githubUsernameIdx: uniqueIndex("github_username_idx").on(
+			githubUsernameIdx: index("github_username_idx").on(
 				table.github_username,
 			),
-			discordUsernameIdx: uniqueIndex("discord_username_idx").on(
+			discordUsernameIdx: index("discord_username_idx").on(
 				table.discord_username,
 			),
-			twitterUsernameIdx: uniqueIndex("twitter_username_idx").on(
+			twitterUsernameIdx: index("twitter_username_idx").on(
 				table.twitter_username,
 			),
-			gitlabUsernameIdx: uniqueIndex("gitlab_username_idx").on(
+			gitlabUsernameIdx: index("gitlab_username_idx").on(
 				table.gitlab_username,
 			),
 		};
@@ -91,6 +91,23 @@ export const session = sqliteTable(
 );
 
 export type Session = typeof session.$inferSelect;
+
+export const oauthState = sqliteTable(
+	"oauth_state",
+	{
+		state_hash: text().primaryKey(),
+		provider: text().notNull(),
+		code_verifier: text(),
+		nonce: text(),
+		redirect_uri: text(),
+		context: text({ mode: "json" }).$type<Record<string, string>>(),
+		created_at: text().notNull(),
+		expires_at: text().notNull(),
+	},
+	(table) => ({
+		expiresAtIdx: index("oauth_state_expires_at_idx").on(table.expires_at),
+	}),
+);
 
 export const bookmark = sqliteTable(
 	"bookmark",

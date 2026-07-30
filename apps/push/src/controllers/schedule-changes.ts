@@ -1,5 +1,3 @@
-import type { ExecutionContext } from "@cloudflare/workers-types";
-
 import { constants } from "../constants";
 import { getFosdemData } from "../lib/fosdem-data";
 import { getBookmarksByUserIds, enrichBookmarks } from "../lib/bookmarks";
@@ -9,7 +7,7 @@ import {
 	createScheduleChangePayload,
 } from "../lib/notifications";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
-import type { Env, Subscription, ScheduleSnapshot } from "../types";
+import type { Bookmark, Env, Subscription, ScheduleSnapshot } from "../types";
 
 type SnapshotRow = ScheduleSnapshot;
 
@@ -119,7 +117,7 @@ export async function triggerScheduleChangeNotifications(
 				includeSent: true,
 				slugs: Array.from(changedEvents.keys()),
 			})
-		: new Map();
+		: new Map<string, Bookmark[]>();
 
 	const results = await Promise.allSettled(
 		subscriptionEntries.map(async ({ subscription, prefs }) => {

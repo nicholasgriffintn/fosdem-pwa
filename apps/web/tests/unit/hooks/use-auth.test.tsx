@@ -73,7 +73,10 @@ describe("useAuth", () => {
 			await result.current.logout();
 		});
 
-		expect(fetchMock).toHaveBeenCalledWith("/api/auth/logout", {
+		expect(fetchMock).toHaveBeenCalledWith("/api/auth", {
+			body: JSON.stringify({ action: "sign_out" }),
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
 			method: "POST",
 		});
 		queryClient.clear();

@@ -15,7 +15,7 @@ type TestNotificationType =
 export const sendTestNotification = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: {
+	.validator((data: {
 		type: TestNotificationType;
 		dayOverride?: "1" | "2";
 	}) => data)

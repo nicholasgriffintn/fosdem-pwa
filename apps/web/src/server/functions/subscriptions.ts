@@ -13,7 +13,7 @@ import type { Subscription } from "~/server/db/schema";
 export const createSubscription = createServerFn({
 	method: "POST",
 })
-	.inputValidator(
+	.validator(
 		(data: { endpoint: string; auth: string; p256dh: string }) => data,
 	)
 	.handler(async (ctx): Promise<Result<number> | null> => {
@@ -41,7 +41,7 @@ export const createSubscription = createServerFn({
 export const deleteSubscription = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { id: number }) => data)
+	.validator((data: { id: number }) => data)
 	.handler(async (ctx): Promise<Result<boolean> | null> => {
 		const { id } = ctx.data;
 

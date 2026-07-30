@@ -16,7 +16,7 @@ import type { Bookmark } from "~/server/db/schema";
 export const getWatchLaterList = createServerFn({
   method: "GET",
 })
-  .inputValidator((data: { year: number }) => data)
+  .validator((data: { year: number }) => data)
   .handler(async (ctx): Promise<Bookmark[]> => {
     const user = await getAuthUser();
     if (!user) {
@@ -29,7 +29,7 @@ export const getWatchLaterList = createServerFn({
 export const getBookmarksByWatchStatus = createServerFn({
   method: "GET",
 })
-  .inputValidator(
+  .validator(
     (data: { year: number; status: "unwatched" | "watching" | "watched" }) =>
       data,
   )
@@ -45,7 +45,7 @@ export const getBookmarksByWatchStatus = createServerFn({
 export const toggleWatchLater = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: { bookmarkId: string }) => data)
+  .validator((data: { bookmarkId: string }) => data)
   .handler(async (ctx): Promise<Result<boolean> | null> => {
     const user = await getAuthUser();
     if (!user) {
@@ -64,7 +64,7 @@ export const toggleWatchLater = createServerFn({
 export const updateWatchProgress = createServerFn({
   method: "POST",
 })
-  .inputValidator(
+  .validator(
     (data: {
       bookmarkId: string;
       progressSeconds: number;
@@ -94,7 +94,7 @@ export const updateWatchProgress = createServerFn({
 export const markAsWatched = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: { bookmarkId: string }) => data)
+  .validator((data: { bookmarkId: string }) => data)
   .handler(async (ctx): Promise<Result<boolean> | null> => {
     const user = await getAuthUser();
     if (!user) {
@@ -113,7 +113,7 @@ export const markAsWatched = createServerFn({
 export const setPlaybackSpeed = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: { bookmarkId: string; speed: string }) => data)
+  .validator((data: { bookmarkId: string; speed: string }) => data)
   .handler(async (ctx): Promise<Result<boolean> | null> => {
     const user = await getAuthUser();
     if (!user) {
@@ -139,7 +139,7 @@ export const setPlaybackSpeed = createServerFn({
 export const toggleWatchLaterFromForm = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: FormData) => {
+  .validator((data: FormData) => {
     if (!(data instanceof FormData)) {
       throw new Error("Invalid! FormData is required");
     }

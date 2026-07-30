@@ -1,242 +1,198 @@
-import { sha256 } from "@oslojs/crypto/sha2";
+import { env } from "cloudflare:workers";
 import {
-	encodeBase32LowerCaseNoPadding,
-	encodeHexLowerCase,
-} from "@oslojs/encoding";
-import { GitHub, Discord, GitLab } from "arctic";
-import { and, eq } from "drizzle-orm";
+	type AuthUser,
+	createAuth,
+	type ExternalIdentity,
+	type IdentityStore,
+	type SessionStore,
+	type UserStore,
+} from "@ngriffin_uk/auth-core";
 import {
 	deleteCookie,
 	getCookie,
 	setCookie,
 } from "@tanstack/react-start/server";
-import { env } from "cloudflare:workers";
+import { and, eq } from "drizzle-orm";
 
-import { Mastodon } from "~/server/lib/mastodon-arctic";
 import { createStandardDate } from "~/lib/dateTime";
-import { CacheManager } from "~/server/cache";
-import { CacheKeys } from "~/server/lib/cache-keys";
 import { db } from "~/server/db";
 import {
-	session as sessionTable,
-	user as userTable,
+	oauthAccount,
 	type Session,
+	session as sessionTable,
 	type User,
+	user as userTable,
 } from "~/server/db/schema";
-import type { GitHubUser } from "~/types/user";
-import { randomInt, randomBase32 } from "~/server/lib/random";
+import { generateGuestUsername } from "~/server/lib/guest-username";
+import { oauthProfile } from "~/server/lib/oauth-profile";
+import {
+	buildNewUserData,
+	buildUpgradeUserData,
+} from "~/server/lib/provider-mapping";
 
 export const SESSION_COOKIE_NAME = "session";
-const TTL = 60 * 60 * 24 * 30;
-const cache = CacheManager.getInstance();
+const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
+const SESSION_TTL_MS = SESSION_TTL_SECONDS * 1_000;
+const SESSION_REFRESH_WINDOW_MS = 15 * 24 * 60 * 60 * 1_000;
+const SESSION_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1_000;
 
-export function generateSessionToken(): string {
-	const bytes = new Uint8Array(20);
-	crypto.getRandomValues(bytes);
-	const token = encodeBase32LowerCaseNoPadding(bytes);
-	return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+export interface FosdemAuthUser extends AuthUser {
+	readonly record: User;
 }
 
-export async function createSession(
-	token: string,
-	userId: number,
-): Promise<Session> {
-	const now = createStandardDate(new Date());
-	const sessionId = token;
-	const session: Session = {
-		id: sessionId,
-		user_id: userId,
-		expires_at: new Date(now.getTime() + 1000 * TTL).toISOString(),
-		last_extended_at: now.toISOString(),
-	};
-	await db.insert(sessionTable).values(session);
-	return session;
-}
+const users: UserStore<FosdemAuthUser> = {
+	async findById(userId) {
+		const id = Number(userId);
+		if (!Number.isSafeInteger(id)) return null;
+		const record = await db.query.user.findFirst({
+			where: eq(userTable.id, id),
+		});
+		return record ? toAuthUser(record) : null;
+	},
+};
 
-export async function validateSessionToken(token: string) {
-	const sessionId = token;
-	const now = Date.now();
+const sessions: SessionStore = {
+	async create(record) {
+		await db.insert(sessionTable).values({
+			id: record.tokenHash,
+			user_id: Number(record.userId),
+			expires_at: record.expiresAt.toISOString(),
+			last_extended_at: record.createdAt.toISOString(),
+		});
+	},
+	async findByTokenHash(tokenHash) {
+		const record = await db.query.session.findFirst({
+			where: eq(sessionTable.id, tokenHash),
+		});
+		if (!record) return null;
 
-	const cachedSession = await cache.get(CacheKeys.session(sessionId));
-	if (cachedSession) {
-		return cachedSession;
-	}
-
-	const results = await db
-		.select({
-			session: {
-				id: sessionTable.id,
-				user_id: sessionTable.user_id,
-				expires_at: sessionTable.expires_at,
-				last_extended_at: sessionTable.last_extended_at,
-			},
-			user: userTable,
-		})
-		.from(sessionTable)
-		.innerJoin(userTable, eq(sessionTable.user_id, userTable.id))
-		.where(eq(sessionTable.id, sessionId));
-
-	if (results.length < 1) {
-		return { session: null, user: null };
-	}
-
-	const { session, user } = results[0];
-	const expiresAt = new Date(session.expires_at).getTime();
-
-	if (now >= expiresAt) {
-		await Promise.all([
-			cache.invalidate(CacheKeys.session(sessionId)),
-			db.delete(sessionTable).where(eq(sessionTable.id, sessionId)),
-		]);
-		return { session: null, user: null };
-	}
-
-	const lastExtendedAt = new Date(session.last_extended_at).getTime();
-	const timeSinceLastExtension = now - lastExtendedAt;
-	const shouldExtend = now >= expiresAt - 1000 * 60 * 60 * 24 * 15 && timeSinceLastExtension > 24 * 60 * 60 * 1000;
-
-	if (shouldExtend) {
-		const newExpiresAt = new Date(now + 1000 * TTL).toISOString();
-		const newLastExtendedAt = new Date(now).toISOString();
-
-		session.expires_at = newExpiresAt;
-		session.last_extended_at = newLastExtendedAt;
-
-		const result = { session, user };
-
-		await Promise.all([
-			cache.set(CacheKeys.session(sessionId), result, TTL),
-			db
+		const now = Date.now();
+		const currentExpiry = new Date(record.expires_at);
+		const lastExtendedAt = new Date(record.last_extended_at);
+		let expiresAt = currentExpiry;
+		if (
+			now < currentExpiry.getTime() &&
+			now >= currentExpiry.getTime() - SESSION_REFRESH_WINDOW_MS &&
+			now - lastExtendedAt.getTime() >= SESSION_REFRESH_INTERVAL_MS
+		) {
+			expiresAt = new Date(now + SESSION_TTL_MS);
+			await db
 				.update(sessionTable)
 				.set({
-					expires_at: newExpiresAt,
-					last_extended_at: newLastExtendedAt,
+					expires_at: expiresAt.toISOString(),
+					last_extended_at: new Date(now).toISOString(),
 				})
-				.where(eq(sessionTable.id, sessionId)),
-		]);
+				.where(eq(sessionTable.id, tokenHash));
+		}
 
-		return result;
-	}
-
-	const result = { session, user };
-	await cache.set(CacheKeys.session(sessionId), result, TTL);
-	return result;
-}
-
-export type { SessionUser } from "~/types/auth";
-
-export async function invalidateSession(sessionId: string): Promise<void> {
-	await Promise.all([
-		cache.invalidate(CacheKeys.session(sessionId)),
-		db.delete(sessionTable).where(eq(sessionTable.id, sessionId)),
-	]);
-}
-
-export function setSessionTokenCookie(token: string, expiresAt: Date) {
-	setCookie(SESSION_COOKIE_NAME, token, {
-		httpOnly: true,
-		sameSite: "lax",
-		secure: env.NODE_ENV === "production",
-		expires: expiresAt,
-		maxAge: TTL,
-		path: "/",
-	});
-}
-
-const GITHUB_REDIRECT_URL = env.GITHUB_REDIRECT_URI
-	? env.GITHUB_REDIRECT_URI
-	: `${env.CF_PAGES_URL}/api/auth/callback/github`;
-export const github = new GitHub(
-	env.GITHUB_CLIENT_ID,
-	env.GITHUB_CLIENT_SECRET,
-	GITHUB_REDIRECT_URL,
-);
-
-const DISCORD_REDIRECT_URL = env.DISCORD_REDIRECT_URI
-	? env.DISCORD_REDIRECT_URI
-	: `${env.CF_PAGES_URL}/api/auth/callback/discord`;
-export const discord = new Discord(
-	env.DISCORD_CLIENT_ID,
-	env.DISCORD_CLIENT_SECRET,
-	DISCORD_REDIRECT_URL,
-);
-
-const GITLAB_REDIRECT_URL = env.GITLAB_REDIRECT_URI
-	? env.GITLAB_REDIRECT_URI
-	: `${env.CF_PAGES_URL}/api/auth/callback/gitlab`;
-export const gitlab = new GitLab(
-	"https://gitlab.com",
-	env.GITLAB_CLIENT_ID,
-	env.GITLAB_CLIENT_SECRET,
-	GITLAB_REDIRECT_URL,
-);
-
-export const MASTODON_INSTANCES = [
-	{
-		name: "mastodon.social",
-		baseUrl: "https://mastodon.social",
-		clientId: env.MASTODON_MASTODON_SOCIAL_CLIENT_ID,
-		clientSecret: env.MASTODON_MASTODON_SOCIAL_CLIENT_SECRET,
+		return {
+			tokenHash,
+			userId: String(record.user_id),
+			createdAt: lastExtendedAt,
+			expiresAt,
+		};
 	},
-	{
-		name: "mastodon.online",
-		baseUrl: "https://mastodon.online",
-		clientId: env.MASTODON_MASTODON_ONLINE_CLIENT_ID,
-		clientSecret: env.MASTODON_MASTODON_ONLINE_CLIENT_SECRET,
+	async deleteByTokenHash(tokenHash) {
+		await db.delete(sessionTable).where(eq(sessionTable.id, tokenHash));
 	},
-];
+};
 
-export function createMastodonInstance(baseUrl: string) {
-	const redirectUrl = env.MASTODON_REDIRECT_URI
-		? env.MASTODON_REDIRECT_URI
-		: `${env.CF_PAGES_URL}/api/auth/callback/mastodon`;
+const identities: IdentityStore<FosdemAuthUser> = {
+	findUser: findIdentityUser,
+	resolve: resolveIdentity,
+};
 
-	const instance = MASTODON_INSTANCES.find(inst => inst.baseUrl === baseUrl);
-	if (!instance) {
-		throw new Error(`Unsupported Mastodon instance: ${baseUrl}`);
-	}
-
-	if (!instance.clientId || !instance.clientSecret) {
-		throw new Error(`Missing credentials for Mastodon instance: ${instance.name}`);
-	}
-
-	return new Mastodon(
-		baseUrl,
-		instance.clientId,
-		instance.clientSecret,
-		redirectUrl,
+export async function resolveIdentity(
+	identity: ExternalIdentity,
+): Promise<FosdemAuthUser> {
+	const profile = oauthProfile(identity);
+	const existing = await findIdentityUser(
+		identity.provider,
+		identity.providerSubject,
 	);
+	if (existing && !existing.record.is_guest) return existing;
+
+	if (identity.emailVerified && identity.email) {
+		const emailUser = await db.query.user.findFirst({
+			where: eq(userTable.email, identity.email),
+		});
+		if (emailUser && emailUser.id !== existing?.record.id) {
+			if (existing?.record.is_guest) {
+				await reassignIdentity(emailUser.id, identity);
+			} else {
+				await linkIdentity(emailUser.id, identity);
+			}
+			return toAuthUser(emailUser);
+		}
+	}
+
+	if (existing) {
+		if (profile.upgradeUserId === existing.record.id) {
+			const upgraded = await upgradeGuestIdentity(
+				profile.upgradeUserId,
+				identity,
+				true,
+			);
+			if (upgraded) return toAuthUser(upgraded);
+		}
+		return existing;
+	}
+
+	if (profile.upgradeUserId !== undefined) {
+		const upgraded = await upgradeGuestIdentity(
+			profile.upgradeUserId,
+			identity,
+			false,
+		);
+		if (upgraded) return toAuthUser(upgraded);
+	}
+
+	try {
+		const [created] = await db
+			.insert(userTable)
+			.values(buildNewUserData(identity.provider, profile))
+			.returning();
+		if (!created) throw new Error("OAuth user creation failed.");
+		await linkIdentity(created.id, identity);
+		return toAuthUser(created);
+	} catch (cause) {
+		const raced = await findIdentityUser(
+			identity.provider,
+			identity.providerSubject,
+		);
+		if (raced) return raced;
+		throw cause;
+	}
 }
 
-/**
- * Retrieves the session and user data if valid.
- * Can be used in API routes and server functions.
- */
+export const auth = createAuth({
+	users,
+	sessions,
+	identities,
+	sessionTtlMs: SESSION_TTL_MS,
+});
+
 export async function getAuthSession(
 	{ refreshCookie } = { refreshCookie: true },
 ) {
 	const token = getCookie(SESSION_COOKIE_NAME);
-	if (!token) {
-		return { session: null, user: null };
-	}
+	if (!token) return { session: null, user: null };
 
-	const { session, user } = await validateSessionToken(token);
-
-	if (session === null) {
+	const authenticated = await auth.authenticate(token);
+	if (!authenticated) {
 		deleteCookie(SESSION_COOKIE_NAME);
 		return { session: null, user: null };
 	}
-
 	if (refreshCookie) {
-		const now = Date.now();
-		const lastExtendedAt = new Date(session.last_extended_at).getTime();
-		const timeSinceLastExtension = now - lastExtendedAt;
-
-		if (timeSinceLastExtension > 24 * 60 * 60 * 1000) {
-			setSessionTokenCookie(token, new Date(session.expires_at));
-		}
+		setSessionTokenCookie(token, authenticated.expiresAt);
 	}
-
+	const user = authenticated.user.record;
+	const session: Session = {
+		id: token,
+		user_id: user.id,
+		expires_at: authenticated.expiresAt.toISOString(),
+		last_extended_at: new Date().toISOString(),
+	};
 	return {
 		session,
 		user,
@@ -245,100 +201,135 @@ export async function getAuthSession(
 }
 
 export const getFullAuthSession = getAuthSession;
+export type { SessionUser } from "~/types/auth";
 
-/**
- * Generates a random guest username
- */
-const adjectives = [
-	"happy", "quick", "clever", "bright", "swift", "bold", "calm", "eager", "fair", "gentle",
-	"kind", "lively", "nice", "proud", "wise"
-];
-const nouns = [
-	"penguin", "dolphin", "eagle", "lion", "fox", "tiger", "bear", "wolf", "owl", "falcon",
-	"deer", "panda", "hawk", "raven", "otter"
-];
-export function generateGuestUsername(): string {
-	const adjective = adjectives[randomInt(adjectives.length)];
-	const noun = nouns[randomInt(nouns.length)];
-	const random = randomBase32(6);
-
-	return `${adjective}-${noun}-${random}`;
+export async function invalidateSession(token: string): Promise<void> {
+	await auth.revokeSession(token);
 }
 
-/**
- * Creates a guest user
- */
-export async function createGuestUser(): Promise<User> {
-	const now = createStandardDate(new Date()).toISOString();
-	const username = generateGuestUsername();
-
-	const guestUser = {
-		name: username,
-		email: `guest-${username}@fosdempwa.com`,
-		github_id: null,
-		is_guest: true,
-		created_at: now,
-		updated_at: now,
-	};
-
-	const [user] = await db.insert(userTable).values(guestUser).returning();
-	return user;
-}
-
-/**
- * Upgrades a guest user to a GitHub user
- */
-export async function upgradeGuestToGithub(
-	userId: number,
-	providerUser: GitHubUser,
-): Promise<User> {
-	const now = createStandardDate(new Date()).toISOString();
-
-	const [updatedUser] = await db
-		.update(userTable)
-		.set({
-			github_username: providerUser.login,
-			email:
-				providerUser.email ||
-				`${providerUser.id}+${providerUser.login}@users.noreply.github.com`,
-			name: providerUser.name || providerUser.login,
-			avatar_url: providerUser.avatar_url,
-			company: providerUser.company,
-			site: providerUser.blog,
-			location: providerUser.location,
-			bio: providerUser.bio,
-			twitter_username: providerUser.twitter_username,
-			is_guest: false,
-			updated_at: now,
-		})
-		.where(and(eq(userTable.id, userId), eq(userTable.is_guest, true)))
-		.returning();
-
-	if (updatedUser) {
-		const sessions = await db
-			.select({ id: sessionTable.id })
-			.from(sessionTable)
-			.where(eq(sessionTable.user_id, userId));
-
-		await Promise.all(
-			sessions.map((session) => cache.invalidate(CacheKeys.session(session.id))),
-		);
+export async function signOut(): Promise<void> {
+	const { session } = await getAuthSession({ refreshCookie: false });
+	deleteCookie(SESSION_COOKIE_NAME);
+	if (session) {
+		await invalidateSession(session.id);
 	}
-
-	return updatedUser;
 }
 
-/**
- * Creates an initial guest session
- */
+export function setSessionTokenCookie(token: string, expiresAt: Date) {
+	setCookie(SESSION_COOKIE_NAME, token, {
+		httpOnly: true,
+		sameSite: "lax",
+		secure: env.NODE_ENV === "production",
+		expires: expiresAt,
+		maxAge: SESSION_TTL_SECONDS,
+		path: "/",
+	});
+}
+
 export async function createGuestSession(): Promise<{
 	token: string;
 	session: Session;
 	user: User;
 }> {
 	const user = await createGuestUser();
-	const token = generateSessionToken();
-	const session = await createSession(token, user.id);
+	const issued = await auth.createSession(String(user.id));
+	return {
+		token: issued.token,
+		session: {
+			id: issued.token,
+			user_id: user.id,
+			expires_at: issued.expiresAt.toISOString(),
+			last_extended_at: new Date().toISOString(),
+		},
+		user,
+	};
+}
 
-	return { token, session, user };
+async function createGuestUser(): Promise<User> {
+	const now = createStandardDate(new Date()).toISOString();
+	const username = generateGuestUsername();
+	const [created] = await db
+		.insert(userTable)
+		.values({
+			name: username,
+			email: `guest-${username}@fosdempwa.com`,
+			is_guest: true,
+			created_at: now,
+			updated_at: now,
+		})
+		.returning();
+	if (!created) throw new Error("Guest user creation failed.");
+	return created;
+}
+
+async function upgradeGuestIdentity(
+	userId: number,
+	identity: ExternalIdentity,
+	identityAlreadyLinked: boolean,
+): Promise<User | null> {
+	const profile = oauthProfile(identity);
+	const guest = await db.query.user.findFirst({
+		where: and(eq(userTable.id, userId), eq(userTable.is_guest, true)),
+	});
+	if (!guest) return null;
+	const [updated] = await db
+		.update(userTable)
+		.set({
+			...buildUpgradeUserData(identity.provider, profile),
+			updated_at: createStandardDate(new Date()).toISOString(),
+		})
+		.where(and(eq(userTable.id, userId), eq(userTable.is_guest, true)))
+		.returning();
+	if (updated && !identityAlreadyLinked) {
+		await linkIdentity(userId, identity);
+	}
+	return updated ?? null;
+}
+
+async function linkIdentity(
+	userId: number,
+	identity: ExternalIdentity,
+): Promise<void> {
+	await db.insert(oauthAccount).values({
+		provider_id: identity.provider,
+		provider_user_id: identity.providerSubject,
+		user_id: userId,
+	});
+}
+
+async function reassignIdentity(
+	userId: number,
+	identity: ExternalIdentity,
+): Promise<void> {
+	await db
+		.update(oauthAccount)
+		.set({ user_id: userId })
+		.where(
+			and(
+				eq(oauthAccount.provider_id, identity.provider),
+				eq(oauthAccount.provider_user_id, identity.providerSubject),
+			),
+		);
+}
+
+function toAuthUser(record: User): FosdemAuthUser {
+	return {
+		id: String(record.id),
+		email: record.email,
+		createdAt: new Date(record.created_at),
+		record,
+	};
+}
+
+async function findIdentityUser(
+	provider: string,
+	providerSubject: string,
+): Promise<FosdemAuthUser | null> {
+	const account = await db.query.oauthAccount.findFirst({
+		where: and(
+			eq(oauthAccount.provider_id, provider),
+			eq(oauthAccount.provider_user_id, providerSubject),
+		),
+	});
+	return account ? users.findById(String(account.user_id)) : null;
 }

@@ -17,7 +17,7 @@ import type { UserConferenceStats } from "~/server/db/schema";
 export const getUserStats = createServerFn({
   method: "GET",
 })
-  .inputValidator((data: { year: number }) => data)
+  .validator((data: { year: number }) => data)
   .handler(async (ctx): Promise<UserConferenceStats | null> => {
     const user = await getAuthUser();
     if (!user) {
@@ -31,7 +31,7 @@ export const getUserStats = createServerFn({
 export const refreshUserStats = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: { year: number }) => data)
+  .validator((data: { year: number }) => data)
   .handler(async (ctx): Promise<Result<UserConferenceStats> | null> => {
     const user = await getAuthUser();
     if (!user) {
@@ -61,7 +61,7 @@ export const getUserStatsHistory = createServerFn({
 export const markEventAttended = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: { bookmarkId: string; inPerson?: boolean }) => data)
+  .validator((data: { bookmarkId: string; inPerson?: boolean }) => data)
   .handler(async (ctx): Promise<Result<boolean> | null> => {
     const user = await getAuthUser();
     if (!user) {
@@ -89,7 +89,7 @@ export const markEventAttended = createServerFn({
 export const unmarkEventAttended = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: { bookmarkId: string }) => data)
+  .validator((data: { bookmarkId: string }) => data)
   .handler(async (ctx): Promise<Result<boolean> | null> => {
     const user = await getAuthUser();
     if (!user) {
@@ -117,7 +117,7 @@ export const unmarkEventAttended = createServerFn({
 export const toggleAttendanceFromForm = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: FormData) => {
+  .validator((data: FormData) => {
     if (!(data instanceof FormData)) {
       throw new Error("Invalid! FormData is required");
     }

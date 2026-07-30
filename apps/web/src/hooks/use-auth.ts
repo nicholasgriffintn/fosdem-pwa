@@ -1,13 +1,13 @@
 "use client";
 
+import { createBrowserAuthTransport } from "@ngriffin_uk/auth-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-
-import { checkAndSyncOnOnline } from "~/lib/backgroundSync";
-import { enableSync } from "~/lib/localStorage";
-import { buildHomeLink } from "~/lib/link-builder";
 import { useSession } from "~/hooks/use-session";
+import { checkAndSyncOnOnline } from "~/lib/backgroundSync";
+import { buildHomeLink } from "~/lib/link-builder";
+import { enableSync } from "~/lib/localStorage";
 import { sessionQueryKeys } from "~/lib/query-keys";
 
 export function useAuth() {
@@ -19,7 +19,7 @@ export function useAuth() {
 	const logout = useMutation({
 		mutationKey: ["logout"],
 		mutationFn: async () => {
-			await fetch("/api/auth/logout", { method: "POST" });
+			await createBrowserAuthTransport().execute({ action: "sign_out" });
 		},
 		onSuccess: () => {
 			queryClient.setQueryData(sessionQueryKeys.auth, null);
@@ -43,15 +43,17 @@ export function useAuth() {
 		};
 
 		enableSync();
-		checkAndSyncOnOnline(user.id).catch((error) => {
-			if (isMounted) {
-				console.error("Initial sync failed:", error);
-			}
-		}).then(() => {
-			if (isMounted) {
-				invalidateBookmarkQueries();
-			}
-		});
+		checkAndSyncOnOnline(user.id)
+			.catch((error) => {
+				if (isMounted) {
+					console.error("Initial sync failed:", error);
+				}
+			})
+			.then(() => {
+				if (isMounted) {
+					invalidateBookmarkQueries();
+				}
+			});
 
 		if (typeof window === "undefined") {
 			return;
@@ -63,13 +65,15 @@ export function useAuth() {
 			}
 			syncTimeout = setTimeout(() => {
 				if (isMounted) {
-					checkAndSyncOnOnline(user.id).catch((error) => {
-						console.error("Online sync failed:", error);
-					}).then(() => {
-						if (isMounted) {
-							invalidateBookmarkQueries();
-						}
-					});
+					checkAndSyncOnOnline(user.id)
+						.catch((error) => {
+							console.error("Online sync failed:", error);
+						})
+						.then(() => {
+							if (isMounted) {
+								invalidateBookmarkQueries();
+							}
+						});
 				}
 			}, 1000);
 		};
@@ -83,7 +87,7 @@ export function useAuth() {
 			}
 			window.removeEventListener("online", handleOnline);
 		};
-	}, [user?.id, queryClient, navigate]);
+	}, [user?.id, queryClient]);
 
 	return {
 		user,

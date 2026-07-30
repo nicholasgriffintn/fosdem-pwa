@@ -62,7 +62,7 @@ export function EventMain({
 			<ResizablePanelGroup
 				key={isMobile ? "event-layout-mobile" : "event-layout-desktop"}
 				autoSaveId={isMobile ? "event-layout-mobile" : "event-layout-desktop"}
-				direction={isMobile ? "vertical" : "horizontal"}
+				orientation={isMobile ? "vertical" : "horizontal"}
 				className={cn("rounded-lg", {
 					"!flex-col": isMobile,
 					"min-h-[200px] border": !isMobile,
@@ -70,9 +70,8 @@ export function EventMain({
 			>
 				<ResizablePanel
 					id="event-player-panel"
-					order={1}
-					minSize={50}
-					defaultSize={isMobile ? 100 : 75}
+					minSize="50%"
+					defaultSize={isMobile ? "100%" : "75%"}
 					className={cn({
 						"!w-full !flex-[1_1_auto]": isMobile,
 					})}
@@ -96,9 +95,8 @@ export function EventMain({
 				{!isMobile && <ResizableHandle withHandle />}
 				<ResizablePanel
 					id="event-notes-panel"
-					order={2}
-					minSize={20}
-					defaultSize={25}
+					minSize="20%"
+					defaultSize="25%"
 					className={cn({
 						"!w-full mt-4 !flex-[1_1_auto]": isMobile,
 					})}

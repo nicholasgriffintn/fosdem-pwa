@@ -268,7 +268,7 @@ export function useMutateBookmark({ year }: { year: number }) {
 					createLocal: createLocalBookmark,
 					removeLocal: removeLocalBookmark,
 					createServer: async (data) => createServerBookmark.mutateAsync(data),
-					userId: user?.id,
+						userId: user ? String(user.id) : undefined,
 				},
 				bookmarkData,
 			);

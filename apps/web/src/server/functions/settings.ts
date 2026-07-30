@@ -7,7 +7,7 @@ import { updateUser } from "~/server/repositories/user-repository";
 export const changeBookmarksVisibility = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { visibility: string }) => {
+	.validator((data: { visibility: string }) => {
 		if (!["private", "public"].includes(data.visibility)) {
 			throw new Error("Invalid value");
 		}

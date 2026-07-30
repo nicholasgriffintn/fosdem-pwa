@@ -14,7 +14,7 @@ import type { Note } from "~/server/db/schema";
 export const getNotes = createServerFn({
 	method: "GET",
 })
-	.inputValidator((data: { year: number; eventId: string }) => data)
+	.validator((data: { year: number; eventId: string }) => data)
 	.handler(async (ctx): Promise<Note[]> => {
 		const { year, eventId } = ctx.data;
 
@@ -29,7 +29,7 @@ export const getNotes = createServerFn({
 export const createNote = createServerFn({
 	method: "POST",
 })
-	.inputValidator(
+	.validator(
 		(data: { year: number; eventId: string; note: string; time?: number }) =>
 			data,
 	)
@@ -57,7 +57,7 @@ export const createNote = createServerFn({
 export const updateNote = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { id: number; updates: Record<string, unknown> }) => data)
+	.validator((data: { id: number; updates: Record<string, unknown> }) => data)
 	.handler(async (ctx): Promise<Result<boolean>> => {
 		const { id, updates } = ctx.data;
 
@@ -103,7 +103,7 @@ export const updateNote = createServerFn({
 export const deleteNote = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { id: number }) => data)
+	.validator((data: { id: number }) => data)
 	.handler(async (ctx): Promise<Result<boolean>> => {
 		const { id } = ctx.data;
 

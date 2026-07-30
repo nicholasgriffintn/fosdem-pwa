@@ -9,107 +9,43 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as StatusRouteImport } from './routes/status'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TesterIndexRouteImport } from './routes/tester/index'
-import { Route as TermsIndexRouteImport } from './routes/terms/index'
-import { Route as SpeakersIndexRouteImport } from './routes/speakers/index'
-import { Route as SigninIndexRouteImport } from './routes/signin/index'
-import { Route as SearchIndexRouteImport } from './routes/search/index'
-import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
-import { Route as ProfileIndexRouteImport } from './routes/profile/index'
-import { Route as PrivacyIndexRouteImport } from './routes/privacy/index'
-import { Route as OfflineIndexRouteImport } from './routes/offline/index'
-import { Route as MapIndexRouteImport } from './routes/map/index'
-import { Route as LiveIndexRouteImport } from './routes/live/index'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as BookmarksIndexRouteImport } from './routes/bookmarks/index'
-import { Route as TypeSlugRouteImport } from './routes/type/$slug'
-import { Route as TrackSlugRouteImport } from './routes/track/$slug'
-import { Route as SpeakersSlugRouteImport } from './routes/speakers/$slug'
-import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
-import { Route as ProfileYearInReviewRouteImport } from './routes/profile/year-in-review'
 import { Route as EventSlugRouteImport } from './routes/event/$slug'
-import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
+import { Route as LiveIndexRouteImport } from './routes/live/index'
+import { Route as MapIndexRouteImport } from './routes/map/index'
+import { Route as OfflineIndexRouteImport } from './routes/offline/index'
+import { Route as PrivacyIndexRouteImport } from './routes/privacy/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
+import { Route as ProfileYearInReviewRouteImport } from './routes/profile/year-in-review'
+import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
+import { Route as RoomsRoomIdRouteImport } from './routes/rooms/$roomId'
+import { Route as SearchIndexRouteImport } from './routes/search/index'
+import { Route as SigninIndexRouteImport } from './routes/signin/index'
+import { Route as SpeakersIndexRouteImport } from './routes/speakers/index'
+import { Route as SpeakersSlugRouteImport } from './routes/speakers/$slug'
+import { Route as TermsIndexRouteImport } from './routes/terms/index'
+import { Route as TesterIndexRouteImport } from './routes/tester/index'
+import { Route as TrackSlugRouteImport } from './routes/track/$slug'
+import { Route as TypeSlugRouteImport } from './routes/type/$slug'
+import { Route as ApiAuthIndexRouteImport } from './routes/api/auth/index'
 import { Route as ApiProxySubtitlesRouteImport } from './routes/api/proxy/subtitles'
-import { Route as ApiAuthUpgradeMastodonRouteImport } from './routes/api/auth/upgrade-mastodon'
-import { Route as ApiAuthUpgradeGitlabRouteImport } from './routes/api/auth/upgrade-gitlab'
-import { Route as ApiAuthUpgradeGithubRouteImport } from './routes/api/auth/upgrade-github'
-import { Route as ApiAuthUpgradeDiscordRouteImport } from './routes/api/auth/upgrade-discord'
-import { Route as ApiAuthMastodonRouteImport } from './routes/api/auth/mastodon'
-import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
-import { Route as ApiAuthGuestRouteImport } from './routes/api/auth/guest'
-import { Route as ApiAuthGitlabRouteImport } from './routes/api/auth/gitlab'
-import { Route as ApiAuthGithubRouteImport } from './routes/api/auth/github'
-import { Route as ApiAuthDiscordRouteImport } from './routes/api/auth/discord'
-import { Route as ApiProxyRoomsStatusRouteImport } from './routes/api/proxy/rooms/status'
-import { Route as ApiAuthCallbackMastodonRouteImport } from './routes/api/auth/callback.mastodon'
-import { Route as ApiAuthCallbackGitlabRouteImport } from './routes/api/auth/callback.gitlab'
-import { Route as ApiAuthCallbackGithubRouteImport } from './routes/api/auth/callback.github'
+import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
 import { Route as ApiAuthCallbackDiscordRouteImport } from './routes/api/auth/callback.discord'
+import { Route as ApiAuthCallbackGithubRouteImport } from './routes/api/auth/callback.github'
+import { Route as ApiAuthCallbackGitlabRouteImport } from './routes/api/auth/callback.gitlab'
+import { Route as ApiAuthCallbackMastodonRouteImport } from './routes/api/auth/callback.mastodon'
+import { Route as ApiProxyRoomsStatusRouteImport } from './routes/api/proxy/rooms/status'
 
-const StatusRoute = StatusRouteImport.update({
-  id: '/status',
-  path: '/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TesterIndexRoute = TesterIndexRouteImport.update({
-  id: '/tester/',
-  path: '/tester/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsIndexRoute = TermsIndexRouteImport.update({
-  id: '/terms/',
-  path: '/terms/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
-  id: '/speakers/',
-  path: '/speakers/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SigninIndexRoute = SigninIndexRouteImport.update({
-  id: '/signin/',
-  path: '/signin/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SearchIndexRoute = SearchIndexRouteImport.update({
-  id: '/search/',
-  path: '/search/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RoomsIndexRoute = RoomsIndexRouteImport.update({
-  id: '/rooms/',
-  path: '/rooms/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileIndexRoute = ProfileIndexRouteImport.update({
-  id: '/profile/',
-  path: '/profile/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyIndexRoute = PrivacyIndexRouteImport.update({
-  id: '/privacy/',
-  path: '/privacy/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OfflineIndexRoute = OfflineIndexRouteImport.update({
-  id: '/offline/',
-  path: '/offline/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MapIndexRoute = MapIndexRouteImport.update({
-  id: '/map/',
-  path: '/map/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LiveIndexRoute = LiveIndexRouteImport.update({
-  id: '/live/',
-  path: '/live/',
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookmarksIndexRoute = BookmarksIndexRouteImport.update({
@@ -117,24 +53,34 @@ const BookmarksIndexRoute = BookmarksIndexRouteImport.update({
   path: '/bookmarks/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TypeSlugRoute = TypeSlugRouteImport.update({
-  id: '/type/$slug',
-  path: '/type/$slug',
+const EventSlugRoute = EventSlugRouteImport.update({
+  id: '/event/$slug',
+  path: '/event/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TrackSlugRoute = TrackSlugRouteImport.update({
-  id: '/track/$slug',
-  path: '/track/$slug',
+const LiveIndexRoute = LiveIndexRouteImport.update({
+  id: '/live/',
+  path: '/live/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SpeakersSlugRoute = SpeakersSlugRouteImport.update({
-  id: '/speakers/$slug',
-  path: '/speakers/$slug',
+const MapIndexRoute = MapIndexRouteImport.update({
+  id: '/map/',
+  path: '/map/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
-  id: '/rooms/$roomId',
-  path: '/rooms/$roomId',
+const OfflineIndexRoute = OfflineIndexRouteImport.update({
+  id: '/offline/',
+  path: '/offline/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyIndexRoute = PrivacyIndexRouteImport.update({
+  id: '/privacy/',
+  path: '/privacy/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileYearInReviewRoute = ProfileYearInReviewRouteImport.update({
@@ -142,14 +88,59 @@ const ProfileYearInReviewRoute = ProfileYearInReviewRouteImport.update({
   path: '/profile/year-in-review',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventSlugRoute = EventSlugRouteImport.update({
-  id: '/event/$slug',
-  path: '/event/$slug',
+const RoomsIndexRoute = RoomsIndexRouteImport.update({
+  id: '/rooms/',
+  path: '/rooms/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProfileUserIdIndexRoute = ProfileUserIdIndexRouteImport.update({
-  id: '/profile/$userId/',
-  path: '/profile/$userId/',
+const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
+  id: '/rooms/$roomId',
+  path: '/rooms/$roomId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchIndexRoute = SearchIndexRouteImport.update({
+  id: '/search/',
+  path: '/search/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninIndexRoute = SigninIndexRouteImport.update({
+  id: '/signin/',
+  path: '/signin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
+  id: '/speakers/',
+  path: '/speakers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersSlugRoute = SpeakersSlugRouteImport.update({
+  id: '/speakers/$slug',
+  path: '/speakers/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsIndexRoute = TermsIndexRouteImport.update({
+  id: '/terms/',
+  path: '/terms/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TesterIndexRoute = TesterIndexRouteImport.update({
+  id: '/tester/',
+  path: '/tester/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackSlugRoute = TrackSlugRouteImport.update({
+  id: '/track/$slug',
+  path: '/track/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TypeSlugRoute = TypeSlugRouteImport.update({
+  id: '/type/$slug',
+  path: '/type/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthIndexRoute = ApiAuthIndexRouteImport.update({
+  id: '/api/auth/',
+  path: '/api/auth/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiProxySubtitlesRoute = ApiProxySubtitlesRouteImport.update({
@@ -157,69 +148,14 @@ const ApiProxySubtitlesRoute = ApiProxySubtitlesRouteImport.update({
   path: '/api/proxy/subtitles',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthUpgradeMastodonRoute = ApiAuthUpgradeMastodonRouteImport.update({
-  id: '/api/auth/upgrade-mastodon',
-  path: '/api/auth/upgrade-mastodon',
+const ProfileUserIdIndexRoute = ProfileUserIdIndexRouteImport.update({
+  id: '/profile/$userId/',
+  path: '/profile/$userId/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthUpgradeGitlabRoute = ApiAuthUpgradeGitlabRouteImport.update({
-  id: '/api/auth/upgrade-gitlab',
-  path: '/api/auth/upgrade-gitlab',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthUpgradeGithubRoute = ApiAuthUpgradeGithubRouteImport.update({
-  id: '/api/auth/upgrade-github',
-  path: '/api/auth/upgrade-github',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthUpgradeDiscordRoute = ApiAuthUpgradeDiscordRouteImport.update({
-  id: '/api/auth/upgrade-discord',
-  path: '/api/auth/upgrade-discord',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthMastodonRoute = ApiAuthMastodonRouteImport.update({
-  id: '/api/auth/mastodon',
-  path: '/api/auth/mastodon',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
-  id: '/api/auth/logout',
-  path: '/api/auth/logout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthGuestRoute = ApiAuthGuestRouteImport.update({
-  id: '/api/auth/guest',
-  path: '/api/auth/guest',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthGitlabRoute = ApiAuthGitlabRouteImport.update({
-  id: '/api/auth/gitlab',
-  path: '/api/auth/gitlab',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthGithubRoute = ApiAuthGithubRouteImport.update({
-  id: '/api/auth/github',
-  path: '/api/auth/github',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthDiscordRoute = ApiAuthDiscordRouteImport.update({
-  id: '/api/auth/discord',
-  path: '/api/auth/discord',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProxyRoomsStatusRoute = ApiProxyRoomsStatusRouteImport.update({
-  id: '/api/proxy/rooms/status',
-  path: '/api/proxy/rooms/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthCallbackMastodonRoute = ApiAuthCallbackMastodonRouteImport.update({
-  id: '/api/auth/callback/mastodon',
-  path: '/api/auth/callback/mastodon',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthCallbackGitlabRoute = ApiAuthCallbackGitlabRouteImport.update({
-  id: '/api/auth/callback/gitlab',
-  path: '/api/auth/callback/gitlab',
+const ApiAuthCallbackDiscordRoute = ApiAuthCallbackDiscordRouteImport.update({
+  id: '/api/auth/callback/discord',
+  path: '/api/auth/callback/discord',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthCallbackGithubRoute = ApiAuthCallbackGithubRouteImport.update({
@@ -227,9 +163,19 @@ const ApiAuthCallbackGithubRoute = ApiAuthCallbackGithubRouteImport.update({
   path: '/api/auth/callback/github',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthCallbackDiscordRoute = ApiAuthCallbackDiscordRouteImport.update({
-  id: '/api/auth/callback/discord',
-  path: '/api/auth/callback/discord',
+const ApiAuthCallbackGitlabRoute = ApiAuthCallbackGitlabRouteImport.update({
+  id: '/api/auth/callback/gitlab',
+  path: '/api/auth/callback/gitlab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthCallbackMastodonRoute = ApiAuthCallbackMastodonRouteImport.update({
+  id: '/api/auth/callback/mastodon',
+  path: '/api/auth/callback/mastodon',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProxyRoomsStatusRoute = ApiProxyRoomsStatusRouteImport.update({
+  id: '/api/proxy/rooms/status',
+  path: '/api/proxy/rooms/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -254,17 +200,8 @@ export interface FileRoutesByFullPath {
   '/speakers/': typeof SpeakersIndexRoute
   '/terms/': typeof TermsIndexRoute
   '/tester/': typeof TesterIndexRoute
-  '/api/auth/discord': typeof ApiAuthDiscordRoute
-  '/api/auth/github': typeof ApiAuthGithubRoute
-  '/api/auth/gitlab': typeof ApiAuthGitlabRoute
-  '/api/auth/guest': typeof ApiAuthGuestRoute
-  '/api/auth/logout': typeof ApiAuthLogoutRoute
-  '/api/auth/mastodon': typeof ApiAuthMastodonRoute
-  '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
-  '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
-  '/api/auth/upgrade-gitlab': typeof ApiAuthUpgradeGitlabRoute
-  '/api/auth/upgrade-mastodon': typeof ApiAuthUpgradeMastodonRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
+  '/api/auth/': typeof ApiAuthIndexRoute
   '/profile/$userId/': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
@@ -293,17 +230,8 @@ export interface FileRoutesByTo {
   '/speakers': typeof SpeakersIndexRoute
   '/terms': typeof TermsIndexRoute
   '/tester': typeof TesterIndexRoute
-  '/api/auth/discord': typeof ApiAuthDiscordRoute
-  '/api/auth/github': typeof ApiAuthGithubRoute
-  '/api/auth/gitlab': typeof ApiAuthGitlabRoute
-  '/api/auth/guest': typeof ApiAuthGuestRoute
-  '/api/auth/logout': typeof ApiAuthLogoutRoute
-  '/api/auth/mastodon': typeof ApiAuthMastodonRoute
-  '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
-  '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
-  '/api/auth/upgrade-gitlab': typeof ApiAuthUpgradeGitlabRoute
-  '/api/auth/upgrade-mastodon': typeof ApiAuthUpgradeMastodonRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
+  '/api/auth': typeof ApiAuthIndexRoute
   '/profile/$userId': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
@@ -333,17 +261,8 @@ export interface FileRoutesById {
   '/speakers/': typeof SpeakersIndexRoute
   '/terms/': typeof TermsIndexRoute
   '/tester/': typeof TesterIndexRoute
-  '/api/auth/discord': typeof ApiAuthDiscordRoute
-  '/api/auth/github': typeof ApiAuthGithubRoute
-  '/api/auth/gitlab': typeof ApiAuthGitlabRoute
-  '/api/auth/guest': typeof ApiAuthGuestRoute
-  '/api/auth/logout': typeof ApiAuthLogoutRoute
-  '/api/auth/mastodon': typeof ApiAuthMastodonRoute
-  '/api/auth/upgrade-discord': typeof ApiAuthUpgradeDiscordRoute
-  '/api/auth/upgrade-github': typeof ApiAuthUpgradeGithubRoute
-  '/api/auth/upgrade-gitlab': typeof ApiAuthUpgradeGitlabRoute
-  '/api/auth/upgrade-mastodon': typeof ApiAuthUpgradeMastodonRoute
   '/api/proxy/subtitles': typeof ApiProxySubtitlesRoute
+  '/api/auth/': typeof ApiAuthIndexRoute
   '/profile/$userId/': typeof ProfileUserIdIndexRoute
   '/api/auth/callback/discord': typeof ApiAuthCallbackDiscordRoute
   '/api/auth/callback/github': typeof ApiAuthCallbackGithubRoute
@@ -374,17 +293,8 @@ export interface FileRouteTypes {
     | '/speakers/'
     | '/terms/'
     | '/tester/'
-    | '/api/auth/discord'
-    | '/api/auth/github'
-    | '/api/auth/gitlab'
-    | '/api/auth/guest'
-    | '/api/auth/logout'
-    | '/api/auth/mastodon'
-    | '/api/auth/upgrade-discord'
-    | '/api/auth/upgrade-github'
-    | '/api/auth/upgrade-gitlab'
-    | '/api/auth/upgrade-mastodon'
     | '/api/proxy/subtitles'
+    | '/api/auth/'
     | '/profile/$userId/'
     | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
@@ -413,17 +323,8 @@ export interface FileRouteTypes {
     | '/speakers'
     | '/terms'
     | '/tester'
-    | '/api/auth/discord'
-    | '/api/auth/github'
-    | '/api/auth/gitlab'
-    | '/api/auth/guest'
-    | '/api/auth/logout'
-    | '/api/auth/mastodon'
-    | '/api/auth/upgrade-discord'
-    | '/api/auth/upgrade-github'
-    | '/api/auth/upgrade-gitlab'
-    | '/api/auth/upgrade-mastodon'
     | '/api/proxy/subtitles'
+    | '/api/auth'
     | '/profile/$userId'
     | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
@@ -452,17 +353,8 @@ export interface FileRouteTypes {
     | '/speakers/'
     | '/terms/'
     | '/tester/'
-    | '/api/auth/discord'
-    | '/api/auth/github'
-    | '/api/auth/gitlab'
-    | '/api/auth/guest'
-    | '/api/auth/logout'
-    | '/api/auth/mastodon'
-    | '/api/auth/upgrade-discord'
-    | '/api/auth/upgrade-github'
-    | '/api/auth/upgrade-gitlab'
-    | '/api/auth/upgrade-mastodon'
     | '/api/proxy/subtitles'
+    | '/api/auth/'
     | '/profile/$userId/'
     | '/api/auth/callback/discord'
     | '/api/auth/callback/github'
@@ -492,17 +384,8 @@ export interface RootRouteChildren {
   SpeakersIndexRoute: typeof SpeakersIndexRoute
   TermsIndexRoute: typeof TermsIndexRoute
   TesterIndexRoute: typeof TesterIndexRoute
-  ApiAuthDiscordRoute: typeof ApiAuthDiscordRoute
-  ApiAuthGithubRoute: typeof ApiAuthGithubRoute
-  ApiAuthGitlabRoute: typeof ApiAuthGitlabRoute
-  ApiAuthGuestRoute: typeof ApiAuthGuestRoute
-  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
-  ApiAuthMastodonRoute: typeof ApiAuthMastodonRoute
-  ApiAuthUpgradeDiscordRoute: typeof ApiAuthUpgradeDiscordRoute
-  ApiAuthUpgradeGithubRoute: typeof ApiAuthUpgradeGithubRoute
-  ApiAuthUpgradeGitlabRoute: typeof ApiAuthUpgradeGitlabRoute
-  ApiAuthUpgradeMastodonRoute: typeof ApiAuthUpgradeMastodonRoute
   ApiProxySubtitlesRoute: typeof ApiProxySubtitlesRoute
+  ApiAuthIndexRoute: typeof ApiAuthIndexRoute
   ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
   ApiAuthCallbackDiscordRoute: typeof ApiAuthCallbackDiscordRoute
   ApiAuthCallbackGithubRoute: typeof ApiAuthCallbackGithubRoute
@@ -513,13 +396,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/status': {
-      id: '/status'
-      path: '/status'
-      fullPath: '/status'
-      preLoaderRoute: typeof StatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -527,81 +403,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tester/': {
-      id: '/tester/'
-      path: '/tester'
-      fullPath: '/tester/'
-      preLoaderRoute: typeof TesterIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms/': {
-      id: '/terms/'
-      path: '/terms'
-      fullPath: '/terms/'
-      preLoaderRoute: typeof TermsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/speakers/': {
-      id: '/speakers/'
-      path: '/speakers'
-      fullPath: '/speakers/'
-      preLoaderRoute: typeof SpeakersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signin/': {
-      id: '/signin/'
-      path: '/signin'
-      fullPath: '/signin/'
-      preLoaderRoute: typeof SigninIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search/': {
-      id: '/search/'
-      path: '/search'
-      fullPath: '/search/'
-      preLoaderRoute: typeof SearchIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rooms/': {
-      id: '/rooms/'
-      path: '/rooms'
-      fullPath: '/rooms/'
-      preLoaderRoute: typeof RoomsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile/': {
-      id: '/profile/'
-      path: '/profile'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof ProfileIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy/': {
-      id: '/privacy/'
-      path: '/privacy'
-      fullPath: '/privacy/'
-      preLoaderRoute: typeof PrivacyIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/offline/': {
-      id: '/offline/'
-      path: '/offline'
-      fullPath: '/offline/'
-      preLoaderRoute: typeof OfflineIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/map/': {
-      id: '/map/'
-      path: '/map'
-      fullPath: '/map/'
-      preLoaderRoute: typeof MapIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/live/': {
-      id: '/live/'
-      path: '/live'
-      fullPath: '/live/'
-      preLoaderRoute: typeof LiveIndexRouteImport
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookmarks/': {
@@ -611,32 +417,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookmarksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/type/$slug': {
-      id: '/type/$slug'
-      path: '/type/$slug'
-      fullPath: '/type/$slug'
-      preLoaderRoute: typeof TypeSlugRouteImport
+    '/event/$slug': {
+      id: '/event/$slug'
+      path: '/event/$slug'
+      fullPath: '/event/$slug'
+      preLoaderRoute: typeof EventSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/track/$slug': {
-      id: '/track/$slug'
-      path: '/track/$slug'
-      fullPath: '/track/$slug'
-      preLoaderRoute: typeof TrackSlugRouteImport
+    '/live/': {
+      id: '/live/'
+      path: '/live'
+      fullPath: '/live/'
+      preLoaderRoute: typeof LiveIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/speakers/$slug': {
-      id: '/speakers/$slug'
-      path: '/speakers/$slug'
-      fullPath: '/speakers/$slug'
-      preLoaderRoute: typeof SpeakersSlugRouteImport
+    '/map/': {
+      id: '/map/'
+      path: '/map'
+      fullPath: '/map/'
+      preLoaderRoute: typeof MapIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rooms/$roomId': {
-      id: '/rooms/$roomId'
-      path: '/rooms/$roomId'
-      fullPath: '/rooms/$roomId'
-      preLoaderRoute: typeof RoomsRoomIdRouteImport
+    '/offline/': {
+      id: '/offline/'
+      path: '/offline'
+      fullPath: '/offline/'
+      preLoaderRoute: typeof OfflineIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy/': {
+      id: '/privacy/'
+      path: '/privacy'
+      fullPath: '/privacy/'
+      preLoaderRoute: typeof PrivacyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile/year-in-review': {
@@ -646,18 +466,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileYearInReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/event/$slug': {
-      id: '/event/$slug'
-      path: '/event/$slug'
-      fullPath: '/event/$slug'
-      preLoaderRoute: typeof EventSlugRouteImport
+    '/rooms/': {
+      id: '/rooms/'
+      path: '/rooms'
+      fullPath: '/rooms/'
+      preLoaderRoute: typeof RoomsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/profile/$userId/': {
-      id: '/profile/$userId/'
-      path: '/profile/$userId'
-      fullPath: '/profile/$userId/'
-      preLoaderRoute: typeof ProfileUserIdIndexRouteImport
+    '/rooms/$roomId': {
+      id: '/rooms/$roomId'
+      path: '/rooms/$roomId'
+      fullPath: '/rooms/$roomId'
+      preLoaderRoute: typeof RoomsRoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search/': {
+      id: '/search/'
+      path: '/search'
+      fullPath: '/search/'
+      preLoaderRoute: typeof SearchIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin/': {
+      id: '/signin/'
+      path: '/signin'
+      fullPath: '/signin/'
+      preLoaderRoute: typeof SigninIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers/': {
+      id: '/speakers/'
+      path: '/speakers'
+      fullPath: '/speakers/'
+      preLoaderRoute: typeof SpeakersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers/$slug': {
+      id: '/speakers/$slug'
+      path: '/speakers/$slug'
+      fullPath: '/speakers/$slug'
+      preLoaderRoute: typeof SpeakersSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms/': {
+      id: '/terms/'
+      path: '/terms'
+      fullPath: '/terms/'
+      preLoaderRoute: typeof TermsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tester/': {
+      id: '/tester/'
+      path: '/tester'
+      fullPath: '/tester/'
+      preLoaderRoute: typeof TesterIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track/$slug': {
+      id: '/track/$slug'
+      path: '/track/$slug'
+      fullPath: '/track/$slug'
+      preLoaderRoute: typeof TrackSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/type/$slug': {
+      id: '/type/$slug'
+      path: '/type/$slug'
+      fullPath: '/type/$slug'
+      preLoaderRoute: typeof TypeSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/': {
+      id: '/api/auth/'
+      path: '/api/auth'
+      fullPath: '/api/auth/'
+      preLoaderRoute: typeof ApiAuthIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/proxy/subtitles': {
@@ -667,95 +550,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProxySubtitlesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/upgrade-mastodon': {
-      id: '/api/auth/upgrade-mastodon'
-      path: '/api/auth/upgrade-mastodon'
-      fullPath: '/api/auth/upgrade-mastodon'
-      preLoaderRoute: typeof ApiAuthUpgradeMastodonRouteImport
+    '/profile/$userId/': {
+      id: '/profile/$userId/'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId/'
+      preLoaderRoute: typeof ProfileUserIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/upgrade-gitlab': {
-      id: '/api/auth/upgrade-gitlab'
-      path: '/api/auth/upgrade-gitlab'
-      fullPath: '/api/auth/upgrade-gitlab'
-      preLoaderRoute: typeof ApiAuthUpgradeGitlabRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/upgrade-github': {
-      id: '/api/auth/upgrade-github'
-      path: '/api/auth/upgrade-github'
-      fullPath: '/api/auth/upgrade-github'
-      preLoaderRoute: typeof ApiAuthUpgradeGithubRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/upgrade-discord': {
-      id: '/api/auth/upgrade-discord'
-      path: '/api/auth/upgrade-discord'
-      fullPath: '/api/auth/upgrade-discord'
-      preLoaderRoute: typeof ApiAuthUpgradeDiscordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/mastodon': {
-      id: '/api/auth/mastodon'
-      path: '/api/auth/mastodon'
-      fullPath: '/api/auth/mastodon'
-      preLoaderRoute: typeof ApiAuthMastodonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/logout': {
-      id: '/api/auth/logout'
-      path: '/api/auth/logout'
-      fullPath: '/api/auth/logout'
-      preLoaderRoute: typeof ApiAuthLogoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/guest': {
-      id: '/api/auth/guest'
-      path: '/api/auth/guest'
-      fullPath: '/api/auth/guest'
-      preLoaderRoute: typeof ApiAuthGuestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/gitlab': {
-      id: '/api/auth/gitlab'
-      path: '/api/auth/gitlab'
-      fullPath: '/api/auth/gitlab'
-      preLoaderRoute: typeof ApiAuthGitlabRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/github': {
-      id: '/api/auth/github'
-      path: '/api/auth/github'
-      fullPath: '/api/auth/github'
-      preLoaderRoute: typeof ApiAuthGithubRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/discord': {
-      id: '/api/auth/discord'
-      path: '/api/auth/discord'
-      fullPath: '/api/auth/discord'
-      preLoaderRoute: typeof ApiAuthDiscordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/proxy/rooms/status': {
-      id: '/api/proxy/rooms/status'
-      path: '/api/proxy/rooms/status'
-      fullPath: '/api/proxy/rooms/status'
-      preLoaderRoute: typeof ApiProxyRoomsStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/callback/mastodon': {
-      id: '/api/auth/callback/mastodon'
-      path: '/api/auth/callback/mastodon'
-      fullPath: '/api/auth/callback/mastodon'
-      preLoaderRoute: typeof ApiAuthCallbackMastodonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/callback/gitlab': {
-      id: '/api/auth/callback/gitlab'
-      path: '/api/auth/callback/gitlab'
-      fullPath: '/api/auth/callback/gitlab'
-      preLoaderRoute: typeof ApiAuthCallbackGitlabRouteImport
+    '/api/auth/callback/discord': {
+      id: '/api/auth/callback/discord'
+      path: '/api/auth/callback/discord'
+      fullPath: '/api/auth/callback/discord'
+      preLoaderRoute: typeof ApiAuthCallbackDiscordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/callback/github': {
@@ -765,11 +571,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthCallbackGithubRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/callback/discord': {
-      id: '/api/auth/callback/discord'
-      path: '/api/auth/callback/discord'
-      fullPath: '/api/auth/callback/discord'
-      preLoaderRoute: typeof ApiAuthCallbackDiscordRouteImport
+    '/api/auth/callback/gitlab': {
+      id: '/api/auth/callback/gitlab'
+      path: '/api/auth/callback/gitlab'
+      fullPath: '/api/auth/callback/gitlab'
+      preLoaderRoute: typeof ApiAuthCallbackGitlabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/callback/mastodon': {
+      id: '/api/auth/callback/mastodon'
+      path: '/api/auth/callback/mastodon'
+      fullPath: '/api/auth/callback/mastodon'
+      preLoaderRoute: typeof ApiAuthCallbackMastodonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/proxy/rooms/status': {
+      id: '/api/proxy/rooms/status'
+      path: '/api/proxy/rooms/status'
+      fullPath: '/api/proxy/rooms/status'
+      preLoaderRoute: typeof ApiProxyRoomsStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -796,17 +616,8 @@ const rootRouteChildren: RootRouteChildren = {
   SpeakersIndexRoute: SpeakersIndexRoute,
   TermsIndexRoute: TermsIndexRoute,
   TesterIndexRoute: TesterIndexRoute,
-  ApiAuthDiscordRoute: ApiAuthDiscordRoute,
-  ApiAuthGithubRoute: ApiAuthGithubRoute,
-  ApiAuthGitlabRoute: ApiAuthGitlabRoute,
-  ApiAuthGuestRoute: ApiAuthGuestRoute,
-  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
-  ApiAuthMastodonRoute: ApiAuthMastodonRoute,
-  ApiAuthUpgradeDiscordRoute: ApiAuthUpgradeDiscordRoute,
-  ApiAuthUpgradeGithubRoute: ApiAuthUpgradeGithubRoute,
-  ApiAuthUpgradeGitlabRoute: ApiAuthUpgradeGitlabRoute,
-  ApiAuthUpgradeMastodonRoute: ApiAuthUpgradeMastodonRoute,
   ApiProxySubtitlesRoute: ApiProxySubtitlesRoute,
+  ApiAuthIndexRoute: ApiAuthIndexRoute,
   ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
   ApiAuthCallbackDiscordRoute: ApiAuthCallbackDiscordRoute,
   ApiAuthCallbackGithubRoute: ApiAuthCallbackGithubRoute,

@@ -1,5 +1,4 @@
 import * as Sentry from "@sentry/cloudflare";
-import type { ExecutionContext, ExportedHandler } from "@cloudflare/workers-types";
 
 import { triggerNotifications } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
@@ -70,7 +69,6 @@ export default Sentry.withSentry(
 		},
 	}),
 	{
-		// @ts-expect-error - CBA
 		async fetch(request: Request, env: Env, ctx: ExecutionContext) {
 			const validation = validateEnv(env);
 			if (!validation.ok) {
@@ -160,7 +158,6 @@ export default Sentry.withSentry(
 				return new Response("Error in fetch", { status: 500 });
 			}
 		},
-		// @ts-expect-error - CBA
 		async scheduled(
 			event: { cron: string; scheduledTime?: number },
 			env: Env,
@@ -205,7 +202,6 @@ export default Sentry.withSentry(
 
 			await triggerRoomStatusNotifications(event, env, ctx, true);
 		},
-		// @ts-ignore - CBA
 		async queue(batch: MessageBatch<QueueMessage>, env: Env, ctx: ExecutionContext): Promise<void> {
 			const validation = validateEnv(env);
 			if (!validation.ok) {
@@ -277,5 +273,5 @@ export default Sentry.withSentry(
 				}
 			}
 		}
-	} satisfies ExportedHandler<Env>,
+	} satisfies ExportedHandler<Env, QueueMessage>,
 );

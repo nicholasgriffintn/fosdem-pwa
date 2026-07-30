@@ -21,7 +21,7 @@ import { generateBookmarkId } from "~/lib/bookmark-id";
 export const exportBookmarksCsv = createServerFn({
   method: "GET",
 })
-  .inputValidator((data: { year: number }) => data)
+  .validator((data: { year: number }) => data)
   .handler(async (ctx) => {
     const yearNum = validateYear(ctx.data.year);
 
@@ -87,7 +87,7 @@ export const exportBookmarksCsv = createServerFn({
 export const importBookmarksCsv = createServerFn({
   method: "POST",
 })
-  .inputValidator((data: { year: number; csv: string }) => data)
+  .validator((data: { year: number; csv: string }) => data)
   .handler(async (ctx) => {
     const yearNum = validateYear(ctx.data.year);
 

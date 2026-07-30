@@ -67,6 +67,30 @@ const serverNote = {
 	updated_at: new Date().toISOString(),
 };
 
+const authenticatedUser = {
+	id: 1,
+	name: "Test user",
+	avatar_url: null,
+	email: "test@example.com",
+	github_username: null,
+	discord_username: null,
+	mastodon_username: null,
+	mastodon_acct: null,
+	mastodon_url: null,
+	gitlab_username: null,
+	company: null,
+	site: null,
+	location: null,
+	bio: null,
+	twitter_username: null,
+	created_at: new Date().toISOString(),
+	updated_at: null,
+	setup_at: null,
+	terms_accepted_at: null,
+	bookmarks_visibility: "private",
+	is_guest: false,
+};
+
 const event = {
 	id: "event-1",
 	title: "Talk",
@@ -99,7 +123,7 @@ describe("useNotes", () => {
 		addToSyncQueueMock.mockReset();
 		getNotesMock.mockReset();
 		createNoteMock.mockReset();
-		useAuthMock.mockReturnValue({ user: { id: "user-1" }, loading: false, logout: vi.fn() });
+			useAuthMock.mockReturnValue({ user: authenticatedUser, loading: false, logout: vi.fn() });
 		useLocalNotesMock.mockReturnValue({ notes: [localNote], loading: false });
 		getNotesMock.mockResolvedValue([serverNote]);
 		createNoteMock.mockResolvedValue({ success: true, data: true });

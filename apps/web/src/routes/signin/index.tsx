@@ -1,36 +1,42 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-
-import { useAuth } from "~/hooks/use-auth";
-import { PageHeader } from "~/components/shared/PageHeader";
 import { SignInForm } from "~/components/Profile/SignInForm";
+import { PageHeader } from "~/components/shared/PageHeader";
+import { PageShell } from "~/components/shared/PageShell";
+import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
+import { useAuth } from "~/hooks/use-auth";
 import { useIsClient } from "~/hooks/use-is-client";
 import { buildHomeLink } from "~/lib/link-builder";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
-import { PageShell } from "~/components/shared/PageShell";
-import { RouteLoadingState } from "~/components/shared/RouteLoadingState";
+
+const AUTHENTICATION_ERROR =
+	"Authentication could not be completed. Please try again.";
+
+interface SignInSearch {
+	readonly authError?: boolean;
+}
 
 export const Route = createFileRoute("/signin/")({
 	component: SignInPage,
+	validateSearch: (search: Record<string, unknown>): SignInSearch =>
+		search.authError === "oauth_callback_failed" ? { authError: true } : {},
 	head: () => ({
 		meta: [
 			...generateCommonSEOTags({
 				title: "Sign In | FOSDEM PWA",
-				description: "Sign in to FOSDEM PWA to sync bookmarks across devices and share your conference schedule.",
-			})
+				description:
+					"Sign in to FOSDEM PWA to sync bookmarks across devices and share your conference schedule.",
+			}),
 		],
 	}),
 });
 
 function SignInPage() {
 	const { user, loading } = useAuth();
+	const { authError } = Route.useSearch();
 	const isClient = useIsClient();
 
 	if (user?.id) {
-		return (
-			<Navigate
-				{...buildHomeLink()}
-			/>
-		);
+		return <Navigate {...buildHomeLink()} />;
 	}
 
 	return (
@@ -46,21 +52,27 @@ function SignInPage() {
 						and only enables syncing across devices and sharing your schedule.
 					</p>
 					<p className="text-sm text-muted-foreground">
-						Continuing as a guest creates a device specific account that won't sync
-						across devices, but it will still save bookmarks and notes if you
-						need something more persistent or the device doesn't support
+						Continuing as a guest creates a device specific account that won't
+						sync across devices, but it will still save bookmarks and notes if
+						you need something more persistent or the device doesn't support
 						JavaScript (although support for non JS interactions is limited).
 					</p>
 					<p className="text-sm text-muted-foreground">
 						Read our{" "}
-						<Link to="/privacy" className="font-medium text-foreground hover:underline">
+						<Link
+							to="/privacy"
+							className="font-medium text-foreground hover:underline"
+						>
 							Privacy Policy
 						</Link>{" "}
 						and{" "}
-						<Link to="/terms" className="font-medium text-foreground hover:underline">
+						<Link
+							to="/terms"
+							className="font-medium text-foreground hover:underline"
+						>
 							Terms of Service
-						</Link>
-						{' '}for more information.
+						</Link>{" "}
+						for more information.
 					</p>
 					<div className="space-y-3">
 						<h2 className="text-lg font-semibold text-foreground">
@@ -84,15 +96,16 @@ function SignInPage() {
 							<li className="flex items-start gap-2">
 								<span className="text-xl">🔗</span>
 								<span>
-									Share your schedule and discover others through profile
-									pages.
+									Share your schedule and discover others through profile pages.
 								</span>
 							</li>
 						</ul>
 					</div>
 				</div>
 				<div className="space-y-4">
-					<SignInForm />
+					<SignInForm
+						initialError={authError ? AUTHENTICATION_ERROR : undefined}
+					/>
 				</div>
 			</div>
 		</PageShell>

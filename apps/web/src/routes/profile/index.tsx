@@ -153,7 +153,9 @@ function ProfilePage() {
               {!resolvedUser.is_guest && (
                 <SetBookmarksVisability
                   userId={profileIdentifier}
-                  bookmarksVisibility={resolvedUser.bookmarks_visibility}
+                  bookmarksVisibility={
+                    resolvedUser.bookmarks_visibility ?? "private"
+                  }
                 />
               )}
               <BookmarksList

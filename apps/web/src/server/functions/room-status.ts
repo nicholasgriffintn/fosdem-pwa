@@ -32,7 +32,7 @@ function convertState(state: string): RoomStatusResult["state"] {
 export const getRoomStatus = createServerFn({
   method: "GET",
 })
-  .inputValidator((data: { roomName: string }) => data)
+  .validator((data: { roomName: string }) => data)
   .handler(async (ctx): Promise<RoomStatusResult> => {
     const { roomName } = ctx.data;
 
@@ -65,7 +65,7 @@ export const getRoomStatus = createServerFn({
 export const getRoomStatusHistory = createServerFn({
   method: "GET",
 })
-  .inputValidator((data: { roomName: string; limit?: number }) => data)
+  .validator((data: { roomName: string; limit?: number }) => data)
   .handler(async (ctx) => {
     const { roomName, limit = 10 } = ctx.data;
 
@@ -89,7 +89,7 @@ export const getRoomStatusHistory = createServerFn({
 export const getRoomStatuses = createServerFn({
   method: "GET",
 })
-  .inputValidator((data: unknown): { roomNames: string[] } => {
+  .validator((data: unknown): { roomNames: string[] } => {
     if (typeof data !== "object" || data === null || !("roomNames" in data)) {
       throw new Error("Invalid input; expected { roomNames: string[] }");
     }

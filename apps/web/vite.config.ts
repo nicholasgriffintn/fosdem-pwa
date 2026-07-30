@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite'
-import viteTsConfigPaths from 'vite-tsconfig-paths'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { cloudflare } from '@cloudflare/vite-plugin'
 import viteReact from '@vitejs/plugin-react'
@@ -10,15 +9,15 @@ export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: mode === 'production',
   },
+  resolve: {
+    tsconfigPaths: true,
+  },
   plugins: [
     devtools(),
     cloudflare({
       viteEnvironment: { name: 'ssr' },
       persistState: { path: "../cloudflare/state" },
       inspectorPort: process.env.NODE_ENV === "test" ? false : undefined,
-    }),
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
     }),
     tailwindcss(),
     tanstackStart(),

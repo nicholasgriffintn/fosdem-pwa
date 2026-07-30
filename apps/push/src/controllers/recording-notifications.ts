@@ -1,11 +1,15 @@
-import type { ExecutionContext } from "@cloudflare/workers-types";
-
 import { constants } from "../constants";
 import { getFosdemData } from "../lib/fosdem-data";
 import { getBookmarksByUserIds } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
-import type { Env, Subscription, NotificationPayload, FosdemEvent } from "../types";
+import type {
+  Bookmark,
+  Env,
+  Subscription,
+  NotificationPayload,
+  FosdemEvent,
+} from "../types";
 
 const DOMAIN = "fosdempwa.com";
 
@@ -173,7 +177,7 @@ export async function triggerRecordingNotifications(
         includeSent: true,
         slugs: recordingSlugs,
       })
-    : new Map();
+    : new Map<string, Bookmark[]>();
 
   for (const { subscription, prefs } of subscriptionEntries) {
     if (!prefs.recording_available) {

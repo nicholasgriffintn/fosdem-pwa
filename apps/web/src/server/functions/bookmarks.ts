@@ -18,7 +18,7 @@ import type { Bookmark } from "~/server/db/schema";
 export const getBookmarks = createServerFn({
 	method: "GET",
 })
-	.inputValidator((data: { year: number; status: "favourited" | "unfavourited" }) => data)
+	.validator((data: { year: number; status: "favourited" | "unfavourited" }) => data)
 	.handler(async (ctx): Promise<Bookmark[]> => {
 		const { year, status } = ctx.data;
 		const yearNum = validateYear(year);
@@ -34,7 +34,7 @@ export const getBookmarks = createServerFn({
 export const getEventBookmark = createServerFn({
 	method: "GET",
 })
-	.inputValidator((data: { year: number; slug: string }) => data)
+	.validator((data: { year: number; slug: string }) => data)
 	.handler(async (ctx): Promise<Bookmark | null> => {
 		const { year, slug } = ctx.data;
 		const yearNum = validateYear(year);
@@ -51,7 +51,7 @@ export const getEventBookmark = createServerFn({
 export const createBookmark = createServerFn({
 	method: "POST",
 })
-	.inputValidator(
+	.validator(
 		(data: {
 			year: number;
 			type: string;
@@ -118,7 +118,7 @@ export const createBookmark = createServerFn({
 export const createBookmarkFromForm = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: FormData) => {
+	.validator((data: FormData) => {
 		if (!(data instanceof FormData)) {
 			throw new Error("Invalid! FormData is required");
 		}
@@ -172,7 +172,7 @@ export const createBookmarkFromForm = createServerFn({
 export const updateBookmark = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { id: string; updates: Record<string, unknown> }) => data)
+	.validator((data: { id: string; updates: Record<string, unknown> }) => data)
 	.handler(async (ctx): Promise<Result<boolean> | null> => {
 		const { id, updates } = ctx.data;
 
@@ -219,7 +219,7 @@ export const updateBookmark = createServerFn({
 export const getUserBookmarks = createServerFn({
 	method: "GET",
 })
-	.inputValidator((data: { year: number; userId: string }) => data)
+	.validator((data: { year: number; userId: string }) => data)
 	.handler(async (ctx): Promise<Bookmark[]> => {
 		const { year, userId } = ctx.data;
 
@@ -243,7 +243,7 @@ export const getUserBookmarks = createServerFn({
 export const deleteBookmark = createServerFn({
 	method: "POST",
 })
-	.inputValidator((data: { id: string }) => data)
+	.validator((data: { id: string }) => data)
 	.handler(async (ctx): Promise<Result<boolean> | null> => {
 		const { id } = ctx.data;
 
