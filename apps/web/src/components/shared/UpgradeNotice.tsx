@@ -6,8 +6,6 @@ import {
 	type ExternalAuthProvider,
 } from "@ngriffin_uk/auth-react";
 
-import { Icons } from "~/components/shared/Icons";
-
 interface UpgradeNoticeProps {
 	user: {
 		is_guest: boolean | null;
@@ -75,28 +73,24 @@ const upgradeProviders: readonly ExternalAuthProvider[] = [
 	{
 		id: "github",
 		label: "GitHub",
-		icon: <Icons.gitHub className="h-4 w-4" />,
 		className: "border-gray-700 bg-gray-900 text-white hover:bg-gray-800",
 		values: { upgrade: "true" },
 	},
 	{
 		id: "discord",
 		label: "Discord",
-		icon: <Icons.discord className="h-4 w-4" />,
 		className: "border-[#4752C4] bg-[#5865F2] text-white hover:bg-[#4752C4]",
 		values: { upgrade: "true" },
 	},
 	{
 		id: "gitlab",
 		label: "GitLab",
-		icon: <Icons.gitlab className="h-4 w-4" />,
 		className: "border-[#E24329] bg-[#FC6D26] text-white hover:bg-[#E24329]",
 		values: { upgrade: "true" },
 	},
 	{
 		id: "mastodon",
 		label: "Mastodon",
-		icon: <Icons.mastodon className="h-4 w-4" />,
 		className: "border-indigo-700 bg-indigo-600 text-white hover:bg-indigo-700",
 		fields: [
 			{

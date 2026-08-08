@@ -38,7 +38,7 @@
     "@ngriffin_uk/auth-provider-github": "^3.0.2",
     "@ngriffin_uk/auth-provider-gitlab": "^3.0.2",
     "@ngriffin_uk/auth-provider-mastodon": "^3.0.2",
-    "@ngriffin_uk/auth-react": "^0.6.0",
+    "@ngriffin_uk/auth-react": "^0.6.4",
     "@radix-ui/react-avatar": "1.2.6",
     "@radix-ui/react-dialog": "1.1.23",
     "@radix-ui/react-dropdown-menu": "2.1.24",

@@ -6,14 +6,12 @@ import {
 	type ExternalAuthProvider,
 } from "@ngriffin_uk/auth-react";
 
-import { Icons } from "~/components/shared/Icons";
 import { constants } from "~/constants";
 
 const providers: readonly ExternalAuthProvider[] = [
 	{
 		id: "mastodon",
 		label: "Sign in with Mastodon",
-		icon: <Icons.mastodon className="w-4 h-4" />,
 		className:
 			"bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white border-indigo-700",
 		fields: [
@@ -34,28 +32,24 @@ const providers: readonly ExternalAuthProvider[] = [
 	{
 		id: "gitlab",
 		label: "Sign in with GitLab",
-		icon: <Icons.gitlab className="w-4 h-4" />,
 		className:
 			"bg-[#C2410C] text-white hover:bg-[#9A3412] hover:text-white border-[#9A3412]",
 	},
 	{
 		id: "github",
 		label: "Sign in with GitHub",
-		icon: <Icons.gitHub className="w-4 h-4" />,
 		className:
 			"bg-gray-900 text-white hover:bg-gray-800 hover:text-white border-gray-700",
 	},
 	{
 		id: "discord",
 		label: "Sign in with Discord",
-		icon: <Icons.discord className="w-4 h-4" />,
 		className:
 			"bg-[#5865F2] text-white hover:bg-[#4752C4] hover:text-white border-[#4752C4]",
 	},
 	{
 		id: "guest",
 		label: "Continue as Guest",
-		icon: <Icons.user className="w-4 h-4" />,
 		className:
 			"border border-input bg-secondary text-secondary-foreground hover:bg-secondary/80",
 		separatorBefore: "Or",
