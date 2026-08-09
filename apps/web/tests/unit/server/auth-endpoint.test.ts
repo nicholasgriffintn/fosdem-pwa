@@ -9,9 +9,16 @@ const oauth = vi.hoisted(() => ({
 	oauthRequestOptions: vi.fn(() => ({})),
 	startOAuthResult: vi.fn(),
 }));
+const turnstile = vi.hoisted(() => ({
+	resolveTurnstileSecret: vi.fn(
+		(_environment: string, configuredSecret: string) => configuredSecret,
+	),
+	verifyTurnstileToken: vi.fn(),
+}));
 
 vi.mock("~/server/auth", () => auth);
 vi.mock("~/server/oauth", () => oauth);
+vi.mock("~/server/lib/turnstile", () => turnstile);
 
 import { handleAuthRequest } from "~/server/auth-endpoint";
 
@@ -22,6 +29,8 @@ describe("handleAuthRequest", () => {
 		auth.signOut.mockReset();
 		oauth.oauthRequestOptions.mockClear();
 		oauth.startOAuthResult.mockReset();
+		turnstile.verifyTurnstileToken.mockReset();
+		turnstile.verifyTurnstileToken.mockResolvedValue(true);
 	});
 
 	it("returns shared provider redirects from the central endpoint", async () => {
@@ -32,7 +41,11 @@ describe("handleAuthRequest", () => {
 		});
 
 		const response = await handleAuthRequest(
-			request({ action: "start_oauth", provider: "github" }),
+			request({
+				action: "start_oauth",
+				provider: "github",
+				values: { turnstileToken: "verified-token" },
+			}),
 		);
 
 		expect(await response.json()).toEqual({
@@ -55,7 +68,7 @@ describe("handleAuthRequest", () => {
 			request({
 				action: "start_oauth",
 				provider: "github",
-				values: { upgrade: "true" },
+				values: { upgrade: "true", turnstileToken: "verified-token" },
 			}),
 		);
 
@@ -71,7 +84,11 @@ describe("handleAuthRequest", () => {
 		});
 
 		const response = await handleAuthRequest(
-			request({ action: "start_oauth", provider: "guest" }),
+			request({
+				action: "start_oauth",
+				provider: "guest",
+				values: { turnstileToken: "verified-token" },
+			}),
 		);
 
 		expect(await response.json()).toEqual({ status: "authenticated" });
@@ -79,6 +96,18 @@ describe("handleAuthRequest", () => {
 			"token",
 			new Date("2026-08-30T00:00:00.000Z"),
 		);
+	});
+
+	it("rejects unverified requests before creating users or OAuth state", async () => {
+		turnstile.verifyTurnstileToken.mockResolvedValue(false);
+
+		const response = await handleAuthRequest(
+			request({ action: "start_oauth", provider: "guest", values: {} }),
+		);
+
+		expect(response.status).toBe(403);
+		expect(auth.createGuestSession).not.toHaveBeenCalled();
+		expect(oauth.startOAuthResult).not.toHaveBeenCalled();
 	});
 
 	it("signs out through the same endpoint", async () => {

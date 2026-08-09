@@ -162,6 +162,13 @@
       "when": 1785444546331,
       "tag": "0022_brief_old_lace",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "6",
+      "when": 1786230455237,
+      "tag": "0023_nosy_red_skull",
+      "breakpoints": true
     }
   ]
 }

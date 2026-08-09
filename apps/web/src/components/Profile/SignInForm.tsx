@@ -7,6 +7,9 @@ import {
 } from "@ngriffin_uk/auth-react";
 
 import { constants } from "~/constants";
+import { turnstileAuthTransport } from "~/lib/auth/turnstile-transport";
+
+import { TurnstileWidget } from "./TurnstileWidget";
 
 const providers: readonly ExternalAuthProvider[] = [
 	{
@@ -65,6 +68,7 @@ export function SignInForm({ initialError }: SignInFormProps) {
 		<div className="flex flex-col gap-4">
 			<AuthProvider
 				config={{
+					transport: turnstileAuthTransport,
 					initialError,
 					capabilities: {
 						magicLink: false,
@@ -97,17 +101,17 @@ export function SignInForm({ initialError }: SignInFormProps) {
 				}}
 			>
 				<AuthFlow />
+
+				<TurnstileWidget
+					siteKey={constants.TURNSTILE_SITE_KEY}
+					action="authentication"
+				/>
 			</AuthProvider>
 
 			<p className="text-sm text-muted-foreground text-center max-w-md mx-auto">
 				Guest accounts will not work across devices, and data may be lost if you
 				clear your browser data. These are meant to be used temporarily only.
 			</p>
-
-			<div
-				className="cf-turnstile js-required"
-				data-sitekey={constants.TURNSTILE_SITE_KEY}
-			/>
 		</div>
 	);
 }

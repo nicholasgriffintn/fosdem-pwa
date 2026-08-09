@@ -14,7 +14,7 @@ import { createDiscordAuth } from "@ngriffin_uk/auth-provider-discord";
 import { createGitHubAuth } from "@ngriffin_uk/auth-provider-github";
 import { createGitLabAuth } from "@ngriffin_uk/auth-provider-gitlab";
 import { createMastodonAuth } from "@ngriffin_uk/auth-provider-mastodon";
-import type { AuthClientResult, AuthRequest } from "@ngriffin_uk/auth-react";
+import type { AuthClientResult, AuthRequest } from "@ngriffin_uk/auth-protocol";
 import { getCookie, setCookie } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
 
@@ -31,6 +31,7 @@ import {
 	redirectResponse,
 } from "~/server/lib/auth-response";
 import { fetchOAuthUserData } from "~/server/lib/oauth-handler-base";
+import type { FosdemOAuthProvider } from "~/server/lib/oauth-provider";
 import type { GitLabUser } from "~/types/gitlab";
 import type {
 	DiscordUser,
@@ -39,7 +40,7 @@ import type {
 	OAuthUser,
 } from "~/types/user";
 
-export type FosdemOAuthProvider = "discord" | "github" | "gitlab" | "mastodon";
+export type { FosdemOAuthProvider } from "~/server/lib/oauth-provider";
 
 export const MASTODON_INSTANCES = [
 	{

@@ -1,15 +1,17 @@
-import type { AuthRequest } from "@ngriffin_uk/auth-react";
+import { env } from "cloudflare:workers";
 
 import {
 	createGuestSession,
 	setSessionTokenCookie,
 	signOut,
 } from "~/server/auth";
+import { oauthRequestOptions, startOAuthResult } from "~/server/oauth";
+import { readAuthRequest } from "~/server/lib/auth-request";
+import { isFosdemOAuthProvider } from "~/server/lib/oauth-provider";
 import {
-	type FosdemOAuthProvider,
-	oauthRequestOptions,
-	startOAuthResult,
-} from "~/server/oauth";
+	resolveTurnstileSecret,
+	verifyTurnstileToken,
+} from "~/server/lib/turnstile";
 
 export async function handleAuthRequest(request: Request): Promise<Response> {
 	try {
@@ -21,12 +23,21 @@ export async function handleAuthRequest(request: Request): Promise<Response> {
 		if (authRequest.action !== "start_oauth") {
 			return authenticationErrorResponse(400);
 		}
+		if (
+			!(await verifyTurnstileToken({
+				token: authRequest.values?.turnstileToken,
+				secret: resolveTurnstileSecret(env.NODE_ENV, env.TURNSTILE_SECRET_KEY),
+				remoteIp: request.headers.get("CF-Connecting-IP") ?? undefined,
+			}))
+		) {
+			return authenticationErrorResponse(403);
+		}
 		if (authRequest.provider === "guest") {
 			const { token, session } = await createGuestSession();
 			setSessionTokenCookie(token, new Date(session.expires_at));
 			return Response.json({ status: "authenticated" });
 		}
-		if (!isOAuthProvider(authRequest.provider)) {
+		if (!isFosdemOAuthProvider(authRequest.provider)) {
 			return authenticationErrorResponse(400);
 		}
 		return Response.json(
@@ -40,49 +51,9 @@ export async function handleAuthRequest(request: Request): Promise<Response> {
 	}
 }
 
-async function readAuthRequest(request: Request): Promise<AuthRequest> {
-	const value: unknown = await request.json();
-	if (isRecord(value) && value.action === "sign_out") {
-		return { action: "sign_out" };
-	}
-	if (
-		!isRecord(value) ||
-		value.action !== "start_oauth" ||
-		typeof value.provider !== "string" ||
-		(value.values !== undefined && !isStringRecord(value.values))
-	) {
-		throw new TypeError("The authentication request is invalid.");
-	}
-	return {
-		action: "start_oauth",
-		provider: value.provider,
-		...(value.values === undefined ? {} : { values: value.values }),
-	};
-}
-
-function isOAuthProvider(value: string): value is FosdemOAuthProvider {
-	return (
-		value === "discord" ||
-		value === "github" ||
-		value === "gitlab" ||
-		value === "mastodon"
-	);
-}
-
 function authenticationErrorResponse(status: number): Response {
 	return Response.json(
 		{ error: "Authentication could not be completed." },
 		{ status },
 	);
-}
-
-function isStringRecord(value: unknown): value is Record<string, string> {
-	return (
-		isRecord(value) &&
-		Object.values(value).every((entry) => typeof entry === "string")
-	);
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
 }

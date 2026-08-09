@@ -1,9 +1,44 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { renderToString } from "react-dom/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SignInForm } from "~/components/Profile/SignInForm";
 
 describe("SignInForm", () => {
+	beforeEach(() => {
+		render(
+			<input name="cf-turnstile-response" defaultValue="verified-token" />,
+		);
+	});
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	it("does not expose Turnstile markup to implicit rendering before hydration", () => {
+		const markup = renderToString(<SignInForm />);
+
+		expect(markup).toContain("api.js?render=explicit");
+		expect(markup).not.toContain("cf-turnstile");
+	});
+
+	it("uses Cloudflare's test site key in local development", () => {
+		const renderWidget = vi.fn().mockReturnValue("widget-id");
+		vi.stubGlobal("turnstile", {
+			remove: vi.fn(),
+			render: renderWidget,
+			reset: vi.fn(),
+		});
+
+		render(<SignInForm />);
+
+		expect(renderWidget).toHaveBeenCalledWith(expect.any(HTMLElement), {
+			action: "authentication",
+			appearance: "interaction-only",
+			sitekey: "1x00000000000000000000AA",
+			size: "flexible",
+		});
+	});
+
 	it("uses the shared auth flow and displays redirect failures", () => {
 		render(
 			<SignInForm initialError="Authentication could not be completed." />,
@@ -49,13 +84,11 @@ describe("SignInForm", () => {
 	});
 
 	it("submits Mastodon instance selection through the shared endpoint", async () => {
-		const fetchMock = vi
-			.spyOn(globalThis, "fetch")
-			.mockResolvedValue(
-				Response.json({
-					status: "completed",
-				}),
-			);
+		const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+			Response.json({
+				status: "completed",
+			}),
+		);
 		render(<SignInForm />);
 
 		fireEvent.click(
@@ -71,7 +104,10 @@ describe("SignInForm", () => {
 				body: JSON.stringify({
 					action: "start_oauth",
 					provider: "mastodon",
-					values: { server: "mastodon.social" },
+					values: {
+						server: "mastodon.social",
+						turnstileToken: "verified-token",
+					},
 				}),
 				credentials: "include",
 				headers: { "Content-Type": "application/json" },
@@ -96,6 +132,7 @@ describe("SignInForm", () => {
 				body: JSON.stringify({
 					action: "start_oauth",
 					provider: "guest",
+					values: { turnstileToken: "verified-token" },
 				}),
 				credentials: "include",
 				headers: { "Content-Type": "application/json" },

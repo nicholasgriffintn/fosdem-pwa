@@ -4,7 +4,6 @@ import {
 	createAuth,
 	type ExternalIdentity,
 	type IdentityStore,
-	type SessionStore,
 	type UserStore,
 } from "@ngriffin_uk/auth-core";
 import {
@@ -19,7 +18,6 @@ import { db } from "~/server/db";
 import {
 	oauthAccount,
 	type Session,
-	session as sessionTable,
 	type User,
 	user as userTable,
 } from "~/server/db/schema";
@@ -29,6 +27,7 @@ import {
 	buildNewUserData,
 	buildUpgradeUserData,
 } from "~/server/lib/provider-mapping";
+import { createFosdemSessionStore } from "~/server/session-store";
 
 export const SESSION_COOKIE_NAME = "session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
@@ -51,51 +50,11 @@ const users: UserStore<FosdemAuthUser> = {
 	},
 };
 
-const sessions: SessionStore = {
-	async create(record) {
-		await db.insert(sessionTable).values({
-			id: record.tokenHash,
-			user_id: Number(record.userId),
-			expires_at: record.expiresAt.toISOString(),
-			last_extended_at: record.createdAt.toISOString(),
-		});
-	},
-	async findByTokenHash(tokenHash) {
-		const record = await db.query.session.findFirst({
-			where: eq(sessionTable.id, tokenHash),
-		});
-		if (!record) return null;
-
-		const now = Date.now();
-		const currentExpiry = new Date(record.expires_at);
-		const lastExtendedAt = new Date(record.last_extended_at);
-		let expiresAt = currentExpiry;
-		if (
-			now < currentExpiry.getTime() &&
-			now >= currentExpiry.getTime() - SESSION_REFRESH_WINDOW_MS &&
-			now - lastExtendedAt.getTime() >= SESSION_REFRESH_INTERVAL_MS
-		) {
-			expiresAt = new Date(now + SESSION_TTL_MS);
-			await db
-				.update(sessionTable)
-				.set({
-					expires_at: expiresAt.toISOString(),
-					last_extended_at: new Date(now).toISOString(),
-				})
-				.where(eq(sessionTable.id, tokenHash));
-		}
-
-		return {
-			tokenHash,
-			userId: String(record.user_id),
-			createdAt: lastExtendedAt,
-			expiresAt,
-		};
-	},
-	async deleteByTokenHash(tokenHash) {
-		await db.delete(sessionTable).where(eq(sessionTable.id, tokenHash));
-	},
-};
+const sessions = createFosdemSessionStore({
+	sessionTtlMs: SESSION_TTL_MS,
+	refreshWindowMs: SESSION_REFRESH_WINDOW_MS,
+	refreshIntervalMs: SESSION_REFRESH_INTERVAL_MS,
+});
 
 const identities: IdentityStore<FosdemAuthUser> = {
 	findUser: findIdentityUser,
@@ -178,7 +137,9 @@ export async function getAuthSession(
 	const token = getCookie(SESSION_COOKIE_NAME);
 	if (!token) return { session: null, user: null };
 
-	const authenticated = await auth.authenticate(token);
+	const authenticated = refreshCookie
+		? await auth.touchSession(token)
+		: await auth.authenticate(token);
 	if (!authenticated) {
 		deleteCookie(SESSION_COOKIE_NAME);
 		return { session: null, user: null };
@@ -252,7 +213,6 @@ async function createGuestUser(): Promise<User> {
 		.insert(userTable)
 		.values({
 			name: username,
-			email: `guest-${username}@fosdempwa.com`,
 			is_guest: true,
 			created_at: now,
 			updated_at: now,
@@ -315,7 +275,7 @@ async function reassignIdentity(
 function toAuthUser(record: User): FosdemAuthUser {
 	return {
 		id: String(record.id),
-		email: record.email,
+		...(record.email ? { email: record.email } : {}),
 		createdAt: new Date(record.created_at),
 		record,
 	};

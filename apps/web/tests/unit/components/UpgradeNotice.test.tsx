@@ -5,7 +5,15 @@ import {
 	waitFor,
 	within,
 } from "@testing-library/react";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	vi,
+} from "vitest";
 
 import { UpgradeNotice } from "~/components/shared/UpgradeNotice";
 
@@ -39,12 +47,45 @@ describe("UpgradeNotice", () => {
 		restoreDialogMethod("showModal", originalShowModal);
 		restoreDialogMethod("close", originalClose);
 	});
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
 
-	it("opens the styled Mastodon options in the shared modal", async () => {
+	it("submits verified upgrades and opens Mastodon options in the shared modal", async () => {
+		const renderWidget = vi.fn().mockReturnValue("widget-id");
+		vi.stubGlobal("turnstile", {
+			remove: vi.fn(),
+			render: renderWidget,
+			reset: vi.fn(),
+		});
 		const fetchMock = vi
 			.spyOn(globalThis, "fetch")
 			.mockResolvedValue(Response.json({ status: "completed" }));
-		render(<UpgradeNotice user={{ is_guest: true }} />);
+		render(
+			<>
+				<input name="cf-turnstile-response" defaultValue="verified-token" />
+				<UpgradeNotice user={{ is_guest: true }} />
+			</>,
+		);
+
+		expect(renderWidget).toHaveBeenCalledOnce();
+		fireEvent.click(screen.getByRole("button", { name: /^github$/i }));
+		await waitFor(() => {
+			expect(fetchMock).toHaveBeenCalledWith("/api/auth", {
+				body: JSON.stringify({
+					action: "start_oauth",
+					provider: "github",
+					values: {
+						upgrade: "true",
+						turnstileToken: "verified-token",
+					},
+				}),
+				credentials: "include",
+				headers: { "Content-Type": "application/json" },
+				method: "POST",
+			});
+		});
+		fetchMock.mockClear();
 
 		const dialog = screen.getByRole("dialog", { hidden: true });
 		expect(dialog).not.toHaveAttribute("open");
@@ -79,6 +120,7 @@ describe("UpgradeNotice", () => {
 					values: {
 						server: "mastodon.social",
 						upgrade: "true",
+						turnstileToken: "verified-token",
 					},
 				}),
 				credentials: "include",

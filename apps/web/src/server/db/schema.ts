@@ -14,7 +14,7 @@ export const user = sqliteTable(
 		id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
 		name: text(),
 		avatar_url: text(),
-		email: text().unique().notNull(),
+		email: text(),
 		github_username: text(),
 		discord_username: text(),
 		mastodon_username: text(),
@@ -38,18 +38,14 @@ export const user = sqliteTable(
 	(table) => {
 		return {
 			emailIdx: uniqueIndex("email_idx").on(table.email),
-			githubUsernameIdx: index("github_username_idx").on(
-				table.github_username,
-			),
+			githubUsernameIdx: index("github_username_idx").on(table.github_username),
 			discordUsernameIdx: index("discord_username_idx").on(
 				table.discord_username,
 			),
 			twitterUsernameIdx: index("twitter_username_idx").on(
 				table.twitter_username,
 			),
-			gitlabUsernameIdx: index("gitlab_username_idx").on(
-				table.gitlab_username,
-			),
+			gitlabUsernameIdx: index("gitlab_username_idx").on(table.gitlab_username),
 		};
 	},
 );

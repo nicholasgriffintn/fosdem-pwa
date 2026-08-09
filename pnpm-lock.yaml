@@ -4,6 +4,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  nanoid@<3.3.17: 3.3.17
+  undici@>=7.0.0 <7.29.0: 7.29.0
+
 importers:
 
   .: {}
@@ -60,35 +64,38 @@ importers:
   apps/web:
     dependencies:
       '@ngriffin_uk/auth-core':
-        specifier: ^0.4.2
-        version: 0.4.2
+        specifier: ^0.5.1
+        version: 0.5.1
       '@ngriffin_uk/auth-crypto':
-        specifier: ^1.0.3
-        version: 1.0.3(@ngriffin_uk/auth-encoding@0.2.4)
+        specifier: ^1.1.1
+        version: 1.1.1
       '@ngriffin_uk/auth-encoding':
         specifier: ^0.2.4
         version: 0.2.4
       '@ngriffin_uk/auth-jwt':
-        specifier: ^1.1.3
-        version: 1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4)
+        specifier: ^2.0.0
+        version: 2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4)
       '@ngriffin_uk/auth-oauth2':
-        specifier: ^3.0.3
-        version: 3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
+        specifier: ^4.0.1
+        version: 4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
+      '@ngriffin_uk/auth-protocol':
+        specifier: ^0.1.1
+        version: 0.1.1
       '@ngriffin_uk/auth-provider-discord':
-        specifier: ^3.0.2
-        version: 3.0.2(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))
+        specifier: ^4.0.0
+        version: 4.0.0(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))
       '@ngriffin_uk/auth-provider-github':
-        specifier: ^3.0.2
-        version: 3.0.2(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))
+        specifier: ^4.0.0
+        version: 4.0.0(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))
       '@ngriffin_uk/auth-provider-gitlab':
-        specifier: ^3.0.2
-        version: 3.0.2(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))
+        specifier: ^4.0.0
+        version: 4.0.0(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))
       '@ngriffin_uk/auth-provider-mastodon':
-        specifier: ^3.0.2
-        version: 3.0.2(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))
+        specifier: ^4.0.0
+        version: 4.0.0(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))
       '@ngriffin_uk/auth-react':
-        specifier: ^0.6.4
-        version: 0.6.4(react@19.2.8)
+        specifier: ^0.7.1
+        version: 0.7.1(react@19.2.8)
       '@ngriffin_uk/auth-request':
         specifier: ^0.2.4
         version: 0.2.4
@@ -1216,59 +1223,60 @@ packages:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.3
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.3
 
-  '@ngriffin_uk/auth-core@0.4.2':
-    resolution: {integrity: sha512-fACkKI+WkgXQ0mFq9NwX5TlCnqf6N0u/gm5YZCcfUctItEzGl6rkCwx/7Yb+TuhkfDjgS8IqGfZ2/auxKkQGCw==}
+  '@ngriffin_uk/auth-core@0.5.1':
+    resolution: {integrity: sha512-SnYmmh6z9it7xAx6pJZyWHmjMRU4MgWpP9VYtN5XEXX+1Gu0dGUNBnmUCSWEpJ3152qGwzkpL52iTDVbUPeySA==}
 
-  '@ngriffin_uk/auth-crypto@1.0.3':
-    resolution: {integrity: sha512-dISn8fedBEUpwFlb6Oeds6YzB2b6LmQDRgWlrg+PPNvDAxRdpGAsiz7AoA5vmbzIXhy8KcBCq3guarRKAwFswQ==}
-    peerDependencies:
-      '@ngriffin_uk/auth-encoding': ^0.2.4
+  '@ngriffin_uk/auth-crypto@1.1.1':
+    resolution: {integrity: sha512-somrWvAtuXafCrCqxUcmJ9pdPJKfHX/Tuf6g3TZLS3UYLIXPpff+DdtM1MPkPxTJbCjltVNK31Ipfgu+19sSoQ==}
 
   '@ngriffin_uk/auth-encoding@0.2.4':
     resolution: {integrity: sha512-mx3c0AFnqYARfEwWvOmvodt/+DHNDLUdB6JhpTNXGd7BLrj+A75a4Ir2XoQ+N9qkYx9VZnnin89in809OeZvzQ==}
 
-  '@ngriffin_uk/auth-jwt@1.1.3':
-    resolution: {integrity: sha512-uE3+nkK8Jt8HihI05BAKY2NJGB2iM23jkeYAvqlpgrmEnew1d3yEYY43qzTCJ6P6R1XH+5dswL/hLzW441Xk0g==}
+  '@ngriffin_uk/auth-jwt@2.0.0':
+    resolution: {integrity: sha512-riZz8EdMlP+ylWdhKbIxUCb7OBE0GoOVGXjT+ICNC346vssnK03T2vk3/d1qcnIT4l/maNbfmFlFu6JtW6YhPA==}
     peerDependencies:
-      '@ngriffin_uk/auth-crypto': ^1.0.3
+      '@ngriffin_uk/auth-crypto': ^1.1.0
       '@ngriffin_uk/auth-encoding': ^0.2.4
       '@ngriffin_uk/auth-request': ^0.2.4
 
-  '@ngriffin_uk/auth-oauth2@3.0.3':
-    resolution: {integrity: sha512-bAymI2qHnv7Bv76o1tCaqV2esEsYPT2srX8nzplHy3vo052h1Ch3kAeV1naBWID5g/tSNFG81ru1oWYD2ZQbBw==}
+  '@ngriffin_uk/auth-oauth2@4.0.1':
+    resolution: {integrity: sha512-UglRLnc5dlA0Gcp+h5/9PJVvZVRX9u2pM2YjjFIKDGJ01Z5TBUWhHvo7JDZlHmaViS+7rfu75RqRhxTz7uYcbw==}
     peerDependencies:
-      '@ngriffin_uk/auth-core': ^0.4.2
-      '@ngriffin_uk/auth-crypto': ^1.0.3
+      '@ngriffin_uk/auth-core': ^0.5.1
+      '@ngriffin_uk/auth-crypto': ^1.1.1
       '@ngriffin_uk/auth-encoding': ^0.2.4
-      '@ngriffin_uk/auth-jwt': ^1.1.3
+      '@ngriffin_uk/auth-jwt': ^2.0.0
       '@ngriffin_uk/auth-request': ^0.2.4
 
-  '@ngriffin_uk/auth-provider-discord@3.0.2':
-    resolution: {integrity: sha512-cCG8fgqKVrOXxbvuZtZFeQnXpDDXdOTmw2+zBw5SALLRd3kt/XsBZ0kpksw02NHfKFGh3teAZtplYVShnS1niQ==}
-    peerDependencies:
-      '@ngriffin_uk/auth-core': ^0.4.2
-      '@ngriffin_uk/auth-oauth2': ^3.0.3
+  '@ngriffin_uk/auth-protocol@0.1.1':
+    resolution: {integrity: sha512-tE6l0IxsnEFNjX1tZp3bpH9f0pXfCvbQmIsmtD/eyUaQDABtTSedUvKtSF4rERdcQ/BwzS+cou4rp7Fd5/+msw==}
 
-  '@ngriffin_uk/auth-provider-github@3.0.2':
-    resolution: {integrity: sha512-sSmudGRBVE1EnqJRdSQHSGYbgt2IGkToIcKtJhpdmZJ7tfZtVPHEEr9MOO4z9ctOFSi6nddGUMQVQKKmsg5/OA==}
+  '@ngriffin_uk/auth-provider-discord@4.0.0':
+    resolution: {integrity: sha512-/bbzGUpqkTPKqOeV/sBWpmTvQC63myalFKV7VqHWrvT4U0AxA1MEzZxbDxVZgp7Fpuzv9HNbxKNFei7fXXEyZQ==}
     peerDependencies:
-      '@ngriffin_uk/auth-core': ^0.4.2
-      '@ngriffin_uk/auth-oauth2': ^3.0.3
+      '@ngriffin_uk/auth-core': ^0.5.0
+      '@ngriffin_uk/auth-oauth2': ^4.0.0
 
-  '@ngriffin_uk/auth-provider-gitlab@3.0.2':
-    resolution: {integrity: sha512-KFoHRI6RlzLYkxkEcgq+Q00vhqnjVFE5TgAZVQr/NMfEWyNja2qrg2AFkSQgpNlj8iyLaxqekWMCjzlFTsXhUQ==}
+  '@ngriffin_uk/auth-provider-github@4.0.0':
+    resolution: {integrity: sha512-3iIdxeC6Wd4mAZCLOzpYnIDrS1CH6OJ335pUFifjeQiXhrlEjJVFy5wdRZt7qTE1QJwPKdXVbPfGqNN0Yoh8oQ==}
     peerDependencies:
-      '@ngriffin_uk/auth-core': ^0.4.2
-      '@ngriffin_uk/auth-oauth2': ^3.0.3
+      '@ngriffin_uk/auth-core': ^0.5.0
+      '@ngriffin_uk/auth-oauth2': ^4.0.0
 
-  '@ngriffin_uk/auth-provider-mastodon@3.0.2':
-    resolution: {integrity: sha512-dpPSvF87VEcJQ9GA+GwrFuTODfPTdtcGeOj+usY8oIYWBvAKg+zsIbxVzXCmWXmAhZjJuGrTtq0tyJrR0QtG6g==}
+  '@ngriffin_uk/auth-provider-gitlab@4.0.0':
+    resolution: {integrity: sha512-ofq635H5gULcLyWrBqiyx/bbodmbaHvQWKjlcbrsPPjrvzGaBpQhZ8CWRWzYJM7q7vYp8JMaKIOc9YrhGOmlcw==}
     peerDependencies:
-      '@ngriffin_uk/auth-core': ^0.4.2
-      '@ngriffin_uk/auth-oauth2': ^3.0.3
+      '@ngriffin_uk/auth-core': ^0.5.0
+      '@ngriffin_uk/auth-oauth2': ^4.0.0
 
-  '@ngriffin_uk/auth-react@0.6.4':
-    resolution: {integrity: sha512-rFC1e1oJoGFl9vzXI/kUCLxSpVYcwdZ4BbOyfd+hFc/7NZ6u1QaG7srke/xAEGDOXM3yv8MYFpMlOw6YGUy2yg==}
+  '@ngriffin_uk/auth-provider-mastodon@4.0.0':
+    resolution: {integrity: sha512-u0xFNpDo9Y2kvlB79e1yyVXCBLMbtBvAThKZz/R9gkSRYsVN0StgSeUm3v/89OTbemGtqOE8QhsMPK7BYdsYAg==}
+    peerDependencies:
+      '@ngriffin_uk/auth-core': ^0.5.0
+      '@ngriffin_uk/auth-oauth2': ^4.0.0
+
+  '@ngriffin_uk/auth-react@0.7.1':
+    resolution: {integrity: sha512-EJwS/+Sx+FK44nZPn0beXmnBXwPoobRXgvbLAZR5QCJhpXhyagX19kkZegDq+2pR5yI9wJ9YDBVeckUKdHYoPw==}
     peerDependencies:
       react: '>=18.2.0'
 
@@ -3226,8 +3234,8 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  nanoid@3.3.16:
-    resolution: {integrity: sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q==}
+  nanoid@3.3.17:
+    resolution: {integrity: sha512-xQLf0A3HOMlgHq0n247/LRuAOYmB7dXJ/DvAxGvsSBij45XtBSmQycu+F8ODbHwns/XyFZagyL1+J0Offw1E0g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
@@ -3522,8 +3530,8 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
-  undici@7.28.0:
-    resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
+  undici@7.29.0:
+    resolution: {integrity: sha512-IDxfleLmmbSskfWSUATiN1nfn2rDuvnMOqb5CWR92iIfojA0Ud+ulOAAEQ57LPr9rWmsreUyf5lwyao+7GNNVw==}
     engines: {node: '>=20.18.1'}
 
   undici@8.9.0:
@@ -4476,50 +4484,57 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@ngriffin_uk/auth-core@0.4.2': {}
+  '@ngriffin_uk/auth-core@0.5.1':
+    dependencies:
+      '@ngriffin_uk/auth-crypto': 1.1.1
+      '@ngriffin_uk/auth-protocol': 0.1.1
 
-  '@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4)':
+  '@ngriffin_uk/auth-crypto@1.1.1':
     dependencies:
       '@ngriffin_uk/auth-encoding': 0.2.4
 
   '@ngriffin_uk/auth-encoding@0.2.4': {}
 
-  '@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4)':
+  '@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4)':
     dependencies:
-      '@ngriffin_uk/auth-crypto': 1.0.3(@ngriffin_uk/auth-encoding@0.2.4)
+      '@ngriffin_uk/auth-crypto': 1.1.1
       '@ngriffin_uk/auth-encoding': 0.2.4
       '@ngriffin_uk/auth-request': 0.2.4
 
-  '@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)':
+  '@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)':
     dependencies:
-      '@ngriffin_uk/auth-core': 0.4.2
-      '@ngriffin_uk/auth-crypto': 1.0.3(@ngriffin_uk/auth-encoding@0.2.4)
+      '@ngriffin_uk/auth-core': 0.5.1
+      '@ngriffin_uk/auth-crypto': 1.1.1
       '@ngriffin_uk/auth-encoding': 0.2.4
-      '@ngriffin_uk/auth-jwt': 1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4)
+      '@ngriffin_uk/auth-jwt': 2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4)
+      '@ngriffin_uk/auth-protocol': 0.1.1
       '@ngriffin_uk/auth-request': 0.2.4
 
-  '@ngriffin_uk/auth-provider-discord@3.0.2(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))':
-    dependencies:
-      '@ngriffin_uk/auth-core': 0.4.2
-      '@ngriffin_uk/auth-oauth2': 3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
+  '@ngriffin_uk/auth-protocol@0.1.1': {}
 
-  '@ngriffin_uk/auth-provider-github@3.0.2(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))':
+  '@ngriffin_uk/auth-provider-discord@4.0.0(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))':
     dependencies:
-      '@ngriffin_uk/auth-core': 0.4.2
-      '@ngriffin_uk/auth-oauth2': 3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
+      '@ngriffin_uk/auth-core': 0.5.1
+      '@ngriffin_uk/auth-oauth2': 4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
 
-  '@ngriffin_uk/auth-provider-gitlab@3.0.2(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))':
+  '@ngriffin_uk/auth-provider-github@4.0.0(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))':
     dependencies:
-      '@ngriffin_uk/auth-core': 0.4.2
-      '@ngriffin_uk/auth-oauth2': 3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
+      '@ngriffin_uk/auth-core': 0.5.1
+      '@ngriffin_uk/auth-oauth2': 4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
 
-  '@ngriffin_uk/auth-provider-mastodon@3.0.2(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-oauth2@3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))':
+  '@ngriffin_uk/auth-provider-gitlab@4.0.0(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))':
     dependencies:
-      '@ngriffin_uk/auth-core': 0.4.2
-      '@ngriffin_uk/auth-oauth2': 3.0.3(@ngriffin_uk/auth-core@0.4.2)(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@1.1.3(@ngriffin_uk/auth-crypto@1.0.3(@ngriffin_uk/auth-encoding@0.2.4))(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
+      '@ngriffin_uk/auth-core': 0.5.1
+      '@ngriffin_uk/auth-oauth2': 4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
 
-  '@ngriffin_uk/auth-react@0.6.4(react@19.2.8)':
+  '@ngriffin_uk/auth-provider-mastodon@4.0.0(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-oauth2@4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4))':
     dependencies:
+      '@ngriffin_uk/auth-core': 0.5.1
+      '@ngriffin_uk/auth-oauth2': 4.0.1(@ngriffin_uk/auth-core@0.5.1)(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-jwt@2.0.0(@ngriffin_uk/auth-crypto@1.1.1)(@ngriffin_uk/auth-encoding@0.2.4)(@ngriffin_uk/auth-request@0.2.4))(@ngriffin_uk/auth-request@0.2.4)
+
+  '@ngriffin_uk/auth-react@0.7.1(react@19.2.8)':
+    dependencies:
+      '@ngriffin_uk/auth-protocol': 0.1.1
       lucide-react: 1.28.0(react@19.2.8)
       qrcode.react: 4.2.0(react@19.2.8)
       react: 19.2.8
@@ -6257,7 +6272,7 @@ snapshots:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       sharp: 0.35.2
-      undici: 7.28.0
+      undici: 7.29.0
       workerd: 1.20260730.1
       ws: 8.21.0
       youch: 4.1.0-beta.10
@@ -6275,7 +6290,7 @@ snapshots:
 
   ms@2.1.3: {}
 
-  nanoid@3.3.16: {}
+  nanoid@3.3.17: {}
 
   node-releases@2.0.51: {}
 
@@ -6343,7 +6358,7 @@ snapshots:
 
   postcss@8.5.25:
     dependencies:
-      nanoid: 3.3.16
+      nanoid: 3.3.17
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -6590,7 +6605,7 @@ snapshots:
 
   undici-types@8.3.0: {}
 
-  undici@7.28.0: {}
+  undici@7.29.0: {}
 
   undici@8.9.0: {}
 

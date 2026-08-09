@@ -1,8 +1,9 @@
-import { TIMEOUT } from "dns";
-
 export const constants = {
 	TIME_ZONE: "Europe/Brussels",
-	TURNSTILE_SITE_KEY: "0x4AAAAAAA4mg92kNkVgcTr6",
+	TURNSTILE_SITE_KEY:
+		process.env.NODE_ENV === "production"
+			? "0x4AAAAAAA4mg92kNkVgcTr6"
+			: "1x00000000000000000000AA",
 	VAPID_PUBLIC_KEY:
 		"BOyDFH_a2LKhi-g00jnVi4ZzkPWxC9mqJov7pyOX5Ka-2BWAHT8cioIcsgvD9Suj96NS9u8QpwrtNp5mdyeQ7gc",
 	DEFAULT_YEAR: 2026,
@@ -50,5 +51,5 @@ export const constants = {
 	},
 	TTL: {
 		ROOM_STATUS_SECONDS: 60,
-	}
+	},
 };

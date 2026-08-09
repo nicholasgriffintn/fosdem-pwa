@@ -6,6 +6,10 @@ import {
 	type ExternalAuthProvider,
 } from "@ngriffin_uk/auth-react";
 
+import { TurnstileWidget } from "~/components/Profile/TurnstileWidget";
+import { constants } from "~/constants";
+import { turnstileAuthTransport } from "~/lib/auth/turnstile-transport";
+
 interface UpgradeNoticeProps {
 	user: {
 		is_guest: boolean | null;
@@ -26,44 +30,52 @@ export function UpgradeNotice({ user }: UpgradeNoticeProps) {
 						devices.
 					</p>
 				</div>
-				<AuthProvider
-					config={{
-						capabilities: {
-							magicLink: false,
-							password: false,
-							passkeys: false,
-							recovery: false,
-							signOut: false,
-							signUp: false,
-						},
-						providers: upgradeProviders,
-						classNames: {
-							actions: "flex justify-end gap-3",
-							button:
-								"inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50",
-							description: "text-sm leading-relaxed text-muted-foreground",
-							dialog:
-								"m-auto w-[calc(100%-2rem)] max-w-md rounded-lg border border-border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/70",
-							dialogContent: "flex flex-col gap-4 p-6",
-							field: "flex flex-col gap-2",
-							form: "flex flex-col gap-4",
-							input:
-								"h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-							label: "text-sm font-medium",
-							linkButton:
-								"inline-flex h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 disabled:pointer-events-none disabled:opacity-50",
-							providerButton:
-								"inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
-							providerList: "flex flex-col sm:flex-row gap-2 w-full sm:w-auto",
-							title: "text-lg font-semibold",
-						},
-					}}
-				>
-					<AuthProviderList
-						fieldPresentation="modal"
-						label="Upgrade account providers"
-					/>
-				</AuthProvider>
+				<div className="flex flex-col items-stretch gap-3">
+					<AuthProvider
+						config={{
+							transport: turnstileAuthTransport,
+							capabilities: {
+								magicLink: false,
+								password: false,
+								passkeys: false,
+								recovery: false,
+								signOut: false,
+								signUp: false,
+							},
+							providers: upgradeProviders,
+							classNames: {
+								actions: "flex justify-end gap-3",
+								button:
+									"inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50",
+								description: "text-sm leading-relaxed text-muted-foreground",
+								dialog:
+									"m-auto w-[calc(100%-2rem)] max-w-md rounded-lg border border-border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/70",
+								dialogContent: "flex flex-col gap-4 p-6",
+								field: "flex flex-col gap-2",
+								form: "flex flex-col gap-4",
+								input:
+									"h-11 w-full rounded-lg border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+								label: "text-sm font-medium",
+								linkButton:
+									"inline-flex h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 disabled:pointer-events-none disabled:opacity-50",
+								providerButton:
+									"inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
+								providerList:
+									"flex flex-col sm:flex-row gap-2 w-full sm:w-auto",
+								title: "text-lg font-semibold",
+							},
+						}}
+					>
+						<AuthProviderList
+							fieldPresentation="modal"
+							label="Upgrade account providers"
+						/>
+						<TurnstileWidget
+							siteKey={constants.TURNSTILE_SITE_KEY}
+							action="authentication"
+						/>
+					</AuthProvider>
+				</div>
 			</div>
 		</div>
 	);
