@@ -98,7 +98,7 @@ export const Route = createFileRoute("/search/")({
 	},
 });
 
-export default function SearchPage() {
+function SearchPage() {
 	const { year, q, track, time, type, fosdemData, serverBookmarks } =
 		Route.useLoaderData();
 	const navigate = useNavigate();
