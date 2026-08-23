@@ -72,7 +72,7 @@
     "qrcode.react": "4.2.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "react-resizable-panels": "4.12.2",
+    "react-resizable-panels": "4.12.3",
     "tailwind-merge": "3.6.0",
     "tailwindcss-animate": "1.0.7",
     "vite": "8.2.1"
