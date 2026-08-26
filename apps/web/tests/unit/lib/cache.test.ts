@@ -34,6 +34,34 @@ describe("CacheManager", () => {
     vi.clearAllMocks();
   });
 
+  it("serves a repeat read from memory instead of hitting KV again", async () => {
+    mockEnv.KV_CACHING_ENABLED = "true";
+    const manager = new CacheManager();
+
+    await manager.set("shared-key", { events: 1 });
+
+    // The memory tier used to be write-only whenever KV was enabled, so every
+    // SSR render paid a KV round trip plus a JSON.parse of the whole dataset.
+    const result = await manager.get("shared-key");
+
+    expect(result).toEqual({ events: 1 });
+    expect(mockKV.get).not.toHaveBeenCalled();
+  });
+
+  it("populates the memory tier from a KV hit", async () => {
+    mockEnv.KV_CACHING_ENABLED = "true";
+    const manager = new CacheManager();
+
+    mockKV.get.mockResolvedValue(JSON.stringify({ events: 2 }));
+
+    expect(await manager.get("cold-key")).toEqual({ events: 2 });
+    expect(mockKV.get).toHaveBeenCalledTimes(1);
+
+    // Second read in the same isolate must not go back to KV.
+    expect(await manager.get("cold-key")).toEqual({ events: 2 });
+    expect(mockKV.get).toHaveBeenCalledTimes(1);
+  });
+
   it("uses memory cache when KV caching is disabled", async () => {
     mockEnv.KV_CACHING_ENABLED = "false";
     vi.useFakeTimers();

@@ -42,7 +42,12 @@ export function NavSearch({
   fullWidth,
   ...props
 }: NavSearchProps) {
-  const { fosdemData, loading } = useFosdemData({ year });
+  // The header renders on every route, so fetching here unconditionally pulled
+  // the entire conference dataset on every page load — including routes with no
+  // search UI at all, like /privacy and /signin. Defer it until the user
+  // actually engages with the search box.
+  const [searchEngaged, setSearchEngaged] = useState(false);
+  const { fosdemData, loading } = useFosdemData({ year, enabled: searchEngaged });
 
   const isClient = useIsClient();
 
@@ -418,7 +423,11 @@ export function NavSearch({
           placeholder="Search events..."
           aria-label="Search events"
           className={cn("w-full", fullWidth ? "pr-12" : "sm:w-64 sm:pr-12")}
-          onChange={(e) => handleSearch(e.target.value)}
+          onFocus={() => setSearchEngaged(true)}
+          onChange={(e) => {
+            setSearchEngaged(true);
+            handleSearch(e.target.value);
+          }}
           onKeyDown={handleKeyDown}
         />
         <kbd className="js-only pointer-events-none absolute right-2.5 top-2.5 hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">

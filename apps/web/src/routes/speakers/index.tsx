@@ -4,7 +4,7 @@ import { getAllData } from "~/server/functions/fosdem";
 import type { Conference } from "~/types/fosdem";
 import { constants } from "~/constants";
 import { PageHeader } from "~/components/shared/PageHeader";
-import { SpeakerList } from "~/components/Speaker/SpeakerList";
+import { SpeakerList, type SpeakerListItem } from "~/components/Speaker/SpeakerList";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { PageShell } from "~/components/shared/PageShell";
 
@@ -27,7 +27,16 @@ export const Route = createFileRoute("/speakers/")({
             )
             : persons;
 
-        return { persons: filteredPersons, year, query: q || "" };
+        // `Person` carries `biography` and `extended_biography`, neither of which
+        // this page renders. Returning the whole record inlined every speaker's
+        // full bio into the SSR payload.
+        const listItems: SpeakerListItem[] = filteredPersons.map((person) => ({
+            id: person.id,
+            name: person.name,
+            slug: person.slug,
+        }));
+
+        return { persons: listItems, year, query: q || "" };
     },
     head: () => ({
         meta: [

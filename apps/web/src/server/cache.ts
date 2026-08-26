@@ -58,6 +58,15 @@ export class CacheManager {
     this.maybeCleanup();
     const prefixedKey = this.getKey(key);
 
+    // The memory tier was written to but never read while KV was enabled, so
+    // every SSR render paid a KV round trip plus a full JSON.parse of the
+    // multi-megabyte conference payload. Workers reuse isolates, so checking it
+    // first turns most requests into a zero-I/O hit.
+    const memoryEntry = this.memoryCache.get(prefixedKey);
+    if (memoryEntry) {
+      return memoryEntry.data;
+    }
+
     if (this.kvCache) {
       try {
         const data = await this.kvCache.get(prefixedKey);
@@ -66,7 +75,12 @@ export class CacheManager {
         }
         if (typeof data === "string" && (data.startsWith("{") || data.startsWith("["))) {
           try {
-            return JSON.parse(data);
+            const parsed = JSON.parse(data);
+            this.memoryCache.set(prefixedKey, {
+              data: parsed,
+              expiresAt: Date.now() + this.TTL * 1000,
+            });
+            return parsed;
           } catch (error) {
             console.error(`JSON parse error for key ${key}:`, error);
             await this.kvCache.delete(prefixedKey);
@@ -108,6 +122,11 @@ export class CacheManager {
   ): Promise<{ data: unknown; isStale: boolean } | null> {
     this.maybeCleanup();
     const prefixedKey = this.getKey(key);
+
+    const memoryResult = this.memoryCache.getWithStaleness(prefixedKey);
+    if (memoryResult) {
+      return { data: memoryResult.entry.data, isStale: memoryResult.isStale };
+    }
 
     if (this.kvCache) {
       try {

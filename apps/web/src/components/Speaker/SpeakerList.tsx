@@ -9,8 +9,14 @@ import { useIsClient } from "~/hooks/use-is-client";
 import { useWindowSize } from "~/hooks/use-window-size";
 import type { Person } from "~/types/fosdem";
 
+/**
+ * Only the fields this list renders. The route projects `Person` down to this
+ * before returning it, so speaker biographies are not serialised into the page.
+ */
+export type SpeakerListItem = Pick<Person, "id" | "name" | "slug">;
+
 type SpeakerListProps = {
-	persons: Person[];
+	persons: SpeakerListItem[];
 	year: number;
 	initialQuery?: string;
 };
