@@ -9,6 +9,7 @@ import {
 	deleteSubscription as deleteSubscriptionRepo,
 } from "~/server/repositories/subscription-repository";
 import type { Subscription } from "~/server/db/schema";
+import { validatePushSubscription } from "~/server/lib/push-subscription";
 
 export const createSubscription = createServerFn({
 	method: "POST",
@@ -22,6 +23,11 @@ export const createSubscription = createServerFn({
 		const user = await getAuthUser();
 		if (!user) {
 			return null;
+		}
+
+		const validation = validatePushSubscription({ endpoint, auth, p256dh });
+		if (!validation.valid) {
+			return err(validation.reason);
 		}
 
 		try {

@@ -10,8 +10,10 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
 	const { user } = await getAuthSession();
 
 	if (!user) {
+		// Calling next() here would run the wrapped handler unauthenticated with
+		// `context: undefined`; throwing stops the chain instead.
 		setResponseStatus(401);
-		return next({ context: undefined });
+		throw new Response(null, { status: 401 });
 	}
 
 	return next({ context: { user } });

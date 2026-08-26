@@ -2,11 +2,19 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Icons } from "~/components/shared/Icons";
-import type { SessionUser } from "~/types/auth";
-import type { User } from "~/server/db/schema";
+
+/**
+ * Structural shape rather than a concrete row type, so this renders both full
+ * account records and the public projection (which has no `email`).
+ */
+type AvatarUser = {
+	name?: string | null;
+	email?: string | null;
+	avatar_url?: string | null;
+};
 
 type UserAvatarProps = {
-	user: SessionUser | User;
+	user: AvatarUser;
 	className?: string;
 	size?: "sm" | "md" | "lg" | "xl";
 	borderColor?: string;
@@ -24,7 +32,7 @@ function getInitials(name?: string | null): string {
 	return `${first}${last}`.toUpperCase();
 }
 
-function getDisplayName(user: SessionUser | User): string {
+function getDisplayName(user: AvatarUser): string {
 	if (user.name) return user.name;
 	if (user.email) return user.email.split("@")[0] ?? "Anonymous";
 	return "Anonymous";

@@ -14,6 +14,7 @@ import {
 } from "~/server/repositories/bookmark-repository";
 import { findUserByUsername } from "~/server/repositories/user-repository";
 import type { Bookmark } from "~/server/db/schema";
+import { safeReturnTo } from "~/server/lib/safe-redirect";
 
 export const getBookmarks = createServerFn({
 	method: "GET",
@@ -62,6 +63,7 @@ export const createBookmark = createServerFn({
 	)
 	.handler(async (ctx): Promise<Result<boolean> | Response | null> => {
 		const { year, type, slug, status, returnTo } = ctx.data;
+		const redirectTo = safeReturnTo(returnTo, "");
 
 		if (!type || !slug || !status) {
 			throw new Error("Invalid request");
@@ -69,11 +71,11 @@ export const createBookmark = createServerFn({
 
 		const user = await getAuthUser();
 		if (!user) {
-			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+			if (redirectTo) {
 				return new Response(null, {
 					status: 303,
 					headers: {
-						Location: returnTo,
+						Location: redirectTo,
 					},
 				});
 			}
@@ -89,11 +91,11 @@ export const createBookmark = createServerFn({
 			const yearNum = validateYear(year);
 			await upsertBookmark(user.id, yearNum, type, slug, status);
 
-			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+			if (redirectTo) {
 				return new Response(null, {
 					status: 303,
 					headers: {
-						Location: returnTo,
+						Location: redirectTo,
 					},
 				});
 			}
@@ -102,11 +104,11 @@ export const createBookmark = createServerFn({
 		} catch (error) {
 			console.error(error);
 
-			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+			if (redirectTo) {
 				return new Response(null, {
 					status: 303,
 					headers: {
-						Location: returnTo,
+						Location: redirectTo,
 					},
 				});
 			}
@@ -164,7 +166,7 @@ export const createBookmarkFromForm = createServerFn({
 		return new Response(null, {
 			status: 303,
 			headers: {
-				Location: returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/",
+				Location: safeReturnTo(returnTo),
 			},
 		});
 	});

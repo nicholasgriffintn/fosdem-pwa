@@ -13,6 +13,7 @@ import {
   updateBookmark,
 } from "~/server/repositories/bookmark-repository";
 import type { UserConferenceStats } from "~/server/db/schema";
+import { safeReturnTo } from "~/server/lib/safe-redirect";
 
 export const getUserStats = createServerFn({
   method: "GET",
@@ -154,7 +155,7 @@ export const toggleAttendanceFromForm = createServerFn({
       return new Response(null, {
         status: 303,
         headers: {
-          Location: returnTo?.startsWith("/") ? returnTo : "/",
+          Location: safeReturnTo(returnTo),
         },
       });
     }
@@ -176,7 +177,7 @@ export const toggleAttendanceFromForm = createServerFn({
     return new Response(null, {
       status: 303,
       headers: {
-        Location: returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/",
+        Location: safeReturnTo(returnTo),
       },
     });
   });

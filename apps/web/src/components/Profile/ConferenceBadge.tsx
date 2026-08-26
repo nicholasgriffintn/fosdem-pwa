@@ -7,7 +7,8 @@ import { Card } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Icons } from "~/components/shared/Icons";
-import type { User, UserConferenceStats } from "~/server/db/schema";
+import type { UserConferenceStats } from "~/server/db/schema";
+import type { PublicUser } from "~/server/lib/public-user";
 import { getAchievements } from "~/lib/achievements";
 import { UserAvatar } from "~/components/shared/UserAvatar";
 
@@ -18,7 +19,7 @@ const QRCodeSVG = lazy(() =>
 );
 
 type ConferenceBadgeProps = {
-	user?: User | null;
+	user?: PublicUser | null;
 	conferenceYear: number;
 	stats?: UserConferenceStats | null;
 	isPublicPage?: boolean;
@@ -39,7 +40,7 @@ function normalizeSiteUrl(site: string) {
 	return `https://${site}`;
 }
 
-function getPublicProfileId(user: User) {
+function getPublicProfileId(user: PublicUser) {
 	return (
 		user.github_username ||
 		user.gitlab_username ||
@@ -61,11 +62,7 @@ export function ConferenceBadge({
 	}
 
 	const publicProfileId = getPublicProfileId(user);
-	const displayName =
-		user.name ||
-		publicProfileId ||
-		user.email?.split("@")[0] ||
-		"Anonymous";
+	const displayName = user.name || publicProfileId || "Anonymous";
 
 	const profileUrl = publicProfileId
 		? `https://fosdempwa.com/profile/${publicProfileId}`
@@ -124,7 +121,6 @@ export function ConferenceBadge({
 					<UserAvatar user={user} size="xl" borderColor={theme.accent} />
 					<div className="flex-1">
 						<h2 className="text-2xl font-bold text-foreground">{displayName}</h2>
-						{user.email && <p className="text-muted-foreground">{user.email}</p>}
 						{user.bio && (
 							<p className="mt-2 text-sm text-muted-foreground line-clamp-2">
 								{user.bio}

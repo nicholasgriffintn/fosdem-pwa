@@ -12,6 +12,7 @@ import {
   updateBookmark,
 } from "~/server/repositories/bookmark-repository";
 import type { Bookmark } from "~/server/db/schema";
+import { safeReturnTo } from "~/server/lib/safe-redirect";
 
 export const getWatchLaterList = createServerFn({
   method: "GET",
@@ -178,7 +179,7 @@ export const toggleWatchLaterFromForm = createServerFn({
     return new Response(null, {
       status: 303,
       headers: {
-        Location: returnTo?.startsWith("/") ? returnTo : "/",
+        Location: safeReturnTo(returnTo),
       },
     });
   });
