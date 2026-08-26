@@ -35,10 +35,19 @@ export const sendTestNotification = createServerFn({
 			}
 
 			const pushServiceUrl = process.env.PUSH_SERVICE_URL || "https://push.fosdempwa.com";
+			const cronSecret = process.env.CRON_SECRET;
+
+			if (!cronSecret) {
+				console.error("CRON_SECRET is not configured; cannot reach the push service");
+				return err("Test notifications are not configured on this environment.");
+			}
 
 			const url = new URL(pushServiceUrl);
 			url.searchParams.set("test", "true");
 			url.searchParams.set("type", type);
+			// Scope the trigger to the caller. Without this the push service fans
+			// the notification out to every subscriber in the database.
+			url.searchParams.set("userId", String(user.id));
 			if (dayOverride) {
 				url.searchParams.set("day", dayOverride);
 			}
@@ -47,6 +56,7 @@ export const sendTestNotification = createServerFn({
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					"x-cron-secret": cronSecret,
 				},
 			});
 

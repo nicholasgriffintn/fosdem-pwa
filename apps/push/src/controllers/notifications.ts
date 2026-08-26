@@ -10,6 +10,7 @@ import {
 } from "../lib/bookmarks";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
 import { getApplicationKeys, sendNotification, createNotificationPayload } from "../lib/notifications";
+import { loadSubscribers } from "../lib/subscribers";
 import type { Bookmark, Subscription, EnrichedBookmark, Env } from "../types";
 
 async function processUserNotifications(
@@ -55,6 +56,7 @@ export async function triggerNotifications(
 	ctx: ExecutionContext,
 	queueMode = false,
 	dayOverride?: string,
+	userId?: string,
 ) {
 	const currentDay = getCurrentDay();
 	const whichDay = dayOverride ?? currentDay;
@@ -67,59 +69,12 @@ export async function triggerNotifications(
 	const keys = await getApplicationKeys(env);
 	const fosdemData = await getFosdemData();
 
-	const subscriptions = await env.DB.prepare(
-		`SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
-      p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
-      p.recording_available, p.daily_summary, p.notify_low_priority
-     FROM subscription s
-     LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
-	).run();
+	const subscriptionEntries = await loadSubscribers(env, { userId });
 
-	if (!subscriptions.success || !subscriptions.results?.length) {
-		throw new Error("No subscriptions found");
+	if (!subscriptionEntries.length) {
+		console.log("No subscriptions found for event reminders");
+		return;
 	}
-
-	const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
-	const subscriptionEntries = subscriptionRows
-		.map((subscription) => {
-			console.log(
-				`Processing notifications for ${subscription.user_id} via ${subscription.endpoint}`,
-			);
-
-			try {
-				if (
-					!subscription.user_id ||
-					!subscription.endpoint ||
-					!subscription.auth ||
-					!subscription.p256dh
-				) {
-					throw new Error("Invalid subscription data");
-				}
-
-				const typedSubscription: Subscription = {
-					user_id: subscription.user_id as string,
-					endpoint: subscription.endpoint as string,
-					auth: subscription.auth as string,
-					p256dh: subscription.p256dh as string,
-				};
-
-				const prefs = resolveNotificationPreference(subscription as any);
-
-				return {
-					subscription: typedSubscription,
-					prefs,
-				};
-			} catch (error) {
-				const errorMessage = error instanceof Error ? error.message : "Unknown error";
-				console.error(
-					`Error processing bookmarks for ${subscription.user_id}: ${errorMessage}`,
-				);
-				throw error;
-			}
-		})
-		.filter((entry): entry is { subscription: Subscription; prefs: ReturnType<typeof resolveNotificationPreference> } =>
-			Boolean(entry),
-		);
 
 	const usersNeedingBookmarks = subscriptionEntries
 		.filter(({ prefs }) => prefs.event_reminders)

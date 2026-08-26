@@ -106,6 +106,13 @@ export function enrichBookmarks(
 		enriched.push({
 			...bookmark,
 			...event,
+			// The FOSDEM event object carries its own `id`, `type` and `status`.
+			// Spreading it over the bookmark would replace the bookmark's D1
+			// primary key with the event id, so markNotificationSent() would
+			// update zero rows and the reminder would re-send on every run.
+			id: bookmark.id,
+			type: bookmark.type,
+			status: bookmark.status,
 		});
 	}
 

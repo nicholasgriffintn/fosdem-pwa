@@ -5,8 +5,9 @@ import { triggerScheduleChangeNotifications } from "./controllers/schedule-chang
 import { triggerRoomStatusNotifications, pollAndStoreRoomStatus, cleanupOldRoomStatus } from "./controllers/room-status";
 import { triggerRecordingNotifications } from "./controllers/recording-notifications";
 import { triggerDailySummary } from "./controllers/daily-summary";
-import { getApplicationKeys, sendNotification } from "./lib/notifications";
+import { getApplicationKeys, sendNotification, ExpiredSubscriptionError } from "./lib/notifications";
 import { markNotificationSent } from "./lib/bookmarks";
+import { deleteSubscriptionByEndpoint } from "./lib/subscribers";
 import type { Env, QueueMessage } from "./types";
 
 const REQUIRED_ENV: Array<keyof Env> = [
@@ -42,8 +43,12 @@ const validateEnv = (env: Env) => {
 };
 
 const isAuthorizedRequest = (request: Request, env: Env): boolean => {
+	// Fail closed. Previously a missing CRON_SECRET made every manual trigger
+	// world-callable, including the ones that fan out to all subscribers.
+	// `scheduled()` does not pass through here, so cron keeps working either way.
 	if (!env.CRON_SECRET) {
-		return true;
+		console.error("CRON_SECRET is not configured; rejecting manual trigger");
+		return false;
 	}
 
 	const authHeader = request.headers.get("Authorization");
@@ -122,29 +127,35 @@ export default Sentry.withSentry<Env, QueueMessage>(
 				if (isTest) {
 					const type = url.searchParams.get("type");
 					const dayOverride = url.searchParams.get("day") || undefined;
+					const userId = url.searchParams.get("userId") || undefined;
 
 					if (!type) {
 						return new Response("Missing type parameter", { status: 400 });
 					}
 
+					// A test must never fan out to the whole subscriber table.
+					if (!userId) {
+						return new Response("Missing userId parameter", { status: 400 });
+					}
+
 					switch (type) {
 						case "event-reminder":
-							await triggerNotifications({ cron: "test" }, env, ctx, true, dayOverride);
+							await triggerNotifications({ cron: "test" }, env, ctx, true, dayOverride, userId);
 							return new Response("Event reminder notifications triggered");
 						case "daily-summary-morning":
-							await triggerDailySummary({ cron: "test" }, env, ctx, true, false, dayOverride);
+							await triggerDailySummary({ cron: "test" }, env, ctx, true, false, dayOverride, userId);
 							return new Response("Morning summary notifications triggered");
 						case "daily-summary-evening":
-							await triggerDailySummary({ cron: "test" }, env, ctx, true, true, dayOverride);
+							await triggerDailySummary({ cron: "test" }, env, ctx, true, true, dayOverride, userId);
 							return new Response("Evening summary notifications triggered");
 						case "schedule-change":
-							await triggerScheduleChangeNotifications({ cron: "test" }, env, ctx, true);
+							await triggerScheduleChangeNotifications({ cron: "test" }, env, ctx, true, userId);
 							return new Response("Schedule change notifications triggered");
 						case "room-status":
-							await triggerRoomStatusNotifications({ cron: "test" }, env, ctx, true, dayOverride);
+							await triggerRoomStatusNotifications({ cron: "test" }, env, ctx, true, dayOverride, userId);
 							return new Response("Room status notifications triggered");
 						case "recording-available":
-							await triggerRecordingNotifications({ cron: "test" }, env, ctx, true);
+							await triggerRecordingNotifications({ cron: "test" }, env, ctx, true, userId);
 							return new Response("Recording notifications triggered");
 						default:
 							return new Response(`Unknown notification type: ${type}`, { status: 400 });
@@ -179,28 +190,42 @@ export default Sentry.withSentry<Env, QueueMessage>(
 			const isHourly = utcMinutes === 0;
 			const isMidnight = utcHours === 0 && utcMinutes === 0;
 
+			// Each trigger is isolated: a failure in one must not stop the rest.
+			// Previously an exception in triggerNotifications skipped schedule
+			// changes and room status for the whole tick.
+			const run = async (name: string, task: () => Promise<unknown>) => {
+				try {
+					await task();
+				} catch (error) {
+					console.error(
+						`Scheduled task ${name} failed:`,
+						error instanceof Error ? error.message : String(error),
+					);
+				}
+			};
+
 			if (isMorningSummary) {
-				await triggerDailySummary(event, env, ctx, true, false);
+				await run("daily-summary-morning", () => triggerDailySummary(event, env, ctx, true, false));
 			}
 
 			if (isEveningSummary) {
-				await triggerDailySummary(event, env, ctx, true, true);
+				await run("daily-summary-evening", () => triggerDailySummary(event, env, ctx, true, true));
 			}
 
 			if (isMidnight) {
-				await cleanupOldRoomStatus(env);
+				await run("cleanup-room-status", () => cleanupOldRoomStatus(env));
 			}
 
 			if (isHourly) {
-				await triggerRecordingNotifications(event, env, ctx, true);
+				await run("recording-notifications", () => triggerRecordingNotifications(event, env, ctx, true));
 			}
 
 			if (isFiveMinute) {
-				await triggerNotifications(event, env, ctx, true);
-				await triggerScheduleChangeNotifications(event, env, ctx, true);
+				await run("event-reminders", () => triggerNotifications(event, env, ctx, true));
+				await run("schedule-changes", () => triggerScheduleChangeNotifications(event, env, ctx, true));
 			}
 
-			await triggerRoomStatusNotifications(event, env, ctx, true);
+			await run("room-status", () => triggerRoomStatusNotifications(event, env, ctx, true));
 		},
 		async queue(batch: MessageBatch<QueueMessage>, env: Env, ctx: ExecutionContext): Promise<void> {
 			const validation = validateEnv(env);
@@ -237,6 +262,16 @@ export default Sentry.withSentry<Env, QueueMessage>(
 							await sendNotification(message.body.subscription, message.body.notification, keys, env);
 							break;
 						} catch (error) {
+							// A 404/410 means the endpoint is permanently gone. Retrying
+							// it burns ~9 doomed requests per notification, forever.
+							if (error instanceof ExpiredSubscriptionError) {
+								console.log("Removing expired push subscription", {
+									endpoint: new URL(error.endpoint).host,
+								});
+								await deleteSubscriptionByEndpoint(error.endpoint, env);
+								throw error;
+							}
+
 							if (attempt === MAX_SEND_RETRIES) {
 								console.error("Dead-lettering notification after retries", {
 									bookmarkId: message.body.bookmarkId,
@@ -250,11 +285,6 @@ export default Sentry.withSentry<Env, QueueMessage>(
 							await delay(backoffDelay + jitter);
 						}
 					}
-					const shouldMarkSent = message.body.shouldMarkSent ?? true;
-
-					if (shouldMarkSent) {
-						await markNotificationSent(message.body.bookmarkId, env);
-					}
 				} catch (error) {
 					console.error('Failed to process notification:', {
 						bookmarkId: message.body?.bookmarkId,
@@ -263,11 +293,30 @@ export default Sentry.withSentry<Env, QueueMessage>(
 						attempts: message.attempts,
 					});
 
-					if (message.attempts < 5) {
+					// An expired subscription will never succeed, so do not retry it.
+					if (!(error instanceof ExpiredSubscriptionError) && message.attempts < 5) {
 						message.retry({ delaySeconds: Math.min(60 * Math.pow(2, message.attempts), 3600) });
-					} else {
+					} else if (message.attempts >= 5) {
 						console.error('Max retry attempts exceeded, dropping notification', {
 							bookmarkId: message.body?.bookmarkId,
+						});
+					}
+
+					continue;
+				}
+
+				// Recorded outside the send try/catch on purpose. The push has already
+				// been delivered at this point; if the D1 write fails, retrying the
+				// message would buzz the user a second time for the same event.
+				const shouldMarkSent = message.body.shouldMarkSent ?? true;
+
+				if (shouldMarkSent) {
+					try {
+						await markNotificationSent(message.body.bookmarkId, env);
+					} catch (error) {
+						console.error('Notification delivered but marking it sent failed:', {
+							bookmarkId: message.body?.bookmarkId,
+							error: error instanceof Error ? error.message : String(error),
 						});
 					}
 				}

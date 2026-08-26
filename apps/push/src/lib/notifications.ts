@@ -102,6 +102,22 @@ export function createScheduleChangePayload(
 	};
 }
 
+/**
+ * Raised when the push service reports the endpoint is permanently gone.
+ *
+ * 404/410 mean the user uninstalled the PWA or the browser rotated the
+ * endpoint. Retrying is pointless; the row should be removed instead.
+ */
+export class ExpiredSubscriptionError extends Error {
+	readonly endpoint: string;
+
+	constructor(endpoint: string, message: string) {
+		super(message);
+		this.name = "ExpiredSubscriptionError";
+		this.endpoint = endpoint;
+	}
+}
+
 export async function sendNotification(
 	subscription: Subscription,
 	notification: NotificationPayload,
@@ -151,6 +167,11 @@ export async function sendNotification(
 		}
 		const error = `HTTP error! status: ${result.status}, content: ${errorDetails}`;
 		trackPushNotificationFailure(subscription, error, env);
+
+		if (result.status === 404 || result.status === 410) {
+			throw new ExpiredSubscriptionError(subscription.endpoint, error);
+		}
+
 		throw new Error(error);
 	}
 

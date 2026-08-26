@@ -3,6 +3,7 @@ import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
 import { getBookmarksByUserIds, enrichBookmarks, getBookmarksForDay } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
+import { loadSubscribers } from "../lib/subscribers";
 import { createBrusselsDate } from "../utils/date";
 import type { Bookmark, Env, NotificationPayload } from "../types";
 
@@ -242,6 +243,7 @@ export async function triggerRoomStatusNotifications(
   ctx: ExecutionContext,
   queueMode = false,
   dayOverride?: string,
+  userId?: string,
   prefetchedStatuses?: RoomStatusResponse[],
 ): Promise<void> {
   const currentDay = getCurrentDay();
@@ -279,29 +281,12 @@ export async function triggerRoomStatusNotifications(
   const fosdemData = await getFosdemData();
   const keys = await getApplicationKeys(env);
 
-  const subscriptions = await env.DB.prepare(
-    `SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
-      p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
-      p.recording_available, p.daily_summary, p.notify_low_priority
-     FROM subscription s
-     LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
-  ).run();
+	const subscriptionEntries = await loadSubscribers(env, { userId });
 
-  if (!subscriptions.success || !subscriptions.results?.length) {
-    console.log("No subscriptions found for room status notifications");
-    return;
-  }
-
-  const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
-  const subscriptionEntries = subscriptionRows.map((subscription) => ({
-    subscription: {
-      user_id: subscription.user_id as string,
-      endpoint: subscription.endpoint as string,
-      auth: subscription.auth as string,
-      p256dh: subscription.p256dh as string,
-    },
-    prefs: resolveNotificationPreference(subscription as any),
-  }));
+	if (!subscriptionEntries.length) {
+		console.log("No subscriptions found for room status notifications");
+		return;
+	}
 
   const usersNeedingBookmarks = subscriptionEntries
     .filter(({ prefs }) => prefs.room_status_alerts)

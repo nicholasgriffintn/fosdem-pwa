@@ -38,7 +38,11 @@ const validEnv = {
 	VAPID_PUBLIC_KEY: "pub",
 	VAPID_PRIVATE_KEY: "priv",
 	BOOKMARK_NOTIFICATIONS_ENABLED: "true",
+	CRON_SECRET: "test-secret",
 } as any;
+
+const authorized = (url: string) =>
+	new Request(url, { headers: { "x-cron-secret": "test-secret" } });
 
 describe("push worker env validation", () => {
 	afterEach(() => {
@@ -56,14 +60,67 @@ describe("push worker env validation", () => {
 		expect(await response.text()).toContain("Missing required bindings");
 	});
 
-	it("allows requests when bindings are present", async () => {
+	it("allows authorized requests when bindings are present", async () => {
+		const response = await handler.fetch(
+			authorized("https://example.com"),
+			validEnv,
+			{} as any,
+		);
+
+		expect(response.status).toBe(200);
+	});
+
+	it("rejects a request that does not present the cron secret", async () => {
 		const response = await handler.fetch(
 			new Request("https://example.com"),
 			validEnv,
 			{} as any,
 		);
 
+		expect(response.status).toBe(401);
+	});
+
+	it("fails closed when CRON_SECRET is not configured", async () => {
+		const { CRON_SECRET, ...envWithoutSecret } = validEnv;
+
+		const response = await handler.fetch(
+			authorized("https://example.com"),
+			envWithoutSecret as any,
+			{} as any,
+		);
+
+		expect(response.status).toBe(401);
+	});
+
+	it("refuses an unscoped test trigger so it cannot fan out to every subscriber", async () => {
+		const response = await handler.fetch(
+			authorized("https://example.com/?test=true&type=event-reminder"),
+			validEnv,
+			{} as any,
+		);
+
+		expect(response.status).toBe(400);
+		expect(await response.text()).toContain("Missing userId");
+	});
+
+	it("scopes a test trigger to the requesting user", async () => {
+		const { triggerNotifications } = await import("../src/controllers/notifications");
+
+		const response = await handler.fetch(
+			authorized("https://example.com/?test=true&type=event-reminder&userId=42"),
+			validEnv,
+			{} as any,
+		);
+
 		expect(response.status).toBe(200);
+		expect(triggerNotifications).toHaveBeenCalledWith(
+			{ cron: "test" },
+			validEnv,
+			expect.anything(),
+			true,
+			undefined,
+			"42",
+		);
 	});
 
 	it("dedupes repeated queue messages within a batch", async () => {

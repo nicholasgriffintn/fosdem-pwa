@@ -3,6 +3,7 @@ import { getFosdemData } from "../lib/fosdem-data";
 import { getBookmarksByUserIds } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
+import { loadSubscribers } from "../lib/subscribers";
 import type {
   Bookmark,
   Env,
@@ -103,6 +104,7 @@ export async function triggerRecordingNotifications(
   env: Env,
   ctx: ExecutionContext,
   queueMode = false,
+  userId?: string,
 ): Promise<void> {
   const fosdemData = await getFosdemData();
   const existingSnapshots = await loadRecordingSnapshots(env);
@@ -142,31 +144,14 @@ export async function triggerRecordingNotifications(
 
   const keys = await getApplicationKeys(env);
 
-  const subscriptions = await env.DB.prepare(
-    `SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
-      p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
-      p.recording_available, p.daily_summary, p.notify_low_priority
-     FROM subscription s
-     LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
-  ).run();
+	const subscriptionEntries = await loadSubscribers(env, { userId });
 
-  if (!subscriptions.success || !subscriptions.results?.length) {
-    console.log("No subscriptions found for recording notifications");
-    return;
-  }
+	if (!subscriptionEntries.length) {
+		console.log("No subscriptions found for recording notifications");
+		return;
+	}
 
-  let notificationsSent = 0;
-
-  const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
-  const subscriptionEntries = subscriptionRows.map((subscription) => ({
-    subscription: {
-      user_id: subscription.user_id as string,
-      endpoint: subscription.endpoint as string,
-      auth: subscription.auth as string,
-      p256dh: subscription.p256dh as string,
-    } as Subscription,
-    prefs: resolveNotificationPreference(subscription as any),
-  }));
+	let notificationsSent = 0;
 
   const usersNeedingBookmarks = subscriptionEntries
     .filter(({ prefs }) => prefs.recording_available)
