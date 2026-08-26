@@ -1,4 +1,4 @@
-import { getSyncQueue, removeFromSyncQueue, updateLocalBookmark } from "~/lib/localStorage";
+import { getSyncQueue, removeFromSyncQueue, recordSyncFailure, updateLocalBookmark } from "~/lib/localStorage";
 import { withRetry } from "~/lib/withRetry";
 import {
   createBookmark,
@@ -179,9 +179,20 @@ export async function syncBookmarksToServer(userId?: number): Promise<SyncResult
       .map((r) => r.status === "fulfilled" ? r.value : { success: false, id: "unknown", error: "Promise rejected" });
 
     const successCount = processedResults.filter((r) => r.success).length;
-    const errors = processedResults
-      .filter((r): r is { success: false; id: string; error: string } => !r.success)
-      .map((r) => r.error);
+    const failures = processedResults.filter(
+      (r): r is { success: false; id: string; error: string } => !r.success,
+    );
+
+    // Count the attempt against the queued item so a permanently-failing entry
+    // is eventually dropped instead of retried on every reconnect for the whole
+    // seven-day TTL.
+    await Promise.allSettled(
+      failures
+        .filter((failure) => failure.id !== "unknown")
+        .map((failure) => recordSyncFailure(failure.id)),
+    );
+
+    const errors = failures.map((r) => r.error);
 
     return {
       success: errors.length === 0,

@@ -3,11 +3,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const localStorageMocks = vi.hoisted(() => ({
 	getSyncQueue: vi.fn(),
 	removeFromSyncQueue: vi.fn(),
+	recordSyncFailure: vi.fn(),
+	// Previously omitted, which meant the serverId-stamping branch of
+	// syncBookmarksToServer could not be exercised at all: it would have thrown
+	// "updateLocalBookmark is not a function" had any test reached it.
+	updateLocalBookmark: vi.fn(),
 	queueUnsyncedBookmarksForSync: vi.fn(),
 }));
 
-const { getSyncQueue, removeFromSyncQueue, queueUnsyncedBookmarksForSync } =
-	localStorageMocks;
+const {
+	getSyncQueue,
+	removeFromSyncQueue,
+	recordSyncFailure,
+	updateLocalBookmark,
+	queueUnsyncedBookmarksForSync,
+} = localStorageMocks;
 
 vi.mock("~/lib/localStorage", () => localStorageMocks);
 
@@ -103,6 +113,47 @@ describe("background sync helpers", () => {
 		expect(result.success).toBe(false);
 		expect(result.errors).toContain("boom");
 		expect(removeFromSyncQueue).not.toHaveBeenCalled();
+	});
+
+	it("stamps the serverId onto the local bookmark after a successful create", async () => {
+		getSyncQueue.mockResolvedValue([
+			{
+				id: "2026_talk",
+				type: "bookmark",
+				action: "create",
+				data: { year: 2026, type: "event", slug: "talk", status: "favourited" },
+			},
+		]);
+
+		createBookmark.mockResolvedValue({ success: true });
+
+		const result = await backgroundSync.syncBookmarksToServer(42);
+
+		expect(result.success).toBe(true);
+		// Without the serverId the next reconcile treats the bookmark as
+		// local-only and re-creates it, which is what produces the conflict UI.
+		expect(updateLocalBookmark).toHaveBeenCalledWith(
+			"2026_talk",
+			{ serverId: "42_2026_talk" },
+			true,
+		);
+	});
+
+	it("records a sync failure against the queued item so it is eventually dropped", async () => {
+		getSyncQueue.mockResolvedValue([
+			{
+				id: "2026_talk",
+				type: "bookmark",
+				action: "create",
+				data: { year: 2026, type: "event", slug: "talk", status: "favourited" },
+			},
+		]);
+
+		createBookmark.mockResolvedValue({ success: false, error: "boom" });
+
+		await backgroundSync.syncBookmarksToServer();
+
+		expect(recordSyncFailure).toHaveBeenCalledWith("2026_talk");
 	});
 
 	it("removes bookmark from queue when server returns 404", async () => {

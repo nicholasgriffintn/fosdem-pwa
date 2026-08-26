@@ -28,9 +28,11 @@ export type OptimisticCreateDeps = {
 			status: string;
 		},
 	) => Promise<LocalBookmark>;
-	removeLocal: (id: string) => Promise<boolean>;
+	removeLocal: (id: string, skipSync?: boolean) => Promise<boolean>;
 	createServer?: (bookmarkData: CreateBookmarkInput) => Promise<unknown>;
 	userId?: string;
+	/** Injectable for tests; defaults to the browser's connectivity state. */
+	isOnline?: () => boolean;
 };
 
 type ServerBookmarkResult = {
@@ -67,6 +69,11 @@ async function clearBookmarkSyncQueue(bookmarkId: string) {
 	}
 }
 
+function defaultIsOnline() {
+	if (typeof navigator === "undefined") return true;
+	return navigator.onLine !== false;
+}
+
 export async function createBookmarkOptimistic(
 	deps: OptimisticCreateDeps,
 	bookmarkData: CreateBookmarkInput,
@@ -77,7 +84,22 @@ export async function createBookmarkOptimistic(
 		try {
 			await deps.createServer(bookmarkData);
 		} catch (error) {
-			await deps.removeLocal(created.id);
+			const isOnline = (deps.isOnline ?? defaultIsOnline)();
+
+			// Offline is the expected case for this app, not a failure. Keep the
+			// local bookmark and the queued create so background sync can finish
+			// the job when connectivity returns.
+			if (!isOnline) {
+				return created;
+			}
+
+			// A genuine server rejection: undo the local write. `skipSync: true`
+			// matters — without it, removeLocalBookmark enqueues a *delete* under
+			// the same queue key as the pending create, replacing it. Background
+			// sync then saw a delete with no serverId and silently dropped it, so
+			// the bookmark was lost rather than retried.
+			await deps.removeLocal(created.id, true);
+			await clearBookmarkSyncQueue(created.id);
 			throw error;
 		}
 	}
@@ -118,10 +140,10 @@ export function useMutateBookmark({ year }: { year: number }) {
 		return updated;
 	};
 
-	const removeLocalBookmark = async (id: string) => {
+	const removeLocalBookmark = async (id: string, skipSync?: boolean) => {
 		const bookmarks = await getLocalBookmarks();
 		const bookmark = bookmarks.find((b) => b.id === id);
-		const success = await removeLocalBookmarkFromStorage(id);
+		const success = await removeLocalBookmarkFromStorage(id, skipSync);
 		if (success && bookmark) {
 			await queryClient.invalidateQueries({
 				queryKey: bookmarkQueryKeys.local(bookmark.year),

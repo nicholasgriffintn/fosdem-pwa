@@ -524,12 +524,39 @@ export async function addToSyncQueue(item: SyncQueueItem): Promise<void> {
     const existingItem = await getFromStore<SyncQueueItem>(STORE_NAMES.SYNC_QUEUE, item.id);
     const queueItem: SyncQueueItem = {
       ...item,
-      retryCount: existingItem ? (existingItem.retryCount ?? 0) + 1 : 0,
+      // Carry the existing count over rather than incrementing it. This function
+      // is only ever called from user mutations, so incrementing here counted
+      // *edits*, and getSyncQueue() discards anything at MAX_RETRY_COUNT — a user
+      // toggling one bookmark ten times offline silently lost the pending change.
+      // Failed sync attempts call recordSyncFailure() instead.
+      retryCount: existingItem?.retryCount ?? 0,
       lastAttempt: new Date().toISOString(),
     };
     await putInStore(STORE_NAMES.SYNC_QUEUE, queueItem);
   } catch (error) {
     console.error("Error adding to sync queue:", error);
+  }
+}
+
+/**
+ * Records a failed sync attempt for a queued item.
+ *
+ * This is what MAX_RETRY_COUNT is meant to bound: an item that can never
+ * succeed is eventually dropped instead of being retried on every reconnect
+ * for the full seven-day TTL.
+ */
+export async function recordSyncFailure(id: string): Promise<void> {
+  try {
+    const existingItem = await getFromStore<SyncQueueItem>(STORE_NAMES.SYNC_QUEUE, id);
+    if (!existingItem) return;
+
+    await putInStore(STORE_NAMES.SYNC_QUEUE, {
+      ...existingItem,
+      retryCount: (existingItem.retryCount ?? 0) + 1,
+      lastAttempt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error recording sync failure:", error);
   }
 }
 

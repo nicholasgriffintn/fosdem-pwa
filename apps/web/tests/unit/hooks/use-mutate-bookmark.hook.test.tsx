@@ -163,7 +163,7 @@ describe("useMutateBookmark", () => {
 			});
 		});
 
-		expect(removeLocalBookmarkMock).toHaveBeenCalledWith("2024_event-1");
+		expect(removeLocalBookmarkMock).toHaveBeenCalledWith("2024_event-1", undefined);
 		expect(serverCreateBookmarkMock).toHaveBeenCalledWith({
 			data: {
 				...favouritedBookmark,

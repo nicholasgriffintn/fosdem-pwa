@@ -15,6 +15,7 @@ import {
 	getSyncQueue,
 	addToSyncQueue,
 	removeFromSyncQueue,
+	recordSyncFailure,
 } from "~/lib/localStorage";
 
 type StoreName = "bookmarks" | "notes" | "sync_queue";
@@ -227,6 +228,66 @@ describe("local storage helpers", () => {
 		await removeFromSyncQueue("queue-item");
 		const afterRemoval = await getSyncQueue();
 		expect(afterRemoval.some((item) => item.id === "queue-item")).toBe(false);
+	});
+
+	it("does not count repeated user edits as sync retries", async () => {
+		const item = {
+			id: "2026_talk-a",
+			type: "bookmark" as const,
+			action: "create" as const,
+			data: {},
+			timestamp: new Date().toISOString(),
+		};
+
+		// A user toggling one bookmark offline re-queues the same id repeatedly.
+		// Previously each call incremented retryCount, and getSyncQueue() discards
+		// anything at MAX_RETRY_COUNT (10), so the pending change vanished.
+		for (let i = 0; i < 12; i++) {
+			await addToSyncQueue(item);
+		}
+
+		const queue = await getSyncQueue();
+		const entry = queue.find((q) => q.id === "2026_talk-a");
+
+		expect(entry).toBeDefined();
+		expect(entry?.retryCount).toBe(0);
+	});
+
+	it("drops an item once real sync attempts exhaust the retry budget", async () => {
+		await addToSyncQueue({
+			id: "2026_talk-b",
+			type: "bookmark",
+			action: "create",
+			data: {},
+			timestamp: new Date().toISOString(),
+		});
+
+		for (let i = 0; i < 10; i++) {
+			await recordSyncFailure("2026_talk-b");
+		}
+
+		const queue = await getSyncQueue();
+		expect(queue.some((q) => q.id === "2026_talk-b")).toBe(false);
+	});
+
+	it("keeps an item that has failed fewer times than the retry budget", async () => {
+		await addToSyncQueue({
+			id: "2026_talk-c",
+			type: "bookmark",
+			action: "create",
+			data: {},
+			timestamp: new Date().toISOString(),
+		});
+
+		await recordSyncFailure("2026_talk-c");
+		await recordSyncFailure("2026_talk-c");
+
+		const queue = await getSyncQueue();
+		expect(queue.find((q) => q.id === "2026_talk-c")?.retryCount).toBe(2);
+	});
+
+	it("ignores a failure recorded for an item that is no longer queued", async () => {
+		await expect(recordSyncFailure("never-queued")).resolves.toBeUndefined();
 	});
 
 	it("filters out invalid notes when retrieving", async () => {
