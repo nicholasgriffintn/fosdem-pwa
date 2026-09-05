@@ -28,9 +28,9 @@ describe("ensureYearFiles", () => {
     const logger = { info: vi.fn() };
 
     const template = await ensureYearFiles(
-      { head, put } as unknown as R2Bucket,
+      { head, put },
       "2027",
-      logger as any
+      logger
     );
 
     expect(template).toBeNull();

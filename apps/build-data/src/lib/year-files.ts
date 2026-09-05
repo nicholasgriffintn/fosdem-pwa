@@ -2,7 +2,12 @@ import type { BuildDataResult } from "../types";
 import { computeWeakEtag } from "../utils/hash";
 import type { createLogger } from "./logger";
 
-type Logger = ReturnType<typeof createLogger>;
+type Logger = Pick<ReturnType<typeof createLogger>, "info">;
+
+interface YearFileBucket {
+  head(key: string): Promise<unknown | null>;
+  put(key: string, value: string, options?: R2PutOptions): Promise<unknown>;
+}
 
 interface YearFile {
   key: string;
@@ -132,7 +137,7 @@ const getYearFiles = (data: BuildDataResult, year: string): YearFile[] => {
 };
 
 const uploadYearFile = async (
-  bucket: R2Bucket,
+  bucket: YearFileBucket,
   file: YearFile,
   year: string,
   logger: Logger
@@ -161,7 +166,7 @@ const uploadYearFile = async (
 };
 
 export const uploadYearFiles = async (
-  bucket: R2Bucket,
+  bucket: YearFileBucket,
   data: BuildDataResult,
   year: string,
   logger: Logger
@@ -172,7 +177,7 @@ export const uploadYearFiles = async (
 };
 
 export const ensureYearFiles = async (
-  bucket: R2Bucket,
+  bucket: YearFileBucket,
   year: string,
   logger: Logger
 ): Promise<BuildDataResult | null> => {
