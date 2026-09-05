@@ -39,6 +39,7 @@ export function flattenConference(conference: any): Conference {
     days: [conference.start?._text, conference.end?._text].filter(Boolean),
     day_change: conference.day_change?._text,
     timeslot_duration: conference.timeslot_duration?._text,
+    base_url: conference.base_url?._text,
     time_zone_name: conference.time_zone_name?._text,
   };
 

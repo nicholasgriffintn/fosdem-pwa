@@ -63,6 +63,7 @@ export interface Conference {
   days: string[];
   day_change?: string;
   timeslot_duration?: string;
+  base_url?: string;
   time_zone_name?: string;
 }
 

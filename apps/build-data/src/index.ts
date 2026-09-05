@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/cloudflare";
 import type { BuildDataResult } from "./types.js";
 import { buildData } from "./lib/fosdem";
 import { createLogger } from "./lib/logger";
+import { ensureYearFiles, uploadYearFiles } from "./lib/year-files";
 
 const DEFAULT_YEAR = 2027;
 const MIN_YEAR = 2000;
@@ -56,16 +57,6 @@ const validateBuildData = (data: BuildDataResult) => {
   }
 };
 
-const toHex = (buffer: ArrayBuffer) =>
-  Array.from(new Uint8Array(buffer))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-
-const computeEtag = async (payload: string): Promise<string> => {
-  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(payload));
-  return `W/"${toHex(hash)}"`;
-};
-
 const run = async (env: Env) => {
   const year = resolveYear(env);
   const yearString = year.value.toString();
@@ -81,102 +72,24 @@ const run = async (env: Env) => {
     clamped: year.clamped,
   });
 
-  const data = await buildData({ year: yearString });
-  validateBuildData(data);
+  const template = await ensureYearFiles(env.R2, yearString, logger);
+  let data: BuildDataResult;
 
-  const serializedFull = JSON.stringify(data, null, 2);
+  try {
+    data = await buildData({ year: yearString });
+    validateBuildData(data);
+  } catch (error) {
+    if (template) {
+      logger.warn("Schedule unavailable; retaining template year files", {
+        error: (error as Error)?.message,
+      });
+      return template;
+    }
 
-  if (!serializedFull.length) {
-    logger.error("Generated payload was empty");
-    throw new Error("Generated data payload is empty");
+    throw error;
   }
 
-  const fullEtag = await computeEtag(serializedFull);
-  const fullKey = `fosdem-${yearString}.json`;
-
-  await env.R2.put(fullKey, serializedFull, {
-    httpMetadata: {
-      contentType: "application/json",
-      cacheControl: "public, max-age=600",
-    },
-    customMetadata: {
-      year: yearString,
-      etag: fullEtag,
-    },
-  });
-
-  logger.info("Uploaded full data to R2", {
-    key: fullKey,
-    size: serializedFull.length,
-    etag: fullEtag,
-  });
-
-  const coreData = {
-    conference: data.conference,
-    days: data.days,
-    types: data.types,
-    buildings: data.buildings,
-  };
-
-  const tracksData = {
-    tracks: data.tracks,
-    rooms: data.rooms,
-  };
-
-  const eventsData = {
-    events: data.events,
-  };
-
-  const personsData = data.persons ? { persons: data.persons } : null;
-
-  const uploads: Array<{key: string; data: unknown; description: string}> = [
-    {
-      key: `fosdem-${yearString}-core.json`,
-      data: coreData,
-      description: "core",
-    },
-    {
-      key: `fosdem-${yearString}-tracks.json`,
-      data: tracksData,
-      description: "tracks",
-    },
-    {
-      key: `fosdem-${yearString}-events.json`,
-      data: eventsData,
-      description: "events",
-    },
-  ];
-
-  if (personsData) {
-    uploads.push({
-      key: `fosdem-${yearString}-persons.json`,
-      data: personsData,
-      description: "persons",
-    });
-  }
-
-  for (const upload of uploads) {
-    const serialized = JSON.stringify(upload.data);
-    const etag = await computeEtag(serialized);
-
-    await env.R2.put(upload.key, serialized, {
-      httpMetadata: {
-        contentType: "application/json",
-        cacheControl: "public, max-age=600",
-      },
-      customMetadata: {
-        year: yearString,
-        etag,
-        type: upload.description,
-      },
-    });
-
-    logger.info("Uploaded split file to R2", {
-      key: upload.key,
-      size: serialized.length,
-      etag,
-    });
-  }
+  await uploadYearFiles(env.R2, data, yearString, logger);
 
   return data;
 };
