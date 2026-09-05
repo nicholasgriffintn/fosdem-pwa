@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fosdempwa",
   "main": "@tanstack/react-start/server-entry",
-  "compatibility_date": "2025-09-02",
+  "compatibility_date": "2026-08-28",
   "compatibility_flags": [
     "nodejs_compat"
   ],
