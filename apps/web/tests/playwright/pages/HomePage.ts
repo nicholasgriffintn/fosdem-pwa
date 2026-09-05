@@ -7,10 +7,10 @@ export class HomePage extends BasePage {
 			await super.goto(path);
 			return;
 		}
-		await super.goto("/?year=2026");
+		await super.goto("/?year=2027");
 	}
 
-	async gotoYear(year = 2026) {
+	async gotoYear(year = 2027) {
 		await super.goto(`/?year=${year}`);
 	}
 

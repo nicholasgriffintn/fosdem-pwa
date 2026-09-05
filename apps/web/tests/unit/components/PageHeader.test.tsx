@@ -97,7 +97,7 @@ describe("PageHeader", () => {
   });
 
   it("does not show year alert for default year", () => {
-    render(<PageHeader heading="Title" year={2026} />);
+    render(<PageHeader heading="Title" year={2027} />);
 
     expect(
       screen.queryByText(/You are viewing the/)

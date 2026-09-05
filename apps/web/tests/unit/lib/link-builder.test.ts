@@ -18,7 +18,7 @@ describe("link-builder", () => {
         to: "/rooms/$roomId",
         params: { roomId: "H1302" },
         search: {
-          year: 2026,
+          year: 2027,
           day: undefined,
           sortFavourites: undefined,
         },
@@ -44,7 +44,7 @@ describe("link-builder", () => {
         to: "/rooms/$roomId",
         params: { roomId: "J1" },
         search: {
-          year: 2026,
+          year: 2027,
           day: undefined,
           sortFavourites: "true",
         },
@@ -58,7 +58,7 @@ describe("link-builder", () => {
       expect(result).toEqual({
         to: "/search",
         search: {
-          year: 2026,
+          year: 2027,
           q: "",
           track: undefined,
           time: undefined,
@@ -95,7 +95,7 @@ describe("link-builder", () => {
         to: "/event/$slug",
         params: { slug: "my-talk-slug" },
         search: {
-          year: 2026,
+          year: 2027,
           test: false,
         },
       });
@@ -121,7 +121,7 @@ describe("link-builder", () => {
         to: "/track/$slug",
         params: { slug: "go-devroom" },
         search: {
-          year: 2026,
+          year: 2027,
           day: undefined,
           view: undefined,
           sortFavourites: undefined,
@@ -155,7 +155,7 @@ describe("link-builder", () => {
       expect(result).toEqual({
         to: "/",
         search: {
-          year: 2026,
+          year: 2027,
         },
       });
     });
@@ -177,7 +177,7 @@ describe("link-builder", () => {
       expect(result).toEqual({
         to: "/bookmarks",
         search: {
-          year: 2026,
+          year: 2027,
           tab: "events",
         },
       });
@@ -201,7 +201,7 @@ describe("link-builder", () => {
       expect(result).toEqual({
         to: "/profile",
         search: {
-          year: 2026,
+          year: 2027,
           tab: "events",
         },
       });

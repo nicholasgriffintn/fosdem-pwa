@@ -10,13 +10,13 @@ describe("search-params", () => {
     });
 
     it("uses default year when year is not a number", () => {
-      expect(preserveYearSearch({ year: "2025" })).toEqual({ year: 2026 });
-      expect(preserveYearSearch({ year: null })).toEqual({ year: 2026 });
-      expect(preserveYearSearch({ year: undefined })).toEqual({ year: 2026 });
+      expect(preserveYearSearch({ year: "2025" })).toEqual({ year: 2027 });
+      expect(preserveYearSearch({ year: null })).toEqual({ year: 2027 });
+      expect(preserveYearSearch({ year: undefined })).toEqual({ year: 2027 });
     });
 
     it("uses default year when year is missing", () => {
-      expect(preserveYearSearch({})).toEqual({ year: 2026 });
+      expect(preserveYearSearch({})).toEqual({ year: 2027 });
     });
 
     it("ignores other properties in the input", () => {

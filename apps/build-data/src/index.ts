@@ -4,7 +4,7 @@ import type { BuildDataResult } from "./types.js";
 import { buildData } from "./lib/fosdem";
 import { createLogger } from "./lib/logger";
 
-const DEFAULT_YEAR = 2026;
+const DEFAULT_YEAR = 2027;
 const MIN_YEAR = 2000;
 const MAX_YEAR = 2100;
 

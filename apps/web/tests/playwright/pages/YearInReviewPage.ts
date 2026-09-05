@@ -3,11 +3,11 @@ import { BasePage } from "./BasePage";
 
 export class YearInReviewPage extends BasePage {
   async goto(path?: string) {
-    const year = path ? parseInt(path, 10) || 2026 : 2026;
+    const year = path ? parseInt(path, 10) || 2027 : 2027;
     await super.goto(`/profile/year-in-review?year=${year}`);
   }
 
-  async gotoYear(year = 2026) {
+  async gotoYear(year = 2027) {
     await super.goto(`/profile/year-in-review?year=${year}`);
   }
 
@@ -20,6 +20,7 @@ export class YearInReviewPage extends BasePage {
   async expectYearSelector() {
     await expect(this.page.getByRole("button", { name: "2025" })).toBeVisible();
     await expect(this.page.getByRole("button", { name: "2026" })).toBeVisible();
+    await expect(this.page.getByRole("button", { name: "2027" })).toBeVisible();
   }
 
   async expectRefreshButton() {

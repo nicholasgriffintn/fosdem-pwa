@@ -45,6 +45,6 @@ test.describe("Search experience", () => {
 		await page.goto("/search?q=keynote");
 
 		const searchPage = new SearchPage(page);
-		await searchPage.expectSearchParam("year", "2026");
+		await searchPage.expectSearchParam("year", "2027");
 	});
 });

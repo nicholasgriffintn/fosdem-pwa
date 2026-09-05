@@ -39,16 +39,16 @@ describe("build-data worker entrypoint", () => {
 			{} as any,
 		);
 
-		expect(buildData).toHaveBeenCalledWith({ year: "2026" });
+		expect(buildData).toHaveBeenCalledWith({ year: "2027" });
 		expect(put).toHaveBeenCalledWith(
-			"fosdem-2026.json",
+			"fosdem-2027.json",
 			JSON.stringify(mockData, null, 2),
 			expect.objectContaining({
 				httpMetadata: expect.objectContaining({
 					contentType: "application/json",
 				}),
 				customMetadata: expect.objectContaining({
-					year: "2026",
+					year: "2027",
 					etag: expect.any(String),
 				}),
 			}),
@@ -110,9 +110,9 @@ describe("build-data worker entrypoint", () => {
 		const buildPromise = waitUntil.mock.calls[0]?.[0] as Promise<unknown>;
 		await buildPromise;
 
-		expect(buildData).toHaveBeenCalledWith({ year: "2026" });
+		expect(buildData).toHaveBeenCalledWith({ year: "2027" });
 		expect(put).toHaveBeenCalledWith(
-			"fosdem-2026.json",
+			"fosdem-2027.json",
 			JSON.stringify(mockData, null, 2),
 			expect.any(Object),
 		);

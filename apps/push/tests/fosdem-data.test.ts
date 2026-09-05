@@ -1,15 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../src/constants", () => ({
-	constants: {
-		YEAR: 2026,
-		DATA_LINK: "https://example.com/fosdem-${YEAR}-events.json",
-		DAYS_MAP: {},
-	},
-}));
-
-describe("getFosdemData caching", () => {
+describe("FOSDEM data", () => {
 	afterEach(() => {
+		vi.useRealTimers();
 		vi.restoreAllMocks();
 		vi.resetModules();
 	});
@@ -26,5 +19,23 @@ describe("getFosdemData caching", () => {
 		await getFosdemData();
 
 		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(fetchMock).toHaveBeenCalledWith(
+			"https://r2.fosdempwa.com/fosdem-2027-events.json",
+			expect.any(Object),
+		);
+	});
+
+	it("maps the 2027 conference dates to their event days", async () => {
+		vi.useFakeTimers();
+		const { getCurrentDay } = await import("../src/lib/fosdem-data");
+
+		vi.setSystemTime(new Date("2027-01-30T12:00:00.000Z"));
+		expect(getCurrentDay()).toBe("1");
+
+		vi.setSystemTime(new Date("2027-01-31T12:00:00.000Z"));
+		expect(getCurrentDay()).toBe("2");
+
+		vi.setSystemTime(new Date("2027-02-01T12:00:00.000Z"));
+		expect(getCurrentDay()).toBeUndefined();
 	});
 });

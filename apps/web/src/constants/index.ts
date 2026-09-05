@@ -6,10 +6,10 @@ export const constants = {
 			: "1x00000000000000000000AA",
 	VAPID_PUBLIC_KEY:
 		"BOyDFH_a2LKhi-g00jnVi4ZzkPWxC9mqJov7pyOX5Ka-2BWAHT8cioIcsgvD9Suj96NS9u8QpwrtNp5mdyeQ7gc",
-	DEFAULT_YEAR: 2026,
+	DEFAULT_YEAR: 2027,
 	AVAILABLE_YEARS: [
 		2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023,
-		2024, 2025, 2026,
+		2024, 2025, 2026, 2027,
 	],
 	DATA_LINK: "https://r2.fosdempwa.com/fosdem-${YEAR}.json",
 	STREAM_LINK: "https://stream.fosdem.org/${ROOM_ID}.m3u8",

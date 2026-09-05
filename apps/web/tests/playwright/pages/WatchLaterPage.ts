@@ -3,11 +3,11 @@ import { BasePage } from "./BasePage";
 
 export class WatchLaterPage extends BasePage {
   async goto(path?: string) {
-    const year = path ? parseInt(path, 10) || 2026 : 2026;
+    const year = path ? parseInt(path, 10) || 2027 : 2027;
     await super.goto(`/bookmarks?year=${year}&tab=watch-later`);
   }
 
-  async gotoYear(year = 2026) {
+  async gotoYear(year = 2027) {
     await super.goto(`/bookmarks?year=${year}&tab=watch-later`);
   }
 

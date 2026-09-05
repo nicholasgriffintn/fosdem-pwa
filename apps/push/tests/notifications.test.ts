@@ -43,7 +43,7 @@ describe("notification payloads", () => {
 		expect(payload.title).toBe("Event Starting Soon");
 		expect(payload.body).toContain("starts in 15 minutes");
 		expect(payload.body).toContain(baseBookmark.room);
-		expect(payload.url).toContain("year=2026");
+		expect(payload.url).toContain("year=2027");
 	});
 
 	it("creates daily summary payloads for morning and evening", () => {

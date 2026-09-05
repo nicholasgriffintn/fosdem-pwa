@@ -2,7 +2,7 @@ import { expect } from "@playwright/test";
 import { BasePage } from "./BasePage";
 
 const DEFAULT_QUERY = "keynote";
-const DEFAULT_YEAR = 2026;
+const DEFAULT_YEAR = 2027;
 
 export class SearchPage extends BasePage {
 	async goto(query = DEFAULT_QUERY, year = DEFAULT_YEAR) {
