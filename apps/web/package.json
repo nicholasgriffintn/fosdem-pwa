@@ -97,7 +97,7 @@
     "globals": "17.11.0",
     "jsdom": "30.0.1",
     "tailwindcss": "4.3.3",
-    "tsx": "4.23.12",
+    "tsx": "4.23.13",
     "typescript": "7.0.2",
     "vitest": "4.1.11",
     "wrangler": "4.127.1"
