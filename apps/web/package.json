@@ -91,7 +91,7 @@
     "@types/react-dom": "19.2.7",
     "@vitejs/plugin-react": "6.1.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "autoprefixer": "10.5.4",
+    "autoprefixer": "10.5.5",
     "drizzle-kit": "0.31.10",
     "glob": "13.0.6",
     "globals": "17.12.0",
