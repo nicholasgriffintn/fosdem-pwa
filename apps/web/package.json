@@ -90,7 +90,7 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "@vitejs/plugin-react": "6.1.1",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^5.0.0",
     "autoprefixer": "10.5.5",
     "drizzle-kit": "0.31.10",
     "glob": "13.0.6",
@@ -99,7 +99,7 @@
     "tailwindcss": "4.3.3",
     "tsx": "4.23.13",
     "typescript": "7.0.2",
-    "vitest": "4.1.11",
+    "vitest": "5.0.0",
     "wrangler": "4.129.0"
   }
 }
