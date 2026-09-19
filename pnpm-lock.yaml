@@ -181,8 +181,8 @@ importers:
         specifier: 7.5.0
         version: 7.5.0
       hls.js:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       lucide-react:
         specifier: 1.43.0
         version: 1.43.0(react@19.3.0)
@@ -3316,8 +3316,8 @@ packages:
       crossws:
         optional: true
 
-  hls.js@1.7.2:
-    resolution: {integrity: sha512-CW/pPvSOFIRsosbwxrYaE9ERmpTo5fbTqL7wCvuCFlqW1Bmb1K5fXsY7yiH95rmlr4rVuA7UXHbM/cIXQ6AXwg==}
+  hls.js@1.7.3:
+    resolution: {integrity: sha512-MsPlx6yVW4Qv4C7mEVou4/gk/5cN2dVxOTnrNjPSmyH2f0Ln+/UkG10Ax1PE6OvrmTVPKgQYozTtBaPOuCzq7A==}
 
   html-encoding-sniffer@6.0.0:
     resolution: {integrity: sha512-CV9TW3Y3f8/wT0BRFc1/KAVQ3TUHiXmaAb6VW9vtiMFf7SLoMd1PdAc4W3KFOFETBJUb90KatHqlsZMWV+R9Gg==}
@@ -6639,7 +6639,7 @@ snapshots:
       rou3: 0.8.1
       srvx: 0.11.22
 
-  hls.js@1.7.2: {}
+  hls.js@1.7.3: {}
 
   html-encoding-sniffer@6.0.0:
     dependencies:
