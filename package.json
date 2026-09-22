@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "pnpm --filter @fosdem-pwa/web dev",
     "build": "pnpm --filter @fosdem-pwa/web build",
+    "preview": "pnpm --filter @fosdem-pwa/web preview",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",

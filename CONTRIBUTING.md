@@ -18,3 +18,9 @@ The Playwright suite follows the Page Object Model:
 
 - `tests/playwright/pages/HomePage.ts`, `SearchPage.ts`, `SignInPage.ts` encapsulate UI sections.
 - Specs live in `tests/playwright/specs` and focus on high-level flows (homepage content, search discoverability, and auth entry-points).
+
+## Cloudflare Worker Previews
+
+Use `pnpm preview` to build and publish a remote web Preview for the current branch. Pass `--name <name>` to choose a name, or run `pnpm exec wrangler preview delete --name <name>` from `apps/web` to remove it. Run `pnpm --filter @fosdem-pwa/web exec wrangler login` first if Wrangler is not authenticated.
+
+Before the first Preview, protect the web Worker's Preview URLs with Cloudflare Access, then enable **Worker URL > Preview** in the Cloudflare dashboard. The Preview uses the existing `fosdem-preview` D1 database, shared across branch Previews, instead of production D1. OAuth and test notifications are disabled until dedicated Preview integrations are configured.
