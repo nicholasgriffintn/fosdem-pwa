@@ -35,6 +35,7 @@ export const sendTestNotification = createServerFn({
 			}
 
 			const pushServiceUrl = process.env.PUSH_SERVICE_URL || "https://push.fosdempwa.com";
+			const cronSecret = process.env.CRON_SECRET;
 
 			const url = new URL(pushServiceUrl);
 			url.searchParams.set("test", "true");
@@ -47,6 +48,7 @@ export const sendTestNotification = createServerFn({
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					...(cronSecret ? { Authorization: `Bearer ${cronSecret}` } : {}),
 				},
 			});
 

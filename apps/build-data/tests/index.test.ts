@@ -12,6 +12,11 @@ vi.mock("../src/lib/fosdem", () => ({
 }));
 
 describe("build-data worker entrypoint", () => {
+	const buildRequest = (secret = "build-secret") =>
+		new Request("https://example.com", {
+			method: "POST",
+			headers: { Authorization: `Bearer ${secret}` },
+		});
 	const makeMockData = () => ({
 		conference: { title: "FOSDEM" },
 		events: { "event-1": { title: "Keynote" } },
@@ -35,10 +40,10 @@ describe("build-data worker entrypoint", () => {
 		(buildData as vi.Mock).mockResolvedValue(mockData);
 
 		const R2 = makeR2();
-		const env = { R2 };
+		const env = { R2, BUILD_TRIGGER_SECRET: "build-secret" };
 
 		const response = await handler.fetch(
-			new Request("https://example.com"),
+			buildRequest(),
 			env as any,
 			{} as any,
 		);
@@ -65,9 +70,9 @@ describe("build-data worker entrypoint", () => {
 		(buildData as vi.Mock).mockResolvedValue(mockData);
 
 		const R2 = makeR2();
-		const env = { R2, YEAR: "1999" };
+		const env = { R2, YEAR: "1999", BUILD_TRIGGER_SECRET: "build-secret" };
 
-		await handler.fetch(new Request("https://example.com"), env as any, {} as any);
+		await handler.fetch(buildRequest(), env as any, {} as any);
 
 		expect(buildData).toHaveBeenCalledWith({ year: "2000" });
 		expect(R2.put).toHaveBeenCalledWith(
@@ -90,10 +95,10 @@ describe("build-data worker entrypoint", () => {
 		(buildData as vi.Mock).mockResolvedValue(mockData);
 
 		const R2 = makeR2();
-		const env = { R2 };
+		const env = { R2, BUILD_TRIGGER_SECRET: "build-secret" };
 
 		await expect(
-			handler.fetch(new Request("https://example.com"), env as any, {} as any),
+			handler.fetch(buildRequest(), env as any, {} as any),
 		).rejects.toThrow("Generated data contains no events");
 
 		expect(R2.put).not.toHaveBeenCalled();
@@ -106,10 +111,13 @@ describe("build-data worker entrypoint", () => {
 
 		const head = vi.fn().mockResolvedValue(null);
 		const put = vi.fn();
-		const env = { R2: { head, put } };
+		const env = {
+			R2: { head, put },
+			BUILD_TRIGGER_SECRET: "build-secret",
+		};
 
 		const response = await handler.fetch(
-			new Request("https://example.com"),
+			buildRequest(),
 			env as any,
 			{} as any,
 		);
@@ -159,6 +167,43 @@ describe("build-data worker entrypoint", () => {
 			tracks: {},
 			events: {},
 		});
+	});
+
+	it("rejects unauthorised manual builds without touching R2", async () => {
+		const R2 = makeR2();
+
+		const missingSecretResponse = await handler.fetch(
+			buildRequest(),
+			{ R2 } as any,
+			{} as any,
+		);
+		const incorrectTokenResponse = await handler.fetch(
+			buildRequest("wrong-secret"),
+			{ R2, BUILD_TRIGGER_SECRET: "build-secret" } as any,
+			{} as any,
+		);
+
+		expect(missingSecretResponse.status).toBe(401);
+		expect(incorrectTokenResponse.status).toBe(401);
+		expect(buildData).not.toHaveBeenCalled();
+		expect(R2.put).not.toHaveBeenCalled();
+	});
+
+	it("rejects non-POST manual builds", async () => {
+		const R2 = makeR2();
+
+		const response = await handler.fetch(
+			new Request("https://example.com", {
+				headers: { Authorization: "Bearer build-secret" },
+			}),
+			{ R2, BUILD_TRIGGER_SECRET: "build-secret" } as any,
+			{} as any,
+		);
+
+		expect(response.status).toBe(405);
+		expect(response.headers.get("Allow")).toBe("POST");
+		expect(buildData).not.toHaveBeenCalled();
+		expect(R2.put).not.toHaveBeenCalled();
 	});
 
 	it("triggers build during scheduled events", async () => {

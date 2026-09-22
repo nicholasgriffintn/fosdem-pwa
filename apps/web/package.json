@@ -9,7 +9,8 @@
     "dev": "vite dev --port 3000",
     "build:sw": "tsx ./scripts/generate-sw.ts",
     "build": "NODE_ENV=production vite build && pnpm build:sw",
-    "preview": "vite preview",
+    "preview": "pnpm build && wrangler preview",
+    "preview:local": "vite preview",
     "start": "node .output/server/index.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -22,7 +23,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply fosdem --local --persist-to ../cloudflare/state",
     "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote",
-    "deploy": "NODE_ENV=production wrangler deploy --env production"
+    "deploy": "pnpm build && wrangler deploy"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -81,7 +82,7 @@
     "@axe-core/playwright": "^4.12.1",
     "@biomejs/biome": "2.5.13",
     "@cloudflare/vite-plugin": "1.54.9",
-    "@cloudflare/workers-types": "5.20260914.1",
+    "@cloudflare/workers-types": "5.20260922.1",
     "@playwright/test": "1.63.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
@@ -100,6 +101,6 @@
     "tsx": "4.23.13",
     "typescript": "7.0.2",
     "vitest": "5.0.0",
-    "wrangler": "4.131.2"
+    "wrangler": "4.136.3"
   }
 }

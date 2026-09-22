@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/cloudflare";
 import type { BuildDataResult } from "./types.js";
 import { buildData } from "./lib/fosdem";
 import { createLogger } from "./lib/logger";
+import { hasBearerToken } from "./lib/request-auth";
 import { ensureYearFiles, uploadYearFiles } from "./lib/year-files";
 
 const DEFAULT_YEAR = 2027;
@@ -10,6 +11,10 @@ const MIN_YEAR = 2000;
 const MAX_YEAR = 2100;
 
 type ParsedYear = { value: number; source: "env" | "default"; clamped: boolean };
+
+interface BuildDataEnv extends Env {
+  BUILD_TRIGGER_SECRET?: string;
+}
 
 const parseYear = (value: string | null | undefined): ParsedYear => {
   const parsed = Number.parseInt(value ?? "", 10);
@@ -94,7 +99,7 @@ const run = async (env: Env) => {
   return data;
 };
 
-export default Sentry.withSentry<Env, unknown>(
+export default Sentry.withSentry<BuildDataEnv, unknown>(
   (env) => ({
     dsn: "https://07aa95ea691d47e198b5c3b291501895@ingest.bitwobbly.com/7",
     sampleRate: 1,
@@ -109,12 +114,23 @@ export default Sentry.withSentry<Env, unknown>(
   }),
   {
     async fetch(request, env, ctx): Promise<Response> {
+      if (request.method !== "POST") {
+        return new Response("Method Not Allowed", {
+          status: 405,
+          headers: { Allow: "POST" },
+        });
+      }
+
+      if (!hasBearerToken(request, env.BUILD_TRIGGER_SECRET)) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+
       const data = await run(env);
 
       return Response.json(data);
     },
-    async scheduled(event: any, env: any, ctx: any) {
+    async scheduled(_event, env, ctx) {
       ctx.waitUntil(run(env));
     },
-  } satisfies ExportedHandler<Env>
+  } satisfies ExportedHandler<BuildDataEnv>
 );
