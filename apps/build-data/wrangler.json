@@ -7,7 +7,7 @@
     "nodejs_compat"
   ],
   "workers_dev": false,
-  "preview_urls": true,
+  "preview_urls": false,
   "placement": {
     "mode": "smart"
   },
@@ -36,14 +36,6 @@
   "triggers": {
     "crons": [
       "0 * * * *"
-    ]
-  },
-  "previews": {
-    "r2_buckets": [
-      {
-        "binding": "R2",
-        "bucket_name": "fosdem-preview"
-      }
     ]
   }
 }

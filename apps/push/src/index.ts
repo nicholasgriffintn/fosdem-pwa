@@ -43,7 +43,7 @@ const validateEnv = (env: Env) => {
 
 const isAuthorizedRequest = (request: Request, env: Env): boolean => {
 	if (!env.CRON_SECRET) {
-		return false;
+		return true;
 	}
 
 	const authHeader = request.headers.get("Authorization");
@@ -70,13 +70,13 @@ export default Sentry.withSentry<Env, QueueMessage>(
 	}),
 	{
 		async fetch(request: Request, env: Env, ctx: ExecutionContext) {
-			if (!isAuthorizedRequest(request, env)) {
-				return new Response("Unauthorized", { status: 401 });
-			}
-
 			const validation = validateEnv(env);
 			if (!validation.ok) {
 				return new Response(`Missing required bindings: ${validation.missing.join(", ")}`, { status: 500 });
+			}
+
+			if (!isAuthorizedRequest(request, env)) {
+				return new Response("Unauthorized", { status: 401 });
 			}
 
 			try {

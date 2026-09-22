@@ -49,8 +49,6 @@
   "previews": {
     "vars": {
       "CF_PAGES_URL": "https://preview.invalid",
-      "KV_CACHING_ENABLED": "false",
-      "NODE_ENV": "production",
       "PUSH_SERVICE_URL": "https://preview-push.invalid"
     },
     "d1_databases": [
@@ -58,12 +56,6 @@
         "binding": "DB",
         "database_name": "fosdem-preview",
         "database_id": "2ec973b1-6e46-49a8-825b-1928ec34cd22"
-      }
-    ],
-    "kv_namespaces": [
-      {
-        "binding": "KV",
-        "id": "ed965a930c33427a9ffb985634f8febb"
       }
     ]
   }

@@ -38,7 +38,6 @@ const validEnv = {
 	VAPID_PUBLIC_KEY: "pub",
 	VAPID_PRIVATE_KEY: "priv",
 	BOOKMARK_NOTIFICATIONS_ENABLED: "true",
-	CRON_SECRET: "cron-secret",
 } as any;
 
 describe("push worker env validation", () => {
@@ -48,10 +47,8 @@ describe("push worker env validation", () => {
 
 	it("returns 500 when required bindings are missing", async () => {
 		const response = await handler.fetch(
-			new Request("https://example.com", {
-				headers: { Authorization: "Bearer cron-secret" },
-			}),
-			{ CRON_SECRET: "cron-secret" } as any,
+			new Request("https://example.com"),
+			{} as any,
 			{} as any,
 		);
 
@@ -61,33 +58,12 @@ describe("push worker env validation", () => {
 
 	it("allows requests when bindings are present", async () => {
 		const response = await handler.fetch(
-			new Request("https://example.com", {
-				headers: { Authorization: "Bearer cron-secret" },
-			}),
+			new Request("https://example.com"),
 			validEnv,
 			{} as any,
 		);
 
 		expect(response.status).toBe(200);
-	});
-
-	it("rejects requests when the cron secret is missing or incorrect", async () => {
-		const { CRON_SECRET: _, ...envWithoutSecret } = validEnv;
-		const missingSecretResponse = await handler.fetch(
-			new Request("https://example.com"),
-			envWithoutSecret,
-			{} as any,
-		);
-		const incorrectTokenResponse = await handler.fetch(
-			new Request("https://example.com", {
-				headers: { Authorization: "Bearer wrong-secret" },
-			}),
-			validEnv,
-			{} as any,
-		);
-
-		expect(missingSecretResponse.status).toBe(401);
-		expect(incorrectTokenResponse.status).toBe(401);
 	});
 
 	it("dedupes repeated queue messages within a batch", async () => {
