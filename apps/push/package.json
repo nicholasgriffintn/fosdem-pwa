@@ -15,7 +15,7 @@
     "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "5.20260916.1",
+    "@cloudflare/workers-types": "5.20260918.1",
     "vitest": "5.0.1",
     "typescript": "7.0.2",
     "wrangler": "4.131.2"
