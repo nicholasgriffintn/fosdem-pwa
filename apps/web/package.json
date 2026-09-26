@@ -51,7 +51,7 @@
     "@radix-ui/react-tabs": "1.1.21",
     "@radix-ui/react-toast": "1.2.23",
     "@radix-ui/react-tooltip": "1.2.16",
-    "@sentry/react": "^10.69.0",
+    "@sentry/react": "^11.0.0",
     "@tailwindcss/typography": "0.5.20",
     "@tailwindcss/vite": "4.3.3",
     "@tanstack/devtools-vite": "0.8.5",
