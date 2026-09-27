@@ -1,7 +1,8 @@
+import { brand, conferenceConfig } from "@roomisfull/conference";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getAllData } from "~/server/functions/fosdem";
-import type { Conference } from "~/types/fosdem";
+import { getAllData } from "~/server/functions/schedule";
+import type { Conference } from "~/types/conference";
 import { constants } from "~/constants";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { RoomList } from "~/components/Room/RoomList";
@@ -21,24 +22,24 @@ export const Route = createFileRoute("/rooms/")({
 		const data = (await getAllData({ data: { year } })) as Conference;
 		const rooms = data.rooms;
 
-		return { fosdem: { rooms }, year, day };
+		return { schedule: { rooms }, year, day };
 	},
 	head: () => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: "Rooms | FOSDEM PWA",
-				description: "All rooms and venues at FOSDEM conference. Browse events by room and location.",
-			})
+				title: `Rooms | ${brand.name}`,
+				description: `All rooms and venues at ${conferenceConfig.name} conference. Browse events by room and location.`,
+			}),
 		],
 	}),
 	staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
 function RoomsPage() {
-	const { fosdem, year } = Route.useLoaderData();
-	const roomKeys = fosdem.rooms ? Object.keys(fosdem.rooms) : [];
+	const { schedule, year } = Route.useLoaderData();
+	const roomKeys = schedule.rooms ? Object.keys(schedule.rooms) : [];
 	const rooms = roomKeys.map((room) => ({
-		...fosdem.rooms[room],
+		...schedule.rooms[room],
 		id: room,
 	}));
 

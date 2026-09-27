@@ -1,6 +1,6 @@
 import type React from "react";
 import { useMemo } from "react";
-import type { Track } from "~/types/fosdem";
+import type { Track } from "~/types/conference";
 import { ItemActions } from "~/components/shared/ItemActions";
 import { useTrackList } from "~/hooks/use-item-list";
 import { groupTracksByDay } from "~/lib/grouping";
@@ -61,7 +61,6 @@ function TrackListItem({
 	track,
 	bookmarksLoading,
 	roomStatus,
-	user,
 	onCreateBookmark,
 }: TrackListItemProps) {
 	const layoutClass =
@@ -70,11 +69,11 @@ function TrackListItem({
 	const metaBadges = [
 		track.room
 			? {
-				key: "room",
-				label: track.room,
-				icon: <Icons.mapPin className="h-3.5 w-3.5" />,
-				status: roomStatusState,
-			}
+					key: "room",
+					label: track.room,
+					icon: <Icons.mapPin className="h-3.5 w-3.5" />,
+					status: roomStatusState,
+				}
 			: null,
 		{
 			key: "events",
@@ -83,10 +82,10 @@ function TrackListItem({
 		},
 		track.type
 			? {
-				key: "type",
-				label: track.type,
-				icon: <Icons.calendar className="h-3.5 w-3.5" />,
-			}
+					key: "type",
+					label: track.type,
+					icon: <Icons.calendar className="h-3.5 w-3.5" />,
+				}
 			: null,
 	].filter(Boolean) as {
 		key: string;
@@ -111,10 +110,7 @@ function TrackListItem({
 					</div>
 					<div className="flex flex-wrap gap-2">
 						{metaBadges.map((meta) => (
-							<div
-								key={meta.key}
-								className="flex items-center gap-1 text-xs"
-							>
+							<div key={meta.key} className="flex items-center gap-1 text-xs">
 								{meta.icon}
 								<span className="truncate">{meta.label}</span>
 								{meta.status && <RoomStatusIndicator state={meta.status} />}
@@ -173,8 +169,8 @@ function TrackListContent({
 					sortedTracks
 						.map((track) => track.room)
 						.filter((room): room is string => Boolean(room)),
-					),
 				),
+			),
 		[sortedTracks],
 	);
 	const { statusByRoom } = useRoomStatuses(roomNames);
@@ -189,7 +185,9 @@ function TrackListContent({
 								year={year}
 								track={track}
 								bookmarksLoading={bookmarksLoading}
-								roomStatus={track.room ? statusByRoom.get(track.room) : undefined}
+								roomStatus={
+									track.room ? statusByRoom.get(track.room) : undefined
+								}
 								user={user}
 								onCreateBookmark={onCreateBookmark}
 							/>
@@ -197,11 +195,11 @@ function TrackListContent({
 					))}
 				</ListContainer>
 			) : (
-					<EmptyStateCard
-						title="No tracks to show"
-						description="Try another day or browse all tracks from the home page."
-						className="my-4"
-					/>
+				<EmptyStateCard
+					title="No tracks to show"
+					description="Try another day or browse all tracks from the home page."
+					className="my-4"
+				/>
 			)}
 		</>
 	);

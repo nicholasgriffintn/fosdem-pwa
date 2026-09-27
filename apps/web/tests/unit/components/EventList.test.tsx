@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { TooltipProvider } from "~/components/ui/tooltip";
 import { EventList } from "~/components/Event/EventList";
-import type { Event } from "~/types/fosdem";
+import type { Event } from "~/types/conference";
 
 vi.mock("@tanstack/react-router", () => ({
 	useNavigate: () => () => {},
@@ -79,7 +79,7 @@ const renderWithClient = (ui: ReactNode) => {
 		...render(
 			<QueryClientProvider client={queryClient}>
 				<TooltipProvider>{ui}</TooltipProvider>
-			</QueryClientProvider>
+			</QueryClientProvider>,
 		),
 	};
 };
@@ -97,13 +97,15 @@ describe("EventList", () => {
 			/>,
 		);
 
-		expect(screen.getByRole("heading", { name: /Schedule/i })).toBeInTheDocument();
+		expect(
+			screen.getByRole("heading", { name: /Schedule/i }),
+		).toBeInTheDocument();
 
 		const calendarLink = screen.getByLabelText(/calendar/i);
 		fireEvent.click(calendarLink);
 		expect(screen.getByText(/Talk A/i)).toBeInTheDocument();
 		expect(screen.getByText(/Talk B/i)).toBeInTheDocument();
-		
+
 		const scheduleLink = screen.getByLabelText(/schedule/i);
 		fireEvent.click(scheduleLink);
 		expect(screen.getByText(/Talk A/i)).toBeInTheDocument();

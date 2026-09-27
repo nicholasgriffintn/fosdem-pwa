@@ -5,7 +5,11 @@ export interface ReconciliationOptions<TLocal, TServer> {
 	serverItems: TServer[];
 	getSlug: (item: TLocal | TServer) => string;
 	createLocalItem: (serverItem: TServer, skipSync: boolean) => Promise<void>;
-	updateLocalItem: (localItem: TLocal, serverItem: TServer, skipSync: boolean) => Promise<void>;
+	updateLocalItem: (
+		localItem: TLocal,
+		serverItem: TServer,
+		skipSync: boolean,
+	) => Promise<void>;
 	needsUpdate: (localItem: TLocal, serverItem: TServer) => boolean;
 	getServerId: (item: TLocal | TServer) => string | number | undefined;
 	queryClient: QueryClient;
@@ -22,7 +26,6 @@ export async function reconcileItems<TLocal, TServer>(
 		createLocalItem,
 		updateLocalItem,
 		needsUpdate,
-		getServerId,
 		queryClient,
 		localQueryKey,
 	} = options;
@@ -54,12 +57,14 @@ export async function reconcileItems<TLocal, TServer>(
 	if (operations.length > 0) {
 		const results = await Promise.allSettled(operations);
 		const failures = results.filter(
-			(r) => r.status === "rejected" || (r.status === "fulfilled" && r.value?.status === "failed")
+			(r) =>
+				r.status === "rejected" ||
+				(r.status === "fulfilled" && r.value?.status === "failed"),
 		);
 
 		if (failures.length > 0) {
 			console.warn(
-				`Reconciliation completed with ${failures.length} failures out of ${results.length} operations`
+				`Reconciliation completed with ${failures.length} failures out of ${results.length} operations`,
 			);
 		}
 

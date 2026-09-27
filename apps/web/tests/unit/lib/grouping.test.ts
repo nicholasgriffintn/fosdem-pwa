@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { Event, Track } from "~/types/fosdem";
+import type { Event, Track } from "~/types/conference";
 import { groupByDay, groupEventsByDay, groupTracksByDay } from "~/lib/grouping";
 
 describe("grouping helpers", () => {

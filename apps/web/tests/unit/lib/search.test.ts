@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Fuse from "fuse.js";
-import type { Event, Track, RoomData } from "~/types/fosdem";
+import type { Event, Track, RoomData } from "~/types/conference";
 
 import {
 	createSearchIndex,
@@ -13,8 +13,24 @@ import {
 describe("search helpers", () => {
 	it("creates an index that can find matching items", () => {
 		const tracks = [
-			{ id: "1", name: "Devroom", description: "", room: "", type: "", day: 1, eventCount: 0 },
-			{ id: "2", name: "Keynotes", description: "", room: "", type: "", day: 1, eventCount: 0 },
+			{
+				id: "1",
+				name: "Devroom",
+				description: "",
+				room: "",
+				type: "",
+				day: 1,
+				eventCount: 0,
+			},
+			{
+				id: "2",
+				name: "Keynotes",
+				description: "",
+				room: "",
+				type: "",
+				day: 1,
+				eventCount: 0,
+			},
 		] as Track[];
 
 		const fuse = createSearchIndex(Fuse, tracks, [{ name: "name", weight: 1 }]);

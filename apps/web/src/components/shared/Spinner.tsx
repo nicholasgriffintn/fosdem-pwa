@@ -6,5 +6,12 @@ type SpinnerProps = {
 };
 
 export function Spinner({ className, size = "sm" }: SpinnerProps) {
-	return <LoadingState type="spinner" className={className} size={size} variant="inline" />;
+	return (
+		<LoadingState
+			type="spinner"
+			className={className}
+			size={size}
+			variant="inline"
+		/>
+	);
 }

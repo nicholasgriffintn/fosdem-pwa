@@ -9,152 +9,156 @@ import { useWatchLater } from "~/hooks/use-watch-later";
 const SAVE_INTERVAL_MS = 30000;
 
 export function VideoProgressTracker() {
-  const { videoRef, currentEvent, year, isPlaying, isLive } = usePlayer();
-  const lastSavedTimeRef = useRef<number>(0);
-  const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const bookmarkIdRef = useRef<string | null>(null);
-  const hasRestoredProgressRef = useRef(false);
+	const { currentEvent, year } = usePlayer();
+	if (!currentEvent) return null;
+	return <EventProgressTracker key={`${year}:${currentEvent.id}`} />;
+}
 
-  const eventSlug = currentEvent?.id ?? "";
-  const yearNum = year ?? new Date().getFullYear();
+function EventProgressTracker() {
+	const { videoRef, currentEvent, year, isPlaying, isLive } = usePlayer();
+	const lastSavedTimeRef = useRef<number>(0);
+	const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
+	const bookmarkIdRef = useRef<string | null>(null);
+	const hasRestoredProgressRef = useRef(false);
 
-  const { bookmark } = useBookmark({ year: yearNum, slug: eventSlug });
-  const { updateProgress, markAsWatched } = useWatchLater({ year: yearNum });
+	const eventSlug = currentEvent?.id ?? "";
+	const yearNum = year ?? new Date().getFullYear();
 
-  bookmarkIdRef.current = bookmark?.serverId ?? null;
+	const { bookmark } = useBookmark({ year: yearNum, slug: eventSlug });
+	const { updateProgress, markAsWatched } = useWatchLater({ year: yearNum });
 
-  const updateProgressRef = useRef(updateProgress);
-  const markWatchedRef = useRef(markAsWatched);
-  updateProgressRef.current = updateProgress;
-  markWatchedRef.current = markAsWatched;
+	bookmarkIdRef.current = bookmark?.serverId ?? null;
 
-  useEffect(() => {
-    hasRestoredProgressRef.current = false;
-    lastSavedTimeRef.current = 0;
-  }, [eventSlug]);
+	const updateProgressRef = useRef(updateProgress);
+	const markWatchedRef = useRef(markAsWatched);
+	updateProgressRef.current = updateProgress;
+	markWatchedRef.current = markAsWatched;
 
-  const saveProgress = useCallback(() => {
-    const video = videoRef.current;
-    const bookmarkId = bookmarkIdRef.current;
-    if (!video || !bookmarkId || isLive) return;
+	const saveProgress = useCallback(
+		(video = videoRef.current) => {
+			const bookmarkId = bookmarkIdRef.current;
+			if (!video || !bookmarkId || isLive) return;
 
-    const currentTime = Math.floor(video.currentTime);
-    if (currentTime === lastSavedTimeRef.current) return;
-    if (currentTime < 5) return;
+			const currentTime = Math.floor(video.currentTime);
+			if (currentTime === lastSavedTimeRef.current) return;
+			if (currentTime < 5) return;
 
-    lastSavedTimeRef.current = currentTime;
-    const playbackSpeed = video.playbackRate.toString();
+			lastSavedTimeRef.current = currentTime;
+			const playbackSpeed = video.playbackRate.toString();
 
-    updateProgressRef.current({
-      bookmarkId,
-      progressSeconds: currentTime,
-      playbackSpeed,
-    });
-  }, [isLive, videoRef]);
+			updateProgressRef.current({
+				bookmarkId,
+				progressSeconds: currentTime,
+				playbackSpeed,
+			});
+		},
+		[isLive, videoRef],
+	);
 
-  const handleVideoEnded = useCallback(() => {
-    const bookmarkId = bookmarkIdRef.current;
-    if (!bookmarkId || isLive) return;
-    markWatchedRef.current(bookmarkId);
-  }, [isLive]);
+	const handleVideoEnded = useCallback(() => {
+		const bookmarkId = bookmarkIdRef.current;
+		if (!bookmarkId || isLive) return;
+		markWatchedRef.current(bookmarkId);
+	}, [isLive]);
 
-  useEffect(() => {
-    if (!bookmark?.serverId || isLive || !isPlaying) {
-      if (saveIntervalRef.current) {
-        clearInterval(saveIntervalRef.current);
-        saveIntervalRef.current = null;
-      }
-      return;
-    }
+	useEffect(() => {
+		if (!bookmark?.serverId || isLive || !isPlaying) {
+			if (saveIntervalRef.current) {
+				clearInterval(saveIntervalRef.current);
+				saveIntervalRef.current = null;
+			}
+			return;
+		}
 
-    if (saveIntervalRef.current) {
-      clearInterval(saveIntervalRef.current);
-    }
+		if (saveIntervalRef.current) {
+			clearInterval(saveIntervalRef.current);
+		}
 
-    saveIntervalRef.current = setInterval(() => {
-      saveProgress();
-    }, SAVE_INTERVAL_MS);
+		saveIntervalRef.current = setInterval(() => {
+			saveProgress();
+		}, SAVE_INTERVAL_MS);
 
-    return () => {
-      if (saveIntervalRef.current) {
-        clearInterval(saveIntervalRef.current);
-        saveIntervalRef.current = null;
-      }
-    };
-  }, [bookmark?.serverId, isLive, isPlaying, saveProgress]);
+		return () => {
+			if (saveIntervalRef.current) {
+				clearInterval(saveIntervalRef.current);
+				saveIntervalRef.current = null;
+			}
+		};
+	}, [bookmark?.serverId, isLive, isPlaying, saveProgress]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || isLive) return;
+	useEffect(() => {
+		const video = videoRef.current;
+		if (!video || isLive) return;
 
-    video.addEventListener("ended", handleVideoEnded);
-    return () => {
-      video.removeEventListener("ended", handleVideoEnded);
-    };
-  }, [isLive, handleVideoEnded, videoRef]);
+		video.addEventListener("ended", handleVideoEnded);
+		return () => {
+			video.removeEventListener("ended", handleVideoEnded);
+		};
+	}, [isLive, handleVideoEnded, videoRef]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || isLive) return;
+	useEffect(() => {
+		const video = videoRef.current;
+		if (!video || isLive) return;
 
-    const handlePause = () => {
-      saveProgress();
-    };
+		const handlePause = () => {
+			saveProgress();
+		};
 
-    video.addEventListener("pause", handlePause);
-    return () => {
-      video.removeEventListener("pause", handlePause);
-    };
-  }, [isLive, saveProgress, videoRef]);
+		video.addEventListener("pause", handlePause);
+		return () => {
+			video.removeEventListener("pause", handlePause);
+		};
+	}, [isLive, saveProgress, videoRef]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || isLive || !bookmark?.watch_progress_seconds) return;
-    if (hasRestoredProgressRef.current) return;
+	useEffect(() => {
+		const video = videoRef.current;
+		if (!video || isLive || !bookmark?.watch_progress_seconds) return;
+		if (hasRestoredProgressRef.current) return;
 
-    const savedProgress = bookmark.watch_progress_seconds;
+		const savedProgress = bookmark.watch_progress_seconds;
 
-    const handleLoadedMetadata = () => {
-      if (hasRestoredProgressRef.current) return;
-      if (savedProgress > 0 && savedProgress < video.duration - 10) {
-        const currentTime = video.currentTime;
-        if (currentTime < savedProgress - 1) {
-          video.currentTime = savedProgress;
-        }
-        lastSavedTimeRef.current = Math.floor(
-          Math.max(currentTime, savedProgress),
-        );
-      }
-      hasRestoredProgressRef.current = true;
-    };
+		const handleLoadedMetadata = () => {
+			if (hasRestoredProgressRef.current) return;
+			if (savedProgress > 0 && savedProgress < video.duration - 10) {
+				const currentTime = video.currentTime;
+				if (currentTime < savedProgress - 1) {
+					video.currentTime = savedProgress;
+				}
+				lastSavedTimeRef.current = Math.floor(
+					Math.max(currentTime, savedProgress),
+				);
+			}
+			hasRestoredProgressRef.current = true;
+		};
 
-    if (video.readyState >= 1) {
-      handleLoadedMetadata();
-    } else {
-      video.addEventListener("loadedmetadata", handleLoadedMetadata);
-      return () => {
-        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      };
-    }
-  }, [isLive, bookmark?.watch_progress_seconds, videoRef]);
+		if (video.readyState >= 1) {
+			handleLoadedMetadata();
+		} else {
+			video.addEventListener("loadedmetadata", handleLoadedMetadata);
+			return () => {
+				video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+			};
+		}
+	}, [isLive, bookmark?.watch_progress_seconds, videoRef]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || isLive || !bookmark?.playback_speed) {
-      return;
-    }
+	useEffect(() => {
+		const video = videoRef.current;
+		if (!video || isLive || !bookmark?.playback_speed) {
+			return;
+		}
 
-    const speed = parseFloat(bookmark.playback_speed);
-    if (!isNaN(speed) && speed > 0) {
-      video.playbackRate = speed;
-    }
-  }, [isLive, bookmark?.playback_speed, videoRef]);
+		const speed = parseFloat(bookmark.playback_speed);
+		if (!Number.isNaN(speed) && speed > 0) {
+			video.playbackRate = speed;
+		}
+	}, [isLive, bookmark?.playback_speed, videoRef]);
 
-  useEffect(() => {
-    return () => {
-      saveProgress();
-    };
-  }, [currentEvent?.id, saveProgress]);
+	useEffect(() => {
+		const video = videoRef.current;
+		return () => {
+			saveProgress(video);
+		};
+	}, [saveProgress, videoRef]);
 
-  return null;
+	return null;
 }

@@ -1,4 +1,4 @@
-import type { Event, Track } from "~/types/fosdem";
+import type { Event, Track } from "~/types/conference";
 
 const normalize = (value?: string | number | null) =>
 	value?.toString().trim().toLowerCase() ?? "";

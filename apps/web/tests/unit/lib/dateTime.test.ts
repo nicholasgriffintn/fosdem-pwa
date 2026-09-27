@@ -6,7 +6,8 @@ vi.mock("~/constants", () => ({
 	},
 }));
 
-import type { ConferenceData, Event } from "~/types/fosdem";
+import type { ConferenceData, Event } from "~/types/conference";
+import { getEventMetadataJson } from "~/utils/event-metadata";
 import {
 	formatTime,
 	createStandardDate,
@@ -113,6 +114,40 @@ describe("dateTime helpers", () => {
 		expect(getEventDateTime(event, baseConference)).toBeNull();
 	});
 
+	it("keeps event dates correct west of UTC and compares actual instants", () => {
+		const conference = {
+			...baseConference,
+			days: ["2027-06-10", "2027-06-11"],
+			time_zone_name: "America/New_York",
+		};
+		const event = buildEvent({ day: 2, startTime: "09:00", duration: "01:00" });
+		expect(getEventDateTime(event, conference)?.toISOString()).toBe(
+			"2027-06-11T13:00:00.000Z",
+		);
+		expect(
+			isEventLive(event, conference, new Date("2027-06-11T13:30:00Z")),
+		).toBe(true);
+		expect(
+			isEventLive(event, conference, new Date("2027-06-10T13:30:00Z")),
+		).toBe(false);
+	});
+
+	it("publishes the right event day and duration without allowing script markup", () => {
+		const event = buildEvent({
+			day: 2,
+			title: "Talk </script>",
+			startTime: "23:30",
+			duration: "01:00",
+		});
+		const json = getEventMetadataJson(event, baseConference, 2024);
+		expect(json).not.toContain("</script>");
+		expect(JSON.parse(json)).toMatchObject({
+			name: "Talk </script>",
+			startDate: "2024-02-04T23:30:00.000Z",
+			endDate: "2024-02-05T00:30:00.000Z",
+		});
+	});
+
 	it("detects live events based on reference time", () => {
 		const event = buildEvent({ startTime: "10:00", duration: "00:30" });
 		const reference = new Date("2024-02-03T10:10:00Z");
@@ -128,9 +163,7 @@ describe("dateTime helpers", () => {
 		const reference = new Date("2024-02-03T09:45:00Z");
 
 		expect(isEventUpcoming(event, baseConference, 30, reference)).toBe(true);
-		expect(
-			isEventUpcoming(event, baseConference, 10, reference),
-		).toBe(false);
+		expect(isEventUpcoming(event, baseConference, 10, reference)).toBe(false);
 	});
 
 	it("detects finished events", () => {
@@ -151,8 +184,8 @@ describe("dateTime helpers", () => {
 
 	it("checks if a conference is more than one month away", () => {
 		const reference = new Date("2024-01-01T00:00:00Z");
-		expect(
-			isConferenceMoreThanOneMonthAway(baseConference, reference),
-		).toBe(true);
+		expect(isConferenceMoreThanOneMonthAway(baseConference, reference)).toBe(
+			true,
+		);
 	});
 });

@@ -38,9 +38,7 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
 			<EmptyStateCard
 				title="Whoops!"
 				description={
-					<p className="text-sm text-muted-foreground break-words">
-						{message}
-					</p>
+					<p className="text-sm text-muted-foreground break-words">{message}</p>
 				}
 				actions={
 					<>

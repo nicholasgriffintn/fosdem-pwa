@@ -1,5 +1,11 @@
 "use client";
 
+import { hashStringToInt } from "~/utils/hash";
+import { getPublicProfileId } from "~/lib/profile";
+import { normalizeSiteUrl } from "~/lib/url";
+
+import { conferenceConfig } from "@roomisfull/conference";
+
 import { lazy, Suspense } from "react";
 import { Link } from "@tanstack/react-router";
 
@@ -24,32 +30,6 @@ type ConferenceBadgeProps = {
 	isPublicPage?: boolean;
 };
 
-function hashStringToInt(input: string) {
-	let hash = 2166136261;
-	for (let i = 0; i < input.length; i++) {
-		hash ^= input.charCodeAt(i);
-		hash = Math.imul(hash, 16777619);
-	}
-	return hash >>> 0;
-}
-
-
-function normalizeSiteUrl(site: string) {
-	if (/^https?:\/\//i.test(site)) return site;
-	return `https://${site}`;
-}
-
-function getPublicProfileId(user: User) {
-	return (
-		user.github_username ||
-		user.gitlab_username ||
-		user.discord_username ||
-		user.mastodon_acct ||
-		user.mastodon_username ||
-		null
-	);
-}
-
 export function ConferenceBadge({
 	user,
 	conferenceYear,
@@ -62,19 +42,16 @@ export function ConferenceBadge({
 
 	const publicProfileId = getPublicProfileId(user);
 	const displayName =
-		user.name ||
-		publicProfileId ||
-		user.email?.split("@")[0] ||
-		"Anonymous";
+		user.name || publicProfileId || user.email?.split("@")[0] || "Anonymous";
 
 	const profileUrl = publicProfileId
-		? `https://fosdempwa.com/profile/${publicProfileId}`
+		? `${conferenceConfig.appUrl}/profile/${publicProfileId}`
 		: null;
 
 	const seed = `${user.id}_${conferenceYear}`;
 	const hash = hashStringToInt(seed);
 	const themes = [
-		{ header: "#9B3493", accent: "#9B3493", pattern: "rgba(255,255,255,0.12)" },
+		{ header: "#115e59", accent: "#115e59", pattern: "rgba(255,255,255,0.12)" },
 		{ header: "#2563EB", accent: "#2563EB", pattern: "rgba(255,255,255,0.14)" },
 		{ header: "#16A34A", accent: "#16A34A", pattern: "rgba(255,255,255,0.12)" },
 		{ header: "#EA580C", accent: "#EA580C", pattern: "rgba(255,255,255,0.14)" },
@@ -108,7 +85,9 @@ export function ConferenceBadge({
 				/>
 				<div className="flex items-center justify-between">
 					<div className="flex flex-col">
-						<h1 className="text-2xl font-bold">FOSDEM {conferenceYear}</h1>
+						<h1 className="text-2xl font-bold">
+							{conferenceConfig.name} {conferenceYear}
+						</h1>
 						<p className="text-xs/5 text-white/80">Badge #{badgeNumber}</p>
 					</div>
 					<div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
@@ -123,8 +102,12 @@ export function ConferenceBadge({
 				<div className="flex items-start gap-4">
 					<UserAvatar user={user} size="xl" borderColor={theme.accent} />
 					<div className="flex-1">
-						<h2 className="text-2xl font-bold text-foreground">{displayName}</h2>
-						{user.email && <p className="text-muted-foreground">{user.email}</p>}
+						<h2 className="text-2xl font-bold text-foreground">
+							{displayName}
+						</h2>
+						{user.email && (
+							<p className="text-muted-foreground">{user.email}</p>
+						)}
 						{user.bio && (
 							<p className="mt-2 text-sm text-muted-foreground line-clamp-2">
 								{user.bio}
@@ -252,7 +235,10 @@ export function ConferenceBadge({
 												className="h-7 w-7 rounded-md flex items-center justify-center flex-shrink-0"
 												style={{ backgroundColor: `${theme.accent}22` }}
 											>
-												<Icon className="h-3.5 w-3.5" style={{ color: theme.accent }} />
+												<Icon
+													className="h-3.5 w-3.5"
+													style={{ color: theme.accent }}
+												/>
 											</div>
 											<span className="text-xs font-medium text-foreground leading-tight line-clamp-2">
 												{achievement.label}
@@ -269,8 +255,16 @@ export function ConferenceBadge({
 						</>
 					)}
 					{!isPublicPage && (
-						<Button asChild variant="outline" size="sm" className="w-full no-underline">
-							<Link to="/profile/year-in-review" search={{ year: conferenceYear }}>
+						<Button
+							asChild
+							variant="outline"
+							size="sm"
+							className="w-full no-underline"
+						>
+							<Link
+								to="/profile/year-in-review"
+								search={{ year: conferenceYear }}
+							>
 								<Icons.star className="h-3.5 w-3.5 mr-2" />
 								View Year in Review
 							</Link>
@@ -300,7 +294,9 @@ export function ConferenceBadge({
 			</div>
 
 			<div className="px-6 py-4 bg-muted/50 text-center text-sm text-muted-foreground">
-				<p>FOSDEM {conferenceYear} • Brussels, Belgium</p>
+				<p>
+					{conferenceConfig.name} {conferenceYear} • {conferenceConfig.city}
+				</p>
 			</div>
 		</Card>
 	);

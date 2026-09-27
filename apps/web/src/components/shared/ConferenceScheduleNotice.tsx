@@ -1,8 +1,9 @@
+import { conferenceConfig } from "@roomisfull/conference";
 import { AlertCircle } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { isConferenceMoreThanOneMonthAway } from "~/lib/dateTime";
-import type { ConferenceData } from "~/types/fosdem";
+import type { ConferenceData } from "~/types/conference";
 
 interface ConferenceScheduleNoticeProps {
 	conference: ConferenceData;
@@ -22,7 +23,9 @@ export function ConferenceScheduleNotice({
 	return (
 		<Alert className="mb-6">
 			<AlertCircle className="h-4 w-4" />
-			<AlertTitle>FOSDEM {year} is still being scheduled</AlertTitle>
+			<AlertTitle>
+				{conferenceConfig.name} {year} is still being scheduled
+			</AlertTitle>
 			<AlertDescription>
 				Events and tracks will be added as they become available closer to the
 				event date.

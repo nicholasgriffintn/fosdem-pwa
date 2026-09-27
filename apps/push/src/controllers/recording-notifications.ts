@@ -1,237 +1,248 @@
+import { conferenceConfig } from "@roomisfull/conference";
 import { constants } from "../constants";
-import { getFosdemData } from "../lib/fosdem-data";
+import { getConferenceData } from "../lib/conference-data";
 import { getBookmarksByUserIds } from "../lib/bookmarks";
 import { getApplicationKeys, sendNotification } from "../lib/notifications";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
 import type {
-  Bookmark,
-  Env,
-  Subscription,
-  NotificationPayload,
-  FosdemEvent,
+	Bookmark,
+	Env,
+	Subscription,
+	NotificationPayload,
+	ConferenceEvent,
 } from "../types";
 
-const DOMAIN = "fosdempwa.com";
+const APP_URL = conferenceConfig.appUrl;
 
 interface RecordingSnapshotRow {
-  slug: string;
-  year: number;
-  has_recording: boolean;
-  recording_url: string | null;
-  notified_at: string | null;
+	slug: string;
+	year: number;
+	has_recording: boolean;
+	recording_url: string | null;
+	notified_at: string | null;
 }
 
-function hasVideoRecording(event: FosdemEvent): { hasRecording: boolean; url?: string } {
-  const videoLink = event.links?.find((link) =>
-    link.type?.startsWith("video/"),
-  );
+function hasVideoRecording(event: ConferenceEvent): {
+	hasRecording: boolean;
+	url?: string;
+} {
+	const videoLink = event.links?.find((link) =>
+		link.type?.startsWith("video/"),
+	);
 
-  return {
-    hasRecording: !!videoLink,
-    url: videoLink?.href,
-  };
+	return {
+		hasRecording: !!videoLink,
+		url: videoLink?.href,
+	};
 }
 
-async function loadRecordingSnapshots(env: Env): Promise<RecordingSnapshotRow[]> {
-  const result = await env.DB.prepare(
-    "SELECT slug, year, has_recording, recording_url, notified_at FROM recording_snapshot WHERE year = ?",
-  )
-    .bind(constants.YEAR)
-    .run();
+async function loadRecordingSnapshots(
+	env: Env,
+): Promise<RecordingSnapshotRow[]> {
+	const result = await env.DB.prepare(
+		"SELECT slug, year, has_recording, recording_url, notified_at FROM recording_snapshot WHERE year = ?",
+	)
+		.bind(constants.YEAR)
+		.run();
 
-  const rows = (result.results ?? []) as unknown as RecordingSnapshotRow[];
-  return rows.map((row) => ({
-    ...row,
-    has_recording: Boolean(row.has_recording),
-  }));
+	const rows = (result.results ?? []) as unknown as RecordingSnapshotRow[];
+	return rows.map((row) => ({
+		...row,
+		has_recording: Boolean(row.has_recording),
+	}));
 }
 
 async function upsertRecordingSnapshot(
-  slug: string,
-  hasRecording: boolean,
-  recordingUrl: string | undefined,
-  env: Env,
+	slug: string,
+	hasRecording: boolean,
+	recordingUrl: string | undefined,
+	env: Env,
 ): Promise<void> {
-  await env.DB.prepare(
-    `INSERT INTO recording_snapshot (slug, year, has_recording, recording_url, updated_at) 
+	await env.DB.prepare(
+		`INSERT INTO recording_snapshot (slug, year, has_recording, recording_url, updated_at)
      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
      ON CONFLICT(slug, year) DO UPDATE SET 
        has_recording = excluded.has_recording,
        recording_url = excluded.recording_url,
        updated_at = CURRENT_TIMESTAMP`,
-  )
-    .bind(slug, constants.YEAR, hasRecording ? 1 : 0, recordingUrl ?? null)
-    .run();
+	)
+		.bind(slug, constants.YEAR, hasRecording ? 1 : 0, recordingUrl ?? null)
+		.run();
 }
 
 async function markRecordingNotified(slug: string, env: Env): Promise<void> {
-  await env.DB.prepare(
-    "UPDATE recording_snapshot SET notified_at = CURRENT_TIMESTAMP WHERE slug = ? AND year = ?",
-  )
-    .bind(slug, constants.YEAR)
-    .run();
+	await env.DB.prepare(
+		"UPDATE recording_snapshot SET notified_at = CURRENT_TIMESTAMP WHERE slug = ? AND year = ?",
+	)
+		.bind(slug, constants.YEAR)
+		.run();
 }
 
 function createRecordingAvailableNotification(
-  eventTitle: string,
-  eventSlug: string,
+	eventTitle: string,
+	eventSlug: string,
 ): NotificationPayload {
-  return {
-    title: "Recording now available",
-    body: `The recording for "${eventTitle}" is now available to watch.`,
-    url: `https://${DOMAIN}/event/${eventSlug}?year=${constants.YEAR}`,
-  };
+	return {
+		title: "Recording now available",
+		body: `The recording for "${eventTitle}" is now available to watch.`,
+		url: `${APP_URL}/event/${eventSlug}?year=${constants.YEAR}`,
+	};
 }
 
 function createRecordingSummaryNotification(
-  recordings: Array<{ title: string; slug: string }>,
+	recordings: Array<{ title: string; slug: string }>,
 ): NotificationPayload {
-  const MAX_TITLES = 3;
-  const listed = recordings.slice(0, MAX_TITLES).map((recording) => recording.title);
-  const remaining = recordings.length - listed.length;
-  const suffix = remaining > 0 ? ` and ${remaining} more` : "";
+	const MAX_TITLES = 3;
+	const listed = recordings
+		.slice(0, MAX_TITLES)
+		.map((recording) => recording.title);
+	const remaining = recordings.length - listed.length;
+	const suffix = remaining > 0 ? ` and ${remaining} more` : "";
 
-  return {
-    title: "Recordings now available",
-    body: `New recordings from your bookmarks: ${listed.join(", ")}${suffix}.`,
-    url: `https://${DOMAIN}/bookmarks?year=${constants.YEAR}`,
-  };
+	return {
+		title: "Recordings now available",
+		body: `New recordings from your bookmarks: ${listed.join(", ")}${suffix}.`,
+		url: `${APP_URL}/bookmarks?year=${constants.YEAR}`,
+	};
 }
 
 export async function triggerRecordingNotifications(
-  event: { cron: string },
-  env: Env,
-  ctx: ExecutionContext,
-  queueMode = false,
+	event: { cron: string },
+	env: Env,
+	ctx: ExecutionContext,
+	queueMode = false,
 ): Promise<void> {
-  const fosdemData = await getFosdemData();
-  const existingSnapshots = await loadRecordingSnapshots(env);
-  const snapshotMap = new Map(
-    existingSnapshots.map((s) => [s.slug, s]),
-  );
+	const scheduleData = await getConferenceData();
+	const existingSnapshots = await loadRecordingSnapshots(env);
+	const snapshotMap = new Map(existingSnapshots.map((s) => [s.slug, s]));
 
-  const newRecordings: Array<{ slug: string; title: string; url?: string }> = [];
+	const newRecordings: Array<{ slug: string; title: string; url?: string }> =
+		[];
 
-  for (const [slug, event] of Object.entries(fosdemData.events)) {
-    const { hasRecording, url } = hasVideoRecording(event);
-    const existingSnapshot = snapshotMap.get(slug);
+	for (const [slug, event] of Object.entries(scheduleData.events)) {
+		const { hasRecording, url } = hasVideoRecording(event);
+		const existingSnapshot = snapshotMap.get(slug);
 
-    const hasChanged = !existingSnapshot ||
-      existingSnapshot.has_recording !== hasRecording ||
-      existingSnapshot.recording_url !== (url ?? null);
+		const hasChanged =
+			!existingSnapshot ||
+			existingSnapshot.has_recording !== hasRecording ||
+			existingSnapshot.recording_url !== (url ?? null);
 
-    if (hasChanged) {
-      await upsertRecordingSnapshot(slug, hasRecording, url, env);
-    }
+		if (hasChanged) {
+			await upsertRecordingSnapshot(slug, hasRecording, url, env);
+		}
 
-    if (
-      hasRecording &&
-      (!existingSnapshot || !existingSnapshot.has_recording) &&
-      (!existingSnapshot || !existingSnapshot.notified_at)
-    ) {
-      newRecordings.push({ slug, title: event.title, url });
-    }
-  }
+		if (
+			hasRecording &&
+			(!existingSnapshot || !existingSnapshot.has_recording) &&
+			(!existingSnapshot || !existingSnapshot.notified_at)
+		) {
+			newRecordings.push({ slug, title: event.title, url });
+		}
+	}
 
-  if (!newRecordings.length) {
-    console.log("No new recordings found");
-    return;
-  }
+	if (!newRecordings.length) {
+		console.log("No new recordings found");
+		return;
+	}
 
-  console.log(`Found ${newRecordings.length} new recordings`);
+	console.log(`Found ${newRecordings.length} new recordings`);
 
-  const keys = await getApplicationKeys(env);
+	const keys = await getApplicationKeys(env);
 
-  const subscriptions = await env.DB.prepare(
-    `SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
+	const subscriptions = await env.DB.prepare(
+		`SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
       p.reminder_minutes_before, p.event_reminders, p.schedule_changes, p.room_status_alerts,
       p.recording_available, p.daily_summary, p.notify_low_priority
      FROM subscription s
      LEFT JOIN notification_preference p ON p.user_id = s.user_id`,
-  ).run();
+	).run();
 
-  if (!subscriptions.success || !subscriptions.results?.length) {
-    console.log("No subscriptions found for recording notifications");
-    return;
-  }
+	if (!subscriptions.success || !subscriptions.results?.length) {
+		console.log("No subscriptions found for recording notifications");
+		return;
+	}
 
-  let notificationsSent = 0;
+	let notificationsSent = 0;
 
-  const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
-  const subscriptionEntries = subscriptionRows.map((subscription) => ({
-    subscription: {
-      user_id: subscription.user_id as string,
-      endpoint: subscription.endpoint as string,
-      auth: subscription.auth as string,
-      p256dh: subscription.p256dh as string,
-    } as Subscription,
-    prefs: resolveNotificationPreference(subscription as any),
-  }));
+	const subscriptionRows = subscriptions.results as Array<
+		Record<string, unknown>
+	>;
+	const subscriptionEntries = subscriptionRows.map((subscription) => ({
+		subscription: {
+			user_id: subscription.user_id as string,
+			endpoint: subscription.endpoint as string,
+			auth: subscription.auth as string,
+			p256dh: subscription.p256dh as string,
+		} as Subscription,
+		prefs: resolveNotificationPreference(subscription as any),
+	}));
 
-  const usersNeedingBookmarks = subscriptionEntries
-    .filter(({ prefs }) => prefs.recording_available)
-    .map(({ subscription }) => subscription.user_id);
-  const recordingSlugs = newRecordings.map((recording) => recording.slug);
-  const bookmarksByUser = usersNeedingBookmarks.length
-    ? await getBookmarksByUserIds(usersNeedingBookmarks, env, {
-        includeSent: true,
-        slugs: recordingSlugs,
-      })
-    : new Map<string, Bookmark[]>();
+	const usersNeedingBookmarks = subscriptionEntries
+		.filter(({ prefs }) => prefs.recording_available)
+		.map(({ subscription }) => subscription.user_id);
+	const recordingSlugs = newRecordings.map((recording) => recording.slug);
+	const bookmarksByUser = usersNeedingBookmarks.length
+		? await getBookmarksByUserIds(usersNeedingBookmarks, env, {
+				includeSent: true,
+				slugs: recordingSlugs,
+			})
+		: new Map<string, Bookmark[]>();
 
-  for (const { subscription, prefs } of subscriptionEntries) {
-    if (!prefs.recording_available) {
-      continue;
-    }
+	for (const { subscription, prefs } of subscriptionEntries) {
+		if (!prefs.recording_available) {
+			continue;
+		}
 
-    const bookmarks = bookmarksByUser.get(subscription.user_id) ?? [];
-    const filteredBookmarks = prefs.notify_low_priority
-      ? bookmarks
-      : bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
+		const bookmarks = bookmarksByUser.get(subscription.user_id) ?? [];
+		const filteredBookmarks = prefs.notify_low_priority
+			? bookmarks
+			: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
 
-    if (!filteredBookmarks.length) continue;
+		if (!filteredBookmarks.length) continue;
 
-    const eligibleRecordings = newRecordings.filter((recording) => {
-      const bookmark = filteredBookmarks.find((b) => b.slug === recording.slug);
-      if (!bookmark) return false;
+		const eligibleRecordings = newRecordings.filter((recording) => {
+			const bookmark = filteredBookmarks.find((b) => b.slug === recording.slug);
+			if (!bookmark) return false;
 
-      const attended = Number(bookmark.attended) === 1;
-      const watched = bookmark.watch_status === "watched";
-      return !attended && !watched;
-    });
+			const attended = Number(bookmark.attended) === 1;
+			const watched = bookmark.watch_status === "watched";
+			return !attended && !watched;
+		});
 
-    if (!eligibleRecordings.length) continue;
+		if (!eligibleRecordings.length) continue;
 
-    const notification = eligibleRecordings.length === 1
-      ? createRecordingAvailableNotification(
-          eligibleRecordings[0].title,
-          eligibleRecordings[0].slug,
-        )
-      : createRecordingSummaryNotification(eligibleRecordings);
+		const notification =
+			eligibleRecordings.length === 1
+				? createRecordingAvailableNotification(
+						eligibleRecordings[0].title,
+						eligibleRecordings[0].slug,
+					)
+				: createRecordingSummaryNotification(eligibleRecordings);
 
-    try {
-      if (queueMode) {
-        await env.NOTIFICATION_QUEUE.send({
-          subscription,
-          notification,
-          bookmarkId: `recordings-${subscription.user_id}-${constants.YEAR}`,
-          shouldMarkSent: false,
-        });
-      } else {
-        await sendNotification(subscription, notification, keys, env);
-      }
-      notificationsSent++;
-    } catch (error) {
-      console.error(
-        `Failed to send recording notification to ${subscription.user_id}:`,
-        error,
-      );
-    }
-  }
+		try {
+			if (queueMode) {
+				await env.NOTIFICATION_QUEUE.send({
+					subscription,
+					notification,
+					bookmarkId: `recordings-${subscription.user_id}-${constants.YEAR}`,
+					shouldMarkSent: false,
+				});
+			} else {
+				await sendNotification(subscription, notification, keys, env);
+			}
+			notificationsSent++;
+		} catch (error) {
+			console.error(
+				`Failed to send recording notification to ${subscription.user_id}:`,
+				error,
+			);
+		}
+	}
 
-  for (const recording of newRecordings) {
-    await markRecordingNotified(recording.slug, env);
-  }
+	for (const recording of newRecordings) {
+		await markRecordingNotified(recording.slug, env);
+	}
 
-  console.log(`Sent ${notificationsSent} recording notifications`);
+	console.log(`Sent ${notificationsSent} recording notifications`);
 }

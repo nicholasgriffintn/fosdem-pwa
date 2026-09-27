@@ -3,8 +3,8 @@ import { useMemo } from "react";
 import clsx from "clsx";
 import { Link } from "@tanstack/react-router";
 
-import type { Event } from "~/types/fosdem";
-import type { EventConflict } from "~/lib/fosdem";
+import type { Event } from "~/types/conference";
+import type { EventConflict } from "~/lib/schedule";
 import { ConflictTooltip } from "~/components/Event/ConflictTooltip";
 import { ItemActions } from "~/components/shared/ItemActions";
 import { useEventList } from "~/hooks/use-item-list";
@@ -14,7 +14,10 @@ import type { BookmarkSnapshot } from "~/lib/type-guards";
 import { Badge } from "~/components/ui/badge";
 import { Icons } from "~/components/shared/Icons";
 import { buildEventLink } from "~/lib/link-builder";
-import { ListContainer, ListEmptyState } from "~/components/shared/ListContainer";
+import {
+	ListContainer,
+	ListEmptyState,
+} from "~/components/shared/ListContainer";
 import type { RoomStatusBatchResult } from "~/server/functions/room-status";
 import { useRoomStatuses } from "~/hooks/use-room-statuses";
 import { RoomStatusIndicator } from "~/components/shared/RoomStatusIndicator";
@@ -81,7 +84,6 @@ export function EventListItem({
 	onSetPriority,
 	showConflictIndicators = true,
 	showTrack,
-	user,
 	onCreateBookmark,
 	variant = "list",
 	className,
@@ -93,9 +95,9 @@ export function EventListItem({
 }: EventListItemProps) {
 	const hasConflicts = showConflictIndicators
 		? conflicts?.some(
-			(conflict) =>
-				conflict.event1.id === event.id || conflict.event2.id === event.id,
-		)
+				(conflict) =>
+					conflict.event1.id === event.id || conflict.event2.id === event.id,
+			)
 		: false;
 	const endTime = calculateEndTime(event.startTime, event.duration);
 	const layoutClass =
@@ -105,7 +107,12 @@ export function EventListItem({
 	const showPinnedBadge = showConflictIndicators && event.priority === 1;
 	const roomStatusState = roomStatus?.state ?? "unknown";
 
-	const metaBadges: { key: string; label: string; icon?: React.ReactNode; status?: RoomStatusBatchResult["state"] }[] = [
+	const metaBadges: {
+		key: string;
+		label: string;
+		icon?: React.ReactNode;
+		status?: RoomStatusBatchResult["state"];
+	}[] = [
 		{
 			key: "time",
 			label: `${event.startTime} – ${endTime}`,
@@ -113,33 +120,35 @@ export function EventListItem({
 		},
 		event.room
 			? {
-				key: "room",
-				label: event.room,
-				icon: (
-					<span className="flex items-center gap-1">
-						<Icons.mapPin className="h-3.5 w-3.5" />
-					</span>
-				),
-				status: roomStatusState,
-			}
+					key: "room",
+					label: event.room,
+					icon: (
+						<span className="flex items-center gap-1">
+							<Icons.mapPin className="h-3.5 w-3.5" />
+						</span>
+					),
+					status: roomStatusState,
+				}
 			: null,
 		showTrack && event.trackKey
 			? {
-				key: "track",
-				label: event.trackKey,
-				icon: <Icons.list className="h-3.5 w-3.5" />,
-			}
+					key: "track",
+					label: event.trackKey,
+					icon: <Icons.list className="h-3.5 w-3.5" />,
+				}
 			: null,
 		event.persons?.length > 0
 			? {
-				key: "persons",
-				label: event.persons.join(", "),
-				icon: <Icons.users className="h-3.5 w-3.5" />,
-			}
+					key: "persons",
+					label: event.persons.join(", "),
+					icon: <Icons.users className="h-3.5 w-3.5" />,
+				}
 			: null,
 	]
 		.filter(Boolean)
-		.map((meta) => meta as { key: string; label: string; icon?: React.ReactNode });
+		.map(
+			(meta) => meta as { key: string; label: string; icon?: React.ReactNode },
+		);
 	const hasStatusBadges = Boolean(
 		event.isLive || hasConflicts || showPinnedBadge,
 	);
@@ -162,11 +171,16 @@ export function EventListItem({
 				{hasStatusBadges && (
 					<div className="flex flex-wrap items-start gap-2">
 						{event.isLive && (
-							<Badge variant="destructive" className="bg-red-600 hover:bg-red-600 text-white">
+							<Badge
+								variant="destructive"
+								className="bg-red-600 hover:bg-red-600 text-white"
+							>
 								Live
 							</Badge>
 						)}
-						{!isProfilePage && hasConflicts && <Badge variant="destructive">Conflict</Badge>}
+						{!isProfilePage && hasConflicts && (
+							<Badge variant="destructive">Conflict</Badge>
+						)}
 						{showPinnedBadge && <Badge variant="secondary">Pinned</Badge>}
 					</div>
 				)}
@@ -175,7 +189,7 @@ export function EventListItem({
 						<div className="font-semibold leading-tight text-base">
 							<Link
 								{...buildEventLink(event.id, {
-									year: Number.isFinite(year) ? year : undefined
+									year: Number.isFinite(year) ? year : undefined,
 								})}
 								className="no-underline hover:underline"
 							>
@@ -219,9 +233,7 @@ export function EventListItem({
 						bookmarksLoading={bookmarksLoading}
 						size={actionSize ?? (variant === "card" ? "sm" : "default")}
 						className={
-							variant === "card"
-								? "pt-2 mt-auto"
-								: "pt-1 lg:pt-0 lg:pl-6"
+							variant === "card" ? "pt-2 mt-auto" : "pt-1 lg:pt-0 lg:pl-6"
 						}
 						onCreateBookmark={onCreateBookmark}
 						onToggleWatchLater={onToggleWatchLater}
@@ -283,10 +295,10 @@ export function EventItemList({
 					</li>
 				))
 			) : (
-					<ListEmptyState
-						title="No events found"
-						description="Try adjusting filters or search terms."
-					/>
+				<ListEmptyState
+					title="No events found"
+					description="Try adjusting filters or search terms."
+				/>
 			)}
 		</ListContainer>
 	);

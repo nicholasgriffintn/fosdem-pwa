@@ -1,5 +1,5 @@
-# FOSDEM PWA - Build Data Service
+# Room is Full — Build Data Service
 
-This an individual service designed to build the data for each year that the FOSDEM PWA will use. It takes the data from the FOSDEM website and builds the data into a format that can be used by the PWA.
+Build and publish conference schedules with this independently deployed worker. Select the conference through its Wrangler environment and the shared `@roomisfull/conference` package.
 
-You can find the full FOSDEM PWA project at https://github.com/nicholasgriffintn/fosdem-pwa
+Run `pnpm build --env fosdem` for a Wrangler dry run or `pnpm run deploy --env fosdem` to deploy FOSDEM. See the [root README](../../README.md#deploy) for deployment setup.

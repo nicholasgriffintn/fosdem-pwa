@@ -8,7 +8,7 @@ export interface FosdemOAuthProfile extends OAuthUser {
 }
 
 export function oauthProfile(identity: ExternalIdentity): FosdemOAuthProfile {
-	const value = identity.claims["profile"];
+	const value = identity.claims.profile;
 	if (!isFosdemOAuthProfile(value)) {
 		throw new TypeError("The OAuth provider returned an invalid profile.");
 	}

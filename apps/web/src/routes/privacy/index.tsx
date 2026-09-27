@@ -1,3 +1,4 @@
+import { brand, conferenceConfig } from "@roomisfull/conference";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { generateCommonSEOTags } from "~/utils/seo-generator";
@@ -10,9 +11,8 @@ export const Route = createFileRoute("/privacy/")({
 	head: () => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: "Privacy Policy | FOSDEM PWA",
-				description:
-					"Learn how FOSDEM PWA stores data locally, syncs signed-in content, and handles error reporting.",
+				title: `Privacy Policy | ${brand.name}`,
+				description: `Learn how ${brand.name} stores data locally, syncs signed-in content, and handles error reporting.`,
 			}),
 		],
 	}),
@@ -23,7 +23,7 @@ function PrivacyPolicyPage() {
 		<PageShell maxWidth="3xl">
 			<PageHeader
 				heading="Privacy Policy"
-				text="This policy explains what FOSDEM PWA stores locally in your browser, what is stored on our servers when you sign in, and how we handle error reporting."
+				text={`This policy explains what ${brand.name} stores locally in your browser, what is stored on our servers when you sign in, and how we handle error reporting.`}
 				className="mb-6"
 			/>
 
@@ -32,9 +32,9 @@ function PrivacyPolicyPage() {
 					<h2 className="text-2xl font-semibold text-foreground">Summary</h2>
 					<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
 						<li>
-							No third party analytics or advertising trackers are used, we
-							do track some usage to provide better push notifications and
-							the year in review feature.
+							No third party analytics or advertising trackers are used, we do
+							track some usage to provide better push notifications and the year
+							in review feature.
 						</li>
 						<li>
 							We store some data locally in your browser to make the app work
@@ -45,8 +45,9 @@ function PrivacyPolicyPage() {
 							and push notification subscriptions to sync across devices.
 						</li>
 						<li>
-							We use the Sentry SDK (but with my own backend [Bit Wobbly](https://bitwobbly.com))
-							for error reporting across services.
+							We use the Sentry SDK (but with my own backend [Bit
+							Wobbly](https://bitwobbly.com)) for error reporting across
+							services.
 						</li>
 					</ul>
 				</section>
@@ -56,8 +57,8 @@ function PrivacyPolicyPage() {
 						Data stored in your browser
 					</h2>
 					<p className="text-muted-foreground">
-						FOSDEM PWA uses cookies, localStorage and IndexedDB for sessions, offline features
-						and faster access:
+						{brand.name} uses cookies, localStorage and IndexedDB for sessions,
+						offline features and faster access:
 					</p>
 					<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
 						<li>
@@ -65,18 +66,33 @@ function PrivacyPolicyPage() {
 							(cookies), these include:
 							<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
 								<li>
-									"[provider]_oauth_state" - The state used for OAuth authentication (only when used), replace [provider] with the provider name (e.g. github, discord, mastodon)
+									"[provider]_oauth_state" - The state used for OAuth
+									authentication (only when used), replace [provider] with the
+									provider name (e.g. github, discord, mastodon)
 									<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-										<li>Note: For Mastodon, we also store "mastodon_code_verifier" and "mastodon_instance" cookies</li>
+										<li>
+											Note: For Mastodon, we also store "mastodon_code_verifier"
+											and "mastodon_instance" cookies
+										</li>
 									</ul>
 								</li>
-								<li>"session" - An identifier to hold your signed in session</li>
+								<li>
+									"session" - An identifier to hold your signed in session
+								</li>
 							</ul>
 						</li>
 						<li>
-							Our service provider, Cloudflare may also set cookies.{' '}
-							<a href="https://developers.cloudflare.com/fundamentals/reference/policies-compliances/cloudflare-cookies/" target="_blank" rel="noreferrer" className="font-medium text-foreground hover:underline">Learn more about those here</a>.
-							{' '}Note: We may not use any of these and will never use all of them.
+							Our service provider, Cloudflare may also set cookies.{" "}
+							<a
+								href="https://developers.cloudflare.com/fundamentals/reference/policies-compliances/cloudflare-cookies/"
+								target="_blank"
+								rel="noreferrer"
+								className="font-medium text-foreground hover:underline"
+							>
+								Learn more about those here
+							</a>
+							. Note: We may not use any of these and will never use all of
+							them.
 						</li>
 						<li>
 							Theme preference, player state, and install prompt state
@@ -102,17 +118,14 @@ function PrivacyPolicyPage() {
 					</p>
 					<ul className="list-disc pl-6 space-y-2 text-muted-foreground">
 						<li>
-							Account profile information from the provider you use to sign in (name, email,
-							username, avatar, and optional profile fields).
+							Account profile information from the provider you use to sign in
+							(name, email, username, avatar, and optional profile fields).
 						</li>
 						<li>Your bookmarks, notes, and sync status.</li>
 						<li>
-							Push notification subscriptions (endpoint and keys) if you opt
-							in.
+							Push notification subscriptions (endpoint and keys) if you opt in.
 						</li>
-						<li>
-							Session data in an HTTP-only cookie to keep you signed in.
-						</li>
+						<li>Session data in an HTTP-only cookie to keep you signed in.</li>
 					</ul>
 				</section>
 
@@ -134,9 +147,9 @@ function PrivacyPolicyPage() {
 					<p className="text-muted-foreground">
 						We use Sentry for error reporting in the data sync and push
 						notification services. Sentry receives error logs and technical
-						metadata such as request details, device/browser information, and
-						IP address, which helps us diagnose issues. We do not use Sentry
-						for analytics.
+						metadata such as request details, device/browser information, and IP
+						address, which helps us diagnose issues. We do not use Sentry for
+						analytics.
 					</p>
 				</section>
 
@@ -145,11 +158,12 @@ function PrivacyPolicyPage() {
 						External services and proxies
 					</h2>
 					<p className="text-muted-foreground">
-						FOSDEM PWA fetches schedule data from FOSDEM sources and may proxy
-						some requests through our API for compatibility. This includes
-						subtitle files for talks and room status data. Requests routed
-						through these proxies may include your IP address and standard
-						request metadata in server logs for security and reliability.
+						{brand.name} fetches schedule data from {conferenceConfig.name}{" "}
+						sources and may proxy some requests through our API for
+						compatibility. This includes subtitle files for talks and room
+						status data. Requests routed through these proxies may include your
+						IP address and standard request metadata in server logs for security
+						and reliability.
 					</p>
 				</section>
 
@@ -174,15 +188,18 @@ function PrivacyPolicyPage() {
 					<p className="text-muted-foreground">
 						Questions? Open an issue on{" "}
 						<a
-							href="https://github.com/nicholasgriffintn/fosdem-pwa"
+							href="https://github.com/nicholasgriffintn/roomisfull"
 							target="_blank"
 							rel="noreferrer"
 							className="font-medium text-foreground hover:underline"
 						>
 							GitHub
-						</a>
-						{" "}or review the{" "}
-						<Link to="/terms" className="font-medium text-foreground hover:underline">
+						</a>{" "}
+						or review the{" "}
+						<Link
+							to="/terms"
+							className="font-medium text-foreground hover:underline"
+						>
 							Terms of Service
 						</Link>
 						.

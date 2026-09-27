@@ -1,11 +1,12 @@
+import { brand } from "@roomisfull/conference";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getAllData } from "~/server/functions/fosdem";
+import { getAllData } from "~/server/functions/schedule";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { TrackList } from "~/components/Track/TrackList";
-import type { Conference, Track } from "~/types/fosdem";
+import type { Conference, Track } from "~/types/conference";
 import { constants } from "~/constants";
-import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
+import { typeDescriptions } from "~/conferences/presentation";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
@@ -17,14 +18,26 @@ import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/type/$slug")({
 	component: TypePage,
-	validateSearch: ({ year, day, sortFavourites }: { year: number; day?: string; sortFavourites?: string }) => ({
+	validateSearch: ({
+		year,
+		day,
+		sortFavourites,
+	}: {
+		year: number;
+		day?: string;
+		sortFavourites?: string;
+	}) => ({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
 			constants.DEFAULT_YEAR,
 		day: day || undefined,
 		sortFavourites: sortFavourites || undefined,
 	}),
-	loaderDeps: ({ search: { year, day, sortFavourites } }) => ({ year, day, sortFavourites }),
+	loaderDeps: ({ search: { year, day, sortFavourites } }) => ({
+		year,
+		day,
+		sortFavourites,
+	}),
 	loader: async ({ params, deps: { year, day } }) => {
 		const data = (await getAllData({ data: { year } })) as Conference;
 		const days = Object.values(data.days);
@@ -38,27 +51,24 @@ export const Route = createFileRoute("/type/$slug")({
 			data: { year, status: "favourited" },
 		});
 
-		return { fosdem: { days, type, trackData }, year, day, serverBookmarks };
+		return { schedule: { days, type, trackData }, year, day, serverBookmarks };
 	},
 	head: ({ loaderData }) => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: `${loaderData?.fosdem.type?.name} | FOSDEM PWA`,
-				description:
-					fosdemTypeDescriptions[
-						loaderData?.fosdem.type?.id as keyof typeof fosdemTypeDescriptions
-					],
-			})
+				title: `${loaderData?.schedule.type?.name} | ${brand.name}`,
+				description: typeDescriptions[loaderData?.schedule.type?.id || ""],
+			}),
 		],
 	}),
 	staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
 function TypePage() {
-	const { fosdem, year, day, serverBookmarks } = Route.useLoaderData();
+	const { schedule, year, day, serverBookmarks } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const resolvedDay = day ?? resolveTodayDayId(fosdem.days);
+	const resolvedDay = day ?? resolveTodayDayId(schedule.days);
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -74,7 +84,7 @@ function TypePage() {
 		});
 	};
 
-	if (!fosdem.type) {
+	if (!schedule.type) {
 		return (
 			<PageShell>
 				<PageHeader heading="Type not found" />
@@ -89,25 +99,21 @@ function TypePage() {
 	return (
 		<PageShell>
 			<PageHeader
-				heading={fosdem.type.name}
+				heading={schedule.type.name}
 				year={year}
-				text={
-					fosdemTypeDescriptions[
-					fosdem.type.id as keyof typeof fosdemTypeDescriptions
-					]
-				}
+				text={typeDescriptions[schedule.type.id]}
 				metadata={[
 					{
-						text: `${fosdem.type.trackCount} tracks`,
+						text: `${schedule.type.trackCount} tracks`,
 					},
 				]}
 			/>
-			{fosdem.trackData?.length > 0 ? (
+			{schedule.trackData?.length > 0 ? (
 				<TrackList
-					tracks={fosdem.trackData}
+					tracks={schedule.trackData}
 					year={year}
 					groupByDay={true}
-					days={fosdem.days}
+					days={schedule.days}
 					day={resolvedDay}
 					sortFavourites={sortFavourites}
 					onSortFavouritesChange={handleSortFavouritesChange}

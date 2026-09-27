@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+	define: { __CONFERENCE_ID__: JSON.stringify("fosdem") },
 	resolve: {
 		tsconfigPaths: true,
 		alias: {

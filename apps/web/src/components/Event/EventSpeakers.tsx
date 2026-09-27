@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { Event, Person } from "~/types/fosdem";
+import type { Event, Person } from "~/types/conference";
 import { sanitiseString } from "~/utils/sanitise";
 
 type EventSpeakersProps = {

@@ -1,3 +1,4 @@
+import { conferenceConfig } from "@roomisfull/conference";
 import {
 	ApplicationServerKeys,
 	generatePushHTTPRequest,
@@ -5,7 +6,7 @@ import {
 } from "webpush-webcrypto";
 
 import { constants } from "../constants";
-import { createBrusselsDate } from "../utils/date";
+import { createConferenceDate } from "../utils/date";
 import type {
 	NotificationPayload,
 	Subscription,
@@ -13,56 +14,66 @@ import type {
 	Env,
 	ScheduleSnapshot,
 } from "../types";
-import { trackPushNotificationSuccess, trackPushNotificationFailure } from "./analytics";
+import {
+	trackPushNotificationSuccess,
+	trackPushNotificationFailure,
+} from "./analytics";
 
 const PUSH_TTL_SECONDS = 60;
 const FETCH_TIMEOUT_MS = 8000;
-const DOMAIN = "fosdempwa.com";
+const APP_URL = conferenceConfig.appUrl;
 
 function minutesUntilStart(start: string, now = new Date()): number {
 	const [hours, minutes] = start.split(":").map(Number);
 	if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return 0;
 
-	const brusselsNow = createBrusselsDate(now);
-	const year = brusselsNow.getUTCFullYear();
-	const month = brusselsNow.getUTCMonth();
-	const day = brusselsNow.getUTCDate();
+	const conferenceNow = createConferenceDate(now);
+	const year = conferenceNow.getUTCFullYear();
+	const month = conferenceNow.getUTCMonth();
+	const day = conferenceNow.getUTCDate();
 	const startTime = new Date(Date.UTC(year, month, day, hours, minutes, 0));
 
 	const diffMinutes =
-		(startTime.getTime() - brusselsNow.getTime()) / (1000 * 60);
+		(startTime.getTime() - conferenceNow.getTime()) / (1000 * 60);
 	if (!Number.isFinite(diffMinutes)) return 0;
 
 	return Math.max(0, Math.ceil(diffMinutes));
 }
 
-export function createNotificationPayload(bookmark: EnrichedBookmark): NotificationPayload {
+export function createNotificationPayload(
+	bookmark: EnrichedBookmark,
+): NotificationPayload {
 	const minutesUntil = minutesUntilStart(bookmark.startTime);
 
 	return {
 		title: "Event Starting Soon",
 		body: `${bookmark.title} starts in ${minutesUntil} minutes in ${bookmark.room}`,
-		url: `https://${DOMAIN}/event/${bookmark.slug}?year=${constants.YEAR}`,
+		url: `${APP_URL}/event/${bookmark.slug}?year=${constants.YEAR}`,
 	};
 }
 
-export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: string, isEvening = false): NotificationPayload {
+export function createDailySummaryPayload(
+	bookmarks: EnrichedBookmark[],
+	day: string,
+	isEvening = false,
+): NotificationPayload {
 	if (!bookmarks.length) {
 		if (isEvening) {
-			const message = day === "2"
-				? "FOSDEM is over! Your Year in Review is now ready to view."
-				: "Day 1 has ended! See you tomorrow!";
+			const message =
+				Number(day) === conferenceConfig.editions[constants.YEAR].dates.length
+					? `${conferenceConfig.name} is over! Your Year in Review is now ready to view.`
+					: `Day ${day} has ended! See you tomorrow!`;
 			return {
-				title: `FOSDEM Day ${day} Wrap-up`,
+				title: `${conferenceConfig.name} Day ${day} Wrap-up`,
 				body: message,
-				url: `https://${DOMAIN}/profile/year-in-review?year=${constants.YEAR}`,
+				url: `${APP_URL}/profile/year-in-review?year=${constants.YEAR}`,
 			};
 		}
 
 		return {
-			title: `FOSDEM Day ${day} Summary`,
+			title: `${conferenceConfig.name} Day ${day} Summary`,
 			body: "No events in your schedule today.",
-			url: `https://${DOMAIN}/bookmarks?day=${day}&year=${constants.YEAR}`,
+			url: `${APP_URL}/bookmarks?day=${day}&year=${constants.YEAR}`,
 		};
 	}
 
@@ -75,16 +86,16 @@ export function createDailySummaryPayload(bookmarks: EnrichedBookmark[], day: st
 
 	if (isEvening) {
 		return {
-			title: `FOSDEM Day ${day} Wrap-up`,
-			body: `You attended ${totalEvents} events today! See you ${day === "1" ? "tomorrow" : "next year"}! 🎉`,
-			url: `https://${DOMAIN}/profile/year-in-review?year=${constants.YEAR}`,
+			title: `${conferenceConfig.name} Day ${day} Wrap-up`,
+			body: `You attended ${totalEvents} events today! See you ${Number(day) < conferenceConfig.editions[constants.YEAR].dates.length ? "tomorrow" : "at the next conference"}! 🎉`,
+			url: `${APP_URL}/profile/year-in-review?year=${constants.YEAR}`,
 		};
 	}
 
 	return {
-		title: `Your FOSDEM Day ${day} Summary`,
+		title: `Your ${conferenceConfig.name} Day ${day} Summary`,
 		body: `You have ${totalEvents} events today, starting from ${firstEvent.startTime} (${firstEvent.title}) until ${lastEvent.startTime} (${lastEvent.title})`,
-		url: `https://${DOMAIN}/bookmarks?day=${day}&year=${constants.YEAR}`,
+		url: `${APP_URL}/bookmarks?day=${day}&year=${constants.YEAR}`,
 	};
 }
 
@@ -98,7 +109,7 @@ export function createScheduleChangePayload(
 	return {
 		title: "Schedule updated",
 		body: `${bookmark.title} now starts at ${bookmark.startTime} in ${bookmark.room} (was ${previousTime} in ${previousRoom})`,
-		url: `https://${DOMAIN}/event/${bookmark.slug}?year=${constants.YEAR}`,
+		url: `${APP_URL}/event/${bookmark.slug}?year=${constants.YEAR}`,
 	};
 }
 
@@ -106,7 +117,7 @@ export async function sendNotification(
 	subscription: Subscription,
 	notification: NotificationPayload,
 	keys: ApplicationServerKeys,
-	env: Env
+	env: Env,
 ) {
 	const target: PushSubscription = {
 		endpoint: subscription.endpoint,
@@ -171,4 +182,4 @@ export async function getApplicationKeys(env: Env) {
 		publicKey: env.VAPID_PUBLIC_KEY,
 		privateKey: env.VAPID_PRIVATE_KEY,
 	});
-} 
+}

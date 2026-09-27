@@ -1,7 +1,7 @@
 "use client";
 
-import type { EventConflict } from "~/lib/fosdem";
-import type { Event } from "~/types/fosdem";
+import type { EventConflict } from "~/lib/schedule";
+import type { Event } from "~/types/conference";
 import { EventItemList } from "~/components/Event/EventItemList";
 import { EventCalendarList } from "~/components/Event/EventCalendarList";
 import { groupEventsByDay } from "~/lib/grouping";
@@ -148,7 +148,11 @@ export function EventList({
 			displaySortByFavourites={displaySortByFavourites}
 			sortByFavourites={sortByFavourites}
 			onSortChange={onSortFavouritesChange}
-			renderViewModeSwitch={displayViewMode ? () => <ViewModeSwitch viewMode={viewMode} /> : undefined}
+			renderViewModeSwitch={
+				displayViewMode
+					? () => <ViewModeSwitch viewMode={viewMode} />
+					: undefined
+			}
 			emptyStateTitle={emptyStateTitle}
 			emptyStateMessage={emptyStateMessage}
 			renderList={renderEventList}

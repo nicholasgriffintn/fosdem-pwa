@@ -1,11 +1,16 @@
-import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
-import { 
+import { conferenceConfig } from "@roomisfull/conference";
+import { getConferenceData, getCurrentDay } from "../lib/conference-data";
+import {
 	getBookmarksByUserIds,
-	enrichBookmarks, 
+	enrichBookmarks,
 	getBookmarksForDay,
 } from "../lib/bookmarks";
 import { refreshYearInReviewStats } from "../lib/year-in-review";
-import { getApplicationKeys, sendNotification, createDailySummaryPayload } from "../lib/notifications";
+import {
+	getApplicationKeys,
+	sendNotification,
+	createDailySummaryPayload,
+} from "../lib/notifications";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
 import type { Bookmark, Subscription, Env } from "../types";
 
@@ -21,7 +26,7 @@ export async function triggerDailySummary(
 	const whichDay = dayOverride ?? currentDay;
 
 	if (!whichDay) {
-		console.error("FOSDEM is not running today");
+		console.error(`${conferenceConfig.name} is not running today`);
 		return;
 	}
 
@@ -34,7 +39,7 @@ export async function triggerDailySummary(
 	}
 
 	const keys = await getApplicationKeys(env);
-	const fosdemData = await getFosdemData();
+	const scheduleData = await getConferenceData();
 
 	const subscriptions = await env.DB.prepare(
 		`SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
@@ -48,43 +53,46 @@ export async function triggerDailySummary(
 		throw new Error("No subscriptions found");
 	}
 
-	const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
+	const subscriptionRows = subscriptions.results as Array<
+		Record<string, unknown>
+	>;
 	const subscriptionEntries = subscriptionRows.map((subscription) => {
-			console.log(
-				`Processing ${isEvening ? 'evening' : 'morning'} summary for ${subscription.user_id}`,
-			);
+		console.log(
+			`Processing ${isEvening ? "evening" : "morning"} summary for ${subscription.user_id}`,
+		);
 
-			try {
-				if (
-					!subscription.user_id ||
-					!subscription.endpoint ||
-					!subscription.auth ||
-					!subscription.p256dh
-				) {
-					throw new Error("Invalid subscription data");
-				}
-
-				const typedSubscription: Subscription = {
-					user_id: subscription.user_id as string,
-					endpoint: subscription.endpoint as string,
-					auth: subscription.auth as string,
-					p256dh: subscription.p256dh as string,
-				};
-
-				const prefs = resolveNotificationPreference(subscription as any);
-
-				return {
-					subscription: typedSubscription,
-					prefs,
-				};
-			} catch (error) {
-				const errorMessage = error instanceof Error ? error.message : "Unknown error";
-				console.error(
-					`Error processing ${isEvening ? 'evening' : 'morning'} summary for ${subscription.user_id}: ${errorMessage}`,
-				);
-				throw error;
+		try {
+			if (
+				!subscription.user_id ||
+				!subscription.endpoint ||
+				!subscription.auth ||
+				!subscription.p256dh
+			) {
+				throw new Error("Invalid subscription data");
 			}
-		});
+
+			const typedSubscription: Subscription = {
+				user_id: subscription.user_id as string,
+				endpoint: subscription.endpoint as string,
+				auth: subscription.auth as string,
+				p256dh: subscription.p256dh as string,
+			};
+
+			const prefs = resolveNotificationPreference(subscription as any);
+
+			return {
+				subscription: typedSubscription,
+				prefs,
+			};
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : "Unknown error";
+			console.error(
+				`Error processing ${isEvening ? "evening" : "morning"} summary for ${subscription.user_id}: ${errorMessage}`,
+			);
+			throw error;
+		}
+	});
 
 	const usersNeedingBookmarks = subscriptionEntries
 		.filter(({ prefs }) => prefs.daily_summary)
@@ -105,16 +113,23 @@ export async function triggerDailySummary(
 			const filteredBookmarks = prefs.notify_low_priority
 				? bookmarks
 				: bookmarks.filter((bookmark) => Number(bookmark.priority) <= 1);
-			const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
+			const enrichedBookmarks = enrichBookmarks(
+				filteredBookmarks,
+				scheduleData.events,
+			);
 			const bookmarksToday = getBookmarksForDay(enrichedBookmarks, whichDay);
 
-			const notification = createDailySummaryPayload(bookmarksToday, whichDay, isEvening);
+			const notification = createDailySummaryPayload(
+				bookmarksToday,
+				whichDay,
+				isEvening,
+			);
 
 			if (queueMode) {
 				await env.NOTIFICATION_QUEUE.send({
 					subscription,
 					notification,
-					bookmarkId: isEvening ? 'evening-summary' : 'morning-summary',
+					bookmarkId: isEvening ? "evening-summary" : "morning-summary",
 					shouldMarkSent: false,
 				});
 			} else {
@@ -127,6 +142,6 @@ export async function triggerDailySummary(
 	const failed = results.filter((r) => r.status === "rejected").length;
 
 	console.log(
-		`Successfully ${queueMode ? 'queued' : 'sent'} ${successful} ${isEvening ? 'evening' : 'morning'} summaries, failed to process ${failed}`,
+		`Successfully ${queueMode ? "queued" : "sent"} ${successful} ${isEvening ? "evening" : "morning"} summaries, failed to process ${failed}`,
 	);
-} 
+}

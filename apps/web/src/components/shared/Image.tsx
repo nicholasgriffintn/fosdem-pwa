@@ -29,10 +29,17 @@ export function Image({
 	const canUseWebP = useWebP && /\.(jpe?g)$/i.test(src);
 
 	const resizedSrc = getResizedImageSrc(src, width, height);
-	const webpSource = canUseWebP ? getResizedImageSrc(src.replace(/\.(jpe?g)$/i, ".webp"), width, height) : null;
+	const webpSource = canUseWebP
+		? getResizedImageSrc(src.replace(/\.(jpe?g)$/i, ".webp"), width, height)
+		: null;
 
 	return (
-		<div className={className} style={{ aspectRatio: width && height ? `${width}/${height}` : undefined }}>
+		<div
+			className={className}
+			style={{
+				aspectRatio: width && height ? `${width}/${height}` : undefined,
+			}}
+		>
 			<picture className="w-full h-full">
 				{webpSource && (
 					<Source src={webpSource} type="image/webp" layout="fullWidth" />

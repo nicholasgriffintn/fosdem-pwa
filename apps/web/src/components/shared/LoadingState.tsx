@@ -20,7 +20,7 @@ export function LoadingState({
 }: LoadingStateProps) {
 	const sizeClasses = {
 		sm: "h-4 w-4",
-		md: "h-6 w-6", 
+		md: "h-6 w-6",
 		lg: "h-8 w-8",
 	};
 
@@ -37,7 +37,9 @@ export function LoadingState({
 			return (
 				<div className={containerClass}>
 					<Loader2 className={cn("animate-spin", sizeClasses[size])} />
-					{message && <p className="text-sm text-muted-foreground">{message}</p>}
+					{message && (
+						<p className="text-sm text-muted-foreground">{message}</p>
+					)}
 				</div>
 			);
 
@@ -46,15 +48,22 @@ export function LoadingState({
 				return (
 					<div className={containerClass}>
 						<Skeleton className={cn(sizeClasses[size])} />
-						{message && <p className="text-sm text-muted-foreground">{message}</p>}
+						{message && (
+							<p className="text-sm text-muted-foreground">{message}</p>
+						)}
 					</div>
 				);
 			}
-			
+
 			return (
 				<div className={containerClass}>
 					<div className="w-full space-y-2">
-						<Skeleton className={cn("w-full", size === "sm" ? "h-4" : size === "md" ? "h-6" : "h-8")} />
+						<Skeleton
+							className={cn(
+								"w-full",
+								size === "sm" ? "h-4" : size === "md" ? "h-6" : "h-8",
+							)}
+						/>
 						{message && <Skeleton className="w-3/4 h-4" />}
 					</div>
 				</div>
@@ -64,8 +73,15 @@ export function LoadingState({
 			return (
 				<div className={containerClass}>
 					<div className="w-full space-y-2">
-						<div className={cn("animate-pulse rounded-md bg-muted", size === "sm" ? "h-4" : size === "md" ? "h-6" : "h-8")} />
-						{message && <div className="animate-pulse rounded-md bg-muted w-3/4 h-4" />}
+						<div
+							className={cn(
+								"animate-pulse rounded-md bg-muted",
+								size === "sm" ? "h-4" : size === "md" ? "h-6" : "h-8",
+							)}
+						/>
+						{message && (
+							<div className="animate-pulse rounded-md bg-muted w-3/4 h-4" />
+						)}
 					</div>
 				</div>
 			);

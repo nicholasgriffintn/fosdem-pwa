@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { constants } from "../src/constants";
-import { buildData } from "../src/lib/fosdem";
+import { constants } from "../src/providers/fosdem/constants";
+import { buildData } from "../src/providers/fosdem";
 
 const mockXml2json = vi.hoisted(() => vi.fn());
 
@@ -134,9 +134,7 @@ describe("buildData", () => {
 				type: "application/vnd.apple.mpegurl",
 			},
 		]);
-		expect(event?.chat).toBe(
-			constants.CHAT_LINK.replace("${ROOM_ID}", "1301"),
-		);
+		expect(event?.chat).toBe(constants.CHAT_LINK.replace("${ROOM_ID}", "1301"));
 		expect(event?.links).toEqual([
 			{
 				href: "https://video.webm",
@@ -215,7 +213,11 @@ describe("buildData", () => {
 
 		const fetchMock = vi
 			.fn()
-			.mockResolvedValueOnce({ ok: false, status: 502, statusText: "Bad Gateway" })
+			.mockResolvedValueOnce({
+				ok: false,
+				status: 502,
+				statusText: "Bad Gateway",
+			})
 			.mockResolvedValueOnce({
 				ok: true,
 				text: async () => "<xml />",

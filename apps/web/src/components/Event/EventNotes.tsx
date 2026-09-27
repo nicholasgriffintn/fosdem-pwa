@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 
-import type { Event } from "~/types/fosdem";
-import type { Note } from "~/server/db/schema";
-import type { LocalNote } from "~/lib/localStorage";
+import type { Event } from "~/types/conference";
 import { Button } from "~/components/ui/button";
 import { useNotes } from "~/hooks/use-notes";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -32,11 +30,7 @@ type EventNotesProps = {
 	isMobile?: boolean;
 };
 
-export function EventNotes({
-	year,
-	event,
-	isMobile,
-}: EventNotesProps) {
+export function EventNotes({ year, event, isMobile }: EventNotesProps) {
 	const { notes, loading, create } = useNotes({ year, event });
 	const { videoRef } = usePlayer();
 	const [note, setNote] = useState("");
@@ -70,7 +64,8 @@ export function EventNotes({
 
 		toast({
 			title: "Note saved",
-			description: noteTime != null ? "Time link captured with your note." : undefined,
+			description:
+				noteTime != null ? "Time link captured with your note." : undefined,
 		});
 	};
 

@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { buildData } from "../src/lib/fosdem";
+import { buildData } from "../src/providers";
 import handler from "../src/index";
 
 vi.mock("@sentry/cloudflare", () => ({
 	withSentry: (_options, handlers) => handlers,
 }));
 
-vi.mock("../src/lib/fosdem", () => ({
+vi.mock("../src/providers", () => ({
 	buildData: vi.fn(),
 }));
 
@@ -67,7 +67,11 @@ describe("build-data worker entrypoint", () => {
 		const R2 = makeR2();
 		const env = { R2, YEAR: "1999" };
 
-		await handler.fetch(new Request("https://example.com"), env as any, {} as any);
+		await handler.fetch(
+			new Request("https://example.com"),
+			env as any,
+			{} as any,
+		);
 
 		expect(buildData).toHaveBeenCalledWith({ year: "2000" });
 		expect(R2.put).toHaveBeenCalledWith(
@@ -123,13 +127,15 @@ describe("build-data worker entrypoint", () => {
 			"fosdem-2027-persons.json",
 		]);
 		expect(put).toHaveBeenCalledTimes(5);
-		expect(put.mock.calls.map(([key]) => key)).toEqual([
-			"fosdem-2027.json",
-			"fosdem-2027-core.json",
-			"fosdem-2027-tracks.json",
-			"fosdem-2027-events.json",
-			"fosdem-2027-persons.json",
-		]);
+		expect(put.mock.calls.map(([key]) => key).sort()).toEqual(
+			[
+				"fosdem-2027.json",
+				"fosdem-2027-core.json",
+				"fosdem-2027-tracks.json",
+				"fosdem-2027-events.json",
+				"fosdem-2027-persons.json",
+			].sort(),
+		);
 		expect(data).toMatchObject({
 			conference: {
 				acronym: "fosdem-2027",

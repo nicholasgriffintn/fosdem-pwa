@@ -194,15 +194,12 @@ export function useMutateBookmark({ year }: { year: number }) {
 
 			const previousBookmarks = queryClient.getQueryData(serverQueryKey);
 
-			queryClient.setQueryData(
-				serverQueryKey,
-				(old: Bookmark[] | null) => {
-					if (!old) return null;
-					return old.map((bookmark) =>
-						bookmark.id === id ? { ...bookmark, ...updates } : bookmark,
-					);
-				},
-			);
+			queryClient.setQueryData(serverQueryKey, (old: Bookmark[] | null) => {
+				if (!old) return null;
+				return old.map((bookmark) =>
+					bookmark.id === id ? { ...bookmark, ...updates } : bookmark,
+				);
+			});
 
 			return { previousBookmarks };
 		},
@@ -210,10 +207,7 @@ export function useMutateBookmark({ year }: { year: number }) {
 			console.error(err);
 			if (context?.previousBookmarks) {
 				const serverQueryKey = bookmarkQueryKeys.list(year, user?.id);
-				queryClient.setQueryData(
-					serverQueryKey,
-					context.previousBookmarks,
-				);
+				queryClient.setQueryData(serverQueryKey, context.previousBookmarks);
 			}
 		},
 		onSettled: (_data, _error, variables) => {
@@ -221,10 +215,9 @@ export function useMutateBookmark({ year }: { year: number }) {
 				queryKey: bookmarkQueryKeys.list(year, user?.id),
 			});
 
-			const bookmarks =
-				queryClient.getQueryData<(Bookmark | LocalBookmark)[]>(
-					bookmarkQueryKeys.list(year, user?.id),
-				);
+			const bookmarks = queryClient.getQueryData<(Bookmark | LocalBookmark)[]>(
+				bookmarkQueryKeys.list(year, user?.id),
+			);
 			const bookmark = bookmarks?.find((b) => b.id === variables.id);
 			if (bookmark && "slug" in bookmark) {
 				queryClient.invalidateQueries({
@@ -268,7 +261,7 @@ export function useMutateBookmark({ year }: { year: number }) {
 					createLocal: createLocalBookmark,
 					removeLocal: removeLocalBookmark,
 					createServer: async (data) => createServerBookmark.mutateAsync(data),
-						userId: user ? String(user.id) : undefined,
+					userId: user ? String(user.id) : undefined,
 				},
 				bookmarkData,
 			);

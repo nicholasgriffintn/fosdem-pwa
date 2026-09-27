@@ -1,3 +1,4 @@
+import { conferenceConfig } from "@roomisfull/conference";
 import { createServerFn } from "@tanstack/react-start";
 
 import { getAuthUser } from "~/server/lib/auth-middleware";
@@ -15,10 +16,9 @@ type TestNotificationType =
 export const sendTestNotification = createServerFn({
 	method: "POST",
 })
-	.validator((data: {
-		type: TestNotificationType;
-		dayOverride?: "1" | "2";
-	}) => data)
+	.validator(
+		(data: { type: TestNotificationType; dayOverride?: "1" | "2" }) => data,
+	)
 	.handler(async (ctx): Promise<Result<{ message: string }> | null> => {
 		const { type, dayOverride } = ctx.data;
 
@@ -31,10 +31,16 @@ export const sendTestNotification = createServerFn({
 			const subscriptions = await findSubscriptionsByUser(user.id);
 
 			if (!subscriptions || subscriptions.length === 0) {
-				return err("No active push subscriptions found. Please enable push notifications first.");
+				return err(
+					"No active push subscriptions found. Please enable push notifications first.",
+				);
 			}
 
-			const pushServiceUrl = process.env.PUSH_SERVICE_URL || "https://push.fosdempwa.com";
+			const pushServiceUrl =
+				process.env.PUSH_SERVICE_URL ||
+				conferenceConfig.integrations.pushServiceUrl;
+			if (!pushServiceUrl)
+				throw new Error("Push notifications are not configured");
 
 			const url = new URL(pushServiceUrl);
 			url.searchParams.set("test", "true");
@@ -43,17 +49,24 @@ export const sendTestNotification = createServerFn({
 				url.searchParams.set("day", dayOverride);
 			}
 
+			const cronSecret = process.env.CRON_SECRET;
+			if (!cronSecret)
+				throw new Error("Push service authorisation is not configured");
+
 			const response = await fetch(url.toString(), {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					Authorization: `Bearer ${cronSecret}`,
 				},
 			});
 
 			if (!response.ok) {
 				const errorText = await response.text();
 				console.error("Push service error:", errorText);
-				return err(`Failed to trigger test notification: ${response.statusText}`);
+				return err(
+					`Failed to trigger test notification: ${response.statusText}`,
+				);
 			}
 
 			const responseText = await response.text();
@@ -64,7 +77,7 @@ export const sendTestNotification = createServerFn({
 		} catch (error) {
 			console.error("Error sending test notification:", error);
 			return err(
-				`Failed to send test notification: ${error instanceof Error ? error.message : "Unknown error"}`
+				`Failed to send test notification: ${error instanceof Error ? error.message : "Unknown error"}`,
 			);
 		}
 	});

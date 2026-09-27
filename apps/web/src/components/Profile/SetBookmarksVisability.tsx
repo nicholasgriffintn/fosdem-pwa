@@ -25,7 +25,6 @@ export function SetBookmarksVisability({
 					Make your profile and bookmarks visible to other users
 				</p>
 			</div>
-			{/** biome-ignore lint/correctness/useUniqueElementIds: it's wrong */}
 			<Switch
 				id="bookmarks-visibility"
 				checked={bookmarksVisibility === "public"}

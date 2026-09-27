@@ -1,10 +1,10 @@
-export interface FosdemEventLink {
+export interface ConferenceEventLink {
 	type?: string;
 	href?: string;
 	title?: string;
 }
 
-export interface FosdemEvent {
+export interface ConferenceEvent {
 	day: string;
 	title: string;
 	type: string;
@@ -13,12 +13,12 @@ export interface FosdemEvent {
 	room: string;
 	startTime: string;
 	duration: string;
-	links?: FosdemEventLink[];
+	links?: ConferenceEventLink[];
 }
 
-export interface FosdemData {
+export interface ConferenceSchedule {
 	events: {
-		[key: string]: FosdemEvent;
+		[key: string]: ConferenceEvent;
 	};
 }
 
@@ -34,7 +34,7 @@ export interface Bookmark {
 	watch_status?: string | null;
 }
 
-export interface EnrichedBookmark extends Bookmark, FosdemEvent {}
+export interface EnrichedBookmark extends Bookmark, ConferenceEvent {}
 
 export interface NotificationPayload {
 	title: string;

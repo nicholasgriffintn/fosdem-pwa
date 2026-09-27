@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { TooltipProvider } from "~/components/ui/tooltip";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import type { Bookmark } from "~/server/db/schema";
-import type { Conference } from "~/types/fosdem";
+import type { Conference } from "~/types/conference";
 
 const routerMocks = vi.hoisted(() => ({
 	Link: ({ children, ...props }: { children: ReactNode }) => (
@@ -15,7 +15,9 @@ const routerMocks = vi.hoisted(() => ({
 	useRouterState: ({
 		select,
 	}: {
-		select: (state: { location: { pathname: string; search: string } }) => string;
+		select: (state: {
+			location: { pathname: string; search: string };
+		}) => string;
 	}) => select({ location: { pathname: "/test", search: "" } }),
 }));
 
@@ -25,7 +27,7 @@ vi.mock("~/hooks/use-auth", () => ({
 	useAuth: () => ({ user: null, loading: false, logout: vi.fn() }),
 }));
 
-const createFosdemData = (): Conference => {
+const createConferenceSchedule = (): Conference => {
 	const dayId = "day1";
 	return {
 		conference: {
@@ -137,7 +139,7 @@ describe("BookmarksList", () => {
 		const { queryClient } = renderWithClient(
 			<BookmarksList
 				bookmarks={[]}
-				fosdemData={createFosdemData()}
+				scheduleData={createConferenceSchedule()}
 				year={2024}
 				loading={false}
 			/>,
@@ -148,7 +150,7 @@ describe("BookmarksList", () => {
 	});
 
 	it("renders bookmarked events and tracks", () => {
-		const fosdemData = createFosdemData();
+		const scheduleData = createConferenceSchedule();
 		const timestamp = new Date().toISOString();
 		const bookmarks: Bookmark[] = [
 			{
@@ -196,7 +198,7 @@ describe("BookmarksList", () => {
 		const { queryClient } = renderWithClient(
 			<BookmarksList
 				bookmarks={bookmarks}
-				fosdemData={fosdemData}
+				scheduleData={scheduleData}
 				year={2024}
 				loading={false}
 				tab="all"

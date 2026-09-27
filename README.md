@@ -1,18 +1,43 @@
-# FOSDEM PWA Companion App
+# Room is Full
 
-This is a companion app for [FOSDEM](https://fosdem.org/) to provide an enhanced experience for attendees. It is built as a Progressive Web App (PWA) using modern web technologies.
+![Room is Full](./apps/web/public/brand/wordmark.svg)
 
-It has also been designed to work without JavaScript enabled, although some features will be limited in that mode.
+Room is Full has been designed to be a companion app that can be deployed individually per conference that I might want an app for.
 
-## Check it out
+This allows me to plan where i'm going to, bookmark any talks that I am interested in, take notes in sessions and share my schedule with other people going. As a PWA (Progressive Web App), it works across my devices and live syncs over apis.
 
-You can check out the app at [https://fosdempwa.com/](https://fosdempwa.com/)
+## Conferences
+
+- [https://fosdempwa.com/](https://fosdempwa.com/)
+
+## Deploy
+
+| Environment | Canonical domain | Redirects from |
+| --- | --- | --- |
+| Default | `roomisfull.app` | `roomisfull.com` and their `www` hosts |
+| `fosdem` | `fosdempwa.com` | `fosdem.roomisfull.app` and `www.fosdempwa.com` |
+
+Run from the repository root to build and deploy the directory:
+
+```sh
+pnpm build
+pnpm --filter @roomisfull/web run deploy
+```
+
+Build and deploy FOSDEM separately:
+
+```sh
+CLOUDFLARE_ENV=fosdem pnpm build
+pnpm --filter @roomisfull/web run deploy
+pnpm --filter @roomisfull/build-data run deploy --env fosdem
+pnpm --filter @roomisfull/push run deploy --env fosdem
+```
 
 ## Features
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
 
-| ![FOSDEM PWA Homepage](./.github/docs/images/homepage.png) |
+| ![Room is Full (FOSDEM) Homepage](./.github/docs/images/homepage.png) |
 |:--:|
 | **Homepage & Navigation** <br> • Quickly access scheduled tracks including Keynotes, Main tracks, Developer rooms, Lightning talks, and Other events <br> • Powerful search feature to locate events, tracks, rooms, and more <br> • Automatic data sync from FOSDEM for latest information |
 

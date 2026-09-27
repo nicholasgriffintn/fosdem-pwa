@@ -1,5 +1,7 @@
 "use client";
 
+import { conferenceConfig } from "@roomisfull/conference";
+
 import { useRouter, useSearch } from "@tanstack/react-router";
 
 import { constants } from "~/constants";
@@ -17,7 +19,7 @@ export function YearSelector({ id = "year-select" }: { id?: string }) {
 
 		toast({
 			title: "Year changed",
-			description: `You are now viewing the ${year} edition of FOSDEM.`,
+			description: `You are now viewing the ${year} edition of ${conferenceConfig.name}.`,
 		});
 	};
 

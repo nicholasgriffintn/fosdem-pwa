@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import type { RoomData } from "~/types/fosdem";
+import type { RoomData } from "~/types/conference";
 import { sortRooms } from "~/lib/sorting";
 import { constants } from "~/constants";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
@@ -16,11 +16,9 @@ type RoomListProps = {
 type RoomListItemProps = {
 	year: number;
 	room: RoomData;
-	index: number;
-	isLast: boolean;
 };
 
-function RoomListItem({ year, room, index, isLast }: RoomListItemProps) {
+function RoomListItem({ year, room }: RoomListItemProps) {
 	return (
 		<div className="flex flex-col md:flex-row md:justify-between w-full py-3 px-2 sm:px-3">
 			<div className="flex flex-col space-y-1.5">
@@ -94,14 +92,9 @@ export function RoomList({
 									</span>
 								</div>
 								<ListContainer className="room-list">
-									{buildingRooms.map((room, index) => (
+									{buildingRooms.map((room) => (
 										<li key={room.slug}>
-											<RoomListItem
-												year={year}
-												room={room}
-												index={index}
-												isLast={buildingRooms.length === index + 1}
-											/>
+											<RoomListItem year={year} room={room} />
 										</li>
 									))}
 								</ListContainer>
@@ -124,23 +117,18 @@ export function RoomList({
 			)}
 			{sortedRooms?.length > 0 ? (
 				<ListContainer className="room-list">
-					{sortedRooms.map((room, index) => (
+					{sortedRooms.map((room) => (
 						<li key={room.slug}>
-							<RoomListItem
-								year={year}
-								room={room}
-								index={index}
-								isLast={rooms.length === index + 1}
-							/>
+							<RoomListItem year={year} room={room} />
 						</li>
 					))}
 				</ListContainer>
 			) : (
-					<EmptyStateCard
-						title="No rooms found"
-						description="Try adjusting your filters or check back later for room updates."
-						className="my-4"
-					/>
+				<EmptyStateCard
+					title="No rooms found"
+					description="Try adjusting your filters or check back later for room updates."
+					className="my-4"
+				/>
 			)}
 		</section>
 	);

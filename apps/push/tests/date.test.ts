@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createBrusselsDate, getCurrentDate } from "../src/utils/date";
+import { createConferenceDate, getCurrentDate } from "../src/utils/date";
 
 describe("date utilities", () => {
 	afterEach(() => {
@@ -11,7 +11,7 @@ describe("date utilities", () => {
 		vi.useFakeTimers();
 		vi.setSystemTime(new Date("2025-02-01T23:30:00Z"));
 
-		const brusselsDate = createBrusselsDate();
+		const brusselsDate = createConferenceDate();
 
 		expect(brusselsDate.toISOString()).toBe("2025-02-02T00:30:00.000Z");
 	});

@@ -1,4 +1,4 @@
-# FOSDEM PQA - CloudFlare shared code
+# Room is Full — Cloudflare shared code
 
 This directory contains the shared code for Cloudflare Workers applications. This includes the migrations for the database as well as the state that will be persisted across the applications.
 

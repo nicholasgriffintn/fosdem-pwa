@@ -1,4 +1,5 @@
-const PLAYER_STATE_KEY = "fosdem_player_state";
+import { conferenceConfig } from "@roomisfull/conference";
+const PLAYER_STATE_KEY = conferenceConfig.storage.playerKey;
 
 export interface PlayerState {
 	eventSlug: string | null;
@@ -41,9 +42,7 @@ export function getPlayerState(): PlayerState {
 	}
 }
 
-export function savePlayerState(
-	state: Partial<PlayerState>,
-): void {
+export function savePlayerState(state: Partial<PlayerState>): void {
 	try {
 		const currentState = getPlayerState();
 		const updatedState: PlayerState = {
@@ -60,7 +59,10 @@ export function savePlayerState(
 
 export function clearPlayerState(): void {
 	try {
-		localStorage.setItem(PLAYER_STATE_KEY, JSON.stringify(DEFAULT_PLAYER_STATE));
+		localStorage.setItem(
+			PLAYER_STATE_KEY,
+			JSON.stringify(DEFAULT_PLAYER_STATE),
+		);
 	} catch (error) {
 		console.error("Error clearing player state:", error);
 	}

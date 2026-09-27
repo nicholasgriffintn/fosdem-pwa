@@ -31,7 +31,7 @@ export function VideoPortal() {
 		const container = portalContainerRef.current;
 		if (!container) return;
 
-		if (!portalTarget) {
+		if (!portalTarget || !currentEvent?.id) {
 			if (container.parentElement) {
 				container.parentElement.removeChild(container);
 			}

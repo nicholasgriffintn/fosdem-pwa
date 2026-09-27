@@ -9,7 +9,9 @@ export function AppNotice() {
 				<div className="flex items-start gap-3 sm:items-center">
 					<Icons.alertTriangle className="h-5 w-5 flex-shrink-0 text-amber-500 dark:text-amber-200 sm:h-4 sm:w-4" />
 					<p>
-						<span className="font-medium">Everything is working fine actually.</span>{" "}
+						<span className="font-medium">
+							Everything is working fine actually.
+						</span>{" "}
 						I'm just leaving the code here in case I need it again.
 					</p>
 				</div>

@@ -1,7 +1,9 @@
 "use client";
 
+import { conferenceConfig } from "@roomisfull/conference";
+
 export const dataQueryKeys = {
-	fosdem: (year: number) => ["fosdem-data", year],
+	schedule: (year: number) => ["conference-data", conferenceConfig.id, year],
 };
 
 export const sessionQueryKeys = {
@@ -13,12 +15,17 @@ export const sessionQueryKeys = {
 
 export const bookmarkQueryKeys = {
 	local: (year: number) => ["local-bookmarks", year],
-	list: (
-		year: number,
-		userId: number | string | null | undefined,
-	) => ["bookmarks", year, userId ?? null],
+	list: (year: number, userId: number | string | null | undefined) => [
+		"bookmarks",
+		year,
+		userId ?? null,
+	],
 	item: (year: number, slug: string) => ["bookmarks", year, slug],
-	userBookmarks: (userId: string, year?: number) => ["userBookmarks", userId, year ?? null],
+	userBookmarks: (userId: string, year?: number) => [
+		"userBookmarks",
+		userId,
+		year ?? null,
+	],
 };
 
 export const notesQueryKeys = {
@@ -32,5 +39,9 @@ export const subscriptionQueryKeys = {
 export const roomStatusQueryKeys = {
 	status: (roomId: string) => ["room-status", roomId],
 	statuses: (roomNames: string[]) => ["room-statuses", ...roomNames],
-	history: (roomId: string, limit: number) => ["room-status-history", roomId, limit],
+	history: (roomId: string, limit: number) => [
+		"room-status-history",
+		roomId,
+		limit,
+	],
 };

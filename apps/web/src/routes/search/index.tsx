@@ -1,3 +1,4 @@
+import { brand } from "@roomisfull/conference";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -8,7 +9,7 @@ import { EventList } from "~/components/Event/EventList";
 import { TrackList } from "~/components/Track/TrackList";
 import { RoomList } from "~/components/Room/RoomList";
 import { constants } from "~/constants";
-import type { Event, Track, RoomData } from "~/types/fosdem";
+import type { Event, Track, RoomData } from "~/types/conference";
 import {
 	TRACK_SEARCH_KEYS,
 	EVENT_SEARCH_KEYS,
@@ -18,7 +19,7 @@ import {
 	formatEvent,
 	formatRoom,
 } from "~/lib/search";
-import { generateTimeSlots } from "~/lib/fosdem";
+import { generateTimeSlots } from "~/lib/schedule";
 import { buildSearchLink } from "~/lib/link-builder";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
@@ -32,7 +33,7 @@ import { SectionStack } from "~/components/shared/SectionStack";
 import { Input } from "~/components/ui/input";
 import { Link } from "@tanstack/react-router";
 import { cn } from "~/lib/utils";
-import { getAllData } from "~/server/functions/fosdem";
+import { getAllData } from "~/server/functions/schedule";
 import { getBookmarks } from "~/server/functions/bookmarks";
 import { generateCommonSEOTags } from "~/utils/seo-generator";
 
@@ -47,9 +48,9 @@ export const Route = createFileRoute("/search/")({
 	head: () => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: "Search | FOSDEM PWA",
-				description: "Search for events, tracks and rooms at FOSDEM PWA",
-			})
+				title: `Search | ${brand.name}`,
+				description: `Search for events, tracks and rooms at ${brand.name}`,
+			}),
 		],
 	}),
 	validateSearch: ({
@@ -82,7 +83,7 @@ export const Route = createFileRoute("/search/")({
 		type,
 	}),
 	loader: async ({ deps: { year, q, track, time, type } }) => {
-		const fosdemData = await getAllData({ data: { year } });
+		const scheduleData = await getAllData({ data: { year } });
 		const serverBookmarks = await getBookmarks({
 			data: { year, status: "favourited" },
 		});
@@ -92,14 +93,14 @@ export const Route = createFileRoute("/search/")({
 			track,
 			time,
 			type,
-			fosdemData,
+			scheduleData,
 			serverBookmarks,
 		};
 	},
 });
 
 function SearchPage() {
-	const { year, q, track, time, type, fosdemData, serverBookmarks } =
+	const { year, q, track, time, type, scheduleData, serverBookmarks } =
 		Route.useLoaderData();
 	const navigate = useNavigate();
 
@@ -138,29 +139,29 @@ function SearchPage() {
 	);
 
 	const fuseIndexes = useMemo(() => {
-		if (!fosdemData || !FuseImpl) return null;
+		if (!scheduleData || !FuseImpl) return null;
 
 		return {
 			tracks: createSearchIndex(
 				FuseImpl,
-				Object.values(fosdemData.tracks),
+				Object.values(scheduleData.tracks),
 				TRACK_SEARCH_KEYS,
 			),
 			events: createSearchIndex(
 				FuseImpl,
-				Object.values(fosdemData.events),
+				Object.values(scheduleData.events),
 				EVENT_SEARCH_KEYS,
 			),
 			rooms: createSearchIndex(
 				FuseImpl,
-				Object.values(fosdemData.rooms),
+				Object.values(scheduleData.rooms),
 				ROOM_SEARCH_KEYS,
 			),
 		};
-	}, [fosdemData, FuseImpl]);
+	}, [scheduleData, FuseImpl]);
 
 	const searchResults = useMemo(() => {
-		if (!fosdemData || !query || !fuseIndexes)
+		if (!scheduleData || !query || !fuseIndexes)
 			return {
 				tracks: [],
 				events: [],
@@ -170,8 +171,9 @@ function SearchPage() {
 				roomsWithScores: [],
 			};
 
-		const trackResults =
-			fuseIndexes.tracks.search(query) as Array<FuseResult<Track>>;
+		const trackResults = fuseIndexes.tracks.search(query) as Array<
+			FuseResult<Track>
+		>;
 		const tracksWithScores: Array<ScoredResult<Track, "track">> = trackResults
 			.slice(0, 10)
 			.map((result) => ({
@@ -180,8 +182,9 @@ function SearchPage() {
 				score: result.score ?? 1,
 			}));
 
-		const eventResults =
-			fuseIndexes.events.search(query) as Array<FuseResult<Event>>;
+		const eventResults = fuseIndexes.events.search(query) as Array<
+			FuseResult<Event>
+		>;
 		const eventsWithScores: Array<ScoredResult<Event, "event">> = eventResults
 			.slice(0, 20)
 			.map((result) => ({
@@ -191,8 +194,9 @@ function SearchPage() {
 			}))
 			.sort((a, b) => a.score - b.score);
 
-		const roomResults =
-			fuseIndexes.rooms.search(query) as Array<FuseResult<RoomData>>;
+		const roomResults = fuseIndexes.rooms.search(query) as Array<
+			FuseResult<RoomData>
+		>;
 		const roomsWithScores: Array<ScoredResult<RoomData, "room">> = roomResults
 			.slice(0, 10)
 			.map((result) => ({
@@ -209,7 +213,7 @@ function SearchPage() {
 			eventsWithScores,
 			roomsWithScores,
 		};
-	}, [fuseIndexes, query, fosdemData]);
+	}, [fuseIndexes, query, scheduleData]);
 
 	const {
 		rooms: rawRooms,
@@ -219,29 +223,29 @@ function SearchPage() {
 	} = searchResults;
 
 	const trackIdToName = useMemo(() => {
-		if (!fosdemData) return {};
-		return Object.values(fosdemData.tracks).reduce<Record<string, string>>(
+		if (!scheduleData) return {};
+		return Object.values(scheduleData.tracks).reduce<Record<string, string>>(
 			(acc, t) => {
 				acc[t.id] = t.name;
 				return acc;
 			},
 			{},
 		);
-	}, [fosdemData]);
+	}, [scheduleData]);
 
 	const filteredTracksWithScores = selectedTrack
 		? tracksWithScores.filter((result) => {
-			const matchesId = result.item.id === selectedTrack;
-			const matchesName = result.item.name === selectedTrack;
-			const selectedName = trackIdToName[selectedTrack];
-			return matchesId || matchesName || result.item.name === selectedName;
-		})
+				const matchesId = result.item.id === selectedTrack;
+				const matchesName = result.item.name === selectedTrack;
+				const selectedName = trackIdToName[selectedTrack];
+				return matchesId || matchesName || result.item.name === selectedName;
+			})
 		: tracksWithScores;
 
 	const filteredEventsWithScores = eventsWithScores.filter((result) => {
 		const matchesTrack = selectedTrack
 			? result.item.trackKey === selectedTrack ||
-			result.item.trackKey === trackIdToName[selectedTrack]
+				result.item.trackKey === trackIdToName[selectedTrack]
 			: true;
 		const matchesTime = selectedTime
 			? result.item.startTime === selectedTime
@@ -251,7 +255,7 @@ function SearchPage() {
 	});
 
 	const formattedTracks = filteredTracksWithScores.map((result) =>
-		formatTrack(result.item, fosdemData?.events || {}),
+		formatTrack(result.item, scheduleData?.events || {}),
 	) as Track[];
 	const formattedEvents = filteredEventsWithScores.map((result) =>
 		formatEvent(result.item),
@@ -264,17 +268,17 @@ function SearchPage() {
 	};
 
 	const trackOptions = useMemo(() => {
-		if (!fosdemData) return [];
+		if (!scheduleData) return [];
 
-		return Object.values(fosdemData.tracks)
+		return Object.values(scheduleData.tracks)
 			.map((t) => ({ label: t.name, value: t.id }))
 			.sort((a, b) => a.label.localeCompare(b.label));
-	}, [fosdemData]);
+	}, [scheduleData]);
 
 	const timeSlotOptions = useMemo(() => {
-		if (!fosdemData) return [];
+		if (!scheduleData) return [];
 
-		const slots = generateTimeSlots(Object.values(fosdemData.events)).map(
+		const slots = generateTimeSlots(Object.values(scheduleData.events)).map(
 			(slot) => slot.time,
 		);
 
@@ -283,7 +287,7 @@ function SearchPage() {
 			const [bHours, bMinutes] = b.split(":").map(Number);
 			return aHours * 60 + aMinutes - (bHours * 60 + bMinutes);
 		});
-	}, [fosdemData]);
+	}, [scheduleData]);
 	const trackSelectOptions = [
 		{ label: "All tracks", value: "all" },
 		...trackOptions,
@@ -347,13 +351,15 @@ function SearchPage() {
 		});
 	};
 
-	const typeFilters: { label: string; value: "all" | "events" | "tracks" | "rooms" }[] =
-		[
-			{ label: "All", value: "all" },
-			{ label: "Events", value: "events" },
-			{ label: "Tracks", value: "tracks" },
-			{ label: "Rooms", value: "rooms" },
-		];
+	const typeFilters: {
+		label: string;
+		value: "all" | "events" | "tracks" | "rooms";
+	}[] = [
+		{ label: "All", value: "all" },
+		{ label: "Events", value: "events" },
+		{ label: "Tracks", value: "tracks" },
+		{ label: "Rooms", value: "rooms" },
+	];
 
 	const sections = [
 		{
@@ -438,9 +444,7 @@ function SearchPage() {
 						</div>
 					</div>
 
-					<div
-						className="flex flex-wrap items-end gap-4 mt-3"
-					>
+					<div className="flex flex-wrap items-end gap-4 mt-3">
 						<div className="flex flex-col gap-1 min-w-[180px]">
 							<Label htmlFor="track-filter">Track</Label>
 							<Select
@@ -448,7 +452,7 @@ function SearchPage() {
 								name="track"
 								value={selectedTrack || "all"}
 								onValueChange={handleTrackChange}
-								disabled={!fosdemData}
+								disabled={!scheduleData}
 								options={trackSelectOptions}
 								className="min-w-[180px] mt-2"
 							/>
@@ -461,7 +465,7 @@ function SearchPage() {
 								name="time"
 								value={selectedTime || "all"}
 								onValueChange={handleTimeChange}
-								disabled={!fosdemData}
+								disabled={!scheduleData}
 								options={timeSelectOptions}
 								className="min-w-[160px] h-10 mt-2"
 							/>
@@ -498,9 +502,11 @@ function SearchPage() {
 									"no-underline",
 									selectedType === filter.value
 										? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-										: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+										: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
 								)}
-								aria-current={selectedType === filter.value ? "page" : undefined}
+								aria-current={
+									selectedType === filter.value ? "page" : undefined
+								}
 							>
 								{filter.label}
 							</Link>
@@ -509,7 +515,7 @@ function SearchPage() {
 				</div>
 			</div>
 
-			{!fosdemData ? (
+			{!scheduleData ? (
 				<EmptyStateCard
 					title="Search unavailable"
 					description="The schedule data is still loading. Please try again in a moment."

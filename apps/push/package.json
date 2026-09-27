@@ -1,27 +1,33 @@
 {
-  "name": "@fosdem-pwa/push",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "build": "wrangler build",
-    "deploy": "wrangler deploy",
-    "dev": "wrangler dev --test-scheduled --persist-to ../cloudflare/state",
-    "start": "wrangler dev --test-scheduled --persist-to ../cloudflare/state",
-    "cf-typegen": "wrangler types",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "db:migrate:local": "wrangler d1 migrations apply fosdem --local --persist-to ../cloudflare/state",
-    "db:migrate:prod": "wrangler d1 migrations apply fosdem --remote"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "5.20260920.1",
-    "vitest": "5.0.1",
-    "typescript": "7.0.2",
-    "wrangler": "4.135.0"
-  },
-  "dependencies": {
-    "@sentry/cloudflare": "10.75.0",
-    "webpush-webcrypto": "1.0.5"
-  }
+	"name": "@roomisfull/push",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "wrangler deploy --dry-run --outdir dist",
+		"build:fosdem": "wrangler deploy --dry-run --outdir dist --env fosdem",
+		"deploy": "wrangler deploy",
+		"deploy:fosdem": "wrangler deploy --env fosdem",
+		"dev": "wrangler dev --test-scheduled --persist-to ../cloudflare/state",
+		"dev:fosdem": "wrangler dev --env fosdem --test-scheduled --persist-to ../cloudflare/state",
+		"start": "wrangler dev --test-scheduled --persist-to ../cloudflare/state",
+		"start:fosdem": "wrangler dev --env fosdem --test-scheduled --persist-to ../cloudflare/state",
+		"cf-typegen": "wrangler types",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"db:migrate:local": "wrangler d1 migrations apply DB --local --persist-to ../cloudflare/state",
+		"db:migrate:prod": "wrangler d1 migrations apply DB --remote"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "5.20260920.1",
+		"vitest": "5.0.1",
+		"typescript": "7.0.2",
+		"wrangler": "4.135.0"
+	},
+	"dependencies": {
+		"@sentry/cloudflare": "10.75.0",
+		"webpush-webcrypto": "1.0.5",
+		"@roomisfull/conference": "workspace:*"
+	}
 }

@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Env, Subscription } from "../src/types";
 
-vi.mock("../src/lib/fosdem-data", () => ({
-	getFosdemData: vi.fn(),
+vi.mock("../src/lib/conference-data", () => ({
+	getConferenceData: vi.fn(),
 	getCurrentDay: vi.fn(),
 }));
 
@@ -26,18 +26,19 @@ vi.mock("../src/utils/config", () => ({
 	bookmarkNotificationsEnabled: vi.fn(() => true),
 }));
 
-const { getFosdemData, getCurrentDay } = await import("../src/lib/fosdem-data");
-const { getBookmarksByUserIds, enrichBookmarks, getBookmarksForDay } = await import(
-	"../src/lib/bookmarks",
+const { getConferenceData, getCurrentDay } = await import(
+	"../src/lib/conference-data"
 );
+const { getBookmarksByUserIds, enrichBookmarks, getBookmarksForDay } =
+	await import("../src/lib/bookmarks");
 const { getApplicationKeys, sendNotification } = await import(
-	"../src/lib/notifications",
+	"../src/lib/notifications"
 );
 const { resolveNotificationPreference } = await import(
-	"../src/lib/notification-preferences",
+	"../src/lib/notification-preferences"
 );
 const { triggerRoomStatusNotifications } = await import(
-	"../src/controllers/room-status",
+	"../src/controllers/room-status"
 );
 
 type Prepared = {
@@ -117,13 +118,16 @@ afterEach(() => {
 
 describe("triggerRoomStatusNotifications", () => {
 	it("skips when room status alerts are disabled", async () => {
-		vi.stubGlobal("fetch", vi.fn(async () => ({
-			ok: true,
-			json: async () => [{ roomname: "H.1302", state: "1" }],
-		})) as unknown as typeof fetch);
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => ({
+				ok: true,
+				json: async () => [{ roomname: "H.1302", state: "1" }],
+			})) as unknown as typeof fetch,
+		);
 
 		(getCurrentDay as vi.Mock).mockReturnValue("1");
-		(getFosdemData as vi.Mock).mockResolvedValue({ events: {} });
+		(getConferenceData as vi.Mock).mockResolvedValue({ events: {} });
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
 		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
@@ -144,13 +148,16 @@ describe("triggerRoomStatusNotifications", () => {
 	});
 
 	it("filters low priority bookmarks when disabled", async () => {
-		vi.stubGlobal("fetch", vi.fn(async () => ({
-			ok: true,
-			json: async () => [{ roomname: "H.1302", state: "1" }],
-		})) as unknown as typeof fetch);
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => ({
+				ok: true,
+				json: async () => [{ roomname: "H.1302", state: "1" }],
+			})) as unknown as typeof fetch,
+		);
 
 		(getCurrentDay as vi.Mock).mockReturnValue("1");
-		(getFosdemData as vi.Mock).mockResolvedValue({ events: {} });
+		(getConferenceData as vi.Mock).mockResolvedValue({ events: {} });
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
 		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,

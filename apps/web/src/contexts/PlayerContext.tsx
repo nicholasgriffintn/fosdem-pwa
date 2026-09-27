@@ -16,7 +16,7 @@ import {
 	savePlayerState,
 	clearPlayerState,
 } from "~/lib/playerPersistence";
-import type { Event } from "~/types/fosdem";
+import type { Event } from "~/types/conference";
 
 export type PortalTarget = "floating" | "event-page" | null;
 
@@ -356,7 +356,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	useEffect(() => {
-		if (!pendingPlayRef.current) return;
+		if (!pendingPlayRef.current || !currentEvent || !streamUrl) return;
 		const video = videoRef.current;
 		if (!video) return;
 
@@ -369,8 +369,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			});
 		}
 		pendingPlayRef.current = false;
-		// biome-ignore lint/correctness/useExhaustiveDependencies: deps trigger effect when event/stream changes
-	}, [currentEvent, streamUrl, isLive]);
+	}, [currentEvent, streamUrl]);
 
 	const setVolume = useCallback((vol: number) => {
 		if (videoRef.current) {
@@ -444,6 +443,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 			isLive,
 			portalTarget,
 			streamUrl,
+			loadEvent,
+			play,
+			pause,
+			togglePlay,
+			setVolume,
+			setMuted,
+			setCurrentTime,
+			minimize,
+			restore,
+			close,
 		],
 	);
 

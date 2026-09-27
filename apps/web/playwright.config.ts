@@ -1,8 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = process.env.PLAYWRIGHT_PORT ?? "3000";
-const baseURL =
-	process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
+
+process.env.CLOUDFLARE_ENV = process.env.CLOUDFLARE_ENV ?? "fosdem";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 

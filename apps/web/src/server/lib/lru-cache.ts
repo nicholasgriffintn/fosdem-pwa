@@ -1,79 +1,81 @@
 interface InMemoryCacheEntry {
-  data: unknown;
-  expiresAt: number;
-  softExpiresAt?: number;
+	data: unknown;
+	expiresAt: number;
+	softExpiresAt?: number;
 }
 
 export class LRUCache {
-  private cache: Map<string, InMemoryCacheEntry>;
-  private maxSize: number;
+	private cache: Map<string, InMemoryCacheEntry>;
+	private maxSize: number;
 
-  constructor(maxSize: number) {
-    this.cache = new Map();
-    this.maxSize = maxSize;
-  }
+	constructor(maxSize: number) {
+		this.cache = new Map();
+		this.maxSize = maxSize;
+	}
 
-  get(key: string): InMemoryCacheEntry | null {
-    const entry = this.cache.get(key);
-    if (!entry) return null;
+	get(key: string): InMemoryCacheEntry | null {
+		const entry = this.cache.get(key);
+		if (!entry) return null;
 
-    if (Date.now() > entry.expiresAt) {
-      this.cache.delete(key);
-      return null;
-    }
+		if (Date.now() > entry.expiresAt) {
+			this.cache.delete(key);
+			return null;
+		}
 
-    this.cache.delete(key);
-    this.cache.set(key, entry);
-    return entry;
-  }
+		this.cache.delete(key);
+		this.cache.set(key, entry);
+		return entry;
+	}
 
-  getWithStaleness(key: string): { entry: InMemoryCacheEntry; isStale: boolean } | null {
-    const entry = this.cache.get(key);
-    if (!entry) return null;
+	getWithStaleness(
+		key: string,
+	): { entry: InMemoryCacheEntry; isStale: boolean } | null {
+		const entry = this.cache.get(key);
+		if (!entry) return null;
 
-    const now = Date.now();
+		const now = Date.now();
 
-    if (now > entry.expiresAt) {
-      this.cache.delete(key);
-      return null;
-    }
+		if (now > entry.expiresAt) {
+			this.cache.delete(key);
+			return null;
+		}
 
-    this.cache.delete(key);
-    this.cache.set(key, entry);
+		this.cache.delete(key);
+		this.cache.set(key, entry);
 
-    const isStale = entry.softExpiresAt ? now > entry.softExpiresAt : false;
-    return { entry, isStale };
-  }
+		const isStale = entry.softExpiresAt ? now > entry.softExpiresAt : false;
+		return { entry, isStale };
+	}
 
-  set(key: string, entry: InMemoryCacheEntry): void {
-    if (this.cache.has(key)) {
-      this.cache.delete(key);
-    } else if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value;
-      if (firstKey) {
-        this.cache.delete(firstKey);
-      }
-    }
-    this.cache.set(key, entry);
-  }
+	set(key: string, entry: InMemoryCacheEntry): void {
+		if (this.cache.has(key)) {
+			this.cache.delete(key);
+		} else if (this.cache.size >= this.maxSize) {
+			const firstKey = this.cache.keys().next().value;
+			if (firstKey) {
+				this.cache.delete(firstKey);
+			}
+		}
+		this.cache.set(key, entry);
+	}
 
-  delete(key: string): void {
-    this.cache.delete(key);
-  }
+	delete(key: string): void {
+		this.cache.delete(key);
+	}
 
-  has(key: string): boolean {
-    return this.cache.has(key);
-  }
+	has(key: string): boolean {
+		return this.cache.has(key);
+	}
 
-  cleanup(): number {
-    const now = Date.now();
-    let removed = 0;
-    for (const [key, entry] of this.cache.entries()) {
-      if (now > entry.expiresAt) {
-        this.cache.delete(key);
-        removed++;
-      }
-    }
-    return removed;
-  }
+	cleanup(): number {
+		const now = Date.now();
+		let removed = 0;
+		for (const [key, entry] of this.cache.entries()) {
+			if (now > entry.expiresAt) {
+				this.cache.delete(key);
+				removed++;
+			}
+		}
+		return removed;
+	}
 }

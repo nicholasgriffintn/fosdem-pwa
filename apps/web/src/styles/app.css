@@ -145,30 +145,30 @@ a:hover {
 }
 
 .js-only {
-	display: none !important;
+	display: none;
 }
 
 html.js-enabled .js-only {
-	display: revert !important;
+	display: revert;
 }
 
 html.js-enabled button.js-only {
-	display: inline-flex !important;
+	display: inline-flex;
 }
 
 .no-js-only {
-	display: revert !important;
+	display: revert;
 }
 
 html.js-enabled .no-js-only {
-	display: none !important;
+	display: none;
 }
 
 html:not(.js-enabled) .js-required {
-	display: none !important;
+	display: none;
 }
 
-.TanStackRouterDevtools button,
-.tsqd-open-btn-container {
-	bottom: 80px !important;
+html .TanStackRouterDevtools button,
+html .tsqd-open-btn-container {
+	bottom: 80px;
 }

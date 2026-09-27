@@ -1,9 +1,10 @@
+import { conferenceConfig } from "@roomisfull/conference";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { constants } from "~/constants";
 import { EventList } from "~/components/Event/EventList";
-import { getAllData } from "~/server/functions/fosdem";
-import type { Conference, Event } from "~/types/fosdem";
+import { getAllData } from "~/server/functions/schedule";
+import type { Conference, Event } from "~/types/conference";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { EmptyStateCard } from "~/components/shared/EmptyStateCard";
 import { useAuth } from "~/hooks/use-auth";
@@ -57,7 +58,7 @@ export const Route = createFileRoute("/speakers/$slug")({
 		});
 
 		return {
-			fosdem: {
+			schedule: {
 				person,
 				personEvents,
 				conference: data.conference,
@@ -70,8 +71,8 @@ export const Route = createFileRoute("/speakers/$slug")({
 	head: ({ loaderData }) => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: `${loaderData?.fosdem.person?.name} | Speakers | FOSDEM ${loaderData?.year}`,
-				description: `Speaker profile for ${loaderData?.fosdem.person?.name} at FOSDEM ${loaderData?.year}. ${loaderData?.fosdem.person?.biography ? `${loaderData.fosdem.person.biography.substring(0, 160)}...` : "View sessions and biography."}`,
+				title: `${loaderData?.schedule.person?.name} | Speakers | ${conferenceConfig.name} ${loaderData?.year}`,
+				description: `Speaker profile for ${loaderData?.schedule.person?.name} at ${conferenceConfig.name} ${loaderData?.year}. ${loaderData?.schedule.person?.biography ? `${loaderData.schedule.person.biography.substring(0, 160)}...` : "View sessions and biography."}`,
 			}),
 		],
 	}),
@@ -79,10 +80,10 @@ export const Route = createFileRoute("/speakers/$slug")({
 });
 
 function SpeakerPage() {
-	const { fosdem, year, serverBookmarks } = Route.useLoaderData();
+	const { schedule, year, serverBookmarks } = Route.useLoaderData();
 	const { day, sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const { person, personEvents, days } = fosdem;
+	const { person, personEvents, days } = schedule;
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
 	const onCreateBookmark = async (bookmark: BookmarkAction) => {
@@ -96,7 +97,7 @@ function SpeakerPage() {
 			}),
 		});
 	};
-	const resolvedDay = day ?? resolveTodayDayId(fosdem.days);
+	const resolvedDay = day ?? resolveTodayDayId(schedule.days);
 
 	if (!person) {
 		return (

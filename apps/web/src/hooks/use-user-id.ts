@@ -9,7 +9,11 @@ import { sessionQueryKeys } from "../lib/query-keys";
 export function useUserId({ userId }: { userId: string }) {
 	const getUserDetailsFromServer = useServerFn(getUserDetails);
 
-	const { data: user, isLoading, isError } = useQuery({
+	const {
+		data: user,
+		isLoading,
+		isError,
+	} = useQuery({
 		queryKey: sessionQueryKeys.profile(userId),
 		retry: false,
 		queryFn: async () => {

@@ -9,9 +9,9 @@ import {
 	ResizablePanelGroup,
 } from "~/components/ui/resizable";
 import { useWindowSize } from "~/hooks/use-window-size";
-import type { Event, ConferenceData, TypeIds, Person } from "~/types/fosdem";
-import { fosdemImageDetails } from "~/data/fosdem-image-details";
-import { fosdemSpecialRooms } from "~/data/fosdem-special-rooms";
+import type { Event, ConferenceData, Person } from "~/types/conference";
+import { imageDetailsByType } from "~/conferences/presentation";
+import { specialRooms } from "~/conferences/presentation";
 import { EventContent } from "~/components/Event/EventContent";
 
 type EventMainProps = {
@@ -34,10 +34,9 @@ export function EventMain({
 	persons,
 }: EventMainProps) {
 	const roomType = event.room?.[0];
-	const specialRoom =
-		roomType && fosdemSpecialRooms[roomType as keyof typeof fosdemSpecialRooms];
+	const specialRoom = roomType && specialRooms[roomType];
 	const testTime = isTest ? new Date(conference.start) : referenceTime;
-	const imageDetails = fosdemImageDetails[event.type as TypeIds];
+	const imageDetails = imageDetailsByType[event.type];
 
 	const { width } = useWindowSize();
 	const isMobile = width > 0 ? width < 768 : false;
@@ -112,28 +111,35 @@ export function EventMain({
 			)}
 			<div className="w-full">
 				<EventContent year={year} event={event} persons={persons} />
-				<div className="mt-4">
-					{(event.abstract || event.links?.length > 0) && (
-						<hr className="my-4" />
-					)}
-					<span className="text-sm block mb-2">
-						Notice: The placeholder video image is licensed under{" "}
-						{imageDetails?.license ?? "the stated license by the content owner"}
-						.{" "}
-						{imageDetails?.original ? (
-							<a href={imageDetails.original} target="_blank" rel="noreferrer">
-								The original image can be found here
-							</a>
-						) : (
-							<span>The original image link is unavailable.</span>
+				{imageDetails && (
+					<div className="mt-4">
+						{(event.abstract || event.links?.length > 0) && (
+							<hr className="my-4" />
 						)}
-					</span>
-					{imageDetails?.changes && (
-						<span className="text-xs block mt-1">
-							Changes made to the image are: {imageDetails.changes}
+						<span className="text-sm block mb-2">
+							Notice: The placeholder video image is licensed under{" "}
+							{imageDetails?.license ??
+								"the stated license by the content owner"}
+							.{" "}
+							{imageDetails?.original ? (
+								<a
+									href={imageDetails.original}
+									target="_blank"
+									rel="noreferrer"
+								>
+									The original image can be found here
+								</a>
+							) : (
+								<span>The original image link is unavailable.</span>
+							)}
 						</span>
-					)}
-				</div>
+						{imageDetails?.changes && (
+							<span className="text-xs block mt-1">
+								Changes made to the image are: {imageDetails.changes}
+							</span>
+						)}
+					</div>
+				)}
 			</div>
 		</>
 	);

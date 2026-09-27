@@ -13,9 +13,7 @@ import type { Subscription } from "~/server/db/schema";
 export const createSubscription = createServerFn({
 	method: "POST",
 })
-	.validator(
-		(data: { endpoint: string; auth: string; p256dh: string }) => data,
-	)
+	.validator((data: { endpoint: string; auth: string; p256dh: string }) => data)
 	.handler(async (ctx): Promise<Result<number> | null> => {
 		const { endpoint, auth, p256dh } = ctx.data;
 
@@ -25,7 +23,10 @@ export const createSubscription = createServerFn({
 		}
 
 		try {
-			const existingSubscription = await findSubscriptionByEndpoint(user.id, endpoint);
+			const existingSubscription = await findSubscriptionByEndpoint(
+				user.id,
+				endpoint,
+			);
 			if (existingSubscription) {
 				return ok(existingSubscription.id);
 			}

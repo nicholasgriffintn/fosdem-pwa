@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Env, Subscription, FosdemEvent } from "../src/types";
+import type { Env, Subscription, ConferenceEvent } from "../src/types";
 
-vi.mock("../src/lib/fosdem-data", () => ({
-	getFosdemData: vi.fn(),
+vi.mock("../src/lib/conference-data", () => ({
+	getConferenceData: vi.fn(),
 }));
 
 vi.mock("../src/lib/bookmarks", () => ({
@@ -23,16 +23,16 @@ vi.mock("../src/utils/config", () => ({
 	bookmarkNotificationsEnabled: vi.fn(() => true),
 }));
 
-const { getFosdemData } = await import("../src/lib/fosdem-data");
+const { getConferenceData } = await import("../src/lib/conference-data");
 const { getBookmarksByUserIds } = await import("../src/lib/bookmarks");
 const { getApplicationKeys, sendNotification } = await import(
-	"../src/lib/notifications",
+	"../src/lib/notifications"
 );
 const { resolveNotificationPreference } = await import(
-	"../src/lib/notification-preferences",
+	"../src/lib/notification-preferences"
 );
 const { triggerRecordingNotifications } = await import(
-	"../src/controllers/recording-notifications",
+	"../src/controllers/recording-notifications"
 );
 
 type Prepared = {
@@ -112,7 +112,7 @@ const baseSubscription: Subscription = {
 	p256dh: "p256dh",
 };
 
-const baseEvent: FosdemEvent = {
+const baseEvent: ConferenceEvent = {
 	day: "1",
 	title: "Talk A",
 	type: "devroom",
@@ -130,7 +130,7 @@ afterEach(() => {
 
 describe("triggerRecordingNotifications", () => {
 	it("skips when recording notifications are disabled", async () => {
-		(getFosdemData as vi.Mock).mockResolvedValue({
+		(getConferenceData as vi.Mock).mockResolvedValue({
 			events: { "talk-a": baseEvent },
 		});
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
@@ -158,7 +158,7 @@ describe("triggerRecordingNotifications", () => {
 	});
 
 	it("filters low priority bookmarks when disabled", async () => {
-		(getFosdemData as vi.Mock).mockResolvedValue({
+		(getConferenceData as vi.Mock).mockResolvedValue({
 			events: { "talk-a": baseEvent },
 		});
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
@@ -203,13 +203,13 @@ describe("triggerRecordingNotifications", () => {
 	});
 
 	it("groups multiple recording notifications into one", async () => {
-		const secondEvent: FosdemEvent = {
+		const secondEvent: ConferenceEvent = {
 			...baseEvent,
 			title: "Talk B",
 			links: [{ type: "video/mp4", href: "https://video.example/talk-b.mp4" }],
 		};
 
-		(getFosdemData as vi.Mock).mockResolvedValue({
+		(getConferenceData as vi.Mock).mockResolvedValue({
 			events: { "talk-a": baseEvent, "talk-b": secondEvent },
 		});
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
@@ -272,7 +272,7 @@ describe("triggerRecordingNotifications", () => {
 	});
 
 	it("skips notifications when the event was already attended", async () => {
-		(getFosdemData as vi.Mock).mockResolvedValue({
+		(getConferenceData as vi.Mock).mockResolvedValue({
 			events: { "talk-a": baseEvent },
 		});
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
@@ -319,7 +319,7 @@ describe("triggerRecordingNotifications", () => {
 	});
 
 	it("does not upsert snapshots when the recording state is unchanged", async () => {
-		(getFosdemData as vi.Mock).mockResolvedValue({
+		(getConferenceData as vi.Mock).mockResolvedValue({
 			events: { "talk-a": baseEvent },
 		});
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});

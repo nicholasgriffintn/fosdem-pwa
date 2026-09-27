@@ -1,64 +1,72 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "fosdem-pwa-push-notifications",
-  "main": "src/index.ts",
-  "compatibility_date": "2026-08-28",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "workers_dev": false,
-  "preview_urls": false,
-  "placement": {
-    "mode": "smart"
-  },
-  "observability": {
-    "enabled": false,
-    "logs": {
-      "enabled": false,
-      "head_sampling_rate": 1,
-      "invocation_logs": false,
-      "persist": true
-    },
-    "traces": {
-      "enabled": false,
-      "persist": true,
-      "head_sampling_rate": 1
-    }
-  },
-  "triggers": {
-    "crons": [
-      "0 * * * *"
-    ]
-  },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "fosdem",
-      "database_id": "a9e2ef23-b95b-49e4-b1aa-5abc2bd26152",
-      "preview_database_id": "2ec973b1-6e46-49a8-825b-1928ec34cd22",
-      "remote": false,
-      "migrations_dir": "../cloudflare/migrations"
-    }
-  ],
-  "analytics_engine_datasets": [
-    {
-      "binding": "ANALYTICS",
-      "dataset": "fosdem-notifications"
-    }
-  ],
-  "queues": {
-    "producers": [
-      {
-        "queue": "fosdem-notifications",
-        "binding": "NOTIFICATION_QUEUE"
-      }
-    ],
-    "consumers": [
-      {
-        "queue": "fosdem-notifications",
-        "max_batch_size": 50,
-        "max_batch_timeout": 30
-      }
-    ]
-  }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "roomisfull-push",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-08-28",
+	"compatibility_flags": ["nodejs_compat"],
+	"workers_dev": false,
+	"preview_urls": false,
+	"placement": {
+		"mode": "smart"
+	},
+	"observability": {
+		"enabled": false,
+		"logs": {
+			"enabled": false,
+			"head_sampling_rate": 1,
+			"invocation_logs": false,
+			"persist": true
+		},
+		"traces": {
+			"enabled": false,
+			"persist": true,
+			"head_sampling_rate": 1
+		}
+	},
+	"env": {
+		"fosdem": {
+			"name": "fosdem-pwa-push-notifications",
+			"routes": [{ "pattern": "push.fosdempwa.com", "custom_domain": true }],
+			"define": {
+				"__CONFERENCE_ID__": "\"fosdem\""
+			},
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "fosdem",
+					"database_id": "a9e2ef23-b95b-49e4-b1aa-5abc2bd26152",
+					"preview_database_id": "2ec973b1-6e46-49a8-825b-1928ec34cd22",
+					"remote": false,
+					"migrations_dir": "../cloudflare/migrations"
+				}
+			],
+			"triggers": {
+				"crons": ["0 * * * *"]
+			},
+			"analytics_engine_datasets": [
+				{
+					"binding": "ANALYTICS",
+					"dataset": "fosdem-notifications"
+				}
+			],
+			"queues": {
+				"producers": [
+					{
+						"queue": "fosdem-notifications",
+						"binding": "NOTIFICATION_QUEUE"
+					}
+				],
+				"consumers": [
+					{
+						"queue": "fosdem-notifications",
+						"max_batch_size": 50,
+						"max_batch_timeout": 30
+					}
+				]
+			}
+		}
+	},
+	"define": {
+		"__CONFERENCE_ID__": "null"
+	}
 }

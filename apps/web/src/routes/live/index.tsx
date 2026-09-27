@@ -1,8 +1,9 @@
+import { brand } from "@roomisfull/conference";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { PageHeader } from "~/components/shared/PageHeader";
 import { EventList } from "~/components/Event/EventList";
-import { getAllData } from "~/server/functions/fosdem";
+import { getAllData } from "~/server/functions/schedule";
 import { testLiveEvents, testConferenceData } from "~/data/test-data";
 import { constants } from "~/constants";
 import { isEventLive, isEventUpcoming } from "~/lib/dateTime";
@@ -46,7 +47,9 @@ export const Route = createFileRoute("/live/")({
 			.sort(sortEvents);
 
 		const upcomingEvents = Object.values(data.events)
-			.filter((event) => isEvent(event) && isEventUpcoming(event, data.conference))
+			.filter(
+				(event) => isEvent(event) && isEventUpcoming(event, data.conference),
+			)
 			.sort(sortUpcomingEvents);
 
 		return { liveEvents, upcomingEvents, year, serverBookmarks };
@@ -54,7 +57,7 @@ export const Route = createFileRoute("/live/")({
 	head: () => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: "Live | FOSDEM PWA",
+				title: `Live | ${brand.name}`,
 				description: "All events that are currently live or starting soon",
 			}),
 		],
@@ -63,7 +66,8 @@ export const Route = createFileRoute("/live/")({
 });
 
 function LivePage() {
-	const { liveEvents, upcomingEvents, year, serverBookmarks } = Route.useLoaderData();
+	const { liveEvents, upcomingEvents, year, serverBookmarks } =
+		Route.useLoaderData();
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });

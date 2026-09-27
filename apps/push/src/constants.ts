@@ -1,8 +1,16 @@
+import { conferenceConfig } from "@roomisfull/conference";
+import { getDataUrl } from "@roomisfull/conference/paths";
+
 export const constants = {
-  DATA_LINK: 'https://r2.fosdempwa.com/fosdem-${YEAR}-events.json',
-  YEAR: 2027,
-  DAYS_MAP: {
-    "2027-01-30T00:00:00.000Z": "1",
-    "2027-01-31T00:00:00.000Z": "2",
-  }
-}
+	DATA_LINK: getDataUrl(
+		conferenceConfig,
+		conferenceConfig.defaultYear,
+		"events",
+	),
+	YEAR: conferenceConfig.defaultYear,
+	DAYS_MAP: Object.fromEntries(
+		conferenceConfig.editions[conferenceConfig.defaultYear].dates.map(
+			(date, index) => [`${date}T00:00:00.000Z`, String(index + 1)],
+		),
+	),
+};

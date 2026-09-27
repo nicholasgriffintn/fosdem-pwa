@@ -1,4 +1,4 @@
-import type { Event, RoomData, Track } from "~/types/fosdem";
+import type { Event, RoomData, Track } from "~/types/conference";
 
 export function sortEvents(a: Event, b: Event): number {
 	const aPriority = a.priority || 3;

@@ -1,3 +1,4 @@
+import { brand, conferenceConfig } from "@roomisfull/conference";
 import { env } from "cloudflare:workers";
 import {
 	AuthError,
@@ -243,13 +244,13 @@ async function resolveGitHubIdentity(
 		"GitHub",
 		"https://api.github.com/user",
 		tokens.accessToken,
-		{ "User-Agent": "FOSDEM PWA" },
+		{ "User-Agent": `${brand.name}` },
 	);
 	const emails = await fetchOAuthUserData<GitHubEmail[]>(
 		"GitHub",
 		"https://api.github.com/user/emails",
 		tokens.accessToken,
-		{ "User-Agent": "FOSDEM PWA" },
+		{ "User-Agent": `${brand.name}` },
 	);
 	const selected =
 		emails.find((email) => email.primary && email.verified) ??
@@ -318,7 +319,7 @@ async function resolveGitLabIdentity(
 		"GitLab",
 		"https://gitlab.com/api/v4/user",
 		tokens.accessToken,
-		{ "User-Agent": "FOSDEM PWA" },
+		{ "User-Agent": `${brand.name}` },
 	);
 	return identity(
 		"gitlab",
@@ -356,7 +357,7 @@ async function resolveMastodonIdentity(
 		`${host}:${profile.id}`,
 		{
 			id: `${host}:${profile.id}`,
-			email: `${host}-${profile.id}@noreply.fosdempwa.com`,
+			email: `${host}-${profile.id}@noreply.${new URL(conferenceConfig.appUrl).hostname}`,
 			emailVerified: false,
 			name: profile.display_name || profile.username,
 			avatar_url: profile.avatar,

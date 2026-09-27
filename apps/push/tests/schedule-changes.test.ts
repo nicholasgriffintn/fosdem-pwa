@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Env, Subscription } from "../src/types";
 
-vi.mock("../src/lib/fosdem-data", () => ({
-	getFosdemData: vi.fn(),
+vi.mock("../src/lib/conference-data", () => ({
+	getConferenceData: vi.fn(),
 }));
 
 vi.mock("../src/lib/bookmarks", () => ({
@@ -26,13 +26,12 @@ vi.mock("../src/utils/config", () => ({
 	scheduleChangeNotificationsEnabled: vi.fn(() => true),
 }));
 
-const { getFosdemData } = await import("../src/lib/fosdem-data");
-const { getBookmarksByUserIds, enrichBookmarks } = await import("../src/lib/bookmarks");
-const {
-	getApplicationKeys,
-	sendNotification,
-	createScheduleChangePayload,
-} = await import("../src/lib/notifications");
+const { getConferenceData } = await import("../src/lib/conference-data");
+const { getBookmarksByUserIds, enrichBookmarks } = await import(
+	"../src/lib/bookmarks"
+);
+const { getApplicationKeys, sendNotification, createScheduleChangePayload } =
+	await import("../src/lib/notifications");
 const { resolveNotificationPreference } = await import(
 	"../src/lib/notification-preferences"
 );
@@ -114,7 +113,7 @@ describe("triggerScheduleChangeNotifications", () => {
 			daily_summary: true,
 			notify_low_priority: false,
 		});
-		(getFosdemData as vi.Mock).mockResolvedValue({
+		(getConferenceData as vi.Mock).mockResolvedValue({
 			events: {
 				"talk-a": { startTime: "09:00", duration: "00:30", room: "H.1301" },
 			},
@@ -122,12 +121,15 @@ describe("triggerScheduleChangeNotifications", () => {
 
 		const env = createMockEnv({
 			snapshots: [],
-			subscriptions: [
-				{ user_id: "1", endpoint: "e", auth: "a", p256dh: "k" },
-			],
+			subscriptions: [{ user_id: "1", endpoint: "e", auth: "a", p256dh: "k" }],
 		});
 
-		await triggerScheduleChangeNotifications({ cron: "" }, env, {} as any, false);
+		await triggerScheduleChangeNotifications(
+			{ cron: "" },
+			env,
+			{} as any,
+			false,
+		);
 
 		// no notifications sent on seed
 		expect(sendNotification).not.toHaveBeenCalled();
@@ -146,7 +148,7 @@ describe("triggerScheduleChangeNotifications", () => {
 			daily_summary: true,
 			notify_low_priority: false,
 		});
-		(getFosdemData as vi.Mock).mockResolvedValue({
+		(getConferenceData as vi.Mock).mockResolvedValue({
 			events: {
 				"talk-a": { startTime: "09:30", duration: "00:30", room: "H.1302" },
 			},
@@ -161,12 +163,15 @@ describe("triggerScheduleChangeNotifications", () => {
 					room: "H.1301",
 				},
 			],
-			subscriptions: [
-				{ user_id: "1", endpoint: "e", auth: "a", p256dh: "k" },
-			],
+			subscriptions: [{ user_id: "1", endpoint: "e", auth: "a", p256dh: "k" }],
 		});
 
-		await triggerScheduleChangeNotifications({ cron: "" }, env, {} as any, false);
+		await triggerScheduleChangeNotifications(
+			{ cron: "" },
+			env,
+			{} as any,
+			false,
+		);
 
 		expect(getBookmarksByUserIds).not.toHaveBeenCalled();
 		expect(sendNotification).not.toHaveBeenCalled();
@@ -191,7 +196,7 @@ describe("triggerScheduleChangeNotifications", () => {
 			},
 		];
 
-		(getFosdemData as vi.Mock).mockResolvedValue({
+		(getConferenceData as vi.Mock).mockResolvedValue({
 			events: {
 				"talk-a": { startTime: "09:30", duration: "00:30", room: "H.1302" },
 			},
@@ -251,7 +256,12 @@ describe("triggerScheduleChangeNotifications", () => {
 			subscriptions,
 		});
 
-		await triggerScheduleChangeNotifications({ cron: "" }, env, {} as any, false);
+		await triggerScheduleChangeNotifications(
+			{ cron: "" },
+			env,
+			{} as any,
+			false,
+		);
 
 		expect(sendNotification).toHaveBeenCalledTimes(1);
 		expect(createScheduleChangePayload).toHaveBeenCalledWith(

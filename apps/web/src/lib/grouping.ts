@@ -1,4 +1,4 @@
-import type { DayGroupedData, Event, Track } from "~/types/fosdem";
+import type { DayGroupedData, Event, Track } from "~/types/conference";
 
 /**
  * Generic function to group items by day

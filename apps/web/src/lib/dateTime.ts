@@ -1,4 +1,5 @@
-import type { Event, ConferenceData } from "~/types/fosdem";
+import { dateTimeInZone } from "@roomisfull/conference/utils/date";
+import type { Event, ConferenceData } from "~/types/conference";
 import { constants } from "~/constants";
 
 export function formatTime(seconds?: number | null) {
@@ -11,6 +12,8 @@ export function formatTime(seconds?: number | null) {
 }
 
 export function createStandardDate(date: Date | string | number) {
+	if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date))
+		return new Date(`${date}T00:00:00`);
 	return new Date(
 		new Date(date).toLocaleString("en-US", { timeZone: constants.TIME_ZONE }),
 	);
@@ -71,10 +74,13 @@ export function getEventDateTime(
 		return null;
 	}
 
-	const eventDate = createStandardDate(conference.days[dayIndex]);
-	const [hours, minutes] = event.startTime.split(":").map(Number);
-	eventDate.setHours(hours, minutes, 0, 0);
-	return eventDate;
+	return new Date(
+		dateTimeInZone(
+			conference.days[dayIndex],
+			`${event.startTime}:00`,
+			conference.time_zone_name || constants.TIME_ZONE,
+		),
+	);
 }
 
 export function isEventLive(
@@ -83,9 +89,7 @@ export function isEventLive(
 	referenceTime?: Date,
 ): boolean {
 	try {
-		const now = referenceTime
-			? createStandardDate(referenceTime)
-			: createStandardDate(new Date());
+		const now = referenceTime ?? new Date();
 		const eventStart = getEventDateTime(event, conference);
 		if (!eventStart) return false;
 
@@ -106,9 +110,7 @@ export function isEventUpcoming(
 	referenceTime?: Date,
 ): boolean {
 	try {
-		const now = referenceTime
-			? createStandardDate(referenceTime)
-			: createStandardDate(new Date());
+		const now = referenceTime ?? new Date();
 		const eventStart = getEventDateTime(event, conference);
 		if (!eventStart) return false;
 
@@ -126,9 +128,7 @@ export function isEventFinished(
 	referenceTime?: Date,
 ): boolean {
 	try {
-		const now = referenceTime
-			? createStandardDate(referenceTime)
-			: createStandardDate(new Date());
+		const now = referenceTime ?? new Date();
 		const eventStart = getEventDateTime(event, conference);
 		if (!eventStart) return false;
 

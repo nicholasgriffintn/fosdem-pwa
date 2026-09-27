@@ -1,9 +1,12 @@
 "use client";
 
+import { conferenceConfig } from "@roomisfull/conference";
+
 import clsx from "clsx";
 import { useState } from "react";
 
 import { Icons } from "~/components/shared/Icons";
+import { resolveUrlTemplate } from "~/lib/url";
 import { constants } from "~/constants";
 import { Image } from "~/components/shared/Image";
 import { useOnlineStatus } from "~/hooks/use-online-status";
@@ -21,14 +24,14 @@ type RoomPlayerProps = {
 export function RoomPlayer({
 	roomId,
 	videoRef,
-	isMobile = false,
-	onClose,
 	isFloating = false,
 }: RoomPlayerProps) {
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [streamError, setStreamError] = useState(false);
 	const isOnline = useOnlineStatus();
-	const streamUrl = constants.STREAM_LINK.replace("${ROOM_ID}", roomId);
+	const streamUrl = resolveUrlTemplate(constants.STREAM_LINK, {
+		ROOM_ID: roomId,
+	});
 	const streamSources = [
 		{ href: streamUrl, type: "application/vnd.apple.mpegurl" },
 	];
@@ -49,12 +52,19 @@ export function RoomPlayer({
 		"w-full h-full",
 	);
 
+	if (!streamUrl)
+		return (
+			<p className="text-muted-foreground">
+				Room streaming is not available for this conference.
+			</p>
+		);
+
 	return (
 		<div className={containerClassName}>
 			{(!isPlaying || !isOnline) && (
 				<Image
-					src="/fosdem/images/fosdem/full/fallback.png"
-					alt="The FOSDEM logo"
+					src="/brand/placeholder.svg"
+					alt={`The ${conferenceConfig.name} logo`}
 					className="w-full h-full absolute top-0 left-0 z-0 object-cover"
 					width={1920}
 					height={1080}
@@ -114,8 +124,10 @@ export function RoomPlayer({
 				<div className="no-js-only w-full h-full">
 					<NoJsVideoFallback
 						openUrl={streamUrl}
-						backgroundImageUrl="/fosdem/images/fosdem/full/fallback.png"
-						sources={[{ href: streamUrl, type: "application/vnd.apple.mpegurl" }]}
+						backgroundImageUrl="/brand/placeholder.svg"
+						sources={[
+							{ href: streamUrl, type: "application/vnd.apple.mpegurl" },
+						]}
 					/>
 				</div>
 			</div>

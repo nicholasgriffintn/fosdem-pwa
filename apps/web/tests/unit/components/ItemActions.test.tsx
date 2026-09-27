@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TooltipProvider } from "~/components/ui/tooltip";
 import { ItemActions } from "~/components/shared/ItemActions";
-import type { Event } from "~/types/fosdem";
+import type { Event } from "~/types/conference";
 
 const renderWithTooltip = (ui: React.ReactElement) =>
 	render(<TooltipProvider>{ui}</TooltipProvider>);
@@ -17,7 +17,9 @@ const routerMocks = vi.hoisted(() => ({
 	useRouterState: ({
 		select,
 	}: {
-		select: (state: { location: { pathname: string; search: string } }) => string;
+		select: (state: {
+			location: { pathname: string; search: string };
+		}) => string;
 	}) => select({ location: { pathname: "/test", search: "" } }),
 }));
 

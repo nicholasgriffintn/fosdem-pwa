@@ -9,16 +9,16 @@ import {
 } from "~/server/db/schema";
 
 export async function findLatestRoomStatus(
-  roomName: string,
-  year: number,
+	roomName: string,
+	year: number,
 ): Promise<RoomStatusHistory | undefined> {
-  return db.query.roomStatusHistory.findFirst({
-    where: and(
-      eq(roomStatusHistoryTable.room_name, roomName),
-      eq(roomStatusHistoryTable.year, year),
-    ),
-    orderBy: [desc(roomStatusHistoryTable.recorded_at)],
-  });
+	return db.query.roomStatusHistory.findFirst({
+		where: and(
+			eq(roomStatusHistoryTable.room_name, roomName),
+			eq(roomStatusHistoryTable.year, year),
+		),
+		orderBy: [desc(roomStatusHistoryTable.recorded_at)],
+	});
 }
 
 export async function findRoomStatusHistory(
@@ -26,17 +26,17 @@ export async function findRoomStatusHistory(
 	year: number,
 	limit = 10,
 ): Promise<RoomStatusHistory[]> {
-  return db
-    .select()
-    .from(roomStatusHistoryTable)
-    .where(
-      and(
-        eq(roomStatusHistoryTable.room_name, roomName),
-        eq(roomStatusHistoryTable.year, year),
-      ),
-    )
-    .orderBy(desc(roomStatusHistoryTable.recorded_at))
-	.limit(limit);
+	return db
+		.select()
+		.from(roomStatusHistoryTable)
+		.where(
+			and(
+				eq(roomStatusHistoryTable.room_name, roomName),
+				eq(roomStatusHistoryTable.year, year),
+			),
+		)
+		.orderBy(desc(roomStatusHistoryTable.recorded_at))
+		.limit(limit);
 }
 
 export async function findLatestRoomStatuses(

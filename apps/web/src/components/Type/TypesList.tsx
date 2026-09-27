@@ -9,10 +9,13 @@ import {
 	CardTitle,
 } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
+import { FeaturedConferenceImage } from "~/components/shared/FeaturedConferenceImage";
 import { constants } from "~/constants";
-import type { TypeIds, Track } from "~/types/fosdem";
-import { fosdemTypeDescriptions } from "~/data/fosdem-type-descriptions";
+import type { TypeIds, Track } from "~/types/conference";
+import {
+	typeDescriptions,
+	imageDetailsByType,
+} from "~/conferences/presentation";
 
 type TypesListProps = {
 	types: {
@@ -30,7 +33,9 @@ export function TypesList({ types, tracks }: TypesListProps) {
 
 	const getSingleTrackForType = (typeId: string): Track | undefined => {
 		if (!tracks) return undefined;
-		const tracksForType = Object.values(tracks).filter(track => track.type === typeId);
+		const tracksForType = Object.values(tracks).filter(
+			(track) => track.type === typeId,
+		);
 		return tracksForType.length === 1 ? tracksForType[0] : undefined;
 	};
 
@@ -47,7 +52,9 @@ export function TypesList({ types, tracks }: TypesListProps) {
 							<CardHeader>
 								<CardTitle>
 									{(() => {
-										const singleTrack = getSingleTrackForType(types[typeKey].id);
+										const singleTrack = getSingleTrackForType(
+											types[typeKey].id,
+										);
 										return singleTrack ? (
 											<Link
 												search={(prev: any) => ({
@@ -62,18 +69,18 @@ export function TypesList({ types, tracks }: TypesListProps) {
 												{types[typeKey].name}
 											</Link>
 										) : (
-												<Link
-													search={(prev: any) => ({
-														...prev,
-														year: prev.year || constants.DEFAULT_YEAR,
-														day: prev.day || undefined,
-													})}
-													to="/type/$slug"
-													params={{ slug: types[typeKey].id }}
-													className="no-underline"
-												>
-													{types[typeKey].name}
-												</Link>
+											<Link
+												search={(prev: any) => ({
+													...prev,
+													year: prev.year || constants.DEFAULT_YEAR,
+													day: prev.day || undefined,
+												})}
+												to="/type/$slug"
+												params={{ slug: types[typeKey].id }}
+												className="no-underline"
+											>
+												{types[typeKey].name}
+											</Link>
 										);
 									})()}
 								</CardTitle>
@@ -86,27 +93,21 @@ export function TypesList({ types, tracks }: TypesListProps) {
 								</CardDescription>
 							</CardHeader>
 							<CardContent className="w-full">
-								<div className="min-h-[151px] bg-muted rounded-md mb-4">
-									<FeaturedFosdemImage
-										type={types[typeKey].id}
-										size="featured"
-										className="w-full rounded-md"
-										loading={isLikelyLcpImage ? "eager" : "lazy"}
-										fetchPriority={isLikelyLcpImage ? "high" : "auto"}
-										decoding="async"
-										showCaptionOnHover
-									/>
-								</div>
-								{fosdemTypeDescriptions[
-									typeKey as keyof typeof fosdemTypeDescriptions
-								] && (
-									<p className="text-sm">
-										{
-											fosdemTypeDescriptions[
-												typeKey as keyof typeof fosdemTypeDescriptions
-											]
-										}
-									</p>
+								{imageDetailsByType[types[typeKey].id] && (
+									<div className="min-h-[151px] bg-muted rounded-md mb-4">
+										<FeaturedConferenceImage
+											type={types[typeKey].id}
+											size="featured"
+											className="w-full rounded-md"
+											loading={isLikelyLcpImage ? "eager" : "lazy"}
+											fetchPriority={isLikelyLcpImage ? "high" : "auto"}
+											decoding="async"
+											showCaptionOnHover
+										/>
+									</div>
+								)}
+								{typeDescriptions[typeKey] && (
+									<p className="text-sm">{typeDescriptions[typeKey]}</p>
 								)}
 							</CardContent>
 							<CardFooter>
@@ -125,7 +126,11 @@ export function TypesList({ types, tracks }: TypesListProps) {
 													day: prev.day || undefined,
 												})}
 												to={singleTrack ? "/track/$slug" : "/type/$slug"}
-												params={{ slug: singleTrack ? singleTrack.id : types[typeKey].id }}
+												params={{
+													slug: singleTrack
+														? singleTrack.id
+														: types[typeKey].id,
+												}}
 											>
 												View {types[typeKey].name ?? "Tracks"}
 											</Link>

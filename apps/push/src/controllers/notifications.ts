@@ -1,15 +1,20 @@
+import { conferenceConfig } from "@roomisfull/conference";
 import type { ApplicationServerKeys } from "webpush-webcrypto";
 
-import { getFosdemData, getCurrentDay } from "../lib/fosdem-data";
-import { 
+import { getConferenceData, getCurrentDay } from "../lib/conference-data";
+import {
 	getBookmarksByUserIds,
-	enrichBookmarks, 
+	enrichBookmarks,
 	getBookmarksForDay,
 	getBookmarksStartingSoon,
 	markNotificationSent,
 } from "../lib/bookmarks";
 import { resolveNotificationPreference } from "../lib/notification-preferences";
-import { getApplicationKeys, sendNotification, createNotificationPayload } from "../lib/notifications";
+import {
+	getApplicationKeys,
+	sendNotification,
+	createNotificationPayload,
+} from "../lib/notifications";
 import type { Bookmark, Subscription, EnrichedBookmark, Env } from "../types";
 
 async function processUserNotifications(
@@ -17,35 +22,43 @@ async function processUserNotifications(
 	bookmarks: EnrichedBookmark[],
 	keys: ApplicationServerKeys,
 	env: Env,
-	queueMode = false
+	queueMode = false,
 ) {
-	const results = await Promise.allSettled(bookmarks.map(async (bookmark) => {
-		try {
-			const notification = createNotificationPayload(bookmark);
-			if (queueMode) {
-				await env.NOTIFICATION_QUEUE.send({
-					subscription,
-					notification,
-					bookmarkId: bookmark.id,
-					shouldMarkSent: true,
-				});
-			} else {
-				await sendNotification(subscription, notification, keys, env);
-				await markNotificationSent(bookmark.id, env);
+	const results = await Promise.allSettled(
+		bookmarks.map(async (bookmark) => {
+			try {
+				const notification = createNotificationPayload(bookmark);
+				if (queueMode) {
+					await env.NOTIFICATION_QUEUE.send({
+						subscription,
+						notification,
+						bookmarkId: bookmark.id,
+						shouldMarkSent: true,
+					});
+				} else {
+					await sendNotification(subscription, notification, keys, env);
+					await markNotificationSent(bookmark.id, env);
+				}
+				return { success: true, bookmarkId: bookmark.id };
+			} catch (error) {
+				const errorMessage =
+					error instanceof Error ? error.message : "Unknown error";
+				console.error(
+					`Error sending notification to ${subscription.user_id} for bookmark ${bookmark.id}: ${errorMessage}`,
+				);
+				return { success: false, bookmarkId: bookmark.id, error: errorMessage };
 			}
-			return { success: true, bookmarkId: bookmark.id };
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : "Unknown error";
-			console.error(
-				`Error sending notification to ${subscription.user_id} for bookmark ${bookmark.id}: ${errorMessage}`,
-			);
-			return { success: false, bookmarkId: bookmark.id, error: errorMessage };
-		}
-	}));
+		}),
+	);
 
-	const failures = results.filter(r => r.status === "rejected" || (r.status === "fulfilled" && !r.value.success));
+	const failures = results.filter(
+		(r) =>
+			r.status === "rejected" || (r.status === "fulfilled" && !r.value.success),
+	);
 	if (failures.length > 0) {
-		console.warn(`${failures.length}/${bookmarks.length} notifications failed for user ${subscription.user_id}`);
+		console.warn(
+			`${failures.length}/${bookmarks.length} notifications failed for user ${subscription.user_id}`,
+		);
 	}
 }
 
@@ -60,12 +73,12 @@ export async function triggerNotifications(
 	const whichDay = dayOverride ?? currentDay;
 
 	if (!whichDay) {
-		console.error("FOSDEM is not running today");
+		console.error(`${conferenceConfig.name} is not running today`);
 		return;
 	}
 
 	const keys = await getApplicationKeys(env);
-	const fosdemData = await getFosdemData();
+	const scheduleData = await getConferenceData();
 
 	const subscriptions = await env.DB.prepare(
 		`SELECT s.user_id, s.endpoint, s.auth, s.p256dh,
@@ -79,7 +92,9 @@ export async function triggerNotifications(
 		throw new Error("No subscriptions found");
 	}
 
-	const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
+	const subscriptionRows = subscriptions.results as Array<
+		Record<string, unknown>
+	>;
 	const subscriptionEntries = subscriptionRows
 		.map((subscription) => {
 			console.log(
@@ -110,15 +125,21 @@ export async function triggerNotifications(
 					prefs,
 				};
 			} catch (error) {
-				const errorMessage = error instanceof Error ? error.message : "Unknown error";
+				const errorMessage =
+					error instanceof Error ? error.message : "Unknown error";
 				console.error(
 					`Error processing bookmarks for ${subscription.user_id}: ${errorMessage}`,
 				);
 				throw error;
 			}
 		})
-		.filter((entry): entry is { subscription: Subscription; prefs: ReturnType<typeof resolveNotificationPreference> } =>
-			Boolean(entry),
+		.filter(
+			(
+				entry,
+			): entry is {
+				subscription: Subscription;
+				prefs: ReturnType<typeof resolveNotificationPreference>;
+			} => Boolean(entry),
 		);
 
 	const usersNeedingBookmarks = subscriptionEntries
@@ -140,8 +161,14 @@ export async function triggerNotifications(
 				? bookmarks
 				: bookmarks.filter((bookmark) => (bookmark.priority ?? 0) <= 1);
 
-			const enrichedBookmarks = enrichBookmarks(filteredBookmarks, fosdemData.events);
-			const bookmarksRunningToday = getBookmarksForDay(enrichedBookmarks, whichDay);
+			const enrichedBookmarks = enrichBookmarks(
+				filteredBookmarks,
+				scheduleData.events,
+			);
+			const bookmarksRunningToday = getBookmarksForDay(
+				enrichedBookmarks,
+				whichDay,
+			);
 
 			if (!bookmarksRunningToday.length) {
 				console.log(`No bookmarks running today for ${subscription.user_id}`);
@@ -158,7 +185,13 @@ export async function triggerNotifications(
 				return;
 			}
 
-			await processUserNotifications(subscription, bookmarksStartingSoon, keys, env, queueMode);
+			await processUserNotifications(
+				subscription,
+				bookmarksStartingSoon,
+				keys,
+				env,
+				queueMode,
+			);
 		}),
 	);
 
@@ -166,6 +199,6 @@ export async function triggerNotifications(
 	const failed = results.filter((r) => r.status === "rejected").length;
 
 	console.log(
-		`Successfully ${queueMode ? 'queued' : 'sent'} ${successful} notifications, failed to process ${failed} notifications`,
+		`Successfully ${queueMode ? "queued" : "sent"} ${successful} notifications, failed to process ${failed} notifications`,
 	);
-} 
+}

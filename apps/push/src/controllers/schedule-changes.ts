@@ -1,5 +1,5 @@
 import { constants } from "../constants";
-import { getFosdemData } from "../lib/fosdem-data";
+import { getConferenceData } from "../lib/conference-data";
 import { getBookmarksByUserIds, enrichBookmarks } from "../lib/bookmarks";
 import {
 	getApplicationKeys,
@@ -45,12 +45,14 @@ export async function triggerScheduleChangeNotifications(
 	ctx: ExecutionContext,
 	queueMode = false,
 ) {
-	const fosdemData = await getFosdemData();
+	const scheduleData = await getConferenceData();
 	const snapshots = await loadSnapshots(env);
 
 	if (!snapshots.length) {
-		await upsertSnapshots(fosdemData.events, env);
-		console.log("schedule_snapshot was empty; stored initial snapshot and skipped notifications");
+		await upsertSnapshots(scheduleData.events, env);
+		console.log(
+			"schedule_snapshot was empty; stored initial snapshot and skipped notifications",
+		);
 		return;
 	}
 
@@ -60,7 +62,7 @@ export async function triggerScheduleChangeNotifications(
 
 	const changedEvents = new Map<string, SnapshotRow | undefined>();
 
-	for (const [slug, event] of Object.entries(fosdemData.events)) {
+	for (const [slug, event] of Object.entries(scheduleData.events)) {
 		const previous = snapshotMap.get(slug);
 		const previousHash = previous
 			? hashEvent(previous.start_time, previous.duration, previous.room)
@@ -92,22 +94,24 @@ export async function triggerScheduleChangeNotifications(
 		return;
 	}
 
-	const subscriptionRows = subscriptions.results as Array<Record<string, unknown>>;
+	const subscriptionRows = subscriptions.results as Array<
+		Record<string, unknown>
+	>;
 	const subscriptionEntries = subscriptionRows.map((subscription) => {
-			const typedSubscription: Subscription = {
-				user_id: subscription.user_id as string,
-				endpoint: subscription.endpoint as string,
-				auth: subscription.auth as string,
-				p256dh: subscription.p256dh as string,
-			};
+		const typedSubscription: Subscription = {
+			user_id: subscription.user_id as string,
+			endpoint: subscription.endpoint as string,
+			auth: subscription.auth as string,
+			p256dh: subscription.p256dh as string,
+		};
 
-			const prefs = resolveNotificationPreference(subscription as any);
+		const prefs = resolveNotificationPreference(subscription as any);
 
-			return {
-				subscription: typedSubscription,
-				prefs,
-			};
-		});
+		return {
+			subscription: typedSubscription,
+			prefs,
+		};
+	});
 
 	const usersNeedingBookmarks = subscriptionEntries
 		.filter(({ prefs }) => prefs.schedule_changes)
@@ -142,7 +146,7 @@ export async function triggerScheduleChangeNotifications(
 				return;
 			}
 
-			const enriched = enrichBookmarks(relevantBookmarks, fosdemData.events);
+			const enriched = enrichBookmarks(relevantBookmarks, scheduleData.events);
 
 			for (const bookmark of enriched) {
 				const previous = changedEvents.get(bookmark.slug);
@@ -169,8 +173,11 @@ export async function triggerScheduleChangeNotifications(
 		`Processed schedule change notifications for ${successful} subscriptions, failed ${failed}`,
 	);
 
-	const eventsToUpdate: Record<string, { startTime: string; duration: string; room: string }> = {};
-	for (const [slug, event] of Object.entries(fosdemData.events)) {
+	const eventsToUpdate: Record<
+		string,
+		{ startTime: string; duration: string; room: string }
+	> = {};
+	for (const [slug, event] of Object.entries(scheduleData.events)) {
 		const previous = snapshotMap.get(slug);
 		const previousHash = previous
 			? hashEvent(previous.start_time, previous.duration, previous.room)
@@ -189,6 +196,8 @@ export async function triggerScheduleChangeNotifications(
 
 	if (Object.keys(eventsToUpdate).length > 0) {
 		await upsertSnapshots(eventsToUpdate, env);
-		console.log(`Updated ${Object.keys(eventsToUpdate).length} schedule snapshots`);
+		console.log(
+			`Updated ${Object.keys(eventsToUpdate).length} schedule snapshots`,
+		);
 	}
 }

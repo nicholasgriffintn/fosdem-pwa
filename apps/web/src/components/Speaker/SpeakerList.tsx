@@ -7,7 +7,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { useIsClient } from "~/hooks/use-is-client";
 import { useWindowSize } from "~/hooks/use-window-size";
-import type { Person } from "~/types/fosdem";
+import type { Person } from "~/types/conference";
 
 type SpeakerListProps = {
 	persons: Person[];

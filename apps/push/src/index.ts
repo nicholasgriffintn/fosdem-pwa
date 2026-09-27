@@ -1,8 +1,15 @@
+import { delay } from "./utils/delay";
+import { createConferenceDate } from "./utils/date";
+import { conferenceConfig } from "@roomisfull/conference";
 import * as Sentry from "@sentry/cloudflare";
 
 import { triggerNotifications } from "./controllers/notifications";
 import { triggerScheduleChangeNotifications } from "./controllers/schedule-changes";
-import { triggerRoomStatusNotifications, pollAndStoreRoomStatus, cleanupOldRoomStatus } from "./controllers/room-status";
+import {
+	triggerRoomStatusNotifications,
+	pollAndStoreRoomStatus,
+	cleanupOldRoomStatus,
+} from "./controllers/room-status";
 import { triggerRecordingNotifications } from "./controllers/recording-notifications";
 import { triggerDailySummary } from "./controllers/daily-summary";
 import { getApplicationKeys, sendNotification } from "./lib/notifications";
@@ -22,10 +29,11 @@ const FIVE_MINUTES_MS = 5 * 60 * 1000;
 const MAX_SEND_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 1000;
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const getScheduledDate = (event: { scheduledTime?: number }) => {
-	const scheduledTime = typeof event.scheduledTime === "number" ? event.scheduledTime : Date.now();
-	const normalizedTime = Math.floor(scheduledTime / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
+	const scheduledTime =
+		typeof event.scheduledTime === "number" ? event.scheduledTime : Date.now();
+	const normalizedTime =
+		Math.floor(scheduledTime / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
 	return new Date(normalizedTime);
 };
 
@@ -43,7 +51,7 @@ const validateEnv = (env: Env) => {
 
 const isAuthorizedRequest = (request: Request, env: Env): boolean => {
 	if (!env.CRON_SECRET) {
-		return true;
+		return false;
 	}
 
 	const authHeader = request.headers.get("Authorization");
@@ -56,8 +64,8 @@ const isAuthorizedRequest = (request: Request, env: Env): boolean => {
 };
 
 export default Sentry.withSentry<Env, QueueMessage>(
-	env => ({
-		dsn: "https://2cbf756f8faa4cab906b2dc99df77f82@ingest.bitwobbly.com/8",
+	(env) => ({
+		dsn: conferenceConfig.integrations.sentryPushDsn,
 		sampleRate: 1,
 		enableLogs: false,
 		tracesSampleRate: 0,
@@ -72,7 +80,10 @@ export default Sentry.withSentry<Env, QueueMessage>(
 		async fetch(request: Request, env: Env, ctx: ExecutionContext) {
 			const validation = validateEnv(env);
 			if (!validation.ok) {
-				return new Response(`Missing required bindings: ${validation.missing.join(", ")}`, { status: 500 });
+				return new Response(
+					`Missing required bindings: ${validation.missing.join(", ")}`,
+					{ status: 500 },
+				);
 			}
 
 			if (!isAuthorizedRequest(request, env)) {
@@ -96,13 +107,23 @@ export default Sentry.withSentry<Env, QueueMessage>(
 				}
 
 				if (isScheduleChange) {
-					await triggerScheduleChangeNotifications({ cron: "fetch" }, env, ctx, true);
+					await triggerScheduleChangeNotifications(
+						{ cron: "fetch" },
+						env,
+						ctx,
+						true,
+					);
 					return new Response("Schedule change notifications queued");
 				}
 
 				const isRoomStatus = url.searchParams.has("room-status");
 				if (isRoomStatus) {
-					await triggerRoomStatusNotifications({ cron: "fetch" }, env, ctx, true);
+					await triggerRoomStatusNotifications(
+						{ cron: "fetch" },
+						env,
+						ctx,
+						true,
+					);
 					return new Response("Room status notifications queued");
 				}
 
@@ -114,7 +135,12 @@ export default Sentry.withSentry<Env, QueueMessage>(
 
 				const isRecordings = url.searchParams.has("recordings");
 				if (isRecordings) {
-					await triggerRecordingNotifications({ cron: "fetch" }, env, ctx, true);
+					await triggerRecordingNotifications(
+						{ cron: "fetch" },
+						env,
+						ctx,
+						true,
+					);
 					return new Response("Recording notifications queued");
 				}
 
@@ -129,25 +155,63 @@ export default Sentry.withSentry<Env, QueueMessage>(
 
 					switch (type) {
 						case "event-reminder":
-							await triggerNotifications({ cron: "test" }, env, ctx, true, dayOverride);
+							await triggerNotifications(
+								{ cron: "test" },
+								env,
+								ctx,
+								true,
+								dayOverride,
+							);
 							return new Response("Event reminder notifications triggered");
 						case "daily-summary-morning":
-							await triggerDailySummary({ cron: "test" }, env, ctx, true, false, dayOverride);
+							await triggerDailySummary(
+								{ cron: "test" },
+								env,
+								ctx,
+								true,
+								false,
+								dayOverride,
+							);
 							return new Response("Morning summary notifications triggered");
 						case "daily-summary-evening":
-							await triggerDailySummary({ cron: "test" }, env, ctx, true, true, dayOverride);
+							await triggerDailySummary(
+								{ cron: "test" },
+								env,
+								ctx,
+								true,
+								true,
+								dayOverride,
+							);
 							return new Response("Evening summary notifications triggered");
 						case "schedule-change":
-							await triggerScheduleChangeNotifications({ cron: "test" }, env, ctx, true);
+							await triggerScheduleChangeNotifications(
+								{ cron: "test" },
+								env,
+								ctx,
+								true,
+							);
 							return new Response("Schedule change notifications triggered");
 						case "room-status":
-							await triggerRoomStatusNotifications({ cron: "test" }, env, ctx, true, dayOverride);
+							await triggerRoomStatusNotifications(
+								{ cron: "test" },
+								env,
+								ctx,
+								true,
+								dayOverride,
+							);
 							return new Response("Room status notifications triggered");
 						case "recording-available":
-							await triggerRecordingNotifications({ cron: "test" }, env, ctx, true);
+							await triggerRecordingNotifications(
+								{ cron: "test" },
+								env,
+								ctx,
+								true,
+							);
 							return new Response("Recording notifications triggered");
 						default:
-							return new Response(`Unknown notification type: ${type}`, { status: 400 });
+							return new Response(`Unknown notification type: ${type}`, {
+								status: 400,
+							});
 					}
 				}
 
@@ -165,16 +229,18 @@ export default Sentry.withSentry<Env, QueueMessage>(
 		): Promise<void> {
 			const validation = validateEnv(env);
 			if (!validation.ok) {
-				console.error(`Missing required bindings: ${validation.missing.join(", ")}`);
+				console.error(
+					`Missing required bindings: ${validation.missing.join(", ")}`,
+				);
 				return;
 			}
 
-			const scheduledDate = getScheduledDate(event);
+			const scheduledDate = createConferenceDate(getScheduledDate(event));
 			const utcHours = scheduledDate.getUTCHours();
 			const utcMinutes = scheduledDate.getUTCMinutes();
 
-			const isMorningSummary = utcHours === 8 && utcMinutes === 0;
-			const isEveningSummary = utcHours === 17 && utcMinutes === 15;
+			const isMorningSummary = utcHours === 9 && utcMinutes === 0;
+			const isEveningSummary = utcHours === 18 && utcMinutes === 15;
 			const isFiveMinute = utcMinutes % 5 === 0;
 			const isHourly = utcMinutes === 0;
 			const isMidnight = utcHours === 0 && utcMinutes === 0;
@@ -202,10 +268,16 @@ export default Sentry.withSentry<Env, QueueMessage>(
 
 			await triggerRoomStatusNotifications(event, env, ctx, true);
 		},
-		async queue(batch: MessageBatch<QueueMessage>, env: Env, ctx: ExecutionContext): Promise<void> {
+		async queue(
+			batch: MessageBatch<QueueMessage>,
+			env: Env,
+			ctx: ExecutionContext,
+		): Promise<void> {
 			const validation = validateEnv(env);
 			if (!validation.ok) {
-				console.error(`Missing required bindings: ${validation.missing.join(", ")}`);
+				console.error(
+					`Missing required bindings: ${validation.missing.join(", ")}`,
+				);
 				return;
 			}
 
@@ -216,16 +288,23 @@ export default Sentry.withSentry<Env, QueueMessage>(
 
 			for (const message of batch.messages) {
 				if (!message.body) {
-					console.error("Skipping queue message with empty body", { messageId: message.id });
+					console.error("Skipping queue message with empty body", {
+						messageId: message.id,
+					});
 					continue;
 				}
 
-				const subscriptionKey = message.body?.subscription?.user_id ?? message.body?.subscription?.endpoint ?? "unknown";
+				const subscriptionKey =
+					message.body?.subscription?.user_id ??
+					message.body?.subscription?.endpoint ??
+					"unknown";
 				const dedupeKey = `${subscriptionKey}:${message.body?.bookmarkId ?? "unknown"}:${message.body?.notification?.title ?? "untitled"}`;
 				const lastSentAt = dedupe.get(dedupeKey);
 				const now = Date.now();
 				if (lastSentAt && now - lastSentAt < DEDUPE_WINDOW_MS) {
-					console.log("Skipping duplicate notification within window", { dedupeKey });
+					console.log("Skipping duplicate notification within window", {
+						dedupeKey,
+					});
 					continue;
 				}
 
@@ -234,7 +313,12 @@ export default Sentry.withSentry<Env, QueueMessage>(
 				try {
 					for (let attempt = 0; attempt <= MAX_SEND_RETRIES; attempt++) {
 						try {
-							await sendNotification(message.body.subscription, message.body.notification, keys, env);
+							await sendNotification(
+								message.body.subscription,
+								message.body.notification,
+								keys,
+								env,
+							);
 							break;
 						} catch (error) {
 							if (attempt === MAX_SEND_RETRIES) {
@@ -256,7 +340,7 @@ export default Sentry.withSentry<Env, QueueMessage>(
 						await markNotificationSent(message.body.bookmarkId, env);
 					}
 				} catch (error) {
-					console.error('Failed to process notification:', {
+					console.error("Failed to process notification:", {
 						bookmarkId: message.body?.bookmarkId,
 						title: message.body?.notification?.title,
 						error: error instanceof Error ? error.message : String(error),
@@ -264,14 +348,19 @@ export default Sentry.withSentry<Env, QueueMessage>(
 					});
 
 					if (message.attempts < 5) {
-						message.retry({ delaySeconds: Math.min(60 * Math.pow(2, message.attempts), 3600) });
-					} else {
-						console.error('Max retry attempts exceeded, dropping notification', {
-							bookmarkId: message.body?.bookmarkId,
+						message.retry({
+							delaySeconds: Math.min(60 * Math.pow(2, message.attempts), 3600),
 						});
+					} else {
+						console.error(
+							"Max retry attempts exceeded, dropping notification",
+							{
+								bookmarkId: message.body?.bookmarkId,
+							},
+						);
 					}
 				}
 			}
-		}
+		},
 	} satisfies ExportedHandler<Env, QueueMessage>,
 );

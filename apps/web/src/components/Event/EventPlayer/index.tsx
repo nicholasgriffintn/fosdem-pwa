@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { FeaturedFosdemImage } from "~/components/shared/FeaturedFosdemImage";
+import { FeaturedConferenceImage } from "~/components/shared/FeaturedConferenceImage";
 import { Icons } from "~/components/shared/Icons";
 import { NoJsVideoFallback } from "~/components/VideoPlayer/NoJsVideoFallback";
 import { usePlayer } from "~/contexts/PlayerContext";
@@ -10,7 +10,7 @@ import { useIsClient } from "~/hooks/use-is-client";
 import { useOnlineStatus } from "~/hooks/use-online-status";
 import { isEventLive } from "~/lib/dateTime";
 import { PlaybackSpeedControl } from "~/components/WatchLater/PlaybackSpeedControl";
-import type { ConferenceData, Event, TypeIds } from "~/types/fosdem";
+import type { ConferenceData, Event, TypeIds } from "~/types/conference";
 import { EventPlayerNotStarted } from "~/components/Event/EventPlayer/components/NotStarted";
 
 type EventPlayerProps = {
@@ -136,7 +136,7 @@ export function EventPlayer({
 	return (
 		<div className="relative w-full aspect-video group">
 			{!isThisEventPlaying && (
-				<FeaturedFosdemImage
+				<FeaturedConferenceImage
 					type={event.type as TypeIds}
 					size="full"
 					className="w-full h-full absolute top-0 left-0 z-0 object-cover"
@@ -201,7 +201,7 @@ export function EventPlayer({
 							{streamUrl ? (
 								<NoJsVideoFallback
 									openUrl={streamUrl}
-									backgroundImageUrl="/fosdem/images/fosdem/full/fallback.png"
+									backgroundImageUrl="/brand/placeholder.svg"
 									subtitleUrl={proxiedSubtitleUrl}
 									sources={[
 										...(eventIsLive

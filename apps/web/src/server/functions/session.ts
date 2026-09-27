@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { setResponseHeader } from "@tanstack/react-start/server";
 
 import { getAuthSession } from "~/server/auth";
 
@@ -14,7 +13,7 @@ export const getSession = createServerFn({
 		}
 
 		return user;
-	} catch (error) {
+	} catch {
 		return null;
 	}
 });

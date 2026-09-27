@@ -13,8 +13,10 @@ import type { NavItem } from "~/components/shared/types";
 import { preserveYearSearch } from "~/lib/search-params";
 import { UserAvatar } from "~/components/shared/UserAvatar";
 
-const mobileNavLinkBase = "flex w-full items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors";
-const mobileNavLinkDefault = "text-foreground/90 hover:bg-muted/60 hover:text-foreground no-underline";
+const mobileNavLinkBase =
+	"flex w-full items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors";
+const mobileNavLinkDefault =
+	"text-foreground/90 hover:bg-muted/60 hover:text-foreground no-underline";
 const mobileNavLinkActive = "bg-muted text-foreground";
 const mobileNavLinkDisabled = "cursor-not-allowed opacity-60";
 
@@ -177,7 +179,9 @@ export function MobileNav({
 								>
 									<UserAvatar user={user} size="md" />
 									<div className="min-w-0 flex-1">
-										<div className="truncate text-sm font-medium">{user.name}</div>
+										<div className="truncate text-sm font-medium">
+											{user.name}
+										</div>
 										{user.is_guest && (
 											<Badge variant="secondary" className="mt-1 text-xs">
 												Guest
@@ -203,16 +207,16 @@ export function MobileNav({
 						) : (
 							<Button
 								variant="ghost"
-									className="h-11 justify-start gap-3 rounded-lg px-3"
-									asChild
-								>
-									<Link
-										to="/signin"
-										onClick={() => {
-											if (menuCheckboxRef?.current) {
-												menuCheckboxRef.current.checked = false;
-											}
-											onClose();
+								className="h-11 justify-start gap-3 rounded-lg px-3"
+								asChild
+							>
+								<Link
+									to="/signin"
+									onClick={() => {
+										if (menuCheckboxRef?.current) {
+											menuCheckboxRef.current.checked = false;
+										}
+										onClose();
 									}}
 									className="no-underline"
 								>
@@ -228,7 +232,7 @@ export function MobileNav({
 							asChild
 						>
 							<a
-								href="https://github.com/nicholasgriffintn/fosdem-pwa"
+								href="https://github.com/nicholasgriffintn/roomisfull"
 								target="_blank"
 								rel="noreferrer"
 								className="no-underline"

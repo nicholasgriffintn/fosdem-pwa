@@ -1,3 +1,4 @@
+import { brand, conferenceConfig } from "@roomisfull/conference";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { generateCommonSEOTags } from "~/utils/seo-generator";
@@ -10,10 +11,9 @@ export const Route = createFileRoute("/terms/")({
 	head: () => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: "Terms of Service | FOSDEM PWA",
-				description:
-					"Terms for using FOSDEM PWA, including account responsibilities and service limitations.",
-			})
+				title: `Terms of Service | ${brand.name}`,
+				description: `Terms for using ${brand.name}, including account responsibilities and service limitations.`,
+			}),
 		],
 	}),
 });
@@ -23,7 +23,7 @@ function TermsPage() {
 		<PageShell maxWidth="3xl">
 			<PageHeader
 				heading="Terms of Service"
-				text="By using FOSDEM PWA, you agree to the terms below. If you do not agree, please do not use the app."
+				text={`By using ${brand.name}, you agree to the terms below. If you do not agree, please do not use the app.`}
 				className="mb-6"
 			/>
 
@@ -33,9 +33,10 @@ function TermsPage() {
 						Service overview
 					</h2>
 					<p className="text-muted-foreground">
-						FOSDEM PWA provides a schedule viewer, bookmarks, notes, and optional
-						push notifications. The service uses publicly available FOSDEM data
-						and is not affiliated with or endorsed by FOSDEM.
+						{brand.name} provides a schedule viewer, bookmarks, notes, and
+						optional push notifications. The service uses publicly available{" "}
+						{conferenceConfig.name} data and is not affiliated with or endorsed
+						by {conferenceConfig.name}.
 					</p>
 				</section>
 
@@ -94,9 +95,7 @@ function TermsPage() {
 				</section>
 
 				<section className="space-y-3">
-					<h2 className="text-2xl font-semibold text-foreground">
-						Disclaimer
-					</h2>
+					<h2 className="text-2xl font-semibold text-foreground">Disclaimer</h2>
 					<p className="text-muted-foreground">
 						The service is provided "as is" without warranties of any kind. We
 						are not liable for any damages arising from use of the app.
@@ -104,12 +103,13 @@ function TermsPage() {
 				</section>
 
 				<section className="space-y-3">
-					<h2 className="text-2xl font-semibold text-foreground">
-						Privacy
-					</h2>
+					<h2 className="text-2xl font-semibold text-foreground">Privacy</h2>
 					<p className="text-muted-foreground">
 						Please review the{" "}
-						<Link to="/privacy" className="font-medium text-foreground hover:underline">
+						<Link
+							to="/privacy"
+							className="font-medium text-foreground hover:underline"
+						>
 							Privacy Policy
 						</Link>{" "}
 						for details on how data is handled.
@@ -121,7 +121,7 @@ function TermsPage() {
 					<p className="text-muted-foreground">
 						For questions about these terms, open an issue on{" "}
 						<a
-							href="https://github.com/nicholasgriffintn/fosdem-pwa"
+							href="https://github.com/nicholasgriffintn/roomisfull"
 							target="_blank"
 							rel="noreferrer"
 							className="font-medium text-foreground hover:underline"

@@ -1,5 +1,7 @@
 "use client";
 
+import { brand, conferenceConfig } from "@roomisfull/conference";
+
 import { useEffect } from "react";
 
 import { toast } from "~/hooks/use-toast";
@@ -18,7 +20,7 @@ export function ServiceWorkerUpdater() {
 		const handleAppInstalled = () => {
 			toast({
 				title: "Successfully Installed",
-				description: "FOSDEM PWA has been added to your home screen",
+				description: `${brand.name} has been added to your home screen`,
 				duration: 3000,
 			});
 			localStorage.removeItem("installPromptDismissed");
@@ -53,7 +55,7 @@ export function ServiceWorkerUpdater() {
 			typeof window !== "undefined" && "BroadcastChannel" in window;
 
 		const dataChannel = supportsBroadcastChannel
-			? new BroadcastChannel("fosdem-data-updates")
+			? new BroadcastChannel(`roomisfull-${conferenceConfig.id}-data-updates`)
 			: null;
 
 		if (dataChannel) {
@@ -65,7 +67,6 @@ export function ServiceWorkerUpdater() {
 				});
 			};
 		}
-
 
 		window.addEventListener("swUpdated", handleSwUpdate);
 

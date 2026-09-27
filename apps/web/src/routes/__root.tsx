@@ -29,84 +29,89 @@ import { generateCommonSEOTags } from "~/utils/seo-generator";
 import { BottomTabNav } from "~/components/BottomTabNav";
 import { navItems } from "~/components/shared/NavItems";
 import { BookmarkConflictNotice } from "~/components/shared/BookmarkConflictNotice";
+import { CanonicalMetadata } from "~/components/shared/CanonicalMetadata";
+import { ThemeScript } from "~/components/shared/ThemeScript";
+import { conferenceConfig } from "@roomisfull/conference";
 
 const ReactQueryDevtools =
 	process.env.NODE_ENV !== "development"
 		? () => null
 		: lazy(() =>
-			import("@tanstack/react-query-devtools").then((res) => ({
-				default: res.ReactQueryDevtools,
-			}))
-		);
+				import("@tanstack/react-query-devtools").then((res) => ({
+					default: res.ReactQueryDevtools,
+				})),
+			);
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV !== "development"
 		? () => null
 		: lazy(() =>
-			import("@tanstack/react-router-devtools").then((res) => ({
-				default: res.TanStackRouterDevtools,
-			}))
-		);
+				import("@tanstack/react-router-devtools").then((res) => ({
+					default: res.TanStackRouterDevtools,
+				})),
+			);
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-	head: () => ({
-		meta: [
-			{
-				charSet: "utf-8",
-			},
-			{
-				name: "viewport",
-				content: "width=device-width, initial-scale=1, viewport-fit=cover",
-			},
-			...generateCommonSEOTags({
-				title: siteMeta.title,
-				description: siteMeta.description,
-			}),
-			{
-				name: "theme-color",
-				content: siteMeta.themeColor,
-			},
-			{
-				property: "og:locale",
-				content: siteMeta.locale,
-			},
-			{
-				property: "og:type",
-				content: "website",
-			},
-			{
-				property: "og:site_name",
-				content: siteMeta.title,
-			},
-			{
-				property: "og:image",
-				content: "/og-image.png",
-			},
-			{
-				name: "twitter:card",
-				content: "summary_large_image",
-			},
-		],
-		links: [
-			{ rel: "preload", as: "style", href: appCss },
-			{ rel: "stylesheet", href: appCss },
-			{
-				rel: "preconnect",
-				href: "https://images.s3rve.co.uk",
-				crossOrigin: "anonymous",
-			},
-			{ rel: "dns-prefetch", href: "https://images.s3rve.co.uk" },
-			{ rel: "manifest", href: "/manifest.webmanifest" },
-			{ rel: "icon", href: "/favicon.ico" },
-			{ rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
-		],
-	}),
-	loader: async () => {
-		const user = await getSession();
-		return { user };
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+	{
+		head: () => ({
+			meta: [
+				{
+					charSet: "utf-8",
+				},
+				{
+					name: "viewport",
+					content: "width=device-width, initial-scale=1, viewport-fit=cover",
+				},
+				...generateCommonSEOTags({
+					title: siteMeta.title,
+					description: siteMeta.description,
+				}),
+				{
+					name: "theme-color",
+					content: siteMeta.themeColor,
+				},
+				{
+					property: "og:locale",
+					content: siteMeta.locale,
+				},
+				{
+					property: "og:type",
+					content: "website",
+				},
+				{
+					property: "og:site_name",
+					content: siteMeta.title,
+				},
+				{
+					property: "og:image",
+					content: `${conferenceConfig.appUrl}/og-image.png`,
+				},
+				{
+					name: "twitter:card",
+					content: "summary_large_image",
+				},
+			],
+			links: [
+				{ rel: "preload", as: "style", href: appCss },
+				{ rel: "stylesheet", href: appCss },
+				{
+					rel: "preconnect",
+					href: "https://images.s3rve.co.uk",
+					crossOrigin: "anonymous",
+				},
+				{ rel: "dns-prefetch", href: "https://images.s3rve.co.uk" },
+				{ rel: "manifest", href: "/manifest.webmanifest" },
+				{ rel: "icon", href: "/favicon.ico" },
+				{ rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
+			],
+		}),
+		loader: async () => {
+			const user = await getSession();
+			return { user };
+		},
+		component: RootComponent,
 	},
-	component: RootComponent,
-});
+);
 
 function RootComponent() {
 	const { queryClient } = Route.useRouteContext();
@@ -131,23 +136,15 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
-				<ScriptOnce>
-					{`(() => {
-            const root = document.documentElement;
-            const stored = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const shouldUseDark = stored === 'dark' || (!stored && prefersDark);
-            root.classList.toggle('dark', shouldUseDark);
-            root.classList.add('js-enabled');
-          })();`}
-				</ScriptOnce>
+				<ThemeScript />
 				<HeadContent />
+				<CanonicalMetadata />
 			</head>
 			<body
 				className={cn(
 					"min-h-screen bg-background font-sans antialiased",
 					"--font-sans",
-					"--font-heading"
+					"--font-heading",
 				)}
 			>
 				<a

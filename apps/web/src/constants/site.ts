@@ -1,6 +1,8 @@
+import { brand, conferenceConfig } from "@roomisfull/conference";
+
 export const siteMeta = {
-	title: "FOSDEM PWA",
-	description: "A companion app for the FOSDEM conference for everyone to use",
+	title: conferenceConfig.name,
+	description: `Your companion for ${conferenceConfig.name}.`,
 	locale: "en",
-	themeColor: "#0f172a",
+	themeColor: brand.themeColor,
 };

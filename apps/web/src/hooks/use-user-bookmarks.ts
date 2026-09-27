@@ -13,7 +13,7 @@ export function useUserBookmarks({
 }: {
 	year: number;
 	userId: string;
-		enabled?: boolean;
+	enabled?: boolean;
 }) {
 	const getUserBookmarksFromServer = useServerFn(getUserBookmarks);
 

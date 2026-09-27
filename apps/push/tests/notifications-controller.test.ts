@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Env, Subscription, EnrichedBookmark } from "../src/types";
 
-vi.mock("../src/lib/fosdem-data", () => ({
-	getFosdemData: vi.fn(),
+vi.mock("../src/lib/conference-data", () => ({
+	getConferenceData: vi.fn(),
 	getCurrentDay: vi.fn(),
 }));
 
@@ -29,7 +29,9 @@ vi.mock("../src/utils/config", () => ({
 	bookmarkNotificationsEnabled: vi.fn(() => true),
 }));
 
-const { getFosdemData, getCurrentDay } = await import("../src/lib/fosdem-data");
+const { getConferenceData, getCurrentDay } = await import(
+	"../src/lib/conference-data"
+);
 const {
 	getBookmarksByUserIds,
 	enrichBookmarks,
@@ -37,13 +39,13 @@ const {
 	getBookmarksStartingSoon,
 } = await import("../src/lib/bookmarks");
 const { getApplicationKeys, sendNotification } = await import(
-	"../src/lib/notifications",
+	"../src/lib/notifications"
 );
 const { resolveNotificationPreference } = await import(
-	"../src/lib/notification-preferences",
+	"../src/lib/notification-preferences"
 );
 const { triggerNotifications } = await import(
-	"../src/controllers/notifications",
+	"../src/controllers/notifications"
 );
 
 type Prepared = {
@@ -108,7 +110,7 @@ afterEach(() => {
 describe("triggerNotifications", () => {
 	it("skips when event reminders are disabled", async () => {
 		(getCurrentDay as vi.Mock).mockReturnValue("1");
-		(getFosdemData as vi.Mock).mockResolvedValue({ events: {} });
+		(getConferenceData as vi.Mock).mockResolvedValue({ events: {} });
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
 		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
@@ -130,7 +132,7 @@ describe("triggerNotifications", () => {
 
 	it("filters low priority bookmarks when disabled", async () => {
 		(getCurrentDay as vi.Mock).mockReturnValue("1");
-		(getFosdemData as vi.Mock).mockResolvedValue({ events: {} });
+		(getConferenceData as vi.Mock).mockResolvedValue({ events: {} });
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
 		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,

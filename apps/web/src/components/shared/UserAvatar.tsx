@@ -14,10 +14,7 @@ type UserAvatarProps = {
 
 function getInitials(name?: string | null): string {
 	if (!name) return "?";
-	const parts = name
-		.trim()
-		.split(/\s+/)
-		.filter(Boolean);
+	const parts = name.trim().split(/\s+/).filter(Boolean);
 	if (parts.length === 0) return "?";
 	const first = parts[0]?.[0] ?? "?";
 	const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
@@ -53,7 +50,9 @@ export function UserAvatar({
 		xl: "h-12 w-12",
 	};
 
-	const borderStyle = borderColor ? { borderColor, borderWidth: "4px" } : undefined;
+	const borderStyle = borderColor
+		? { borderColor, borderWidth: "4px" }
+		: undefined;
 
 	return (
 		<Avatar className={className || sizeClasses[size]} style={borderStyle}>

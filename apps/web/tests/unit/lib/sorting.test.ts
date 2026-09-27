@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Event, Track, RoomData } from "~/types/fosdem";
+import type { Event, Track, RoomData } from "~/types/conference";
 
 import {
 	sortEvents,
@@ -45,10 +45,7 @@ describe("sorting helpers", () => {
 	});
 
 	it("prioritizes favorite events", () => {
-		const events = [
-			buildEvent({ id: "fav" }),
-			buildEvent({ id: "plain" }),
-		];
+		const events = [buildEvent({ id: "fav" }), buildEvent({ id: "plain" })];
 		const sorter = sortEventsWithFavorites({ fav: true });
 		const sorted = [...events].sort(sorter);
 		expect(sorted[0].id).toBe("fav");

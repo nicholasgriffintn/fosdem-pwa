@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
 	Tooltip,
@@ -19,6 +20,7 @@ type ShareButtonProps = {
 };
 
 export function ShareButton({ title, text, url, className }: ShareButtonProps) {
+	const linkInputId = useId();
 	const handleShare = async () => {
 		const shareText = text ? `${text}\n${url}` : url;
 
@@ -72,8 +74,14 @@ export function ShareButton({ title, text, url, className }: ShareButtonProps) {
 					<Icons.share className="h-4 w-4" />
 				</summary>
 				<div className="absolute right-0 mt-2 w-64 rounded-md border bg-background p-2 shadow-md z-50">
-					<label className="text-xs text-muted-foreground">Copy link</label>
+					<label
+						htmlFor={linkInputId}
+						className="text-xs text-muted-foreground"
+					>
+						Copy link
+					</label>
 					<input
+						id={linkInputId}
 						type="text"
 						readOnly
 						value={url}

@@ -12,10 +12,7 @@ export function RouteLoadingState({
 }: RouteLoadingStateProps) {
 	return (
 		<div
-			className={cn(
-				"min-h-[60vh] flex items-center justify-center",
-				className,
-			)}
+			className={cn("min-h-[60vh] flex items-center justify-center", className)}
 		>
 			<LoadingState type="spinner" message={message} variant="centered" />
 		</div>

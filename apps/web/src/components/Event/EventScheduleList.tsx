@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { cn } from "~/lib/utils";
-import type { Event } from "~/types/fosdem";
-import type { EventConflict } from "~/lib/fosdem";
+import type { Event } from "~/types/conference";
+import type { EventConflict } from "~/lib/schedule";
 import { EventListItem } from "~/components/Event/EventItemList";
 import { useEventList } from "~/hooks/use-item-list";
 import { calculateTransitionTime } from "~/lib/dateTime";

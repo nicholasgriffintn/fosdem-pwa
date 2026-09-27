@@ -18,6 +18,7 @@ export function RoomStatusIndicator({
 }: RoomStatusIndicatorProps) {
 	return (
 		<span
+			role="img"
 			className={clsx(
 				"inline-flex h-2 w-2 rounded-full",
 				roomStatusStyles[state],

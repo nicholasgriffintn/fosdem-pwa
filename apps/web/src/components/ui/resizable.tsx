@@ -20,12 +20,13 @@ const ResizablePanelGroup = ({
 	panelIds,
 	...props
 }: ResizablePanelGroupProps) => {
-	const { defaultLayout, onLayoutChanged } = ResizablePrimitive.useDefaultLayout({
-		id: autoSaveId,
-		panelIds,
-		storage:
-			typeof localStorage === "undefined" ? serverStorage : localStorage,
-	});
+	const { defaultLayout, onLayoutChanged } =
+		ResizablePrimitive.useDefaultLayout({
+			id: autoSaveId,
+			panelIds,
+			storage:
+				typeof localStorage === "undefined" ? serverStorage : localStorage,
+		});
 
 	return (
 		<ResizablePrimitive.Group

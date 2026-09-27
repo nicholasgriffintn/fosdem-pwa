@@ -1,8 +1,11 @@
 "use client";
 
+import { Video } from "~/components/VideoPlayer/Video";
+
 import { useEffect, useRef } from "react";
 import clsx from "clsx";
-import type { Event } from "~/types/fosdem";
+import { isHlsType } from "~/utils/media";
+import type { Event } from "~/types/conference";
 
 interface SharedVideoElementProps {
 	event?: Event | null;
@@ -28,32 +31,22 @@ export function SharedVideoElement({
 	const resolvedSources = sources?.length
 		? sources
 		: isLive
-			? event?.streams ?? []
-			: event?.links?.filter((link) => link.type?.startsWith("video/")) ?? [];
-
-	const isHlsType = (type?: string) =>
-		type === "application/vnd.apple.mpegurl" ||
-		type === "application/x-mpegURL";
+			? (event?.streams ?? [])
+			: (event?.links?.filter((link) => link.type?.startsWith("video/")) ?? []);
 
 	const streamUrl = isLive
-		? resolvedSources.find((source) =>
-			isHlsType(source.type),
-		)?.href
+		? resolvedSources.find((source) => isHlsType(source.type))?.href
 		: null;
 
-	const resetVideo = (video: HTMLVideoElement) => {
-		video.pause();
-		video.removeAttribute("src");
-		video.load();
-	};
-
 	useEffect(() => {
-		if (!videoRef.current || !streamUrl) {
+		const video = videoRef.current;
+		if (!video || !streamUrl) {
 			return;
 		}
 
-		const video = videoRef.current;
-		resetVideo(video);
+		video.pause();
+		video.removeAttribute("src");
+		video.load();
 
 		if (video.canPlayType("application/vnd.apple.mpegurl")) {
 			video.src = streamUrl;
@@ -110,11 +103,13 @@ export function SharedVideoElement({
 				hlsRef.current = null;
 			}
 		};
-	}, [streamUrl]);
+	}, [streamUrl, videoRef]);
 
 	if (!event && (!resolvedSources || resolvedSources.length === 0)) return null;
 
-	const subtitleTrack = event?.links?.find((link) => link.href.endsWith(".vtt"));
+	const subtitleTrack = event?.links?.find((link) =>
+		link.href.endsWith(".vtt"),
+	);
 	const proxiedSubtitleUrl = subtitleTrack
 		? `/api/proxy/subtitles?url=${encodeURIComponent(subtitleTrack.href)}`
 		: null;
@@ -126,7 +121,8 @@ export function SharedVideoElement({
 	});
 
 	return (
-		<video
+		<Video
+			subtitleUrl={proxiedSubtitleUrl}
 			key={event?.id ?? streamUrl ?? "shared-video"}
 			ref={videoRef}
 			className={clsx("w-full h-full object-contain", className)}
@@ -136,18 +132,10 @@ export function SharedVideoElement({
 			webkit-playsinline="true"
 			preload="metadata"
 		>
-			{!isLive && sortedSources.map((source) => (
-				<source key={source.href} src={source.href} type={source.type} />
-			))}
-			{proxiedSubtitleUrl && (
-				<track
-					kind="subtitles"
-					src={proxiedSubtitleUrl}
-					srcLang="en"
-					label="English"
-					default
-				/>
-			)}
-		</video>
+			{!isLive &&
+				sortedSources.map((source) => (
+					<source key={source.href} src={source.href} type={source.type} />
+				))}
+		</Video>
 	);
 }

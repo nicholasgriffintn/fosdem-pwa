@@ -1,4 +1,5 @@
-import type { Event, Person } from "~/types/fosdem";
+import { conferenceConfig } from "@roomisfull/conference";
+import type { Event, Person } from "~/types/conference";
 import { EventSpeakers } from "~/components/Event/EventSpeakers";
 import { sanitiseString } from "~/utils/sanitise";
 
@@ -71,7 +72,7 @@ export function EventContent({ year, event, persons }: EventContentProps) {
 						{event.url && (
 							<li>
 								<a href={event.url} target="_blank" rel="noreferrer">
-									View on the FOSDEM website
+									View on the {conferenceConfig.name} website
 								</a>
 							</li>
 						)}

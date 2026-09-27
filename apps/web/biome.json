@@ -7,9 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": [
-			"src/**/*"
-		]
+		"includes": ["src/**/*", "!src/**/routeTree.gen.ts"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -33,5 +31,17 @@
 		"parser": {
 			"tailwindDirectives": true
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["src/components/VideoPlayer/Video.tsx"],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"useMediaCaption": "off"
+					}
+				}
+			}
+		}
+	]
 }

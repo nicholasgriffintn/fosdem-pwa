@@ -22,10 +22,10 @@ const MockHls = vi.hoisted(() => {
 		static isSupported() {
 			return true;
 		}
-		on() { }
-		attachMedia() { }
-		loadSource() { }
-		destroy() { }
+		on() {}
+		attachMedia() {}
+		loadSource() {}
+		destroy() {}
 	};
 });
 
@@ -36,6 +36,8 @@ vi.mock("hls.js", () => ({
 describe("RoomPlayer", () => {
 	beforeEach(() => {
 		useOnlineStatusMock.mockReset();
+		vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => {});
+		vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => {});
 	});
 
 	it("plays the stream when the user clicks play", () => {
@@ -51,7 +53,9 @@ describe("RoomPlayer", () => {
 			/>,
 		);
 
-		const playButton = screen.getByRole("button", { name: /watch room stream/i });
+		const playButton = screen.getByRole("button", {
+			name: /watch room stream/i,
+		});
 		fireEvent.click(playButton);
 
 		expect(document.querySelector("video")).toBeInTheDocument();

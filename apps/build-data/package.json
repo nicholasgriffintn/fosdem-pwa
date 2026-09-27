@@ -1,24 +1,31 @@
 {
-  "name": "@fosdem-pwa/build-data",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "build": "wrangler build",
-    "deploy": "wrangler deploy",
-    "dev": "wrangler dev",
-    "start": "wrangler dev",
-    "cf-typegen": "wrangler types",
-    "test": "vitest"
-  },
-  "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "0.22.0",
-    "@cloudflare/workers-types": "5.20260920.1",
-    "typescript": "7.0.2",
-    "vitest": "5.0.1",
-    "wrangler": "4.135.0"
-  },
-  "dependencies": {
-    "@sentry/cloudflare": "10.75.0",
-    "xml-js": "1.6.11"
-  }
+	"name": "@roomisfull/build-data",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "wrangler deploy --dry-run --outdir dist",
+		"build:fosdem": "wrangler deploy --dry-run --outdir dist --env fosdem",
+		"deploy": "wrangler deploy",
+		"deploy:fosdem": "wrangler deploy --env fosdem",
+		"dev": "wrangler dev",
+		"dev:fosdem": "wrangler dev --env fosdem",
+		"start": "wrangler dev",
+		"start:fosdem": "wrangler dev --env fosdem",
+		"cf-typegen": "wrangler types",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.22.0",
+		"@cloudflare/workers-types": "5.20260920.1",
+		"typescript": "7.0.2",
+		"vitest": "5.0.1",
+		"wrangler": "4.135.0"
+	},
+	"dependencies": {
+		"@sentry/cloudflare": "10.75.0",
+		"xml-js": "1.6.11",
+		"@roomisfull/conference": "workspace:*"
+	}
 }

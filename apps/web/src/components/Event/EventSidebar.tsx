@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import type { Event } from "~/types/fosdem";
+import type { Event } from "~/types/conference";
 import { useAuth } from "~/hooks/use-auth";
 import { EventNotes } from "~/components/Event/EventNotes";
 import { EventNotesMobile } from "~/components/Event/EventNotesMobile";
@@ -28,13 +28,11 @@ export function EventSidebar({
 
 	return (
 		<div className={sidebarClassName}>
-			<h2 className="text-xl font-medium mb-4 text-foreground">
-				Notes
-			</h2>
+			<h2 className="text-xl font-medium mb-4 text-foreground">Notes</h2>
 			<noscript>
 				<div className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-					Notes are only available with JavaScript enabled. You can still browse the
-					event details and schedule.
+					Notes are only available with JavaScript enabled. You can still browse
+					the event details and schedule.
 				</div>
 			</noscript>
 			<div className="js-required flex-1 flex flex-col min-h-0">
@@ -48,7 +46,11 @@ export function EventSidebar({
 					/>
 				) : (
 					<div className="flex-1 flex flex-col min-h-0">
-							{isMobile ? <EventNotesMobile event={event} year={year} /> : <EventNotes event={event} year={year} />}
+						{isMobile ? (
+							<EventNotesMobile event={event} year={year} />
+						) : (
+							<EventNotes event={event} year={year} />
+						)}
 					</div>
 				)}
 			</div>

@@ -1,7 +1,8 @@
+import { Video } from "~/components/VideoPlayer/Video";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Icons } from "~/components/shared/Icons";
-import type { Event } from "~/types/fosdem";
+import type { Event } from "~/types/conference";
 
 export function EventPlayerStarted({
 	event,
@@ -97,7 +98,8 @@ export function EventPlayerStarted({
 				</button>
 			)}
 			{isPlaying && !streamError && (
-				<video
+				<Video
+					subtitleUrl={proxiedSubtitleUrl}
 					ref={videoRef}
 					className="w-full h-full object-contain"
 					controls
@@ -120,16 +122,7 @@ export function EventPlayerStarted({
 									type={recording.type}
 								/>
 							))}
-					{proxiedSubtitleUrl && (
-						<track
-							kind="subtitles"
-							src={proxiedSubtitleUrl}
-							srcLang="en"
-							label="English"
-							default
-						/>
-					)}
-				</video>
+				</Video>
 			)}
 			{streamError && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">

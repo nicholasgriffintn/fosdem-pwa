@@ -1,9 +1,10 @@
+import { conferenceConfig } from "@roomisfull/conference";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getAllData } from "~/server/functions/fosdem";
+import { getAllData } from "~/server/functions/schedule";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { EventList } from "~/components/Event/EventList";
-import type { Event, Conference } from "~/types/fosdem";
+import type { Event, Conference } from "~/types/conference";
 import { constants } from "~/constants";
 import { useAuth } from "~/hooks/use-auth";
 import { useMutateBookmark } from "~/hooks/use-mutate-bookmark";
@@ -16,7 +17,17 @@ import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/track/$slug")({
 	component: TrackPage,
-	validateSearch: ({ year, day, view, sortFavourites }: { year: number; day?: string; view?: string; sortFavourites?: string }) => ({
+	validateSearch: ({
+		year,
+		day,
+		view,
+		sortFavourites,
+	}: {
+		year: number;
+		day?: string;
+		view?: string;
+		sortFavourites?: string;
+	}) => ({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
 			constants.DEFAULT_YEAR,
@@ -24,7 +35,12 @@ export const Route = createFileRoute("/track/$slug")({
 		view: view || undefined,
 		sortFavourites: sortFavourites || undefined,
 	}),
-	loaderDeps: ({ search: { year, day, view, sortFavourites } }) => ({ year, day, view, sortFavourites }),
+	loaderDeps: ({ search: { year, day, view, sortFavourites } }) => ({
+		year,
+		day,
+		view,
+		sortFavourites,
+	}),
 	loader: async ({ params, deps: { year, day } }) => {
 		const slug = decodeURIComponent(params.slug);
 		const data = (await getAllData({ data: { year } })) as Conference;
@@ -40,24 +56,31 @@ export const Route = createFileRoute("/track/$slug")({
 			data: { year, status: "favourited" },
 		});
 
-		return { fosdem: { days, track, type, eventData }, year, day, serverBookmarks };
+		return {
+			schedule: { days, track, type, eventData },
+			year,
+			day,
+			serverBookmarks,
+		};
 	},
 	head: ({ loaderData }) => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: `${loaderData?.fosdem.track?.name} | Track | FOSDEM ${loaderData?.year}`,
-				description: loaderData?.fosdem.track?.description || `${loaderData?.fosdem.track?.name} track at FOSDEM ${loaderData?.year}. ${loaderData?.fosdem.track?.eventCount} events.`,
-			})
+				title: `${loaderData?.schedule.track?.name} | Track | ${conferenceConfig.name} ${loaderData?.year}`,
+				description:
+					loaderData?.schedule.track?.description ||
+					`${loaderData?.schedule.track?.name} track at ${conferenceConfig.name} ${loaderData?.year}. ${loaderData?.schedule.track?.eventCount} events.`,
+			}),
 		],
 	}),
 	staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
 function TrackPage() {
-	const { fosdem, year, day, serverBookmarks } = Route.useLoaderData();
+	const { schedule, year, day, serverBookmarks } = Route.useLoaderData();
 	const { view, sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const resolvedDay = day ?? resolveTodayDayId(fosdem.days);
+	const resolvedDay = day ?? resolveTodayDayId(schedule.days);
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -73,7 +96,7 @@ function TrackPage() {
 		});
 	};
 
-	if (!fosdem.track) {
+	if (!schedule.track) {
 		return (
 			<PageShell>
 				<PageHeader heading="Track not found" year={year} />
@@ -88,32 +111,32 @@ function TrackPage() {
 	return (
 		<PageShell>
 			<PageHeader
-				heading={fosdem.track.name}
+				heading={schedule.track.name}
 				year={year}
 				breadcrumbs={
-					fosdem.type
-						? [{ title: fosdem.type.name, href: `/type/${fosdem.type.id}` }]
+					schedule.type
+						? [{ title: schedule.type.name, href: `/type/${schedule.type.id}` }]
 						: []
 				}
 				metadata={[
 					{
-						text: `${fosdem.track.room}`,
-						href: `/rooms/${fosdem.track.room}`,
+						text: `${schedule.track.room}`,
+						href: `/rooms/${schedule.track.room}`,
 					},
 					{
-						text: `Day ${Array.isArray(fosdem.track.day) ? fosdem.track.day.join(" and ") : fosdem.track.day}`,
+						text: `Day ${Array.isArray(schedule.track.day) ? schedule.track.day.join(" and ") : schedule.track.day}`,
 					},
 					{
-						text: `${fosdem.track.eventCount} events`,
+						text: `${schedule.track.eventCount} events`,
 					},
 				]}
 			/>
-			{fosdem.eventData?.length > 0 ? (
+			{schedule.eventData?.length > 0 ? (
 				<EventList
-					events={fosdem.eventData}
+					events={schedule.eventData}
 					year={year}
 					groupByDay={true}
-					days={fosdem.days}
+					days={schedule.days}
 					defaultViewMode="list"
 					displayViewMode={false}
 					day={resolvedDay}

@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import { Icons } from "~/components/shared/Icons";
 import { cn } from "~/lib/utils";
 

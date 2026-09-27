@@ -1,3 +1,5 @@
+import { resolveUrlTemplate } from "~/lib/url";
+import { conferenceConfig } from "@roomisfull/conference";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 
@@ -5,8 +7,8 @@ import { constants } from "~/constants";
 import { EventList } from "~/components/Event/EventList";
 import { RoomPlayer } from "~/components/Room/RoomPlayer";
 import { RoomStatus } from "~/components/Room/RoomStatus";
-import { getAllData } from "~/server/functions/fosdem";
-import type { Conference, Event, RoomData } from "~/types/fosdem";
+import { getAllData } from "~/server/functions/schedule";
+import type { Conference, Event, RoomData } from "~/types/conference";
 import { PageHeader } from "~/components/shared/PageHeader";
 import { createStandardDate } from "~/lib/dateTime";
 import { useAuth } from "~/hooks/use-auth";
@@ -20,14 +22,26 @@ import { resolveTodayDayId } from "~/lib/dateTime";
 
 export const Route = createFileRoute("/rooms/$roomId")({
 	component: RoomPage,
-	validateSearch: ({ year, day, sortFavourites }: { year: number; day?: string; sortFavourites?: string }) => ({
+	validateSearch: ({
+		year,
+		day,
+		sortFavourites,
+	}: {
+		year: number;
+		day?: string;
+		sortFavourites?: string;
+	}) => ({
 		year:
 			(constants.AVAILABLE_YEARS.includes(year) && year) ||
 			constants.DEFAULT_YEAR,
 		day: day || undefined,
 		sortFavourites: sortFavourites || undefined,
 	}),
-	loaderDeps: ({ search: { year, day, sortFavourites } }) => ({ year, day, sortFavourites }),
+	loaderDeps: ({ search: { year, day, sortFavourites } }) => ({
+		year,
+		day,
+		sortFavourites,
+	}),
 	loader: async ({ params, deps: { year, day } }) => {
 		const data = (await getAllData({ data: { year } })) as Conference;
 
@@ -57,7 +71,7 @@ export const Route = createFileRoute("/rooms/$roomId")({
 		});
 
 		return {
-			fosdem: { room, roomEvents, conference: data.conference, days },
+			schedule: { room, roomEvents, conference: data.conference, days },
 			year,
 			day,
 			serverBookmarks,
@@ -66,19 +80,19 @@ export const Route = createFileRoute("/rooms/$roomId")({
 	head: ({ loaderData }) => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: `${loaderData?.fosdem.room?.name} | Room | FOSDEM ${loaderData?.year}`,
-				description: `Events in ${loaderData?.fosdem.room?.name} at FOSDEM ${loaderData?.year}. Building ${loaderData?.fosdem.room?.buildingId || loaderData?.fosdem.room?.building?.id}.`,
-			})
+				title: `${loaderData?.schedule.room?.name} | Room | ${conferenceConfig.name} ${loaderData?.year}`,
+				description: `Events in ${loaderData?.schedule.room?.name} at ${conferenceConfig.name} ${loaderData?.year}. Building ${loaderData?.schedule.room?.buildingId || loaderData?.schedule.room?.building?.id}.`,
+			}),
 		],
 	}),
 	staleTime: 1000 * 60 * 5, // 5 minutes
 });
 
 function RoomPage() {
-	const { fosdem, day, year, serverBookmarks } = Route.useLoaderData();
+	const { schedule, day, year, serverBookmarks } = Route.useLoaderData();
 	const { sortFavourites } = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const resolvedDay = day ?? resolveTodayDayId(fosdem?.days);
+	const resolvedDay = day ?? resolveTodayDayId(schedule?.days);
 
 	const { user } = useAuth();
 	const { create: createBookmark } = useMutateBookmark({ year });
@@ -96,17 +110,16 @@ function RoomPage() {
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 
-	const roomEvents = fosdem.roomEvents;
-	const roomInfo = fosdem.room;
-	const conference = fosdem.conference;
-	const days = fosdem.days;
+	const roomEvents = schedule.roomEvents;
+	const roomInfo = schedule.room;
+	const conference = schedule.conference;
+	const days = schedule.days;
 
 	const now = createStandardDate(new Date());
 	const conferenceStart = createStandardDate(conference.start);
 	const conferenceEnd = createStandardDate(conference.end);
 	conferenceEnd.setHours(23, 59, 59, 999);
-	const isConferenceRunning =
-		now >= conferenceStart && now <= conferenceEnd;
+	const isConferenceRunning = now >= conferenceStart && now <= conferenceEnd;
 
 	if (!roomInfo) {
 		return (
@@ -143,7 +156,12 @@ function RoomPage() {
 
 				<div className="space-y-6">
 					<div>
-						<RoomStatus roomId={roomInfo.name} isRunning={isConferenceRunning} />
+						{constants.ROOMS_API && (
+							<RoomStatus
+								roomId={roomInfo.name}
+								isRunning={isConferenceRunning}
+							/>
+						)}
 					</div>
 
 					<div>
@@ -151,26 +169,29 @@ function RoomPage() {
 							Quick Links
 						</h2>
 						<div className="flex flex-col space-y-2">
-							<a
-								href={constants.CHAT_LINK.replace(
-									"${ROOM_ID}",
-									roomInfo.slug,
-								)}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								Join Chat
-							</a>
-							<a
-								href={constants.NAVIGATE_TO_LOCATION_LINK.replace(
-									"${LOCATION_ID}",
-									roomInfo.slug,
-								)}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								Navigate to Room
-							</a>
+							{constants.CHAT_LINK && (
+								<a
+									href={resolveUrlTemplate(constants.CHAT_LINK, {
+										ROOM_ID: roomInfo.slug,
+									})}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									Join Chat
+								</a>
+							)}
+							{constants.NAVIGATE_TO_LOCATION_LINK && (
+								<a
+									href={resolveUrlTemplate(
+										constants.NAVIGATE_TO_LOCATION_LINK,
+										{ LOCATION_ID: roomInfo.slug },
+									)}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									Navigate to Room
+								</a>
+							)}
 						</div>
 					</div>
 				</div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { conferenceConfig } from "@roomisfull/conference";
+
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -25,8 +27,11 @@ export function useRoomStatuses(roomNames: string[]) {
 
 	const query = useQuery({
 		queryKey: roomStatusQueryKeys.statuses(normalizedRoomNames),
-		queryFn: () => fetchRoomStatuses({ data: { roomNames: normalizedRoomNames } }),
-		enabled: normalizedRoomNames.length > 0,
+		queryFn: () =>
+			fetchRoomStatuses({ data: { roomNames: normalizedRoomNames } }),
+		enabled:
+			Boolean(conferenceConfig.integrations.roomStatus) &&
+			normalizedRoomNames.length > 0,
 		refetchInterval: 60000,
 		staleTime: 1000 * 60 * 5,
 	});

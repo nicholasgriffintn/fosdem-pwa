@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { isBrowser, off, on } from "~/lib/utils";
 import useRefState from "./use-ref-state";
 

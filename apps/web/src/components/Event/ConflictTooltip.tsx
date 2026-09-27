@@ -11,8 +11,8 @@ import {
 	DialogTrigger,
 } from "~/components/ui/dialog";
 import { Icons } from "~/components/shared/Icons";
-import type { EventConflict } from "~/lib/fosdem";
-import type { Event } from "~/types/fosdem";
+import type { EventConflict } from "~/lib/schedule";
+import type { Event } from "~/types/conference";
 import { Button } from "~/components/ui/button";
 
 type ConflictTooltipProps = {
@@ -85,14 +85,12 @@ export function ConflictTooltip({
 				>
 					<div className="flex items-center gap-1.5">
 						{priority ? (
-							<>
-								<span className="font-semibold text-sm">Priority {priority}</span>
-							</>
+							<span className="font-semibold text-sm">Priority {priority}</span>
 						) : (
-								<>
+							<>
 								<Icons.alertTriangle className="h-4 w-4" />
-									<span className="font-medium text-sm">Resolve Conflict</span>
-								</>
+								<span className="font-medium text-sm">Resolve Conflict</span>
+							</>
 						)}
 					</div>
 				</Button>
@@ -101,7 +99,8 @@ export function ConflictTooltip({
 				<DialogHeader>
 					<DialogTitle>Schedule Conflicts</DialogTitle>
 					<DialogDescription>
-						"{event.title}" overlaps with {eventConflicts.length} other bookmarked event{eventConflicts.length > 1 ? "s" : ""}.
+						"{event.title}" overlaps with {eventConflicts.length} other
+						bookmarked event{eventConflicts.length > 1 ? "s" : ""}.
 					</DialogDescription>
 				</DialogHeader>
 				<div className="space-y-4">
@@ -161,7 +160,8 @@ export function ConflictTooltip({
 							</div>
 							{!priority && (
 								<p className="text-xs text-muted-foreground mt-2">
-									This will set this event as your priority and mark conflicting events as lower priority.
+									This will set this event as your priority and mark conflicting
+									events as lower priority.
 								</p>
 							)}
 						</div>

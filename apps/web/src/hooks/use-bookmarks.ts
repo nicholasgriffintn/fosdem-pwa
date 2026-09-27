@@ -28,7 +28,7 @@ export function useBookmarks({
 }: {
 	year: number;
 	localOnly?: boolean;
-		initialServerBookmarks?: Bookmark[];
+	initialServerBookmarks?: Bookmark[];
 }): {
 	bookmarks: MergedBookmark[];
 	loading: boolean;
@@ -57,6 +57,7 @@ export function useBookmarks({
 		data: serverBookmarks,
 		isLoading: serverLoading,
 		isFetchedAfterMount: serverFetchedAfterMount,
+		dataUpdatedAt: serverUpdatedAt,
 	} = useQuery({
 		queryKey: serverQueryKey,
 		queryFn: async () => {
@@ -70,7 +71,8 @@ export function useBookmarks({
 		},
 		enabled: !!userId && !localOnly,
 		staleTime: 5 * 60 * 1000, // 5 minutes
-		initialData: userId && initialServerBookmarks ? initialServerBookmarks : undefined,
+		initialData:
+			userId && initialServerBookmarks ? initialServerBookmarks : undefined,
 	});
 
 	const mergedBookmarks = useMemo(() => {
@@ -102,19 +104,19 @@ export function useBookmarks({
 			existsOnServer: serverMap.has(local.slug),
 		}));
 
-			for (const serverBookmark of serverBookmarks) {
-				if (!localMap.has(serverBookmark.slug)) {
-					merged.push({
-						...serverBookmark,
-						id: `${serverBookmark.year}_${serverBookmark.slug}`,
-						created_at: new Date().toISOString(),
-						serverId: serverBookmark.id,
-						existsOnServer: true,
-						watch_later: serverBookmark.watch_later ?? null,
-						priority: serverBookmark.priority ?? null,
-					});
-				}
+		for (const serverBookmark of serverBookmarks) {
+			if (!localMap.has(serverBookmark.slug)) {
+				merged.push({
+					...serverBookmark,
+					id: `${serverBookmark.year}_${serverBookmark.slug}`,
+					created_at: new Date().toISOString(),
+					serverId: serverBookmark.id,
+					existsOnServer: true,
+					watch_later: serverBookmark.watch_later ?? null,
+					priority: serverBookmark.priority ?? null,
+				});
 			}
+		}
 
 		return merged;
 	}, [localOnly, userId, localBookmarks, serverBookmarks]);
@@ -126,8 +128,8 @@ export function useBookmarks({
 
 	useEffect(() => {
 		if (!serverFetchedAfterMount) return;
-		lastServerFetchAtRef.current = Date.now();
-	}, [serverFetchedAfterMount, serverBookmarks]);
+		lastServerFetchAtRef.current = serverUpdatedAt;
+	}, [serverFetchedAfterMount, serverUpdatedAt]);
 
 	useEffect(() => {
 		if (localOnly) return;
@@ -135,10 +137,22 @@ export function useBookmarks({
 		if (!serverBookmarks || !localBookmarks) return;
 		if (reconciliationPromiseRef.current) return;
 
-		const serverIds = serverBookmarks.map(b => b.id).sort().join(',');
-		const localIds = localBookmarks.map(b => b.id).sort().join(',');
-		const prevServerIds = serverBookmarksRef.current.map(b => b.id).sort().join(',');
-		const prevLocalIds = localBookmarksRef.current.map(b => b.id).sort().join(',');
+		const serverIds = serverBookmarks
+			.map((b) => b.id)
+			.sort()
+			.join(",");
+		const localIds = localBookmarks
+			.map((b) => b.id)
+			.sort()
+			.join(",");
+		const prevServerIds = serverBookmarksRef.current
+			.map((b) => b.id)
+			.sort()
+			.join(",");
+		const prevLocalIds = localBookmarksRef.current
+			.map((b) => b.id)
+			.sort()
+			.join(",");
 
 		const serverChanged = serverIds !== prevServerIds;
 		const localChanged = localIds !== prevLocalIds;
@@ -213,7 +227,8 @@ export function useBookmarks({
 					if (cancelled) break;
 					if (!serverFetchedAfterMount) continue;
 					const lastServerFetchAt = lastServerFetchAtRef.current;
-					const localTimestamp = localBookmark.updated_at ?? localBookmark.created_at;
+					const localTimestamp =
+						localBookmark.updated_at ?? localBookmark.created_at;
 					const localUpdatedAt = Date.parse(localTimestamp);
 					if (!lastServerFetchAt || Number.isNaN(localUpdatedAt)) {
 						continue;
@@ -230,12 +245,14 @@ export function useBookmarks({
 				}
 
 				if (updates.length > 0 && !cancelled) {
-					const results = await Promise.allSettled(updates.map(fn => fn()));
+					const results = await Promise.allSettled(updates.map((fn) => fn()));
 
-					const failures = results.filter(r => r.status === 'rejected');
+					const failures = results.filter((r) => r.status === "rejected");
 					if (failures.length > 0) {
-						console.error(`Failed to reconcile ${failures.length}/${updates.length} bookmarks:`,
-							failures.map((r) => r.status === 'rejected' ? r.reason : null));
+						console.error(
+							`Failed to reconcile ${failures.length}/${updates.length} bookmarks:`,
+							failures.map((r) => (r.status === "rejected" ? r.reason : null)),
+						);
 					}
 
 					await queryClient.invalidateQueries({
@@ -260,7 +277,6 @@ export function useBookmarks({
 		userId,
 		serverBookmarks,
 		localBookmarks,
-		year,
 		queryClient,
 		localQueryKey,
 		serverFetchedAfterMount,

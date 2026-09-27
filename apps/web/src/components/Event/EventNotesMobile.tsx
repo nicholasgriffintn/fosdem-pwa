@@ -10,17 +10,14 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "~/components/ui/sheet";
-import type { Event } from "~/types/fosdem";
+import type { Event } from "~/types/conference";
 
 type EventNotesMobileProps = {
 	event: Event;
 	year: number;
 };
 
-export function EventNotesMobile({
-	event,
-	year,
-}: EventNotesMobileProps) {
+export function EventNotesMobile({ event, year }: EventNotesMobileProps) {
 	return (
 		<Sheet>
 			<SheetTrigger asChild>
@@ -34,11 +31,7 @@ export function EventNotesMobile({
 					<SheetTitle>Notes</SheetTitle>
 				</SheetHeader>
 				<div className="mt-4 h-[calc(100vh-8rem)]">
-					<EventNotes
-						event={event}
-						year={year}
-						isMobile={true}
-					/>
+					<EventNotes event={event} year={year} isMobile={true} />
 				</div>
 			</SheetContent>
 		</Sheet>

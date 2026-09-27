@@ -26,8 +26,12 @@ export function useUserSettings({ userId }: { userId: string }) {
 			return data;
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: sessionQueryKeys.profile(userId) });
-			queryClient.invalidateQueries({ queryKey: bookmarkQueryKeys.userBookmarks(userId) });
+			queryClient.invalidateQueries({
+				queryKey: sessionQueryKeys.profile(userId),
+			});
+			queryClient.invalidateQueries({
+				queryKey: bookmarkQueryKeys.userBookmarks(userId),
+			});
 		},
 	});
 

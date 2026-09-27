@@ -1,0 +1,123 @@
+{
+	"conference": {
+		"acronym": "example-2027",
+		"title": "Example Conference 2027",
+		"venue": "Conference Centre",
+		"city": "New York",
+		"start": "2027-06-10",
+		"end": "2027-06-12",
+		"days": ["2027-06-10", "2027-06-11", "2027-06-12"],
+		"day_change": "00:00:00",
+		"timeslot_duration": "00:05:00",
+		"time_zone_name": "America/New_York"
+	},
+	"types": {
+		"session": {
+			"id": "session",
+			"name": "Sessions",
+			"trackCount": 1,
+			"eventCount": 1,
+			"roomCount": 1,
+			"buildingCount": 0,
+			"rooms": ["Hall A"],
+			"buildings": []
+		}
+	},
+	"buildings": {},
+	"rooms": {
+		"Hall A": {
+			"name": "Hall A",
+			"slug": "hall-a",
+			"buildingId": null,
+			"building": null,
+			"floor": null,
+			"eventCount": 1
+		}
+	},
+	"tracks": {
+		"community": {
+			"id": "community",
+			"name": "Community",
+			"type": "session",
+			"room": "Hall A",
+			"day": [1],
+			"eventCount": 1
+		}
+	},
+	"events": {
+		"opening": {
+			"id": "opening",
+			"title": "Opening session",
+			"type": "session",
+			"track": "Community",
+			"trackKey": "community",
+			"day": 1,
+			"room": "Hall A",
+			"startTime": "09:00",
+			"duration": "01:00",
+			"isLive": false,
+			"status": "running",
+			"persons": ["Alex Example"],
+			"personIds": ["alex"],
+			"links": [],
+			"attachments": [],
+			"streams": [],
+			"chat": null,
+			"abstract": "Welcome to the conference.",
+			"description": "Meet the community and plan the next three days.",
+			"url": "https://conference.example.org/sessions/opening",
+			"language": "en"
+		}
+	},
+	"persons": {
+		"alex": {
+			"id": "alex",
+			"name": "Alex Example",
+			"slug": "alex-example"
+		}
+	},
+	"days": {
+		"1": {
+			"id": 1,
+			"name": "Day 1",
+			"date": "2027-06-10",
+			"start": "2027-06-10T00:00:00-04:00",
+			"end": "2027-06-10T23:59:59-04:00",
+			"eventCount": 1,
+			"trackCount": 1,
+			"roomCount": 1,
+			"buildingCount": 0,
+			"rooms": ["Hall A"],
+			"buildings": [],
+			"tracks": ["community"]
+		},
+		"2": {
+			"id": 2,
+			"name": "Day 2",
+			"date": "2027-06-11",
+			"start": "2027-06-11T00:00:00-04:00",
+			"end": "2027-06-11T23:59:59-04:00",
+			"eventCount": 0,
+			"trackCount": 0,
+			"roomCount": 0,
+			"buildingCount": 0,
+			"rooms": [],
+			"buildings": [],
+			"tracks": []
+		},
+		"3": {
+			"id": 3,
+			"name": "Day 3",
+			"date": "2027-06-12",
+			"start": "2027-06-12T00:00:00-04:00",
+			"end": "2027-06-12T23:59:59-04:00",
+			"eventCount": 0,
+			"trackCount": 0,
+			"roomCount": 0,
+			"buildingCount": 0,
+			"rooms": [],
+			"buildings": [],
+			"tracks": []
+		}
+	}
+}

@@ -73,7 +73,8 @@ export function FavouriteButton({
 	const handleFavourite = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		if (onCreateBookmark && !isProcessing) {
-			const newStatus = currentStatus === "favourited" ? "unfavourited" : "favourited";
+			const newStatus =
+				currentStatus === "favourited" ? "unfavourited" : "favourited";
 			const previousStatus = currentStatus;
 
 			setIsProcessing(true);
@@ -91,7 +92,7 @@ export function FavouriteButton({
 					slug,
 					status: newStatus,
 				});
-			} catch (error) {
+			} catch {
 				setCurrentStatus(previousStatus);
 				toast({
 					title: "Error",
@@ -105,8 +106,7 @@ export function FavouriteButton({
 	};
 
 	if (!isClient) {
-		const nextStatus =
-			status === "favourited" ? "unfavourited" : "favourited";
+		const nextStatus = status === "favourited" ? "unfavourited" : "favourited";
 		const canSubmit = Boolean(serverUser?.id);
 
 		return (
@@ -121,9 +121,7 @@ export function FavouriteButton({
 						variant="outline"
 						disabled={!canSubmit}
 						title={
-							canSubmit
-								? "Bookmark this item"
-								: "Sign in to bookmark events"
+							canSubmit ? "Bookmark this item" : "Sign in to bookmark events"
 						}
 						type="submit"
 						className="w-full"
@@ -137,7 +135,10 @@ export function FavouriteButton({
 		);
 	}
 
-	const tooltipLabel = currentStatus === "favourited" ? "Remove from bookmarks" : "Add to bookmarks";
+	const tooltipLabel =
+		currentStatus === "favourited"
+			? "Remove from bookmarks"
+			: "Add to bookmarks";
 
 	return (
 		<div className={className}>

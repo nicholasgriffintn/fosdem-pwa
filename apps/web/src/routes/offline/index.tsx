@@ -1,15 +1,16 @@
+import { brand, conferenceConfig } from "@roomisfull/conference";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback } from "react";
 
 import { PageHeader } from "~/components/shared/PageHeader";
 import { TypesList } from "~/components/Type/TypesList";
 import { useBookmarks } from "~/hooks/use-bookmarks";
-import { useFosdemData } from "~/hooks/use-fosdem-data";
+import { useConferenceData } from "~/hooks/use-conference-data";
 import { useAuth } from "~/hooks/use-auth";
 import { BookmarksList } from "~/components/Bookmarks/BookmarksList";
 import { LoadingState } from "~/components/shared/LoadingState";
 import { Button } from "~/components/ui/button";
-import type { Event, Track } from "~/types/fosdem";
+import type { Event, Track } from "~/types/conference";
 import { isEvent, isTrack } from "~/lib/type-guards";
 import {
 	Card,
@@ -36,8 +37,8 @@ export const Route = createFileRoute("/offline/")({
 	head: () => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: "Offline | FOSDEM PWA",
-				description: "You're currently offline. Browse cached content and your local bookmarks from FOSDEM conference.",
+				title: `Offline | ${brand.name}`,
+				description: `You're currently offline. Browse cached content and your local bookmarks from ${conferenceConfig.name} conference.`,
 			}),
 		],
 	}),
@@ -52,9 +53,10 @@ function OfflinePage() {
 	});
 	const { user } = useAuth();
 
-	const currentPathname = typeof window !== "undefined" ? window.location.pathname : "";
+	const currentPathname =
+		typeof window !== "undefined" ? window.location.pathname : "";
 
-	const cachedData = useFosdemData({ year });
+	const cachedData = useConferenceData({ year });
 
 	const handleRetry = useCallback(() => {
 		if (typeof window !== "undefined") {
@@ -72,8 +74,8 @@ function OfflinePage() {
 		const isEventBookmark =
 			bookmark.type === "bookmark_event" || bookmark.type === "event";
 		const cachedItem = isEventBookmark
-			? cachedData.fosdemData?.events?.[bookmark.slug]
-			: cachedData.fosdemData?.tracks?.[bookmark.slug];
+			? cachedData.scheduleData?.events?.[bookmark.slug]
+			: cachedData.scheduleData?.tracks?.[bookmark.slug];
 
 		let title: string;
 		if (cachedItem) {
@@ -90,12 +92,15 @@ function OfflinePage() {
 
 		const detail = cachedItem?.room
 			? cachedItem.room
-			: cachedData.fosdemData
+			: cachedData.scheduleData
 				? "Not found in cached schedule"
 				: `Slug: ${bookmark.slug}`;
 
 		return {
-			kindLabel: isEventBookmark || (cachedItem && isEvent(cachedItem)) ? "Event" : "Track",
+			kindLabel:
+				isEventBookmark || (cachedItem && isEvent(cachedItem))
+					? "Event"
+					: "Track",
 			title,
 			detail,
 			isEvent: isEventBookmark || (cachedItem && isEvent(cachedItem)),
@@ -145,25 +150,27 @@ function OfflinePage() {
 					</CardContent>
 				</Card>
 
-				{cachedData.fosdemData && (
+				{cachedData.scheduleData && (
 					<Card>
 						<CardHeader>
-							<CardTitle>FOSDEM {year} Schedule</CardTitle>
+							<CardTitle>
+								{conferenceConfig.name} {year} Schedule
+							</CardTitle>
 							<CardDescription>
 								Browse the cached conference schedule
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<div className="space-y-4">
-								{cachedData.fosdemData.types && (
-									<TypesList types={cachedData.fosdemData.types} />
+								{cachedData.scheduleData.types && (
+									<TypesList types={cachedData.scheduleData.types} />
 								)}
 							</div>
 						</CardContent>
 					</Card>
 				)}
 
-				{!cachedData.fosdemData && (
+				{!cachedData.scheduleData && (
 					<Card className="mb-6">
 						<CardHeader>
 							<CardTitle>No cached schedule yet</CardTitle>
@@ -205,12 +212,16 @@ function OfflinePage() {
 					</CardHeader>
 					<CardContent>
 						{bookmarksLoading ? (
-							<LoadingState type="spinner" message="Loading bookmarks..." variant="centered" />
+							<LoadingState
+								type="spinner"
+								message="Loading bookmarks..."
+								variant="centered"
+							/>
 						) : bookmarks && bookmarks.length > 0 ? (
-							cachedData.fosdemData ? (
+							cachedData.scheduleData ? (
 								<BookmarksList
 									bookmarks={bookmarks}
-									fosdemData={cachedData.fosdemData}
+									scheduleData={cachedData.scheduleData}
 									year={year}
 									loading={bookmarksLoading}
 									defaultViewMode="list"
@@ -263,9 +274,7 @@ function OfflinePage() {
 																{display.detail}
 															</p>
 														</div>
-														<Badge variant="outline">
-															{bookmark.status}
-														</Badge>
+														<Badge variant="outline">{bookmark.status}</Badge>
 													</div>
 												</div>
 											);

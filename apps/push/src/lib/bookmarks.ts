@@ -1,6 +1,11 @@
 import { constants } from "../constants";
-import { createBrusselsDate } from "../utils/date";
-import type { FosdemEvent, Bookmark, EnrichedBookmark, Env } from "../types";
+import { createConferenceDate } from "../utils/date";
+import type {
+	ConferenceEvent,
+	Bookmark,
+	EnrichedBookmark,
+	Env,
+} from "../types";
 
 interface GetUserBookmarksOptions {
 	includeSent?: boolean;
@@ -18,8 +23,7 @@ export async function getUserBookmarks(
 	env: Env,
 	{ includeSent = false }: GetUserBookmarksOptions = {},
 ): Promise<Bookmark[]> {
-	const baseQuery =
-		`SELECT ${BOOKMARK_QUERY_COLUMNS} FROM bookmark WHERE user_id = ? AND type = 'bookmark_event' AND status = 'favourited' AND year = ?`;
+	const baseQuery = `SELECT ${BOOKMARK_QUERY_COLUMNS} FROM bookmark WHERE user_id = ? AND type = 'bookmark_event' AND status = 'favourited' AND year = ?`;
 
 	const query = includeSent
 		? baseQuery
@@ -43,10 +47,18 @@ export async function getBookmarksByUserIds(
 ): Promise<Map<string, Bookmark[]>> {
 	const bookmarksByUserId = new Map<string, Bookmark[]>();
 	const uniqueUserIds = Array.from(
-		new Set(userIds.filter((userId) => typeof userId === "string" && userId.length > 0)),
+		new Set(
+			userIds.filter(
+				(userId) => typeof userId === "string" && userId.length > 0,
+			),
+		),
 	);
 	const uniqueSlugs = slugs?.length
-		? Array.from(new Set(slugs.filter((slug) => typeof slug === "string" && slug.length > 0)))
+		? Array.from(
+				new Set(
+					slugs.filter((slug) => typeof slug === "string" && slug.length > 0),
+				),
+			)
 		: [];
 
 	if (!uniqueUserIds.length) {
@@ -87,7 +99,7 @@ export async function getBookmarksByUserIds(
 
 export function enrichBookmarks(
 	bookmarks: Bookmark[],
-	events: { [key: string]: FosdemEvent },
+	events: { [key: string]: ConferenceEvent },
 ): EnrichedBookmark[] {
 	const enriched: EnrichedBookmark[] = [];
 
@@ -112,7 +124,10 @@ export function enrichBookmarks(
 	return enriched;
 }
 
-export function getBookmarksForDay(bookmarks: EnrichedBookmark[], day: string): EnrichedBookmark[] {
+export function getBookmarksForDay(
+	bookmarks: EnrichedBookmark[],
+	day: string,
+): EnrichedBookmark[] {
 	if (!day) {
 		throw new Error(`Invalid day: ${day}`);
 	}
@@ -124,14 +139,14 @@ export function getBookmarksStartingSoon(
 	bookmarks: EnrichedBookmark[],
 	reminderMinutes = 15,
 ): EnrichedBookmark[] {
-	const nowBrussels = createBrusselsDate();
-	const year = nowBrussels.getUTCFullYear();
-	const month = nowBrussels.getUTCMonth();
-	const day = nowBrussels.getUTCDate();
+	const conferenceNow = createConferenceDate();
+	const year = conferenceNow.getUTCFullYear();
+	const month = conferenceNow.getUTCMonth();
+	const day = conferenceNow.getUTCDate();
 	const nowMinutes =
-		nowBrussels.getUTCHours() * 60 +
-		nowBrussels.getUTCMinutes() +
-		nowBrussels.getUTCSeconds() / 60;
+		conferenceNow.getUTCHours() * 60 +
+		conferenceNow.getUTCMinutes() +
+		conferenceNow.getUTCSeconds() / 60;
 	const windowMinutes = Number.isFinite(reminderMinutes)
 		? Math.max(0, reminderMinutes)
 		: 15;
@@ -151,7 +166,10 @@ export function getBookmarksStartingSoon(
 	});
 }
 
-export async function markNotificationSent(bookmarkId: string, env: Env): Promise<void> {
+export async function markNotificationSent(
+	bookmarkId: string,
+	env: Env,
+): Promise<void> {
 	const result = await env.DB.prepare(
 		"UPDATE bookmark SET last_notification_sent_at = CURRENT_TIMESTAMP WHERE id = ?",
 	)
@@ -159,6 +177,8 @@ export async function markNotificationSent(bookmarkId: string, env: Env): Promis
 		.run();
 
 	if (!result.success) {
-		throw new Error(`Failed to update last_notification_sent_at for bookmark ${bookmarkId}`);
+		throw new Error(
+			`Failed to update last_notification_sent_at for bookmark ${bookmarkId}`,
+		);
 	}
-} 
+}

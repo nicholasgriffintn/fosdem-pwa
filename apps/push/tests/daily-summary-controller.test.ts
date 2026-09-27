@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Env, Subscription, EnrichedBookmark } from "../src/types";
 
-vi.mock("../src/lib/fosdem-data", () => ({
-	getFosdemData: vi.fn(),
+vi.mock("../src/lib/conference-data", () => ({
+	getConferenceData: vi.fn(),
 	getCurrentDay: vi.fn(),
 }));
 
@@ -27,17 +27,18 @@ vi.mock("../src/lib/year-in-review", () => ({
 	refreshYearInReviewStats: vi.fn(),
 }));
 
-const { getFosdemData, getCurrentDay } = await import("../src/lib/fosdem-data");
-const { getBookmarksByUserIds, enrichBookmarks, getBookmarksForDay } = await import(
-	"../src/lib/bookmarks",
+const { getConferenceData, getCurrentDay } = await import(
+	"../src/lib/conference-data"
 );
+const { getBookmarksByUserIds, enrichBookmarks, getBookmarksForDay } =
+	await import("../src/lib/bookmarks");
 const { getApplicationKeys, sendNotification, createDailySummaryPayload } =
 	await import("../src/lib/notifications");
 const { resolveNotificationPreference } = await import(
-	"../src/lib/notification-preferences",
+	"../src/lib/notification-preferences"
 );
 const { triggerDailySummary } = await import(
-	"../src/controllers/daily-summary",
+	"../src/controllers/daily-summary"
 );
 
 type Prepared = {
@@ -102,7 +103,7 @@ afterEach(() => {
 describe("triggerDailySummary", () => {
 	it("skips when daily summary preference is disabled", async () => {
 		(getCurrentDay as vi.Mock).mockReturnValue("1");
-		(getFosdemData as vi.Mock).mockResolvedValue({ events: {} });
+		(getConferenceData as vi.Mock).mockResolvedValue({ events: {} });
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
 		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,
@@ -124,7 +125,7 @@ describe("triggerDailySummary", () => {
 
 	it("filters low priority bookmarks when disabled", async () => {
 		(getCurrentDay as vi.Mock).mockReturnValue("1");
-		(getFosdemData as vi.Mock).mockResolvedValue({ events: {} });
+		(getConferenceData as vi.Mock).mockResolvedValue({ events: {} });
 		(getApplicationKeys as vi.Mock).mockResolvedValue({});
 		(resolveNotificationPreference as vi.Mock).mockReturnValue({
 			reminder_minutes_before: 15,

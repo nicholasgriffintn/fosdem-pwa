@@ -36,6 +36,7 @@ export function PushNotifications() {
 		}
 
 		return (
+			Boolean(constants.VAPID_PUBLIC_KEY) &&
 			"serviceWorker" in navigator &&
 			typeof Notification !== "undefined" &&
 			"PushManager" in window
@@ -156,39 +157,39 @@ export function PushNotifications() {
 		}
 	}, [pushSupported, subscriptions, createSubscription]);
 
-	const handleUnsubscribe = useCallback(async (
-		subscriptionId: number,
-		endpoint: string,
-	) => {
-		if (!pushSupported) {
-			return;
-		}
-
-		try {
-			await deleteSubscription({ id: subscriptionId });
-
-			if (endpoint === currentEndpoint) {
-				const registration = await navigator.serviceWorker.ready;
-				const subscription = await registration.pushManager.getSubscription();
-				if (subscription) {
-					await subscription.unsubscribe();
-					setCurrentEndpoint(null);
-				}
+	const handleUnsubscribe = useCallback(
+		async (subscriptionId: number, endpoint: string) => {
+			if (!pushSupported) {
+				return;
 			}
 
-			toast({
-				title: "Unsubscribed from notifications",
-				description: "This device will no longer receive notifications",
-			});
-		} catch (error) {
-			console.error("Error unsubscribing from push notifications:", error);
-			toast({
-				title: "Failed to unsubscribe",
-				description: "Please try again",
-				variant: "destructive",
-			});
-		}
-	}, [pushSupported, currentEndpoint, deleteSubscription]);
+			try {
+				await deleteSubscription({ id: subscriptionId });
+
+				if (endpoint === currentEndpoint) {
+					const registration = await navigator.serviceWorker.ready;
+					const subscription = await registration.pushManager.getSubscription();
+					if (subscription) {
+						await subscription.unsubscribe();
+						setCurrentEndpoint(null);
+					}
+				}
+
+				toast({
+					title: "Unsubscribed from notifications",
+					description: "This device will no longer receive notifications",
+				});
+			} catch (error) {
+				console.error("Error unsubscribing from push notifications:", error);
+				toast({
+					title: "Failed to unsubscribe",
+					description: "Please try again",
+					variant: "destructive",
+				});
+			}
+		},
+		[pushSupported, currentEndpoint, deleteSubscription],
+	);
 
 	return (
 		<div className="space-y-4">
@@ -200,79 +201,53 @@ export function PushNotifications() {
 				</p>
 			)}
 			{subscriptionsLoading ? (
-				<LoadingState type="spinner" message="Loading subscriptions..." variant="centered" />
-			) : (
-				<>
-					{subscriptions && subscriptions.length > 0 ? (
-						<div className="space-y-4">
-							<p>Your subscribed devices:</p>
-							<div className="flex flex-col gap-2">
-								{subscriptions.map((subscription) => (
-									<div
-										key={subscription.id}
-										className="flex items-center justify-between p-4 border rounded-lg"
-									>
-										<div className="flex flex-col">
-											<span>
-												Subscription created at{" "}
-												{new Date(subscription.created_at).toLocaleString()}
-											</span>
-											{subscription.endpoint === currentEndpoint && (
-												<span className="text-sm text-muted-foreground">
-													(Current device)
-												</span>
-											)}
-										</div>
-										<Button
-											variant="destructive"
-											onClick={() =>
-												handleUnsubscribe(
-													subscription.id,
-													subscription.endpoint,
-												)
-											}
-											disabled={deleteSubscriptionLoading || !pushSupported}
-										>
-											{deleteSubscriptionLoading ? (
-												<LoadingState type="spinner" size="sm" variant="inline" />
-											) : (
-												"Unsubscribe"
-											)}
-										</Button>
-									</div>
-								))}
-							</div>
-							{!currentEndpoint && (
-								<div className="flex items-center justify-between py-4 mt-4 border-t">
-									<div className="space-y-0.5">
-										<Label htmlFor="push-notifications">Add this device</Label>
-										<p className="text-sm text-muted-foreground">
-											Subscribe this device to receive notifications
-										</p>
-									</div>
-									<Button
-										variant="outline"
-										onClick={handleSubscribe}
-										disabled={createSubscriptionLoading || !pushSupported}
-									>
-										{createSubscriptionLoading ? (
-												<LoadingState type="spinner" size="sm" variant="inline" />
-										) : (
-											"Subscribe"
-										)}
-									</Button>
+				<LoadingState
+					type="spinner"
+					message="Loading subscriptions..."
+					variant="centered"
+				/>
+			) : subscriptions && subscriptions.length > 0 ? (
+				<div className="space-y-4">
+					<p>Your subscribed devices:</p>
+					<div className="flex flex-col gap-2">
+						{subscriptions.map((subscription) => (
+							<div
+								key={subscription.id}
+								className="flex items-center justify-between p-4 border rounded-lg"
+							>
+								<div className="flex flex-col">
+									<span>
+										Subscription created at{" "}
+										{new Date(subscription.created_at).toLocaleString()}
+									</span>
+									{subscription.endpoint === currentEndpoint && (
+										<span className="text-sm text-muted-foreground">
+											(Current device)
+										</span>
+									)}
 								</div>
-							)}
-						</div>
-					) : (
-						<div className="flex items-center justify-between py-4">
+								<Button
+									variant="destructive"
+									onClick={() =>
+										handleUnsubscribe(subscription.id, subscription.endpoint)
+									}
+									disabled={deleteSubscriptionLoading || !pushSupported}
+								>
+									{deleteSubscriptionLoading ? (
+										<LoadingState type="spinner" size="sm" variant="inline" />
+									) : (
+										"Unsubscribe"
+									)}
+								</Button>
+							</div>
+						))}
+					</div>
+					{!currentEndpoint && (
+						<div className="flex items-center justify-between py-4 mt-4 border-t">
 							<div className="space-y-0.5">
-								<Label htmlFor="push-notifications">
-									Subscribe to push notifications
-								</Label>
+								<Label htmlFor="push-notifications">Add this device</Label>
 								<p className="text-sm text-muted-foreground">
-									You'll receive notifications for when events from your
-									schedule are starting.
+									Subscribe this device to receive notifications
 								</p>
 							</div>
 							<Button
@@ -281,14 +256,37 @@ export function PushNotifications() {
 								disabled={createSubscriptionLoading || !pushSupported}
 							>
 								{createSubscriptionLoading ? (
-											<LoadingState type="spinner" size="sm" variant="inline" />
+									<LoadingState type="spinner" size="sm" variant="inline" />
 								) : (
 									"Subscribe"
 								)}
 							</Button>
 						</div>
 					)}
-				</>
+				</div>
+			) : (
+				<div className="flex items-center justify-between py-4">
+					<div className="space-y-0.5">
+						<Label htmlFor="push-notifications">
+							Subscribe to push notifications
+						</Label>
+						<p className="text-sm text-muted-foreground">
+							You'll receive notifications for when events from your schedule
+							are starting.
+						</p>
+					</div>
+					<Button
+						variant="outline"
+						onClick={handleSubscribe}
+						disabled={createSubscriptionLoading || !pushSupported}
+					>
+						{createSubscriptionLoading ? (
+							<LoadingState type="spinner" size="sm" variant="inline" />
+						) : (
+							"Subscribe"
+						)}
+					</Button>
+				</div>
 			)}
 
 			{subscriptions && subscriptions.length > 0 && (
@@ -302,10 +300,7 @@ export function PushNotifications() {
 								Customize which notifications you want to receive
 							</p>
 						</div>
-						<Button
-							variant="outline"
-							onClick={() => setPreferencesOpen(true)}
-						>
+						<Button variant="outline" onClick={() => setPreferencesOpen(true)}>
 							Configure
 						</Button>
 					</div>
@@ -313,7 +308,10 @@ export function PushNotifications() {
 			)}
 
 			<Sheet open={preferencesOpen} onOpenChange={setPreferencesOpen}>
-				<SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+				<SheetContent
+					side="right"
+					className="w-full sm:max-w-md overflow-y-auto"
+				>
 					<SheetHeader>
 						<SheetTitle>Notification Preferences</SheetTitle>
 						<SheetDescription>

@@ -1,3 +1,4 @@
+import { brand } from "@roomisfull/conference";
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { SignInForm } from "~/components/Profile/SignInForm";
 import { PageHeader } from "~/components/shared/PageHeader";
@@ -22,9 +23,8 @@ export const Route = createFileRoute("/signin/")({
 	head: () => ({
 		meta: [
 			...generateCommonSEOTags({
-				title: "Sign In | FOSDEM PWA",
-				description:
-					"Sign in to FOSDEM PWA to sync bookmarks across devices and share your conference schedule.",
+				title: `Sign In | ${brand.name}`,
+				description: `Sign in to ${brand.name} to sync bookmarks across devices and share your conference schedule.`,
 			}),
 		],
 	}),
@@ -48,7 +48,7 @@ function SignInPage() {
 			<div className="flex flex-col gap-8">
 				<div className="space-y-6">
 					<p className="text-lg text-muted-foreground">
-						FOSDEM PWA works fully offline and locally. Signing in is optional
+						{brand.name} works fully offline and locally. Signing in is optional
 						and only enables syncing across devices and sharing your schedule.
 					</p>
 					<p className="text-sm text-muted-foreground">

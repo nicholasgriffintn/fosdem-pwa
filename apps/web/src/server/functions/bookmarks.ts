@@ -7,7 +7,6 @@ import {
 	findBookmarksByUserAndStatus,
 	findBookmarksByUserAndYear,
 	findBookmark,
-	findBookmarkById,
 	upsertBookmark,
 	updateBookmark as updateBookmarkRepo,
 	deleteBookmark as deleteBookmarkRepo,
@@ -18,7 +17,9 @@ import type { Bookmark } from "~/server/db/schema";
 export const getBookmarks = createServerFn({
 	method: "GET",
 })
-	.validator((data: { year: number; status: "favourited" | "unfavourited" }) => data)
+	.validator(
+		(data: { year: number; status: "favourited" | "unfavourited" }) => data,
+	)
 	.handler(async (ctx): Promise<Bookmark[]> => {
 		const { year, status } = ctx.data;
 		const yearNum = validateYear(year);
@@ -58,7 +59,7 @@ export const createBookmark = createServerFn({
 			slug: string;
 			status: string;
 			returnTo?: string;
-		}) => data
+		}) => data,
 	)
 	.handler(async (ctx): Promise<Result<boolean> | Response | null> => {
 		const { year, type, slug, status, returnTo } = ctx.data;
@@ -69,7 +70,7 @@ export const createBookmark = createServerFn({
 
 		const user = await getAuthUser();
 		if (!user) {
-			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+			if (returnTo?.startsWith("/") && !returnTo.startsWith("//")) {
 				return new Response(null, {
 					status: 303,
 					headers: {
@@ -89,7 +90,7 @@ export const createBookmark = createServerFn({
 			const yearNum = validateYear(year);
 			await upsertBookmark(user.id, yearNum, type, slug, status);
 
-			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+			if (returnTo?.startsWith("/") && !returnTo.startsWith("//")) {
 				return new Response(null, {
 					status: 303,
 					headers: {
@@ -102,7 +103,7 @@ export const createBookmark = createServerFn({
 		} catch (error) {
 			console.error(error);
 
-			if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+			if (returnTo?.startsWith("/") && !returnTo.startsWith("//")) {
 				return new Response(null, {
 					status: 303,
 					headers: {
@@ -164,7 +165,10 @@ export const createBookmarkFromForm = createServerFn({
 		return new Response(null, {
 			status: 303,
 			headers: {
-				Location: returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/",
+				Location:
+					returnTo?.startsWith("/") && !returnTo.startsWith("//")
+						? returnTo
+						: "/",
 			},
 		});
 	});
@@ -176,7 +180,11 @@ export const updateBookmark = createServerFn({
 	.handler(async (ctx): Promise<Result<boolean> | null> => {
 		const { id, updates } = ctx.data;
 
-		const allowedFields = ["status", "priority", "last_notification_sent_at"] as const;
+		const allowedFields = [
+			"status",
+			"priority",
+			"last_notification_sent_at",
+		] as const;
 		type AllowedField = (typeof allowedFields)[number];
 		const safeUpdates: Partial<Pick<Bookmark, AllowedField>> = {};
 
@@ -188,8 +196,14 @@ export const updateBookmark = createServerFn({
 				if (key === "priority" && value !== null && typeof value !== "number") {
 					return err(`Invalid type for ${key}: expected number or null`);
 				}
-				if (key === "last_notification_sent_at" && value !== null && typeof value !== "string") {
-					return err(`Invalid type for ${key}: expected ISO date string or null`);
+				if (
+					key === "last_notification_sent_at" &&
+					value !== null &&
+					typeof value !== "string"
+				) {
+					return err(
+						`Invalid type for ${key}: expected ISO date string or null`,
+					);
 				}
 				(safeUpdates as Record<string, unknown>)[key] = value;
 			}

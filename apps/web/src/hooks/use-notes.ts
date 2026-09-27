@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef } from "react";
 
-import type { Event } from "~/types/fosdem";
+import type { Event } from "~/types/conference";
 import { getNotes, createNote } from "~/server/functions/notes";
 import { useAuth } from "~/hooks/use-auth";
 import { useLocalNotes } from "~/hooks/use-local-notes";
@@ -91,7 +91,10 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 			return {
 				...local,
-				serverId: matchingServerNote && hasId(matchingServerNote) ? matchingServerNote.id : undefined,
+				serverId:
+					matchingServerNote && hasId(matchingServerNote)
+						? matchingServerNote.id
+						: undefined,
 				existsOnServer: !!matchingServerNote,
 				isPending: !!user?.id && !matchingServerNote,
 			};
@@ -245,7 +248,9 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 				const localServerIdMap = new Map(
 					localNotes
-						.filter((note): note is LocalNote & { serverId: number } => isNumber(note.serverId))
+						.filter((note): note is LocalNote & { serverId: number } =>
+							isNumber(note.serverId),
+						)
 						.map((note) => [String(note.serverId), note]),
 				);
 
@@ -260,7 +265,7 @@ export function useNotes({ year, event }: UseNotesArgs) {
 							const needsUpdate =
 								existingLocalByServerId.note !== serverNote.note ||
 								(existingLocalByServerId.time ?? null) !==
-								(serverNote.time ?? null);
+									(serverNote.time ?? null);
 
 							if (needsUpdate) {
 								await persistUpdateLocalNote(
@@ -314,12 +319,14 @@ export function useNotes({ year, event }: UseNotesArgs) {
 
 				const results = await Promise.allSettled(operations);
 				const failures = results.filter(
-					(r) => r.status === "rejected" || (r.status === "fulfilled" && r.value?.status === "failed")
+					(r) =>
+						r.status === "rejected" ||
+						(r.status === "fulfilled" && r.value?.status === "failed"),
 				);
 
 				if (failures.length > 0) {
 					console.warn(
-						`Note reconciliation completed with ${failures.length} failures out of ${results.length} operations`
+						`Note reconciliation completed with ${failures.length} failures out of ${results.length} operations`,
 					);
 				}
 

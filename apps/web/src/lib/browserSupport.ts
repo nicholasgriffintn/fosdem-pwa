@@ -1,7 +1,7 @@
 export const shareSupported = () => {
 	try {
 		return "share" in navigator && "canShare" in navigator;
-	} catch (error) {
+	} catch {
 		return false;
 	}
 };
@@ -9,7 +9,7 @@ export const shareSupported = () => {
 export const clipboardSupported = () => {
 	try {
 		return "clipboard" in navigator;
-	} catch (error) {
+	} catch {
 		return false;
 	}
 };

@@ -3,12 +3,8 @@
 import { constants } from "~/constants";
 import { Icons } from "~/components/shared/Icons";
 import { useIsClient } from "~/hooks/use-is-client";
-import {
-	isEventFinished,
-	createStandardDate,
-	getEventDateTime,
-} from "~/lib/dateTime";
-import type { Event, ConferenceData } from "~/types/fosdem";
+import { isEventFinished, getEventDateTime } from "~/lib/dateTime";
+import type { Event, ConferenceData } from "~/types/conference";
 
 export function EventPlayerNotStarted({
 	event,
@@ -25,8 +21,7 @@ export function EventPlayerNotStarted({
 		: false;
 
 	const eventStart = isClient ? getEventDateTime(event, conference) : null;
-	const now =
-		isClient && referenceTime ? createStandardDate(referenceTime) : null;
+	const now = isClient && referenceTime ? referenceTime : null;
 
 	const timeUntilStartMs =
 		eventStart != null && now != null

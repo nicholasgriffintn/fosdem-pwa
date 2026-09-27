@@ -1,6 +1,6 @@
 import type { FuseResult, FuseOptionKey } from "fuse.js";
 
-import type { Event, Track, RoomData } from "~/types/fosdem";
+import type { Event, Track, RoomData } from "~/types/conference";
 import { doesEventMatchTrack } from "~/lib/tracks";
 import { isEvent } from "~/lib/type-guards";
 
@@ -73,11 +73,13 @@ export function formatSearchResults<T>(
 
 export function formatTrack(
 	track: Track,
-	fosdemEvents: Record<string, Event>,
+	scheduleEvents: Record<string, Event>,
 ): Track {
-	const eventCount = track.eventCount ?? Object.values(fosdemEvents || {}).filter((event) =>
-		isEvent(event) && doesEventMatchTrack(event, track),
-	).length;
+	const eventCount =
+		track.eventCount ??
+		Object.values(scheduleEvents || {}).filter(
+			(event) => isEvent(event) && doesEventMatchTrack(event, track),
+		).length;
 
 	return {
 		id: track.id,
