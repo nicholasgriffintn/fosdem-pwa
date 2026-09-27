@@ -9,7 +9,7 @@ import { getBuildDeployment } from "./build/deployment.ts";
 
 const deployment = getBuildDeployment();
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ command, mode, isPreview }) => ({
 	define: {
 		__CONFERENCE_ID__: JSON.stringify(deployment.conference?.id ?? null),
 	},
@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
 		tsconfigPaths: true,
 	},
 	plugins: [
-		devtools(),
+		command === "serve" && mode === "development" && !isPreview && devtools(),
 		conferenceAssets(deployment),
 		cloudflare({
 			viteEnvironment: { name: "ssr" },

@@ -10,7 +10,7 @@
 		"dev:fosdem": "CLOUDFLARE_ENV=fosdem vite dev --port 3000",
 		"build:sw": "tsx ./scripts/generate-sw.ts",
 		"build": "NODE_ENV=production vite build && pnpm build:sw",
-		"build:fosdem": "CLOUDFLARE_ENV=fosdem vite build && pnpm build:sw",
+		"build:fosdem": "CLOUDFLARE_ENV=fosdem pnpm build",
 		"preview": "vite preview",
 		"preview:fosdem": "CLOUDFLARE_ENV=fosdem vite preview",
 		"start": "node .output/server/index.mjs",

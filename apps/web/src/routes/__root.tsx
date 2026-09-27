@@ -6,7 +6,6 @@ import {
 	HeadContent,
 	Scripts,
 } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 import appCss from "~/styles/app.css?url";
@@ -30,26 +29,9 @@ import { BottomTabNav } from "~/components/BottomTabNav";
 import { navItems } from "~/components/shared/NavItems";
 import { BookmarkConflictNotice } from "~/components/shared/BookmarkConflictNotice";
 import { CanonicalMetadata } from "~/components/shared/CanonicalMetadata";
+import { DevelopmentTools } from "~/components/shared/DevelopmentTools";
 import { ThemeScript } from "~/components/shared/ThemeScript";
 import { conferenceConfig } from "@roomisfull/conference";
-
-const ReactQueryDevtools =
-	process.env.NODE_ENV !== "development"
-		? () => null
-		: lazy(() =>
-				import("@tanstack/react-query-devtools").then((res) => ({
-					default: res.ReactQueryDevtools,
-				})),
-			);
-
-const TanStackRouterDevtools =
-	process.env.NODE_ENV !== "development"
-		? () => null
-		: lazy(() =>
-				import("@tanstack/react-router-devtools").then((res) => ({
-					default: res.TanStackRouterDevtools,
-				})),
-			);
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 	{
@@ -163,12 +145,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 					</div>
 					<BottomTabNav items={navItems} />
 					<Footer />
-					<Suspense>
-						<ReactQueryDevtools buttonPosition="bottom-left" />
-					</Suspense>
-					<Suspense>
-						<TanStackRouterDevtools position="bottom-right" />
-					</Suspense>
+					<DevelopmentTools />
 					<OfflineIndicator />
 					<ServiceWorkerUpdater />
 					<FloatingPlayer />
