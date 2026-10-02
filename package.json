@@ -2,7 +2,7 @@
 	"name": "roomisfull",
 	"version": "0.2025.1",
 	"private": true,
-	"packageManager": "pnpm@10.34.5",
+	"packageManager": "pnpm@12.8.1",
 	"engines": {
 		"node": ">=22.0.0"
 	},
