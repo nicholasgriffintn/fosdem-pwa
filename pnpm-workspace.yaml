@@ -3,4 +3,4 @@ packages:
   - "packages/*"
 overrides:
   "nanoid@<3.3.17": "6.0.1"
-  "undici@>=7.0.0 <7.29.0": "7.29.1"
+  "undici@>=7.0.0 <7.29.0": "7.30.0"
